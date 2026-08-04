@@ -1,4 +1,6 @@
 # Miscellaneous
+.idea/
+*.iml
 *.class
 *.lock
 *.log
