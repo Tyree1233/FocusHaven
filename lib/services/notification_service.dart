@@ -16,16 +16,50 @@ class NotificationService {
 
     try {
       await _notifications.initialize(settings);
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        await _notifications
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>()
-            ?.requestPermission();
-      }
+      await requestPermissions();
     } catch (error) {
       debugPrint('Notification setup failed: $error');
     }
   }
+
+  Future<bool> requestPermissions() async {
+    if (kIsWeb) return false;
+
+    try {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+          return (await _notifications
+                  .resolvePlatformSpecificImplementation<
+                      AndroidFlutterLocalNotificationsPlugin>()
+                  ?.requestPermission()) ??
+              false;
+        case TargetPlatform.iOS:
+          return (await _notifications
+                  .resolvePlatformSpecificImplementation<
+                      IOSFlutterLocalNotificationsPlugin>()
+                  ?.requestPermissions(alert: true, sound: true)) ??
+              false;
+        case TargetPlatform.macOS:
+          return (await _notifications
+                  .resolvePlatformSpecificImplementation<
+                      MacOSFlutterLocalNotificationsPlugin>()
+                  ?.requestPermissions(alert: true, sound: true)) ??
+              false;
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.linux:
+        case TargetPlatform.windows:
+          return false;
+      }
+    } catch (error) {
+      debugPrint('Notification permission request failed: $error');
+      return false;
+    }
+  }
+
+  Future<void> showTestNotification() => showSessionComplete(
+        title: 'FocusHaven notifications are ready',
+        body: 'You will see an alert when your focus timer ends.',
+      );
 
   Future<void> showSessionComplete({
     required String title,

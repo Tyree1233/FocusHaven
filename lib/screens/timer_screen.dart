@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/iap_service.dart';
+import '../services/notification_service.dart';
 import '../services/timer_service.dart';
 
 class TimerScreen extends StatelessWidget {
@@ -166,6 +167,24 @@ class TimerScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('FocusHaven'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_active_outlined),
+            tooltip: 'Test notifications',
+            onPressed: () async {
+              final notifications = context.read<NotificationService>();
+              final granted = await notifications.requestPermissions();
+              if (!context.mounted) return;
+              if (!granted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Enable FocusHaven notifications in macOS System Settings.'),
+                  ),
+                );
+                return;
+              }
+              await notifications.showTestNotification();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.account_circle_outlined),
             tooltip: 'Sign in with Google',
