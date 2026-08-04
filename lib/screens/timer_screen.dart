@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,27 +32,93 @@ class TimerScreen extends StatelessWidget {
   }
 
   Future<void> _chooseCustomDuration(BuildContext context, TimerService timer) async {
-    final controller = TextEditingController(text: '${timer.totalSessionSeconds ~/ 60}');
-    final minutes = await showDialog<int>(
+    const maximumMinutes = 180;
+    final initialMinutes = (timer.totalSessionSeconds ~/ 60).clamp(1, maximumMinutes).toInt();
+    var selectedMinutes = initialMinutes;
+    final pickerController = FixedExtentScrollController(initialItem: initialMinutes - 1);
+
+    final minutes = await showModalBottomSheet<int>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('${timer.sessionType.label} duration'),
-        content: TextField(
-          autofocus: true,
-          controller: controller,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(labelText: 'Minutes', hintText: '25'),
-          onSubmitted: (value) => Navigator.pop(dialogContext, int.tryParse(value)),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, int.tryParse(controller.text)),
-            child: const Text('Save'),
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF352260),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 4,
+                  width: 42,
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)),
+                ),
+                const SizedBox(height: 20),
+                Text('${timer.sessionType.label} duration', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 8),
+                const Text('Tap a favorite or scroll to choose minutes.', style: TextStyle(color: Colors.white70)),
+                const SizedBox(height: 18),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [5, 10, 15, 25, 45, 60]
+                      .map(
+                        (minutes) => ChoiceChip(
+                          label: Text('$minutes min'),
+                          selected: selectedMinutes == minutes,
+                          onSelected: (_) {
+                            setSheetState(() => selectedMinutes = minutes);
+                            pickerController.animateToItem(
+                              minutes - 1,
+                              duration: const Duration(milliseconds: 220),
+                              curve: Curves.easeOut,
+                            );
+                          },
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  height: 150,
+                  child: CupertinoPicker.builder(
+                    scrollController: pickerController,
+                    itemExtent: 42,
+                    selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                      background: _pink.withValues(alpha: 0.15),
+                    ),
+                    onSelectedItemChanged: (index) => setSheetState(() => selectedMinutes = index + 1),
+                    childCount: maximumMinutes,
+                    itemBuilder: (context, index) => Center(
+                      child: Text('${index + 1} minutes', style: const TextStyle(fontSize: 22)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.pop(sheetContext, selectedMinutes),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _pink,
+                      foregroundColor: _ink,
+                      minimumSize: const Size.fromHeight(54),
+                    ),
+                    child: Text('Set $selectedMinutes minutes'),
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
+    pickerController.dispose();
     if (minutes != null && minutes > 0) timer.setCustomMinutes(minutes);
   }
 
