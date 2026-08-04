@@ -1,6 +1,8 @@
 #include "../../Flutter/Flutter-Debug.xcconfig"
 #include "Warnings.xcconfig"
 
-// Local development builds do not need an Apple signing identity. Skipping
-// signing avoids Finder metadata errors when running the app from this Mac.
-CODE_SIGNING_ALLOWED=NO
+// Ad-hoc signing gives this local build a stable macOS app identity without
+// requiring an Apple Developer certificate. It is needed for notifications.
+CODE_SIGNING_ALLOWED=YES
+CODE_SIGN_IDENTITY=-
+COPYFILE_DISABLE=1
