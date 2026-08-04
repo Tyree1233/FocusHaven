@@ -1,12 +1,26 @@
 # FocusHaven
 
-A calming focus-timer app for the web, iPhone, and Android. The first screen includes a 25-minute focus timer, pause/reset controls, and the FocusHaven visual identity.
+A Flutter focus-timer app for the web, iPhone, and Android. It includes onboarding, a 25-minute timer, Firebase-backed timer settings for Pro users, and the FocusHaven brand asset.
 
-## Run locally
+## Get started
+
+Install the [Flutter SDK](https://docs.flutter.dev/get-started/install), then generate the platform folders and fetch packages:
 
 ```bash
-npm install
-npm start
+flutter create . --platforms=android,ios,web
+flutter pub get
+flutter run -d chrome
 ```
 
-Use `npm run web`, `npm run ios`, or `npm run android` to open a specific platform.
+Use `flutter run -d ios` or `flutter run -d android` to launch a device or simulator.
+
+## Firebase setup
+
+Firebase packages are included, but credentials are intentionally not committed. Configure your Firebase project before running the app:
+
+```bash
+dart pub global activate flutterfire_cli
+flutterfire configure
+```
+
+This generates `lib/firebase_options.dart` and the platform configuration files. Then update `lib/main.dart` to initialize Firebase with the generated options before releasing.
