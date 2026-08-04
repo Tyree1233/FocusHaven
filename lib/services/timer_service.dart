@@ -122,21 +122,23 @@ class TimerService extends ChangeNotifier {
     }
   }
 
-  void setCustomMinutes(int minutes) {
-    final seconds = (minutes * 60).clamp(60, 24 * 60 * 60).toInt();
+  void setCustomDuration(int minutes, int seconds) {
+    final totalSeconds = (minutes * 60 + seconds).clamp(1, 24 * 60 * 60).toInt();
     switch (_sessionType) {
       case SessionType.focus:
-        _focusSeconds = seconds;
+        _focusSeconds = totalSeconds;
         break;
       case SessionType.shortBreak:
-        _shortBreakSeconds = seconds;
+        _shortBreakSeconds = totalSeconds;
         break;
       case SessionType.longBreak:
-        _longBreakSeconds = seconds;
+        _longBreakSeconds = totalSeconds;
         break;
     }
     reset();
   }
+
+  void setCustomMinutes(int minutes) => setCustomDuration(minutes, 0);
 
   void _finishSession() {
     _ticker?.cancel();

@@ -33,11 +33,14 @@ class TimerScreen extends StatelessWidget {
 
   Future<void> _chooseCustomDuration(BuildContext context, TimerService timer) async {
     const maximumMinutes = 180;
-    final initialMinutes = (timer.totalSessionSeconds ~/ 60).clamp(1, maximumMinutes).toInt();
+    final initialMinutes = (timer.totalSessionSeconds ~/ 60).clamp(0, maximumMinutes).toInt();
+    final initialSeconds = timer.totalSessionSeconds % 60;
     var selectedMinutes = initialMinutes;
-    final pickerController = FixedExtentScrollController(initialItem: initialMinutes - 1);
+    var selectedSeconds = initialSeconds;
+    final pickerController = FixedExtentScrollController(initialItem: initialMinutes);
+    final secondsPickerController = FixedExtentScrollController(initialItem: initialSeconds);
 
-    final minutes = await showModalBottomSheet<int>(
+    final duration = await showModalBottomSheet<Duration>(
       context: context,
       isScrollControlled: true,
       backgroundColor: const Color(0xFF352260),
@@ -60,7 +63,7 @@ class TimerScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 Text('${timer.sessionType.label} duration', style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
-                const Text('Tap a favorite or scroll to choose minutes.', style: TextStyle(color: Colors.white70)),
+                const Text('Tap a favorite or scroll minutes and seconds.', style: TextStyle(color: Colors.white70)),
                 const SizedBox(height: 18),
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -72,9 +75,17 @@ class TimerScreen extends StatelessWidget {
                           label: Text('$minutes min'),
                           selected: selectedMinutes == minutes,
                           onSelected: (_) {
-                            setSheetState(() => selectedMinutes = minutes);
+                            setSheetState(() {
+                              selectedMinutes = minutes;
+                              selectedSeconds = 0;
+                            });
                             pickerController.animateToItem(
-                              minutes - 1,
+                              minutes,
+                              duration: const Duration(milliseconds: 220),
+                              curve: Curves.easeOut,
+                            );
+                            secondsPickerController.animateToItem(
+                              0,
                               duration: const Duration(milliseconds: 220),
                               curve: Curves.easeOut,
                             );
@@ -86,30 +97,50 @@ class TimerScreen extends StatelessWidget {
                 const SizedBox(height: 18),
                 SizedBox(
                   height: 150,
-                  child: CupertinoPicker.builder(
-                    scrollController: pickerController,
-                    itemExtent: 42,
-                    selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
-                      background: _pink.withValues(alpha: 0.15),
-                    ),
-                    onSelectedItemChanged: (index) => setSheetState(() => selectedMinutes = index + 1),
-                    childCount: maximumMinutes,
-                    itemBuilder: (context, index) => Center(
-                      child: Text('${index + 1} minutes', style: const TextStyle(fontSize: 22)),
-                    ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CupertinoPicker.builder(
+                          scrollController: pickerController,
+                          itemExtent: 42,
+                          selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                            background: _pink.withValues(alpha: 0.15),
+                          ),
+                          onSelectedItemChanged: (index) => setSheetState(() => selectedMinutes = index),
+                          childCount: maximumMinutes + 1,
+                          itemBuilder: (context, index) => Center(
+                            child: Text('$index min', style: const TextStyle(fontSize: 22)),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: CupertinoPicker.builder(
+                          scrollController: secondsPickerController,
+                          itemExtent: 42,
+                          selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                            background: _pink.withValues(alpha: 0.15),
+                          ),
+                          onSelectedItemChanged: (index) => setSheetState(() => selectedSeconds = index),
+                          childCount: 60,
+                          itemBuilder: (context, index) => Center(
+                            child: Text('${index.toString().padLeft(2, '0')} sec', style: const TextStyle(fontSize: 22)),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 18),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: () => Navigator.pop(sheetContext, selectedMinutes),
+                    onPressed: () => Navigator.pop(sheetContext, Duration(minutes: selectedMinutes, seconds: selectedSeconds)),
                     style: FilledButton.styleFrom(
                       backgroundColor: _pink,
                       foregroundColor: _ink,
                       minimumSize: const Size.fromHeight(54),
                     ),
-                    child: Text('Set $selectedMinutes minutes'),
+                    child: Text('Set ${selectedMinutes.toString().padLeft(2, '0')}:${selectedSeconds.toString().padLeft(2, '0')}'),
                   ),
                 ),
               ],
@@ -119,7 +150,10 @@ class TimerScreen extends StatelessWidget {
       ),
     );
     pickerController.dispose();
-    if (minutes != null && minutes > 0) timer.setCustomMinutes(minutes);
+    secondsPickerController.dispose();
+    if (duration != null && duration.inSeconds > 0) {
+      timer.setCustomDuration(duration.inMinutes, duration.inSeconds % 60);
+    }
   }
 
   @override
