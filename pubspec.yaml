@@ -23,4 +23,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/focushaven-logo.png
-flutterfire configure --project=focushaven-68c59 --platforms=android,ios,macos,web
+flutterfire configure --project=focushaven-68c59 --platforms=android,ios,macos,weblib/firebase_options.dart
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
