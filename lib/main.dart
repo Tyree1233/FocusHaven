@@ -18,23 +18,29 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const FocusHavenApp());
+  runApp(FocusHavenApp(notificationService: notificationService));
 }
 
 class FocusHavenApp extends StatelessWidget {
-  const FocusHavenApp({super.key});
+  const FocusHavenApp({
+    super.key,
+    this.notificationService,
+  });
+
+  final NotificationService? notificationService;
 
   @override
   Widget build(BuildContext context) {
+    final activeNotificationService = notificationService ?? NotificationService();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => TimerService(notificationService: notificationService),
+          create: (_) => TimerService(notificationService: activeNotificationService),
         ),
         ChangeNotifierProvider(create: (_) => AuthService()),
         Provider(create: (_) => IAPService()),
         Provider(create: (_) => CloudSyncService()),
-        Provider.value(value: notificationService),
+        Provider.value(value: activeNotificationService),
       ],
       child: MaterialApp(
         title: 'FocusHaven',
