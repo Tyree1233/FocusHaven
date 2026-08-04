@@ -1,15 +1,20 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'onboarding_screen.dart';
-import 'timer_screen.dart';
+import 'package:provider/provider.dart';
+import 'services/auth_service.dart';
+import 'services/cloud_sync_service.dart';
+import 'services/iap_service.dart';
+import 'services/timer_service.dart';
+import 'screens/onboarding_screen.dart';
+import 'screens/timer_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
     await Firebase.initializeApp();
   } catch (_) {
-    // The timer remains available until Firebase is configured for a release.
+    // The local timer remains available until Firebase is configured.
   }
   runApp(const FocusHavenApp());
 }
@@ -19,24 +24,32 @@ class FocusHavenApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FocusHaven',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFF16FBA),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => TimerService()),
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        Provider(create: (_) => IAPService()),
+        Provider(create: (_) => CloudSyncService()),
+      ],
+      child: MaterialApp(
+        title: 'FocusHaven',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
           brightness: Brightness.dark,
-          surface: const Color(0xFF352260),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFFF16FBA),
+            brightness: Brightness.dark,
+            surface: const Color(0xFF352260),
+          ),
+          scaffoldBackgroundColor: const Color(0xFF211442),
+          useMaterial3: true,
         ),
-        scaffoldBackgroundColor: const Color(0xFF211442),
-        useMaterial3: true,
+        initialRoute: '/',
+        routes: {
+          '/': (_) => const OnboardingScreen(),
+          '/timer': (_) => const TimerScreen(),
+        },
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => OnboardingScreen(),
-        '/timer': (context) => TimerScreen(),
-      },
     );
   }
 }

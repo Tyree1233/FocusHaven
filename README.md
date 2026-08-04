@@ -1,26 +1,25 @@
 # FocusHaven
 
-A Flutter focus-timer app for the web, iPhone, and Android. It includes onboarding, a 25-minute timer, Firebase-backed timer settings for Pro users, and the FocusHaven brand asset.
+A calm, cross-platform focus timer for macOS, iOS, Android, and the web.
 
-## Get started
+## Included MVP functionality
 
-Install the [Flutter SDK](https://docs.flutter.dev/get-started/install), then generate the platform folders and fetch packages:
+- Branded onboarding and a 25-minute focus timer
+- Start, pause, reset, add-time, and locally persisted timer state
+- Anonymous Firebase auth with optional Google sign-in
+- Pro-gated Firestore timer sync
+- In-app-purchase and notification scaffolding
+- Automated Flutter analysis and test workflow
+
+## Run locally
 
 ```bash
-flutter create . --platforms=android,ios,web
 flutter pub get
-flutter run -d chrome
+flutter run -d macos
 ```
 
-Use `flutter run -d ios` or `flutter run -d android` to launch a device or simulator.
+Use `flutter run -d chrome`, `flutter run -d ios`, or `flutter run -d android` when the relevant device is available.
 
-## Firebase setup
+## Firebase and purchases
 
-Firebase packages are included, but credentials are intentionally not committed. Configure your Firebase project before running the app:
-
-```bash
-dart pub global activate flutterfire_cli
-flutterfire configure
-```
-
-This generates `lib/firebase_options.dart` and the platform configuration files. Then update `lib/main.dart` to initialize Firebase with the generated options before releasing.
+Firebase credentials and store product IDs are not committed. Before release, configure Firebase with `flutterfire configure`, replace the `focushaven_pro` placeholder product ID, and add server-side purchase verification.
