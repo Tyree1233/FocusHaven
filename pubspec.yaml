@@ -4,14 +4,14 @@ description: A calming focus timer app
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.6.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  firebase_core: ^2.25.4
-  firebase_auth: ^4.17.4
-  cloud_firestore: ^4.15.4
+  firebase_core: ^4.13.0
+  firebase_auth: ^6.5.6
+  cloud_firestore: ^6.8.0
   google_sign_in: ^6.0.0
   shared_preferences: ^2.1.1
   in_app_purchase: ^3.0.7
