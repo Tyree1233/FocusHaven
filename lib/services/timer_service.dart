@@ -3,26 +3,58 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum SessionType { focus, shortBreak, longBreak }
+
+extension SessionTypeDetails on SessionType {
+  String get label => switch (this) {
+        SessionType.focus => 'Focus',
+        SessionType.shortBreak => 'Short break',
+        SessionType.longBreak => 'Long break',
+      };
+
+  String get encouragement => switch (this) {
+        SessionType.focus => 'Give your full attention to one thing.',
+        SessionType.shortBreak => 'Step away and let your mind breathe.',
+        SessionType.longBreak => 'You earned a longer moment to recharge.',
+      };
+}
+
 class TimerService extends ChangeNotifier {
-  static const _defaultSeconds = 25 * 60;
-  int _secondsRemaining = _defaultSeconds;
+  static const _defaultFocusSeconds = 25 * 60;
+  static const _defaultShortBreakSeconds = 5 * 60;
+  static const _defaultLongBreakSeconds = 15 * 60;
+
   Timer? _ticker;
+  int _focusSeconds = _defaultFocusSeconds;
+  int _shortBreakSeconds = _defaultShortBreakSeconds;
+  int _longBreakSeconds = _defaultLongBreakSeconds;
+  int _secondsRemaining = _defaultFocusSeconds;
+  int _totalSessionSeconds = _defaultFocusSeconds;
+  int _completedFocusSessions = 0;
   bool _isRunning = false;
+  bool _isComplete = false;
+  SessionType _sessionType = SessionType.focus;
 
   int get secondsRemaining => _secondsRemaining;
+  int get totalSessionSeconds => _totalSessionSeconds;
+  int get completedFocusSessions => _completedFocusSessions;
   bool get isRunning => _isRunning;
+  bool get isComplete => _isComplete;
+  SessionType get sessionType => _sessionType;
+  double get progress =>
+      _totalSessionSeconds == 0 ? 0 : 1 - (_secondsRemaining / _totalSessionSeconds);
 
   TimerService() {
     _loadFromPrefs();
   }
 
   void start() {
-    if (_isRunning || _secondsRemaining == 0) return;
+    if (_isRunning || _isComplete || _secondsRemaining == 0) return;
     _isRunning = true;
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_secondsRemaining <= 1) {
         _secondsRemaining = 0;
-        pause();
+        _finishSession();
       } else {
         _secondsRemaining--;
         notifyListeners();
@@ -44,31 +76,90 @@ class TimerService extends ChangeNotifier {
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
-    _secondsRemaining = _defaultSeconds;
+    _isComplete = false;
+    _secondsRemaining = _durationFor(_sessionType);
+    _totalSessionSeconds = _secondsRemaining;
     notifyListeners();
     _saveToPrefs();
   }
 
-  void addMinutes(int minutes) {
-    _secondsRemaining += minutes * 60;
+  void selectSession(SessionType type) {
+    _ticker?.cancel();
+    _ticker = null;
+    _isRunning = false;
+    _isComplete = false;
+    _sessionType = type;
+    _secondsRemaining = _durationFor(type);
+    _totalSessionSeconds = _secondsRemaining;
     notifyListeners();
     _saveToPrefs();
   }
 
-  void setCustomSeconds(int seconds) {
-    _secondsRemaining = seconds.clamp(0, 24 * 60 * 60).toInt();
+  void beginNextSession() {
+    if (_sessionType == SessionType.focus) {
+      final isLongBreak = _completedFocusSessions > 0 && _completedFocusSessions % 4 == 0;
+      selectSession(isLongBreak ? SessionType.longBreak : SessionType.shortBreak);
+    } else {
+      selectSession(SessionType.focus);
+    }
+  }
+
+  void setCustomMinutes(int minutes) {
+    final seconds = (minutes * 60).clamp(60, 24 * 60 * 60).toInt();
+    switch (_sessionType) {
+      case SessionType.focus:
+        _focusSeconds = seconds;
+        break;
+      case SessionType.shortBreak:
+        _shortBreakSeconds = seconds;
+        break;
+      case SessionType.longBreak:
+        _longBreakSeconds = seconds;
+        break;
+    }
+    reset();
+  }
+
+  void _finishSession() {
+    _ticker?.cancel();
+    _ticker = null;
+    _isRunning = false;
+    _isComplete = true;
+    if (_sessionType == SessionType.focus) {
+      _completedFocusSessions++;
+    }
     notifyListeners();
     _saveToPrefs();
   }
+
+  int _durationFor(SessionType type) => switch (type) {
+        SessionType.focus => _focusSeconds,
+        SessionType.shortBreak => _shortBreakSeconds,
+        SessionType.longBreak => _longBreakSeconds,
+      };
 
   Future<void> _saveToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('secondsRemaining', _secondsRemaining);
+    await Future.wait([
+      prefs.setInt('focusSeconds', _focusSeconds),
+      prefs.setInt('shortBreakSeconds', _shortBreakSeconds),
+      prefs.setInt('longBreakSeconds', _longBreakSeconds),
+      prefs.setInt('secondsRemaining', _secondsRemaining),
+      prefs.setInt('totalSessionSeconds', _totalSessionSeconds),
+      prefs.setInt('completedFocusSessions', _completedFocusSessions),
+      prefs.setInt('sessionType', _sessionType.index),
+    ]);
   }
 
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    _secondsRemaining = prefs.getInt('secondsRemaining') ?? _defaultSeconds;
+    _focusSeconds = prefs.getInt('focusSeconds') ?? _focusSeconds;
+    _shortBreakSeconds = prefs.getInt('shortBreakSeconds') ?? _shortBreakSeconds;
+    _longBreakSeconds = prefs.getInt('longBreakSeconds') ?? _longBreakSeconds;
+    _completedFocusSessions = prefs.getInt('completedFocusSessions') ?? 0;
+    _sessionType = SessionType.values[prefs.getInt('sessionType') ?? 0];
+    _totalSessionSeconds = prefs.getInt('totalSessionSeconds') ?? _durationFor(_sessionType);
+    _secondsRemaining = prefs.getInt('secondsRemaining') ?? _totalSessionSeconds;
     notifyListeners();
   }
 
