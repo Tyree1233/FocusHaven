@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/focus_session.dart';
+import 'notification_service.dart';
 
 enum SessionType { focus, shortBreak, longBreak }
 
@@ -38,6 +39,7 @@ class TimerService extends ChangeNotifier {
   bool _isRunning = false;
   bool _isComplete = false;
   SessionType _sessionType = SessionType.focus;
+  final NotificationService? _notificationService;
 
   int get secondsRemaining => _secondsRemaining;
   int get totalSessionSeconds => _totalSessionSeconds;
@@ -62,7 +64,8 @@ class TimerService extends ChangeNotifier {
   double get progress =>
       _totalSessionSeconds == 0 ? 0 : 1 - (_secondsRemaining / _totalSessionSeconds);
 
-  TimerService() {
+  TimerService({NotificationService? notificationService})
+      : _notificationService = notificationService {
     _loadFromPrefs();
   }
 
@@ -145,6 +148,13 @@ class TimerService extends ChangeNotifier {
     _ticker = null;
     _isRunning = false;
     _isComplete = true;
+    unawaited(
+      _notificationService?.showSessionComplete(
+            title: '${_sessionType.label} complete',
+            body: _completionMessage,
+          ) ??
+          Future<void>.value(),
+    );
     if (_sessionType == SessionType.focus) {
       _completedFocusSessions++;
       _focusHistory.add(
@@ -159,6 +169,12 @@ class TimerService extends ChangeNotifier {
         SessionType.focus => _focusSeconds,
         SessionType.shortBreak => _shortBreakSeconds,
         SessionType.longBreak => _longBreakSeconds,
+      };
+
+  String get _completionMessage => switch (_sessionType) {
+        SessionType.focus => 'Nice work. Take a moment to recharge before your next session.',
+        SessionType.shortBreak => 'Your break is over. You are ready for another focused block.',
+        SessionType.longBreak => 'Your long break is complete. Come back refreshed and ready.',
       };
 
   Future<void> _saveToPrefs() async {

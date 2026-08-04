@@ -6,12 +6,15 @@ import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'services/cloud_sync_service.dart';
 import 'services/iap_service.dart';
+import 'services/notification_service.dart';
 import 'services/timer_service.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final notificationService = NotificationService();
+  await notificationService.initialize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -25,10 +28,13 @@ class FocusHavenApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => TimerService()),
+        ChangeNotifierProvider(
+          create: (_) => TimerService(notificationService: notificationService),
+        ),
         ChangeNotifierProvider(create: (_) => AuthService()),
         Provider(create: (_) => IAPService()),
         Provider(create: (_) => CloudSyncService()),
+        Provider.value(value: notificationService),
       ],
       child: MaterialApp(
         title: 'FocusHaven',
