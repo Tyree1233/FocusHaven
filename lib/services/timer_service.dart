@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/focus_session.dart';
 
 enum SessionType { focus, shortBreak, longBreak }
 
@@ -31,6 +34,7 @@ class TimerService extends ChangeNotifier {
   int _secondsRemaining = _defaultFocusSeconds;
   int _totalSessionSeconds = _defaultFocusSeconds;
   int _completedFocusSessions = 0;
+  List<FocusSession> _focusHistory = [];
   bool _isRunning = false;
   bool _isComplete = false;
   SessionType _sessionType = SessionType.focus;
@@ -38,6 +42,20 @@ class TimerService extends ChangeNotifier {
   int get secondsRemaining => _secondsRemaining;
   int get totalSessionSeconds => _totalSessionSeconds;
   int get completedFocusSessions => _completedFocusSessions;
+  List<FocusSession> get recentFocusSessions => List.unmodifiable(_focusHistory.reversed);
+  int get todayFocusMinutes => _focusHistory
+      .where((session) => _isSameDay(session.completedAt, DateTime.now()))
+      .fold(0, (total, session) => total + (session.durationSeconds ~/ 60));
+  int get currentStreak {
+    final completedDays = _focusHistory.map((session) => _dateKey(session.completedAt)).toSet();
+    var streak = 0;
+    var day = DateTime.now();
+    while (completedDays.contains(_dateKey(day))) {
+      streak++;
+      day = day.subtract(const Duration(days: 1));
+    }
+    return streak;
+  }
   bool get isRunning => _isRunning;
   bool get isComplete => _isComplete;
   SessionType get sessionType => _sessionType;
@@ -127,6 +145,9 @@ class TimerService extends ChangeNotifier {
     _isComplete = true;
     if (_sessionType == SessionType.focus) {
       _completedFocusSessions++;
+      _focusHistory.add(
+        FocusSession(completedAt: DateTime.now(), durationSeconds: _totalSessionSeconds),
+      );
     }
     notifyListeners();
     _saveToPrefs();
@@ -148,6 +169,10 @@ class TimerService extends ChangeNotifier {
       prefs.setInt('totalSessionSeconds', _totalSessionSeconds),
       prefs.setInt('completedFocusSessions', _completedFocusSessions),
       prefs.setInt('sessionType', _sessionType.index),
+      prefs.setString(
+        'focusHistory',
+        jsonEncode(_focusHistory.map((session) => session.toJson()).toList()),
+      ),
     ]);
   }
 
@@ -157,6 +182,20 @@ class TimerService extends ChangeNotifier {
     _shortBreakSeconds = prefs.getInt('shortBreakSeconds') ?? _shortBreakSeconds;
     _longBreakSeconds = prefs.getInt('longBreakSeconds') ?? _longBreakSeconds;
     _completedFocusSessions = prefs.getInt('completedFocusSessions') ?? 0;
+    final historyJson = prefs.getString('focusHistory');
+    if (historyJson != null) {
+      try {
+        final decoded = jsonDecode(historyJson);
+        if (decoded is List) {
+          _focusHistory = decoded
+              .whereType<Map>()
+              .map((item) => FocusSession.fromJson(Map<String, dynamic>.from(item)))
+              .toList();
+        }
+      } on FormatException {
+        _focusHistory = [];
+      }
+    }
     _sessionType = SessionType.values[prefs.getInt('sessionType') ?? 0];
     _totalSessionSeconds = prefs.getInt('totalSessionSeconds') ?? _durationFor(_sessionType);
     _secondsRemaining = prefs.getInt('secondsRemaining') ?? _totalSessionSeconds;
@@ -168,4 +207,9 @@ class TimerService extends ChangeNotifier {
     _ticker?.cancel();
     super.dispose();
   }
+
+  static bool _isSameDay(DateTime first, DateTime second) =>
+      first.year == second.year && first.month == second.month && first.day == second.day;
+
+  static String _dateKey(DateTime date) => '${date.year}-${date.month}-${date.day}';
 }

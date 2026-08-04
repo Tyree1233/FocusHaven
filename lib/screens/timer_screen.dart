@@ -19,6 +19,17 @@ class TimerScreen extends StatelessWidget {
     return '$minutes:$remaining';
   }
 
+  String _dateLabel(DateTime date) {
+    final now = DateTime.now();
+    if (DateUtils.isSameDay(date, now)) return 'Today';
+    if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) return 'Yesterday';
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+    ];
+    return '${months[date.month - 1]} ${date.day}';
+  }
+
   Future<void> _chooseCustomDuration(BuildContext context, TimerService timer) async {
     final controller = TextEditingController(text: '${timer.totalSessionSeconds ~/ 60}');
     final minutes = await showDialog<int>(
@@ -164,8 +175,57 @@ class TimerScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 30),
                     child: Column(
                       children: [
-                        Text('${timer.completedFocusSessions} focus sessions completed', style: const TextStyle(color: Colors.white70)),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _StatCard(
+                                icon: Icons.today_outlined,
+                                value: '${timer.todayFocusMinutes}m',
+                                label: 'today',
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _StatCard(
+                                icon: Icons.local_fire_department_outlined,
+                                value: '${timer.currentStreak}',
+                                label: 'day streak',
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _StatCard(
+                                icon: Icons.check_circle_outline,
+                                value: '${timer.completedFocusSessions}',
+                                label: 'completed',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 22),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text('Recent focus', style: Theme.of(context).textTheme.titleMedium),
+                        ),
                         const SizedBox(height: 8),
+                        if (timer.recentFocusSessions.isEmpty)
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text('Complete a focus session to begin your history.', style: TextStyle(color: Colors.white60)),
+                          )
+                        else
+                          ...timer.recentFocusSessions.take(3).map(
+                                (session) => ListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: const CircleAvatar(
+                                    backgroundColor: Color(0x33F16FBA),
+                                    child: Icon(Icons.auto_awesome, color: _pink),
+                                  ),
+                                  title: Text('${session.durationSeconds ~/ 60}-minute focus session'),
+                                  trailing: Text(_dateLabel(session.completedAt), style: const TextStyle(color: Colors.white60)),
+                                ),
+                              ),
+                        const SizedBox(height: 4),
                         TextButton.icon(
                           onPressed: () async {
                             final isPro = await IAPService.isProUser();
@@ -189,6 +249,39 @@ class TimerScreen extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  const _StatCard({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
+        child: Column(
+          children: [
+            Icon(icon, size: 18, color: TimerScreen._pink),
+            const SizedBox(height: 4),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+            Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+          ],
         ),
       ),
     );
