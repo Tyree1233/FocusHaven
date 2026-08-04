@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "791775983697",
+    "project_id": "focushaven-68c59",
+    "storage_bucket": "focushaven-68c59.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791775983697:android:da7841917e25fce8b1a070",
+        "android_client_info": {
+          "package_name": "com.FocusHaven"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiEm9gciiUuq-6ExH7bTIZSmoYsqfSMyU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791775983697:android:f91f6aa096085832b1a070",
+        "android_client_info": {
+          "package_name": "com.example.focushaven"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiEm9gciiUuq-6ExH7bTIZSmoYsqfSMyU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
