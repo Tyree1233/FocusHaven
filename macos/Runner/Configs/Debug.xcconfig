@@ -1,8 +1,8 @@
 #include "../../Flutter/Flutter-Debug.xcconfig"
 #include "Warnings.xcconfig"
 
-// Ad-hoc signing gives this local build a stable macOS app identity without
-// requiring an Apple Developer certificate. It is needed for notifications.
-CODE_SIGNING_ALLOWED=YES
-CODE_SIGN_IDENTITY=-
+// Swift Package Manager currently copies Finder metadata into Firebase
+// artifacts on this machine. Keep local debug builds unsigned until those
+// generated artifacts can be signed reliably.
+CODE_SIGNING_ALLOWED=NO
 COPYFILE_DISABLE=1
