@@ -679,6 +679,13 @@ class TimerScreen extends StatelessWidget {
                     Text('Focus queue', style: Theme.of(sheetContext).textTheme.titleLarge),
                     const SizedBox(height: 5),
                     const Text('Choose a task to make it your current focus intention.', style: TextStyle(color: Colors.white70)),
+                    if (queue.completedToday > 0) ...[
+                      const SizedBox(height: 5),
+                      Text(
+                        '${queue.completedToday} ${queue.completedToday == 1 ? 'task' : 'tasks'} tended today — gentle progress.',
+                        style: TextStyle(color: Theme.of(sheetContext).colorScheme.primary),
+                      ),
+                    ],
                     const SizedBox(height: 14),
                     Row(
                       children: [
@@ -717,7 +724,15 @@ class TimerScreen extends StatelessWidget {
                                 },
                           leading: Checkbox(
                             value: item.isComplete,
-                            onChanged: (_) => queue.toggle(item.id),
+                            onChanged: (_) async {
+                              final wasComplete = item.isComplete;
+                              await queue.toggle(item.id);
+                              if (!wasComplete && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('One thing handled. Take a breath.')),
+                                );
+                              }
+                            },
                           ),
                           title: Text(
                             item.title,
@@ -730,13 +745,13 @@ class TimerScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if (queue.items.any((item) => item.isComplete))
+                    if (queue.completedItems.isNotEmpty)
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton.icon(
-                          onPressed: queue.clearCompleted,
-                          icon: const Icon(Icons.delete_sweep_outlined),
-                          label: const Text('Clear completed'),
+                          onPressed: () => _showCompletedTasksSheet(sheetContext),
+                          icon: const Icon(Icons.history_outlined),
+                          label: Text('Completed (${queue.completedItems.length})'),
                         ),
                       ),
                   ],
@@ -748,6 +763,63 @@ class TimerScreen extends StatelessWidget {
       ),
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => textController.dispose());
+    scrollController.dispose();
+  }
+
+  Future<void> _showCompletedTasksSheet(BuildContext context) async {
+    final scrollController = ScrollController();
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.62,
+          child: Consumer<FocusQueueService>(
+            builder: (context, queue, _) => Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: Column(
+                children: [
+                  Container(height: 4, width: 42, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99))),
+                  const SizedBox(height: 18),
+                  Text('Completed tasks', style: Theme.of(sheetContext).textTheme.titleLarge),
+                  const SizedBox(height: 5),
+                  const Text('A quiet record of what you handled.', style: TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: Scrollbar(
+                      controller: scrollController,
+                      thumbVisibility: false,
+                      interactive: true,
+                      child: ListView.separated(
+                        controller: scrollController,
+                        itemCount: queue.completedItems.length,
+                        separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                        itemBuilder: (context, index) {
+                          final item = queue.completedItems[index];
+                          return ListTile(
+                            leading: Icon(Icons.check_circle_outline, color: Theme.of(sheetContext).colorScheme.primary),
+                            title: Text(item.title),
+                            subtitle: Text(item.completedAt == null ? 'Completed' : 'Completed ${_dateLabel(item.completedAt!)}'),
+                            trailing: IconButton(
+                              tooltip: 'Return to queue',
+                              icon: const Icon(Icons.undo),
+                              onPressed: () => queue.toggle(item.id),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
     scrollController.dispose();
   }
 

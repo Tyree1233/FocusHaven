@@ -4,21 +4,32 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FocusQueueItem {
-  const FocusQueueItem({required this.id, required this.title, this.isComplete = false});
+  const FocusQueueItem({required this.id, required this.title, this.isComplete = false, this.completedAt});
 
   final String id;
   final String title;
   final bool isComplete;
+  final DateTime? completedAt;
 
-  FocusQueueItem copyWith({bool? isComplete}) =>
-      FocusQueueItem(id: id, title: title, isComplete: isComplete ?? this.isComplete);
+  FocusQueueItem copyWith({bool? isComplete, DateTime? completedAt}) => FocusQueueItem(
+        id: id,
+        title: title,
+        isComplete: isComplete ?? this.isComplete,
+        completedAt: completedAt,
+      );
 
-  Map<String, dynamic> toJson() => {'id': id, 'title': title, 'isComplete': isComplete};
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'isComplete': isComplete,
+        if (completedAt != null) 'completedAt': completedAt!.toIso8601String(),
+      };
 
   factory FocusQueueItem.fromJson(Map<String, dynamic> json) => FocusQueueItem(
         id: json['id'] as String,
         title: json['title'] as String,
         isComplete: json['isComplete'] == true,
+        completedAt: json['completedAt'] is String ? DateTime.tryParse(json['completedAt'] as String) : null,
       );
 }
 
@@ -30,8 +41,15 @@ class FocusQueueService extends ChangeNotifier {
     _load();
   }
 
-  List<FocusQueueItem> get items => List.unmodifiable(_items);
-  int get remainingCount => _items.where((item) => !item.isComplete).length;
+  List<FocusQueueItem> get items => List.unmodifiable(_items.where((item) => !item.isComplete));
+  List<FocusQueueItem> get completedItems => List.unmodifiable(_items.where((item) => item.isComplete).toList().reversed);
+  int get remainingCount => items.length;
+  int get completedToday => _items.where((item) {
+        final completedAt = item.completedAt;
+        if (completedAt == null) return false;
+        final now = DateTime.now();
+        return completedAt.year == now.year && completedAt.month == now.month && completedAt.day == now.day;
+      }).length;
 
   Future<void> add(String title) async {
     final cleaned = title.trim().replaceAll(RegExp(r'\s+'), ' ');
@@ -43,19 +61,19 @@ class FocusQueueService extends ChangeNotifier {
   }
 
   Future<void> toggle(String id) async {
-    _items = _items.map((item) => item.id == id ? item.copyWith(isComplete: !item.isComplete) : item).toList();
+    _items = _items
+        .map(
+          (item) => item.id == id
+              ? item.copyWith(isComplete: !item.isComplete, completedAt: item.isComplete ? null : DateTime.now())
+              : item,
+        )
+        .toList();
     await _save();
     notifyListeners();
   }
 
   Future<void> remove(String id) async {
     _items.removeWhere((item) => item.id == id);
-    await _save();
-    notifyListeners();
-  }
-
-  Future<void> clearCompleted() async {
-    _items.removeWhere((item) => item.isComplete);
     await _save();
     notifyListeners();
   }
