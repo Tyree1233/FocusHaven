@@ -38,6 +38,7 @@ class TimerService extends ChangeNotifier {
   int _totalSessionSeconds = _defaultFocusSeconds;
   int _completedFocusSessions = 0;
   List<FocusSession> _focusHistory = [];
+  List<String> _distractions = [];
   String _focusTask = '';
   int _dailyGoalMinutes = _defaultDailyGoalMinutes;
   bool _isRunning = false;
@@ -60,6 +61,7 @@ class TimerService extends ChangeNotifier {
         'focusHistory': _focusHistory.map((session) => session.toJson()).toList(),
       };
   List<FocusSession> get recentFocusSessions => List.unmodifiable(_focusHistory.reversed);
+  List<String> get distractions => List.unmodifiable(_distractions.reversed);
   int get todayFocusMinutes => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))
       .fold(0, (total, session) => total + (session.durationSeconds ~/ 60));
@@ -192,6 +194,21 @@ class TimerService extends ChangeNotifier {
     _saveToPrefs();
   }
 
+  void captureDistraction(String distraction) {
+    final cleaned = distraction.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (cleaned.isEmpty) return;
+    _distractions.add(cleaned.length > 140 ? cleaned.substring(0, 140) : cleaned);
+    notifyListeners();
+    _saveToPrefs();
+  }
+
+  void clearDistractions() {
+    if (_distractions.isEmpty) return;
+    _distractions = [];
+    notifyListeners();
+    _saveToPrefs();
+  }
+
   void setDailyGoalMinutes(int minutes) {
     _dailyGoalMinutes = minutes.clamp(5, 480).toInt();
     notifyListeners();
@@ -310,6 +327,7 @@ class TimerService extends ChangeNotifier {
         'focusHistory',
         jsonEncode(_focusHistory.map((session) => session.toJson()).toList()),
       ),
+      prefs.setStringList('distractions', _distractions),
     ]);
   }
 
@@ -321,6 +339,7 @@ class TimerService extends ChangeNotifier {
     _completedFocusSessions = prefs.getInt('completedFocusSessions') ?? 0;
     _focusTask = prefs.getString('focusTask') ?? '';
     _dailyGoalMinutes = prefs.getInt('dailyGoalMinutes') ?? _dailyGoalMinutes;
+    _distractions = prefs.getStringList('distractions') ?? [];
     final historyJson = prefs.getString('focusHistory');
     if (historyJson != null) {
       try {

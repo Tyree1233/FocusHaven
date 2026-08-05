@@ -651,6 +651,101 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _captureDistraction(BuildContext context, TimerService timer) async {
+    final controller = TextEditingController();
+    final thought = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Park this thought'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 140,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(
+            hintText: 'Example: Reply to Jordan after this session',
+            helperText: 'Save it, then return to your focus.',
+          ),
+          onSubmitted: (value) => Navigator.pop(dialogContext, value),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
+            child: const Text('Save thought'),
+          ),
+        ],
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+    if (thought != null) {
+      timer.captureDistraction(thought);
+    }
+  }
+
+  Future<void> _showDistractionSheet(BuildContext context, TimerService timer) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.62,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            child: Column(
+              children: [
+                Container(
+                  height: 4,
+                  width: 42,
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)),
+                ),
+                const SizedBox(height: 18),
+                Text('Distraction parking lot', style: Theme.of(sheetContext).textTheme.titleLarge),
+                const SizedBox(height: 6),
+                const Text(
+                  'Your saved thoughts stay on this device until you clear them.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: timer.distractions.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'Nothing parked yet. Keep your attention where you want it.',
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : ListView.separated(
+                          itemCount: timer.distractions.length,
+                          separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                          itemBuilder: (context, index) => ListTile(
+                            leading: Icon(Icons.bookmark_outline, color: Theme.of(sheetContext).colorScheme.primary),
+                            title: Text(timer.distractions[index]),
+                          ),
+                        ),
+                ),
+                if (timer.distractions.isNotEmpty)
+                  TextButton.icon(
+                    onPressed: () {
+                      timer.clearDistractions();
+                      Navigator.pop(sheetContext);
+                    },
+                    icon: const Icon(Icons.delete_outline),
+                    label: const Text('Clear parking lot'),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _showFocusHistory(BuildContext context, TimerService timer) async {
     final weeklySeconds = timer.lastSevenDaysFocusSeconds;
     final weeklyMinutes = timer.weeklyFocusSeconds ~/ 60;
@@ -1091,6 +1186,18 @@ class TimerScreen extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        if (timer.isRunning || timer.distractions.isNotEmpty)
+                          TextButton.icon(
+                            onPressed: () => timer.isRunning
+                                ? _captureDistraction(context, timer)
+                                : _showDistractionSheet(context, timer),
+                            icon: Icon(timer.isRunning ? Icons.add_task_outlined : Icons.bookmark_outline, size: 18),
+                            label: Text(
+                              timer.isRunning
+                                  ? 'Park a distraction${timer.distractions.isEmpty ? '' : ' • ${timer.distractions.length} saved'}'
+                                  : 'Review ${timer.distractions.length} parked thought${timer.distractions.length == 1 ? '' : 's'}',
+                            ),
+                          ),
                       ],
                       const SizedBox(height: 30),
                       SizedBox(
