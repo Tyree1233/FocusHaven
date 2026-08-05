@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'services/cloud_sync_service.dart';
+import 'services/focus_profile_service.dart';
 import 'services/iap_service.dart';
 import 'services/journal_service.dart';
 import 'services/notification_service.dart';
@@ -49,6 +50,7 @@ class FocusHavenApp extends StatelessWidget {
           create: (_) => TimerService(notificationService: activeNotificationService),
         ),
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => FocusProfileService()),
         ChangeNotifierProvider(create: (_) => JournalService()),
         Provider(create: (_) => IAPService()),
         Provider(create: (_) => CloudSyncService()),

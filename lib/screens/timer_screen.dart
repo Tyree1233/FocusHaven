@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
+import '../services/focus_profile_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/notification_service.dart';
@@ -234,6 +235,11 @@ class TimerScreen extends StatelessWidget {
                     icon: const Icon(Icons.workspace_premium_outlined),
                     label: const Text('FocusHaven Pro'),
                   ),
+                  TextButton.icon(
+                    onPressed: () => _showFocusProfileSheet(context),
+                    icon: const Icon(Icons.psychology_outlined),
+                    label: const Text('Discover your focus profile'),
+                  ),
                 ],
               ),
             ),
@@ -241,6 +247,187 @@ class TimerScreen extends StatelessWidget {
         ),
       );
   }
+
+  Future<void> _showFocusProfileSheet(BuildContext context) async {
+    const questions = [
+      _FocusQuestion(
+        prompt: 'When does focused work feel most natural?',
+        choices: [
+          _FocusChoice('Early in the day', 'Clear Starter'),
+          _FocusChoice('Once I build momentum', 'Momentum Builder'),
+          _FocusChoice('Later in the evening', 'Night Owl'),
+        ],
+      ),
+      _FocusQuestion(
+        prompt: 'Which environment helps you settle in?',
+        choices: [
+          _FocusChoice('Quiet and uninterrupted', 'Deep Diver'),
+          _FocusChoice('Gentle music or ambient sound', 'Gentle Flow'),
+          _FocusChoice('A clear plan and small steps', 'Momentum Builder'),
+        ],
+      ),
+      _FocusQuestion(
+        prompt: 'When you feel stuck, what helps most?',
+        choices: [
+          _FocusChoice('Removing every distraction', 'Deep Diver'),
+          _FocusChoice('Taking a brief reset', 'Gentle Flow'),
+          _FocusChoice('Starting with one tiny action', 'Momentum Builder'),
+        ],
+      ),
+      _FocusQuestion(
+        prompt: 'What kind of session sounds best?',
+        choices: [
+          _FocusChoice('A long, uninterrupted block', 'Deep Diver'),
+          _FocusChoice('A calm, flexible rhythm', 'Gentle Flow'),
+          _FocusChoice('A quick, energizing sprint', 'Clear Starter'),
+        ],
+      ),
+    ];
+    final profile = context.read<FocusProfileService>();
+    var page = -1;
+    String? result;
+    final answers = List<_FocusChoice?>.filled(questions.length, null);
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF352260),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          final activeType = result ?? profile.focusType;
+          if (page == questions.length && result != null) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.auto_awesome, size: 44, color: _pink),
+                    const SizedBox(height: 12),
+                    const Text('Your focus profile', style: TextStyle(fontSize: 16, color: Colors.white70)),
+                    const SizedBox(height: 6),
+                    Text(activeType!, style: Theme.of(context).textTheme.headlineSmall),
+                    const SizedBox(height: 12),
+                    Text(
+                      _focusProfileTip(activeType),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+                      child: const Text('Use this profile'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          if (page == -1) {
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.psychology_outlined, size: 42, color: _pink),
+                    const SizedBox(height: 14),
+                    Text('Find your focus profile', style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: 10),
+                    Text(
+                      activeType == null
+                          ? 'Answer four quick questions for a practical focus style and tip.'
+                          : 'Your current profile is $activeType. Retake the quiz anytime as your habits change.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      onPressed: () => setSheetState(() => page = 0),
+                      style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+                      child: Text(activeType == null ? 'Start quiz' : 'Retake quiz'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          final question = questions[page];
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 22, 24, 30),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('${page + 1} of ${questions.length}', style: const TextStyle(color: Colors.white60)),
+                  const SizedBox(height: 14),
+                  Text(question.prompt, style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 20),
+                  ...question.choices.map(
+                    (choice) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: OutlinedButton(
+                        onPressed: () async {
+                          answers[page] = choice;
+                          if (page == questions.length - 1) {
+                            final scores = <String, int>{};
+                            for (final answer in answers.whereType<_FocusChoice>()) {
+                              scores.update(answer.focusType, (count) => count + 1, ifAbsent: () => 1);
+                            }
+                            final winner = scores.entries.reduce(
+                              (first, next) => first.value >= next.value ? first : next,
+                            ).key;
+                            await profile.saveFocusType(winner);
+                            if (sheetContext.mounted) {
+                              setSheetState(() {
+                                result = winner;
+                                page = questions.length;
+                              });
+                            }
+                          } else {
+                            setSheetState(() => page++);
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          alignment: Alignment.centerLeft,
+                          padding: const EdgeInsets.all(16),
+                        ),
+                        child: Text(choice.label),
+                      ),
+                    ),
+                  ),
+                  if (page > 0) ...[
+                    const SizedBox(height: 4),
+                    TextButton.icon(
+                      onPressed: () => setSheetState(() => page--),
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Back to previous question'),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _focusProfileTip(String focusType) => switch (focusType) {
+        'Clear Starter' => 'Protect your best early window with one clear intention and a short timer.',
+        'Momentum Builder' => 'Start with a small five-minute step. Momentum is your best fuel.',
+        'Deep Diver' => 'Create a quiet, distraction-free block and let yourself stay with one meaningful task.',
+        'Gentle Flow' => 'Use calm transitions, a comfortable pace, and intentional breaks to stay steady.',
+        'Night Owl' => 'Plan your most important work for your later high-energy window and protect your wind-down.',
+        _ => 'Choose a calm space and one clear next step.',
+      };
 
   Future<void> _showProSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
@@ -1032,4 +1219,18 @@ class _ProBenefit extends StatelessWidget {
       ),
     );
   }
+}
+
+class _FocusQuestion {
+  const _FocusQuestion({required this.prompt, required this.choices});
+
+  final String prompt;
+  final List<_FocusChoice> choices;
+}
+
+class _FocusChoice {
+  const _FocusChoice(this.label, this.focusType);
+
+  final String label;
+  final String focusType;
 }
