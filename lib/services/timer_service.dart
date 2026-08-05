@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/focus_session.dart';
@@ -23,7 +24,8 @@ extension SessionTypeDetails on SessionType {
       };
 }
 
-class TimerService extends ChangeNotifier {
+class TimerService extends ChangeNotifier with WidgetsBindingObserver {
+  static const _timerEndsAtKey = 'timerEndsAt';
   static const _defaultFocusSeconds = 25 * 60;
   static const _defaultShortBreakSeconds = 5 * 60;
   static const _defaultLongBreakSeconds = 15 * 60;
@@ -43,6 +45,7 @@ class TimerService extends ChangeNotifier {
   int _dailyGoalMinutes = _defaultDailyGoalMinutes;
   bool _isRunning = false;
   bool _isComplete = false;
+  DateTime? _endsAt;
   SessionType _sessionType = SessionType.focus;
   final NotificationService? _notificationService;
 
@@ -108,29 +111,67 @@ class TimerService extends ChangeNotifier {
 
   TimerService({NotificationService? notificationService})
       : _notificationService = notificationService {
+    WidgetsBinding.instance.addObserver(this);
     _loadFromPrefs();
   }
 
   void start() {
     if (_isRunning || _isComplete || _secondsRemaining == 0) return;
     _isRunning = true;
+    _endsAt = DateTime.now().add(Duration(seconds: _secondsRemaining));
+    _startTicker();
+    notifyListeners();
+    _saveToPrefs();
+  }
+
+  void _startTicker() {
+    _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_secondsRemaining <= 1) {
+      final endsAt = _endsAt;
+      if (endsAt == null) return;
+      final remaining = (endsAt.difference(DateTime.now()).inMilliseconds / 1000).ceil();
+      if (remaining <= 0) {
         _secondsRemaining = 0;
         _finishSession();
       } else {
-        _secondsRemaining--;
+        _secondsRemaining = remaining;
         notifyListeners();
       }
     });
-    notifyListeners();
-    _saveToPrefs();
+  }
+
+  void _synchronizeWithDeadline() {
+    final endsAt = _endsAt;
+    if (endsAt == null) return;
+    final remaining = (endsAt.difference(DateTime.now()).inMilliseconds / 1000).ceil();
+    if (remaining <= 0) {
+      _secondsRemaining = 0;
+      _finishSession();
+    } else {
+      _secondsRemaining = remaining;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _synchronizeWithDeadline();
+      return;
+    }
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
+      _saveToPrefs();
+    }
   }
 
   void pause() {
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
+    _endsAt = null;
     notifyListeners();
     _saveToPrefs();
   }
@@ -140,6 +181,7 @@ class TimerService extends ChangeNotifier {
     _ticker = null;
     _isRunning = false;
     _isComplete = false;
+    _endsAt = null;
     _secondsRemaining = _durationFor(_sessionType);
     _totalSessionSeconds = _secondsRemaining;
     notifyListeners();
@@ -151,6 +193,7 @@ class TimerService extends ChangeNotifier {
     _ticker = null;
     _isRunning = false;
     _isComplete = false;
+    _endsAt = null;
     _sessionType = type;
     _secondsRemaining = _durationFor(type);
     _totalSessionSeconds = _secondsRemaining;
@@ -251,6 +294,7 @@ class TimerService extends ChangeNotifier {
       _ticker = null;
       _isRunning = false;
       _isComplete = false;
+      _endsAt = null;
       _focusSeconds = focusSeconds.clamp(1, 24 * 60 * 60).toInt();
       _shortBreakSeconds = shortBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
       _longBreakSeconds = longBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
@@ -278,6 +322,7 @@ class TimerService extends ChangeNotifier {
     _ticker = null;
     _isRunning = false;
     _isComplete = true;
+    _endsAt = null;
     unawaited(
       _notificationService?.showSessionComplete(
             title: '${_sessionType.label} complete',
@@ -323,6 +368,7 @@ class TimerService extends ChangeNotifier {
       prefs.setString('focusTask', _focusTask),
       prefs.setInt('dailyGoalMinutes', _dailyGoalMinutes),
       prefs.setInt('sessionType', _sessionType.index),
+      _endsAt == null ? prefs.remove(_timerEndsAtKey) : prefs.setInt(_timerEndsAtKey, _endsAt!.millisecondsSinceEpoch),
       prefs.setString(
         'focusHistory',
         jsonEncode(_focusHistory.map((session) => session.toJson()).toList()),
@@ -359,12 +405,26 @@ class TimerService extends ChangeNotifier {
     _sessionType = SessionType.values[prefs.getInt('sessionType') ?? 0];
     _totalSessionSeconds = prefs.getInt('totalSessionSeconds') ?? _durationFor(_sessionType);
     _secondsRemaining = prefs.getInt('secondsRemaining') ?? _totalSessionSeconds;
+    final savedEndsAt = prefs.getInt(_timerEndsAtKey);
+    if (savedEndsAt != null) {
+      _endsAt = DateTime.fromMillisecondsSinceEpoch(savedEndsAt);
+      final remaining = (_endsAt!.difference(DateTime.now()).inMilliseconds / 1000).ceil();
+      if (remaining <= 0) {
+        _secondsRemaining = 0;
+        _finishSession();
+      } else {
+        _secondsRemaining = remaining;
+        _isRunning = true;
+        _startTicker();
+      }
+    }
     notifyListeners();
   }
 
   @override
   void dispose() {
     _ticker?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
