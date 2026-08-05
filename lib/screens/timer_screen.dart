@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/focus_profile_service.dart';
+import '../services/focus_queue_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/notification_service.dart';
@@ -651,6 +652,96 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _showFocusQueueSheet(BuildContext context, TimerService timer) async {
+    final textController = TextEditingController();
+    final scrollController = ScrollController();
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.72,
+          child: Consumer<FocusQueueService>(
+            builder: (context, queue, _) => Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: Scrollbar(
+                controller: scrollController,
+                thumbVisibility: false,
+                interactive: true,
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    Center(child: Container(height: 4, width: 42, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)))),
+                    const SizedBox(height: 18),
+                    Text('Focus queue', style: Theme.of(sheetContext).textTheme.titleLarge),
+                    const SizedBox(height: 5),
+                    const Text('Choose a task to make it your current focus intention.', style: TextStyle(color: Colors.white70)),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: textController,
+                            maxLength: 100,
+                            decoration: const InputDecoration(hintText: 'Add a task', counterText: ''),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        IconButton.filled(
+                          onPressed: () async {
+                            await queue.add(textController.text);
+                            textController.clear();
+                          },
+                          icon: const Icon(Icons.add),
+                          tooltip: 'Add task',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (queue.items.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 34),
+                        child: Center(child: Text('Your next task can live here.', style: TextStyle(color: Colors.white60))),
+                      )
+                    else
+                      ...queue.items.map(
+                        (item) => ListTile(
+                          onTap: item.isComplete
+                              ? null
+                              : () {
+                                  timer.setFocusTask(item.title);
+                                  Navigator.pop(sheetContext);
+                                },
+                          leading: Checkbox(
+                            value: item.isComplete,
+                            onChanged: (_) => queue.toggle(item.id),
+                          ),
+                          title: Text(
+                            item.title,
+                            style: item.isComplete ? const TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white54) : null,
+                          ),
+                          trailing: IconButton(
+                            onPressed: () => queue.remove(item.id),
+                            icon: const Icon(Icons.close),
+                            tooltip: 'Remove task',
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => textController.dispose());
+    scrollController.dispose();
+  }
+
   Future<void> _captureDistraction(BuildContext context, TimerService timer) async {
     final controller = TextEditingController();
     final thought = await showDialog<String>(
@@ -1169,6 +1260,7 @@ class TimerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
     final auth = context.watch<AuthService>();
+    final queueRemaining = context.select<FocusQueueService, int>((queue) => queue.remainingCount);
     final sessionColor = _sessionColor(context, timer.sessionType);
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
@@ -1254,6 +1346,11 @@ class TimerScreen extends StatelessWidget {
                             timer.focusTask.isEmpty ? 'Set a focus intention' : timer.focusTask,
                             overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        TextButton.icon(
+                          onPressed: () => _showFocusQueueSheet(context, timer),
+                          icon: const Icon(Icons.format_list_bulleted_outlined, size: 18),
+                          label: Text(queueRemaining == 0 ? 'Open focus queue' : 'Focus queue • $queueRemaining'),
                         ),
                         if (timer.isRunning || timer.distractions.isNotEmpty)
                           TextButton.icon(
