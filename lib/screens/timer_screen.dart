@@ -746,6 +746,75 @@ class TimerScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _showMilestonesSheet(BuildContext context, TimerService timer) async {
+    final scrollController = ScrollController();
+    final milestones = [
+      _Milestone('First step', 'Complete your first focus session.', timer.completedFocusSessions >= 1),
+      _Milestone('Weekly rhythm', 'Complete 3 focus sessions in seven days.', timer.weeklyFocusSessions >= 3),
+      _Milestone('Momentum', 'Complete 5 focus sessions in total.', timer.completedFocusSessions >= 5),
+      _Milestone('Half-hour haven', 'Reach 30 total minutes of focus.', timer.totalFocusSeconds >= 30 * 60),
+      _Milestone('Century club', 'Reach 100 total minutes of focus.', timer.totalFocusSeconds >= 100 * 60),
+      _Milestone('Steady flame', 'Build a 3-day focus streak.', timer.currentStreak >= 3),
+      _Milestone('Deep roots', 'Build a 7-day focus streak.', timer.currentStreak >= 7),
+      _Milestone('Goal getter', 'Reach your daily focus goal.', timer.hasReachedDailyGoal),
+    ];
+    final unlocked = milestones.where((milestone) => milestone.unlocked).length;
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.6,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            child: Column(
+              children: [
+                Container(height: 4, width: 42, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99))),
+                const SizedBox(height: 18),
+                Text('Focus milestones', style: Theme.of(sheetContext).textTheme.titleLarge),
+                const SizedBox(height: 5),
+                Text('$unlocked of ${milestones.length} unlocked', style: const TextStyle(color: Colors.white70)),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: Scrollbar(
+                    controller: scrollController,
+                    thumbVisibility: false,
+                    interactive: true,
+                    child: ListView.separated(
+                      controller: scrollController,
+                      itemCount: milestones.length,
+                      separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                      itemBuilder: (context, index) {
+                        final milestone = milestones[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: Theme.of(sheetContext).colorScheme.primary.withValues(alpha: milestone.unlocked ? 0.22 : 0.08),
+                            child: Icon(
+                              milestone.unlocked ? Icons.emoji_events_outlined : Icons.lock_outline,
+                              color: milestone.unlocked ? Theme.of(sheetContext).colorScheme.primary : Colors.white38,
+                            ),
+                          ),
+                          title: Text(milestone.title),
+                          subtitle: Text(milestone.detail),
+                          trailing: Icon(milestone.unlocked ? Icons.check_circle : Icons.radio_button_unchecked,
+                              color: milestone.unlocked ? Theme.of(sheetContext).colorScheme.primary : Colors.white38),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    scrollController.dispose();
+  }
+
   Future<void> _showFocusHistory(BuildContext context, TimerService timer) async {
     final weeklySeconds = timer.lastSevenDaysFocusSeconds;
     final weeklyMinutes = timer.weeklyFocusSeconds ~/ 60;
@@ -1341,6 +1410,14 @@ class TimerScreen extends StatelessWidget {
                             ),
                           ],
                         ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: () => _showMilestonesSheet(context, timer),
+                            icon: const Icon(Icons.emoji_events_outlined),
+                            label: const Text('Milestones'),
+                          ),
+                        ),
                         const SizedBox(height: 14),
                         DecoratedBox(
                           decoration: BoxDecoration(
@@ -1549,6 +1626,14 @@ class TimerScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+class _Milestone {
+  const _Milestone(this.title, this.detail, this.unlocked);
+
+  final String title;
+  final String detail;
+  final bool unlocked;
 }
 
 class _StatCard extends StatelessWidget {

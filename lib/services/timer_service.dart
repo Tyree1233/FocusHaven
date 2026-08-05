@@ -68,6 +68,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       };
   List<FocusSession> get recentFocusSessions => List.unmodifiable(_focusHistory.reversed);
   List<String> get distractions => List.unmodifiable(_distractions.reversed);
+  int get totalFocusSeconds => _focusHistory.fold(0, (total, session) => total + session.durationSeconds);
   int get todayFocusMinutes => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))
       .fold(0, (total, session) => total + (session.durationSeconds ~/ 60));
