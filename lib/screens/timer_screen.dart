@@ -14,8 +14,15 @@ class TimerScreen extends StatelessWidget {
   const TimerScreen({super.key});
 
   static const _pink = Color(0xFFF16FBA);
+  static const _mint = Color(0xFF72E0B8);
   static const _lavender = Color(0xFF9B82FF);
   static const _ink = Color(0xFF211442);
+
+  Color _sessionColor(SessionType type) => switch (type) {
+        SessionType.focus => _pink,
+        SessionType.shortBreak => _mint,
+        SessionType.longBreak => _lavender,
+      };
 
   String _formattedTime(int seconds) {
     final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
@@ -67,6 +74,7 @@ class TimerScreen extends StatelessWidget {
 
   Future<void> _chooseCustomDuration(BuildContext context, TimerService timer) async {
     const maximumMinutes = 180;
+    final sessionColor = _sessionColor(timer.sessionType);
     final initialMinutes = (timer.totalSessionSeconds ~/ 60).clamp(0, maximumMinutes).toInt();
     final initialSeconds = timer.totalSessionSeconds % 60;
     var selectedMinutes = initialMinutes;
@@ -138,7 +146,7 @@ class TimerScreen extends StatelessWidget {
                           scrollController: pickerController,
                           itemExtent: 42,
                           selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
-                            background: _pink.withValues(alpha: 0.15),
+                            background: sessionColor.withValues(alpha: 0.15),
                           ),
                           onSelectedItemChanged: (index) => setSheetState(() => selectedMinutes = index),
                           childCount: maximumMinutes + 1,
@@ -152,7 +160,7 @@ class TimerScreen extends StatelessWidget {
                           scrollController: secondsPickerController,
                           itemExtent: 42,
                           selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
-                            background: _pink.withValues(alpha: 0.15),
+                            background: sessionColor.withValues(alpha: 0.15),
                           ),
                           onSelectedItemChanged: (index) => setSheetState(() => selectedSeconds = index),
                           childCount: 60,
@@ -170,7 +178,7 @@ class TimerScreen extends StatelessWidget {
                   child: FilledButton(
                     onPressed: () => Navigator.pop(sheetContext, Duration(minutes: selectedMinutes, seconds: selectedSeconds)),
                     style: FilledButton.styleFrom(
-                      backgroundColor: _pink,
+                      backgroundColor: sessionColor,
                       foregroundColor: _ink,
                       minimumSize: const Size.fromHeight(54),
                     ),
@@ -827,7 +835,7 @@ class TimerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
     final auth = context.watch<AuthService>();
-    final sessionColor = timer.sessionType == SessionType.focus ? _pink : _lavender;
+    final sessionColor = _sessionColor(timer.sessionType);
 
     return Scaffold(
       appBar: AppBar(
@@ -973,6 +981,7 @@ class TimerScreen extends StatelessWidget {
                         onPressed: () => _chooseCustomDuration(context, timer),
                         icon: const Icon(Icons.tune),
                         label: const Text('Custom duration'),
+                        style: TextButton.styleFrom(foregroundColor: sessionColor),
                       ),
                     ],
                   ),
