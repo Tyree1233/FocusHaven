@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
+
+  Future<void> _beginFocus(BuildContext context) async {
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool('hasCompletedOnboarding', true);
+    if (context.mounted) {
+      Navigator.of(context).pushReplacementNamed('/timer');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +33,7 @@ class OnboardingScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pushReplacementNamed('/timer'),
+                  onPressed: () => _beginFocus(context),
                   style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF16FBA), foregroundColor: const Color(0xFF28133F), minimumSize: const Size.fromHeight(56)),
                   child: const Text('Begin focus'),
                 ),

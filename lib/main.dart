@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'services/cloud_sync_service.dart';
@@ -18,16 +19,25 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(FocusHavenApp(notificationService: notificationService));
+  final preferences = await SharedPreferences.getInstance();
+  final showOnboarding = !(preferences.getBool('hasCompletedOnboarding') ?? false);
+  runApp(
+    FocusHavenApp(
+      notificationService: notificationService,
+      showOnboarding: showOnboarding,
+    ),
+  );
 }
 
 class FocusHavenApp extends StatelessWidget {
   const FocusHavenApp({
     super.key,
     this.notificationService,
+    this.showOnboarding = true,
   });
 
   final NotificationService? notificationService;
+  final bool showOnboarding;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +65,7 @@ class FocusHavenApp extends StatelessWidget {
           scaffoldBackgroundColor: const Color(0xFF211442),
           useMaterial3: true,
         ),
-        initialRoute: '/',
+        initialRoute: showOnboarding ? '/' : '/timer',
         routes: {
           '/': (_) => const OnboardingScreen(),
           '/timer': (_) => const TimerScreen(),
