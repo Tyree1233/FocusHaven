@@ -157,10 +157,57 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _showAccountSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+        context: context,
+        backgroundColor: const Color(0xFF352260),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        builder: (sheetContext) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Consumer<AuthService>(
+              builder: (context, auth, _) => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Your FocusHaven account', style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  Text(
+                    auth.isSignedIn
+                        ? 'Signed in as ${auth.displayName}'
+                        : 'Sign in to protect your focus history and use cloud backup.',
+                    style: const TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 20),
+                  if (auth.isSignedIn)
+                    OutlinedButton.icon(
+                      onPressed: auth.signOut,
+                      icon: const Icon(Icons.logout),
+                      label: const Text('Sign out'),
+                    )
+                  else
+                    FilledButton.icon(
+                      onPressed: () async {
+                        final result = await auth.signInWithGoogle();
+                        if (result != null && sheetContext.mounted) Navigator.pop(sheetContext);
+                      },
+                      icon: const Icon(Icons.login),
+                      label: const Text('Sign in with Google'),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
-    final auth = context.read<AuthService>();
+    final auth = context.watch<AuthService>();
     final sessionColor = timer.sessionType == SessionType.focus ? _pink : _lavender;
 
     return Scaffold(
@@ -187,8 +234,8 @@ class TimerScreen extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.account_circle_outlined),
-            tooltip: 'Sign in with Google',
-            onPressed: auth.signInWithGoogle,
+            tooltip: auth.isSignedIn ? 'Account' : 'Sign in',
+            onPressed: () => _showAccountSheet(context),
           ),
         ],
       ),
@@ -350,17 +397,21 @@ class TimerScreen extends StatelessWidget {
                           onPressed: () async {
                             final isPro = await IAPService.isProUser();
                             if (!context.mounted) return;
-                            if (isPro) {
-                              await context.read<CloudSyncService>().syncTimerSettings(timer.secondsRemaining);
-                            }
+                            final message = !auth.isSignedIn
+                                ? 'Sign in with Google to back up your focus data'
+                                : !isPro
+                                    ? 'Upgrade to Pro to use cloud backup'
+                                    : await context.read<CloudSyncService>().syncFocusData(timer.cloudBackup)
+                                        ? 'Focus data backed up securely'
+                                        : 'Backup failed. Check your Firebase setup.';
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(isPro ? 'Timer settings synced' : 'Upgrade to Pro to sync across devices')),
+                                SnackBar(content: Text(message)),
                               );
                             }
                           },
                           icon: const Icon(Icons.cloud_upload_outlined),
-                          label: const Text('Sync settings'),
+                          label: const Text('Back up focus data'),
                         ),
                       ],
                     ),

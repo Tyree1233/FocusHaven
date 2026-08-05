@@ -44,6 +44,13 @@ class TimerService extends ChangeNotifier {
   int get secondsRemaining => _secondsRemaining;
   int get totalSessionSeconds => _totalSessionSeconds;
   int get completedFocusSessions => _completedFocusSessions;
+  Map<String, dynamic> get cloudBackup => {
+        'focusSeconds': _focusSeconds,
+        'shortBreakSeconds': _shortBreakSeconds,
+        'longBreakSeconds': _longBreakSeconds,
+        'completedFocusSessions': _completedFocusSessions,
+        'focusHistory': _focusHistory.map((session) => session.toJson()).toList(),
+      };
   List<FocusSession> get recentFocusSessions => List.unmodifiable(_focusHistory.reversed);
   int get todayFocusMinutes => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))

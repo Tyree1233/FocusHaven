@@ -5,6 +5,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthService extends ChangeNotifier {
   User? user;
 
+  bool get isSignedIn => user != null && !user!.isAnonymous;
+  String get displayName => user?.displayName ?? user?.email ?? 'Guest';
+
   AuthService() {
     try {
       FirebaseAuth.instance.authStateChanges().listen((currentUser) {
@@ -42,6 +45,16 @@ class AuthService extends ChangeNotifier {
     } catch (error) {
       debugPrint('Google sign-in failed: $error');
       return null;
+    }
+  }
+
+  Future<void> signOut() async {
+    try {
+      await GoogleSignIn().signOut();
+      await FirebaseAuth.instance.signOut();
+      await signInAnonymouslyIfNeeded();
+    } catch (error) {
+      debugPrint('Sign-out failed: $error');
     }
   }
 }

@@ -2,23 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class CloudSyncService {
-  Future<void> syncTimerSettings(int secondsRemaining) async {
+  Future<bool> syncFocusData(Map<String, dynamic> backup) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return;
+      if (user == null || user.isAnonymous) return false;
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'secondsRemaining': secondsRemaining,
+        'focusBackup': backup,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
+      return true;
     } catch (_) {}
+    return false;
   }
 
-  Future<int?> fetchTimerSettings() async {
+  Future<Map<String, dynamic>?> fetchFocusData() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      if (user == null) return null;
+      if (user == null || user.isAnonymous) return null;
       final snapshot = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
-      return snapshot.data()?['secondsRemaining'] as int?;
+      final backup = snapshot.data()?['focusBackup'];
+      return backup is Map<String, dynamic> ? backup : null;
     } catch (_) {
       return null;
     }
