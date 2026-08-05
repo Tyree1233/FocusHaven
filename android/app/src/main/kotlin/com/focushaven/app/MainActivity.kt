@@ -1,4 +1,4 @@
-package com.example.focushaven
+package com.focushaven.app
 
 import io.flutter.embedding.android.FlutterActivity
 

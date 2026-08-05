@@ -12,7 +12,12 @@
           "package_name": "com.FocusHaven"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "791775983697-a7v1glggjci4ltgdv28mgp4n4lqildbu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCiEm9gciiUuq-6ExH7bTIZSmoYsqfSMyU"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "791775983697-a7v1glggjci4ltgdv28mgp4n4lqildbu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "791775983697-sbgvrs1puqqsmre43jp2vki9k4fd3e7l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.focushaven"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +48,12 @@
           "package_name": "com.example.focushaven"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "791775983697-a7v1glggjci4ltgdv28mgp4n4lqildbu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCiEm9gciiUuq-6ExH7bTIZSmoYsqfSMyU"
@@ -39,7 +61,63 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "791775983697-a7v1glggjci4ltgdv28mgp4n4lqildbu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "791775983697-sbgvrs1puqqsmre43jp2vki9k4fd3e7l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.focushaven"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:791775983697:android:2169909bf8abf259b1a070",
+        "android_client_info": {
+          "package_name": "com.focushaven.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "791775983697-rph40grb8ghi320h312685u1lg9nv0bd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.focushaven.app",
+            "certificate_hash": "9747ad065461d23af8d40317218a7a360e65ff40"
+          }
+        },
+        {
+          "client_id": "791775983697-a7v1glggjci4ltgdv28mgp4n4lqildbu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiEm9gciiUuq-6ExH7bTIZSmoYsqfSMyU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "791775983697-a7v1glggjci4ltgdv28mgp4n4lqildbu.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "791775983697-sbgvrs1puqqsmre43jp2vki9k4fd3e7l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.focushaven"
+              }
+            }
+          ]
         }
       }
     }

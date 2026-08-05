@@ -35,7 +35,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCiEm9gciiUuq-6ExH7bTIZSmoYsqfSMyU',
-    appId: '1:791775983697:android:f91f6aa096085832b1a070',
+    appId: '1:791775983697:android:2169909bf8abf259b1a070',
     messagingSenderId: '791775983697',
     projectId: 'focushaven-68c59',
     storageBucket: 'focushaven-68c59.firebasestorage.app',

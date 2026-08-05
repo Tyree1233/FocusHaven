@@ -281,22 +281,16 @@ class TimerScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   const Text('Choose the atmosphere that feels best for your focus.', style: TextStyle(color: Colors.white70)),
                   const SizedBox(height: 14),
-                  Expanded(
-                    child: ListView(
-                      children: FocusHavenTheme.values
-                          .map(
-                            (theme) => RadioListTile<FocusHavenTheme>(
-                              contentPadding: EdgeInsets.zero,
-                              value: theme,
-                              groupValue: themes.selectedTheme,
-                              onChanged: (value) {
-                                if (value != null) themes.setTheme(value);
-                              },
-                              title: Text(theme.label),
-                              secondary: CircleAvatar(backgroundColor: theme.primary),
-                            ),
-                          )
-                          .toList(),
+                  ...FocusHavenTheme.values.map(
+                    (theme) => RadioListTile<FocusHavenTheme>(
+                      contentPadding: EdgeInsets.zero,
+                      value: theme,
+                      groupValue: themes.selectedTheme,
+                      onChanged: (value) {
+                        if (value != null) themes.setTheme(value);
+                      },
+                      title: Text(theme.label),
+                      secondary: CircleAvatar(backgroundColor: theme.primary),
                     ),
                   ),
                 ],
