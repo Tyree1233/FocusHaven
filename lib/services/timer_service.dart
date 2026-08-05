@@ -111,6 +111,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   bool get isComplete => _isComplete;
   bool get hasPendingResume => _hasPendingResume;
   SessionType get sessionType => _sessionType;
+  String get completionMessage => _completionMessage;
   double get progress =>
       _totalSessionSeconds == 0 ? 0 : 1 - (_secondsRemaining / _totalSessionSeconds);
 
@@ -375,9 +376,9 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       };
 
   String get _completionMessage => switch (_sessionType) {
-        SessionType.focus => 'Nice work. Take a moment to recharge before your next session.',
-        SessionType.shortBreak => 'Your break is over. You are ready for another focused block.',
-        SessionType.longBreak => 'Your long break is complete. Come back refreshed and ready.',
+        SessionType.focus => 'You showed up for what matters. Let yourself take a real breath.',
+        SessionType.shortBreak => 'A small pause counts. Return when you feel ready.',
+        SessionType.longBreak => 'You made room to restore. Carry the calm forward.',
       };
 
   Future<void> _saveToPrefs() async {

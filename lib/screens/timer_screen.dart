@@ -1417,7 +1417,11 @@ class TimerScreen extends StatelessWidget {
                         style: TextStyle(color: sessionColor, fontWeight: FontWeight.bold, letterSpacing: 1.8),
                       ),
                       const SizedBox(height: 10),
-                      Text(timer.sessionType.encouragement, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
+                      Text(
+                        timer.isComplete ? timer.completionMessage : timer.sessionType.encouragement,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
                       if (timer.sessionType == SessionType.focus) ...[
                         const SizedBox(height: 12),
                         TextButton.icon(
