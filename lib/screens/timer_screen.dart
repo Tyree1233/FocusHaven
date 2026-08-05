@@ -646,7 +646,7 @@ class TimerScreen extends StatelessWidget {
         ],
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
     if (task != null) {
       timer.setFocusTask(task);
     }
@@ -1143,7 +1143,7 @@ class TimerScreen extends StatelessWidget {
         ],
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
     if (minutes != null) {
       timer.setDailyGoalMinutes(minutes);
     }
@@ -1210,7 +1210,7 @@ class TimerScreen extends StatelessWidget {
         ),
       ),
     );
-    controller.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
   }
 
   Future<void> _showJournalSheet(BuildContext context) async {

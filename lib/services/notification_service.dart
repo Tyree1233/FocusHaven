@@ -15,7 +15,7 @@ class NotificationService {
     );
 
     try {
-      await _notifications.initialize(settings);
+      await _notifications.initialize(settings: settings);
       await requestPermissions();
     } catch (error) {
       debugPrint('Notification setup failed: $error');
@@ -31,7 +31,7 @@ class NotificationService {
           return (await _notifications
                   .resolvePlatformSpecificImplementation<
                       AndroidFlutterLocalNotificationsPlugin>()
-                  ?.requestPermission()) ??
+                  ?.requestNotificationsPermission()) ??
               false;
         case TargetPlatform.iOS:
           return (await _notifications
@@ -81,10 +81,10 @@ class NotificationService {
 
     try {
       await _notifications.show(
-        DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
-        title,
-        body,
-        details,
+        id: DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
+        title: title,
+        body: body,
+        notificationDetails: details,
       );
     } catch (error) {
       debugPrint('Notification display failed: $error');
