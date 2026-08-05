@@ -68,6 +68,20 @@ class TimerService extends ChangeNotifier {
       .fold(0, (total, session) => total + session.durationSeconds);
   int get todayFocusSessions =>
       _focusHistory.where((session) => _isSameDay(session.completedAt, DateTime.now())).length;
+  List<int> get lastSevenDaysFocusSeconds {
+    final today = DateTime.now();
+    return List.generate(7, (index) {
+      final day = today.subtract(Duration(days: 6 - index));
+      return _focusHistory
+          .where((session) => _isSameDay(session.completedAt, day))
+          .fold(0, (total, session) => total + session.durationSeconds);
+    });
+  }
+  int get weeklyFocusSeconds => lastSevenDaysFocusSeconds.fold(0, (total, seconds) => total + seconds);
+  int get weeklyFocusSessions {
+    final cutoff = DateTime.now().subtract(const Duration(days: 6));
+    return _focusHistory.where((session) => !session.completedAt.isBefore(cutoff)).length;
+  }
   int get dailyChallengeTarget => _dailyChallengeTarget;
   double get dailyChallengeProgress => (todayFocusSessions / _dailyChallengeTarget).clamp(0, 1);
   bool get hasCompletedDailyChallenge => todayFocusSessions >= _dailyChallengeTarget;

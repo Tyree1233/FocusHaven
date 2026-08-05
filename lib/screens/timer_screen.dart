@@ -652,6 +652,13 @@ class TimerScreen extends StatelessWidget {
   }
 
   Future<void> _showFocusHistory(BuildContext context, TimerService timer) async {
+    final weeklySeconds = timer.lastSevenDaysFocusSeconds;
+    final weeklyMinutes = timer.weeklyFocusSeconds ~/ 60;
+    final weeklySessions = timer.weeklyFocusSessions;
+    final weeklyDuration = timer.weeklyFocusSeconds < 60
+        ? '${timer.weeklyFocusSeconds} ${timer.weeklyFocusSeconds == 1 ? 'second' : 'seconds'}'
+        : '$weeklyMinutes ${weeklyMinutes == 1 ? 'minute' : 'minutes'}';
+    final highestDaySeconds = weeklySeconds.fold(1, (highest, seconds) => seconds > highest ? seconds : highest);
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -682,7 +689,63 @@ class TimerScreen extends StatelessWidget {
                   '${timer.completedFocusSessions} completed sessions',
                   style: const TextStyle(color: Colors.white70),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 14),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Theme.of(sheetContext).colorScheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('This week', style: Theme.of(sheetContext).textTheme.titleSmall),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$weeklyDuration • $weeklySessions ${weeklySessions == 1 ? 'session' : 'sessions'}',
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 76,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: List.generate(7, (index) {
+                              final day = DateTime.now().subtract(Duration(days: 6 - index));
+                              final double height = weeklySeconds[index] == 0
+                                  ? 3.0
+                                  : 8.0 + (42 * weeklySeconds[index] / highestDaySeconds);
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        height: height,
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(sheetContext).colorScheme.primary,
+                                          borderRadius: BorderRadius.circular(99),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        const ['M', 'T', 'W', 'T', 'F', 'S', 'S'][day.weekday - 1],
+                                        style: const TextStyle(fontSize: 11, color: Colors.white60),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
                 Expanded(
                   child: ListView.separated(
                     itemCount: timer.recentFocusSessions.length,
