@@ -1232,7 +1232,47 @@ class TimerScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      if (timer.isComplete)
+                      if (timer.hasPendingResume)
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: sessionColor.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Column(
+                              children: [
+                                const Text('Resume your saved session?', style: TextStyle(fontWeight: FontWeight.w700)),
+                                const SizedBox(height: 5),
+                                const Text(
+                                  'Your timer was paused when FocusHaven reopened.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: timer.discardPendingSession,
+                                        child: const Text('Start fresh'),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: FilledButton(
+                                        onPressed: timer.resumePendingSession,
+                                        style: FilledButton.styleFrom(backgroundColor: sessionColor, foregroundColor: _ink),
+                                        child: const Text('Resume'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else if (timer.isComplete)
                         FilledButton.icon(
                           onPressed: timer.beginNextSession,
                           icon: const Icon(Icons.arrow_forward),
