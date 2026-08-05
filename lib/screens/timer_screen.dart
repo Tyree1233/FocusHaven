@@ -21,6 +21,30 @@ class TimerScreen extends StatelessWidget {
     return '$minutes:$remaining';
   }
 
+  String _durationLabel(int seconds) {
+    if (seconds < 60) {
+      return '$seconds ${seconds == 1 ? 'SECOND' : 'SECONDS'}';
+    }
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    if (remainingSeconds == 0) {
+      return '$minutes ${minutes == 1 ? 'MINUTE' : 'MINUTES'}';
+    }
+    return '$minutes ${minutes == 1 ? 'MINUTE' : 'MINUTES'} $remainingSeconds SEC';
+  }
+
+  String _focusSessionLabel(int seconds) {
+    if (seconds < 60) {
+      return '$seconds-second focus session';
+    }
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    if (remainingSeconds == 0) {
+      return '$minutes-minute focus session';
+    }
+    return '$minutes min $remainingSeconds sec focus session';
+  }
+
   String _dateLabel(DateTime date) {
     final now = DateTime.now();
     if (DateUtils.isSameDay(date, now)) return 'Today';
@@ -204,6 +228,37 @@ class TimerScreen extends StatelessWidget {
       );
   }
 
+  Future<void> _confirmClearHistory(BuildContext context, TimerService timer) async {
+    final shouldClear = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Clear focus history?'),
+        content: const Text(
+          'This removes all saved focus sessions on this device and resets your completed count and streak.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Keep history'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+            child: const Text('Clear history'),
+          ),
+        ],
+      ),
+    );
+    if (shouldClear == true) {
+      timer.clearFocusHistory();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Focus history cleared from this device')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
@@ -294,7 +349,10 @@ class TimerScreen extends StatelessWidget {
                               children: [
                                 Text(_formattedTime(timer.secondsRemaining), style: const TextStyle(fontSize: 60, fontWeight: FontWeight.w700, height: 1)),
                                 const SizedBox(height: 10),
-                                Text('${timer.totalSessionSeconds ~/ 60} MINUTES', style: const TextStyle(color: Colors.white60, letterSpacing: 1.2)),
+                                Text(
+                                  _durationLabel(timer.totalSessionSeconds),
+                                  style: const TextStyle(color: Colors.white60, letterSpacing: 1.2),
+                                ),
                               ],
                             ),
                           ],
@@ -388,30 +446,72 @@ class TimerScreen extends StatelessWidget {
                                     backgroundColor: Color(0x33F16FBA),
                                     child: Icon(Icons.auto_awesome, color: _pink),
                                   ),
-                                  title: Text('${session.durationSeconds ~/ 60}-minute focus session'),
+                                  title: Text(_focusSessionLabel(session.durationSeconds)),
                                   trailing: Text(_dateLabel(session.completedAt), style: const TextStyle(color: Colors.white60)),
-                                ),
                               ),
+                            ),
+                        if (timer.recentFocusSessions.isNotEmpty)
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: TextButton.icon(
+                              onPressed: () => _confirmClearHistory(context, timer),
+                              icon: const Icon(Icons.delete_outline),
+                              label: const Text('Clear focus history'),
+                            ),
+                          ),
                         const SizedBox(height: 4),
-                        TextButton.icon(
-                          onPressed: () async {
-                            final isPro = await IAPService.isProUser();
-                            if (!context.mounted) return;
-                            final message = !auth.isSignedIn
-                                ? 'Sign in with Google to back up your focus data'
-                                : !isPro
-                                    ? 'Upgrade to Pro to use cloud backup'
-                                    : await context.read<CloudSyncService>().syncFocusData(timer.cloudBackup)
-                                        ? 'Focus data backed up securely'
-                                        : 'Backup failed. Check your Firebase setup.';
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(message)),
-                              );
-                            }
-                          },
-                          icon: const Icon(Icons.cloud_upload_outlined),
-                          label: const Text('Back up focus data'),
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          spacing: 4,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () async {
+                                final isPro = await IAPService.isProUser();
+                                if (!context.mounted) return;
+                                final message = !auth.isSignedIn
+                                    ? 'Sign in with Google to back up your focus data'
+                                    : !isPro
+                                        ? 'Upgrade to Pro to use cloud backup'
+                                        : await context.read<CloudSyncService>().syncFocusData(timer.cloudBackup)
+                                            ? 'Focus data backed up securely'
+                                            : 'Backup failed. Check your Firebase setup.';
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(message)),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.cloud_upload_outlined),
+                              label: const Text('Back up'),
+                            ),
+                            TextButton.icon(
+                              onPressed: () async {
+                                final isPro = await IAPService.isProUser();
+                                if (!context.mounted) return;
+                                String message;
+                                if (!auth.isSignedIn) {
+                                  message = 'Sign in with Google to restore your focus data';
+                                } else if (!isPro) {
+                                  message = 'Upgrade to Pro to restore cloud backup';
+                                } else {
+                                  final backup = await context.read<CloudSyncService>().fetchFocusData();
+                                  if (!context.mounted) return;
+                                  message = backup == null
+                                      ? 'No cloud backup found yet'
+                                      : timer.restoreCloudBackup(backup)
+                                          ? 'Focus data restored from cloud'
+                                          : 'That cloud backup could not be restored';
+                                }
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(message)),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.cloud_download_outlined),
+                              label: const Text('Restore'),
+                            ),
+                          ],
                         ),
                       ],
                     ),

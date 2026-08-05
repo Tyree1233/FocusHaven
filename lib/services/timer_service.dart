@@ -150,6 +150,56 @@ class TimerService extends ChangeNotifier {
 
   void setCustomMinutes(int minutes) => setCustomDuration(minutes, 0);
 
+  void clearFocusHistory() {
+    _focusHistory = [];
+    _completedFocusSessions = 0;
+    notifyListeners();
+    _saveToPrefs();
+  }
+
+  bool restoreCloudBackup(Map<String, dynamic> backup) {
+    try {
+      final focusSeconds = backup['focusSeconds'];
+      final shortBreakSeconds = backup['shortBreakSeconds'];
+      final longBreakSeconds = backup['longBreakSeconds'];
+      final completedFocusSessions = backup['completedFocusSessions'];
+      final history = backup['focusHistory'];
+
+      if (focusSeconds is! int ||
+          shortBreakSeconds is! int ||
+          longBreakSeconds is! int ||
+          completedFocusSessions is! int ||
+          history is! List) {
+        return false;
+      }
+
+      final restoredHistory = history
+          .whereType<Map>()
+          .map((item) => FocusSession.fromJson(Map<String, dynamic>.from(item)))
+          .toList();
+
+      _ticker?.cancel();
+      _ticker = null;
+      _isRunning = false;
+      _isComplete = false;
+      _focusSeconds = focusSeconds.clamp(1, 24 * 60 * 60).toInt();
+      _shortBreakSeconds = shortBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
+      _longBreakSeconds = longBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
+      _completedFocusSessions = completedFocusSessions.clamp(0, 1 << 31).toInt();
+      _focusHistory = restoredHistory;
+      _sessionType = SessionType.focus;
+      _totalSessionSeconds = _focusSeconds;
+      _secondsRemaining = _focusSeconds;
+      notifyListeners();
+      _saveToPrefs();
+      return true;
+    } on FormatException {
+      return false;
+    } on TypeError {
+      return false;
+    }
+  }
+
   void _finishSession() {
     _ticker?.cancel();
     _ticker = null;
