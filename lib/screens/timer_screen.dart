@@ -350,6 +350,41 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _editFocusTask(BuildContext context, TimerService timer) async {
+    final controller = TextEditingController(text: timer.focusTask);
+    final task = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('What are you focusing on?'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 80,
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(
+            hintText: 'Example: Finish the project proposal',
+          ),
+          onSubmitted: (value) => Navigator.pop(dialogContext, value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, ''),
+            child: const Text('Clear'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (task != null) {
+      timer.setFocusTask(task);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
@@ -417,6 +452,17 @@ class TimerScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(timer.sessionType.encouragement, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70)),
+                      if (timer.sessionType == SessionType.focus) ...[
+                        const SizedBox(height: 12),
+                        TextButton.icon(
+                          onPressed: () => _editFocusTask(context, timer),
+                          icon: const Icon(Icons.edit_outlined, size: 18),
+                          label: Text(
+                            timer.focusTask.isEmpty ? 'Set a focus intention' : timer.focusTask,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 30),
                       SizedBox(
                         width: 270,
@@ -537,7 +583,13 @@ class TimerScreen extends StatelessWidget {
                                     backgroundColor: Color(0x33F16FBA),
                                     child: Icon(Icons.auto_awesome, color: _pink),
                                   ),
-                                  title: Text(_focusSessionLabel(session.durationSeconds)),
+                                  title: Text(session.focusTask ?? _focusSessionLabel(session.durationSeconds)),
+                                  subtitle: session.focusTask == null
+                                      ? null
+                                      : Text(
+                                          _focusSessionLabel(session.durationSeconds),
+                                          style: const TextStyle(color: Colors.white60),
+                                        ),
                                   trailing: Text(_dateLabel(session.completedAt), style: const TextStyle(color: Colors.white60)),
                               ),
                             ),

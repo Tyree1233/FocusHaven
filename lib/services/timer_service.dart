@@ -36,6 +36,7 @@ class TimerService extends ChangeNotifier {
   int _totalSessionSeconds = _defaultFocusSeconds;
   int _completedFocusSessions = 0;
   List<FocusSession> _focusHistory = [];
+  String _focusTask = '';
   bool _isRunning = false;
   bool _isComplete = false;
   SessionType _sessionType = SessionType.focus;
@@ -44,11 +45,13 @@ class TimerService extends ChangeNotifier {
   int get secondsRemaining => _secondsRemaining;
   int get totalSessionSeconds => _totalSessionSeconds;
   int get completedFocusSessions => _completedFocusSessions;
+  String get focusTask => _focusTask;
   Map<String, dynamic> get cloudBackup => {
         'focusSeconds': _focusSeconds,
         'shortBreakSeconds': _shortBreakSeconds,
         'longBreakSeconds': _longBreakSeconds,
         'completedFocusSessions': _completedFocusSessions,
+        'focusTask': _focusTask,
         'focusHistory': _focusHistory.map((session) => session.toJson()).toList(),
       };
   List<FocusSession> get recentFocusSessions => List.unmodifiable(_focusHistory.reversed);
@@ -150,6 +153,15 @@ class TimerService extends ChangeNotifier {
 
   void setCustomMinutes(int minutes) => setCustomDuration(minutes, 0);
 
+  void setFocusTask(String task) {
+    _focusTask = task.trim().replaceAll(RegExp(r'\s+'), ' ');
+    if (_focusTask.length > 80) {
+      _focusTask = _focusTask.substring(0, 80);
+    }
+    notifyListeners();
+    _saveToPrefs();
+  }
+
   void clearFocusHistory() {
     _focusHistory = [];
     _completedFocusSessions = 0;
@@ -164,12 +176,14 @@ class TimerService extends ChangeNotifier {
       final longBreakSeconds = backup['longBreakSeconds'];
       final completedFocusSessions = backup['completedFocusSessions'];
       final history = backup['focusHistory'];
+      final focusTask = backup['focusTask'];
 
       if (focusSeconds is! int ||
           shortBreakSeconds is! int ||
           longBreakSeconds is! int ||
           completedFocusSessions is! int ||
-          history is! List) {
+          history is! List ||
+          (focusTask != null && focusTask is! String)) {
         return false;
       }
 
@@ -187,6 +201,7 @@ class TimerService extends ChangeNotifier {
       _longBreakSeconds = longBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
       _completedFocusSessions = completedFocusSessions.clamp(0, 1 << 31).toInt();
       _focusHistory = restoredHistory;
+      _focusTask = focusTask ?? '';
       _sessionType = SessionType.focus;
       _totalSessionSeconds = _focusSeconds;
       _secondsRemaining = _focusSeconds;
@@ -215,7 +230,11 @@ class TimerService extends ChangeNotifier {
     if (_sessionType == SessionType.focus) {
       _completedFocusSessions++;
       _focusHistory.add(
-        FocusSession(completedAt: DateTime.now(), durationSeconds: _totalSessionSeconds),
+        FocusSession(
+          completedAt: DateTime.now(),
+          durationSeconds: _totalSessionSeconds,
+          focusTask: _focusTask.isEmpty ? null : _focusTask,
+        ),
       );
     }
     notifyListeners();
@@ -243,6 +262,7 @@ class TimerService extends ChangeNotifier {
       prefs.setInt('secondsRemaining', _secondsRemaining),
       prefs.setInt('totalSessionSeconds', _totalSessionSeconds),
       prefs.setInt('completedFocusSessions', _completedFocusSessions),
+      prefs.setString('focusTask', _focusTask),
       prefs.setInt('sessionType', _sessionType.index),
       prefs.setString(
         'focusHistory',
@@ -257,6 +277,7 @@ class TimerService extends ChangeNotifier {
     _shortBreakSeconds = prefs.getInt('shortBreakSeconds') ?? _shortBreakSeconds;
     _longBreakSeconds = prefs.getInt('longBreakSeconds') ?? _longBreakSeconds;
     _completedFocusSessions = prefs.getInt('completedFocusSessions') ?? 0;
+    _focusTask = prefs.getString('focusTask') ?? '';
     final historyJson = prefs.getString('focusHistory');
     if (historyJson != null) {
       try {
@@ -268,6 +289,8 @@ class TimerService extends ChangeNotifier {
               .toList();
         }
       } on FormatException {
+        _focusHistory = [];
+      } on TypeError {
         _focusHistory = [];
       }
     }
