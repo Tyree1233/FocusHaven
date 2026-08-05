@@ -45,6 +45,13 @@ class TimerScreen extends StatelessWidget {
     return '$minutes min $remainingSeconds sec focus session';
   }
 
+  String _shortDurationLabel(int seconds) {
+    if (seconds < 60) return '$seconds sec';
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return remainingSeconds == 0 ? '$minutes min' : '$minutes min $remainingSeconds sec';
+  }
+
   String _dateLabel(DateTime date) {
     final now = DateTime.now();
     if (DateUtils.isSameDay(date, now)) return 'Today';
@@ -449,6 +456,41 @@ class TimerScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _chooseDailyGoal(BuildContext context, TimerService timer) async {
+    final controller = TextEditingController(text: timer.dailyGoalMinutes.toString());
+    final minutes = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Set daily focus goal'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Minutes per day',
+            helperText: 'Choose between 5 and 480 minutes',
+          ),
+          onSubmitted: (value) => Navigator.pop(dialogContext, int.tryParse(value)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, int.tryParse(controller.text)),
+            style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+            child: const Text('Save goal'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (minutes != null) {
+      timer.setDailyGoalMinutes(minutes);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
@@ -627,6 +669,53 @@ class TimerScreen extends StatelessWidget {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 14),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.07),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.flag_outlined, color: _pink),
+                                    const SizedBox(width: 8),
+                                    const Expanded(
+                                      child: Text('Daily focus goal', style: TextStyle(fontWeight: FontWeight.w600)),
+                                    ),
+                                    TextButton(
+                                      onPressed: () => _chooseDailyGoal(context, timer),
+                                      child: const Text('Change'),
+                                    ),
+                                  ],
+                                ),
+                                Text(
+                                  '${_shortDurationLabel(timer.todayFocusSeconds)} of ${timer.dailyGoalMinutes} min',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                                const SizedBox(height: 10),
+                                LinearProgressIndicator(
+                                  value: timer.dailyGoalProgress,
+                                  minHeight: 9,
+                                  borderRadius: BorderRadius.circular(99),
+                                  backgroundColor: Colors.white.withValues(alpha: 0.10),
+                                  color: timer.hasReachedDailyGoal ? const Color(0xFF72E0B8) : _pink,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  timer.hasReachedDailyGoal
+                                      ? 'Daily goal complete — wonderful work.'
+                                      : '${((timer.dailyGoalMinutes * 60 - timer.todayFocusSeconds) / 60).ceil()} min remaining today',
+                                  style: const TextStyle(color: Colors.white60),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 22),
                         Row(

@@ -27,6 +27,7 @@ class TimerService extends ChangeNotifier {
   static const _defaultFocusSeconds = 25 * 60;
   static const _defaultShortBreakSeconds = 5 * 60;
   static const _defaultLongBreakSeconds = 15 * 60;
+  static const _defaultDailyGoalMinutes = 60;
 
   Timer? _ticker;
   int _focusSeconds = _defaultFocusSeconds;
@@ -37,6 +38,7 @@ class TimerService extends ChangeNotifier {
   int _completedFocusSessions = 0;
   List<FocusSession> _focusHistory = [];
   String _focusTask = '';
+  int _dailyGoalMinutes = _defaultDailyGoalMinutes;
   bool _isRunning = false;
   bool _isComplete = false;
   SessionType _sessionType = SessionType.focus;
@@ -46,18 +48,26 @@ class TimerService extends ChangeNotifier {
   int get totalSessionSeconds => _totalSessionSeconds;
   int get completedFocusSessions => _completedFocusSessions;
   String get focusTask => _focusTask;
+  int get dailyGoalMinutes => _dailyGoalMinutes;
   Map<String, dynamic> get cloudBackup => {
         'focusSeconds': _focusSeconds,
         'shortBreakSeconds': _shortBreakSeconds,
         'longBreakSeconds': _longBreakSeconds,
         'completedFocusSessions': _completedFocusSessions,
         'focusTask': _focusTask,
+        'dailyGoalMinutes': _dailyGoalMinutes,
         'focusHistory': _focusHistory.map((session) => session.toJson()).toList(),
       };
   List<FocusSession> get recentFocusSessions => List.unmodifiable(_focusHistory.reversed);
   int get todayFocusMinutes => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))
       .fold(0, (total, session) => total + (session.durationSeconds ~/ 60));
+  int get todayFocusSeconds => _focusHistory
+      .where((session) => _isSameDay(session.completedAt, DateTime.now()))
+      .fold(0, (total, session) => total + session.durationSeconds);
+  double get dailyGoalProgress =>
+      _dailyGoalMinutes == 0 ? 0 : (todayFocusSeconds / (_dailyGoalMinutes * 60)).clamp(0, 1);
+  bool get hasReachedDailyGoal => todayFocusSeconds >= _dailyGoalMinutes * 60;
   int get currentStreak {
     final completedDays = _focusHistory.map((session) => _dateKey(session.completedAt)).toSet();
     var streak = 0;
@@ -162,6 +172,12 @@ class TimerService extends ChangeNotifier {
     _saveToPrefs();
   }
 
+  void setDailyGoalMinutes(int minutes) {
+    _dailyGoalMinutes = minutes.clamp(5, 480).toInt();
+    notifyListeners();
+    _saveToPrefs();
+  }
+
   void clearFocusHistory() {
     _focusHistory = [];
     _completedFocusSessions = 0;
@@ -177,13 +193,15 @@ class TimerService extends ChangeNotifier {
       final completedFocusSessions = backup['completedFocusSessions'];
       final history = backup['focusHistory'];
       final focusTask = backup['focusTask'];
+      final dailyGoalMinutes = backup['dailyGoalMinutes'];
 
       if (focusSeconds is! int ||
           shortBreakSeconds is! int ||
           longBreakSeconds is! int ||
           completedFocusSessions is! int ||
           history is! List ||
-          (focusTask != null && focusTask is! String)) {
+          (focusTask != null && focusTask is! String) ||
+          (dailyGoalMinutes != null && dailyGoalMinutes is! int)) {
         return false;
       }
 
@@ -202,6 +220,9 @@ class TimerService extends ChangeNotifier {
       _completedFocusSessions = completedFocusSessions.clamp(0, 1 << 31).toInt();
       _focusHistory = restoredHistory;
       _focusTask = focusTask ?? '';
+      if (dailyGoalMinutes != null) {
+        _dailyGoalMinutes = dailyGoalMinutes.clamp(5, 480).toInt();
+      }
       _sessionType = SessionType.focus;
       _totalSessionSeconds = _focusSeconds;
       _secondsRemaining = _focusSeconds;
@@ -263,6 +284,7 @@ class TimerService extends ChangeNotifier {
       prefs.setInt('totalSessionSeconds', _totalSessionSeconds),
       prefs.setInt('completedFocusSessions', _completedFocusSessions),
       prefs.setString('focusTask', _focusTask),
+      prefs.setInt('dailyGoalMinutes', _dailyGoalMinutes),
       prefs.setInt('sessionType', _sessionType.index),
       prefs.setString(
         'focusHistory',
@@ -278,6 +300,7 @@ class TimerService extends ChangeNotifier {
     _longBreakSeconds = prefs.getInt('longBreakSeconds') ?? _longBreakSeconds;
     _completedFocusSessions = prefs.getInt('completedFocusSessions') ?? 0;
     _focusTask = prefs.getString('focusTask') ?? '';
+    _dailyGoalMinutes = prefs.getInt('dailyGoalMinutes') ?? _dailyGoalMinutes;
     final historyJson = prefs.getString('focusHistory');
     if (historyJson != null) {
       try {
