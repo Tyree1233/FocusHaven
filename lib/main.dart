@@ -7,6 +7,7 @@ import 'firebase_options.dart';
 import 'services/auth_service.dart';
 import 'services/cloud_sync_service.dart';
 import 'services/iap_service.dart';
+import 'services/journal_service.dart';
 import 'services/notification_service.dart';
 import 'services/timer_service.dart';
 import 'screens/onboarding_screen.dart';
@@ -48,6 +49,7 @@ class FocusHavenApp extends StatelessWidget {
           create: (_) => TimerService(notificationService: activeNotificationService),
         ),
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => JournalService()),
         Provider(create: (_) => IAPService()),
         Provider(create: (_) => CloudSyncService()),
         Provider.value(value: activeNotificationService),

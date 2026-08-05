@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/iap_service.dart';
+import '../services/journal_service.dart';
 import '../services/notification_service.dart';
 import '../services/timer_service.dart';
 
@@ -491,6 +492,150 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _editTodayJournal(BuildContext context, JournalService journal) async {
+    const moods = ['Calm', 'Focused', 'Tired', 'Stressed', 'Grateful'];
+    var selectedMood = journal.todayEntry?.mood ?? moods.first;
+    final controller = TextEditingController(text: journal.todayEntry?.reflection ?? '');
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text("Today's reflection"),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('How are you feeling?'),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: moods
+                      .map(
+                        (mood) => ChoiceChip(
+                          label: Text(mood),
+                          selected: selectedMood == mood,
+                          onSelected: (_) => setDialogState(() => selectedMood = mood),
+                        ),
+                      )
+                      .toList(),
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  maxLines: 5,
+                  maxLength: 800,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    hintText: 'What helped you feel focused today?',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                await journal.saveToday(mood: selectedMood, reflection: controller.text);
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+              },
+              style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+              child: const Text('Save reflection'),
+            ),
+          ],
+        ),
+      ),
+    );
+    controller.dispose();
+  }
+
+  Future<void> _showJournalSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF352260),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: Consumer<JournalService>(
+          builder: (context, journal, _) => SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * 0.72,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Container(
+                      height: 4,
+                      width: 42,
+                      decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(99),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  Text('Reflection journal', style: Theme.of(sheetContext).textTheme.titleLarge),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'A private space saved only on this device.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: () => _editTodayJournal(sheetContext, journal),
+                    icon: const Icon(Icons.edit_note),
+                    label: Text(journal.todayEntry == null ? 'Write today’s reflection' : 'Update today’s reflection'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _pink,
+                      foregroundColor: _ink,
+                      minimumSize: const Size.fromHeight(52),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text('Recent reflections', style: Theme.of(sheetContext).textTheme.titleMedium),
+                  const SizedBox(height: 6),
+                  Expanded(
+                    child: journal.entries.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'Your first reflection will appear here.',
+                              style: TextStyle(color: Colors.white60),
+                            ),
+                          )
+                        : ListView.separated(
+                            itemCount: journal.entries.length,
+                            separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                            itemBuilder: (context, index) {
+                              final entry = journal.entries[index];
+                              return ListTile(
+                                contentPadding: const EdgeInsets.symmetric(vertical: 5),
+                                leading: const Icon(Icons.favorite_outline, color: _pink),
+                                title: Text('${entry.mood} • ${_dateLabel(entry.createdAt)}'),
+                                subtitle: Text(entry.reflection, maxLines: 2, overflow: TextOverflow.ellipsis),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
@@ -501,6 +646,11 @@ class TimerScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('FocusHaven'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.menu_book_outlined),
+            tooltip: 'Reflection journal',
+            onPressed: () => _showJournalSheet(context),
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
             tooltip: 'Test notifications',
