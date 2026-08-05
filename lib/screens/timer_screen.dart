@@ -385,6 +385,70 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _showFocusHistory(BuildContext context, TimerService timer) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF352260),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.72,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+            child: Column(
+              children: [
+                Container(
+                  height: 4,
+                  width: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(99),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text('All focus sessions', style: Theme.of(sheetContext).textTheme.titleLarge),
+                const SizedBox(height: 8),
+                Text(
+                  '${timer.completedFocusSessions} completed sessions',
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: ListView.separated(
+                    itemCount: timer.recentFocusSessions.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                    itemBuilder: (context, index) {
+                      final session = timer.recentFocusSessions[index];
+                      final time = MaterialLocalizations.of(context).formatTimeOfDay(
+                        TimeOfDay.fromDateTime(session.completedAt),
+                      );
+                      return ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 4),
+                        leading: const CircleAvatar(
+                          backgroundColor: Color(0x33F16FBA),
+                          child: Icon(Icons.auto_awesome, color: _pink),
+                        ),
+                        title: Text(session.focusTask ?? _focusSessionLabel(session.durationSeconds)),
+                        subtitle: Text(
+                          '${_focusSessionLabel(session.durationSeconds)} • ${_dateLabel(session.completedAt)} at $time',
+                          style: const TextStyle(color: Colors.white60),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
@@ -565,9 +629,17 @@ class TimerScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 22),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text('Recent focus', style: Theme.of(context).textTheme.titleMedium),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text('Recent focus', style: Theme.of(context).textTheme.titleMedium),
+                            ),
+                            if (timer.recentFocusSessions.isNotEmpty)
+                              TextButton(
+                                onPressed: () => _showFocusHistory(context, timer),
+                                child: const Text('View all'),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         if (timer.recentFocusSessions.isEmpty)
