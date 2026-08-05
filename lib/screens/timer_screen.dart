@@ -10,6 +10,7 @@ import '../services/journal_service.dart';
 import '../services/notification_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
+import '../widgets/guided_breathing_sheet.dart';
 
 class TimerScreen extends StatelessWidget {
   const TimerScreen({super.key});
@@ -304,6 +305,18 @@ class TimerScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showBreathingPause(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) => const GuidedBreathingSheet(),
     );
   }
 
@@ -895,6 +908,11 @@ class TimerScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('FocusHaven'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.self_improvement_outlined),
+            tooltip: 'Mindful pause',
+            onPressed: () => _showBreathingPause(context),
+          ),
           IconButton(
             icon: const Icon(Icons.menu_book_outlined),
             tooltip: 'Reflection journal',
