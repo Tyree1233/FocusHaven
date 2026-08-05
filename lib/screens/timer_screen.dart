@@ -787,8 +787,8 @@ class TimerScreen extends StatelessWidget {
                   maxLines: 5,
                   maxLength: 800,
                   textCapitalization: TextCapitalization.sentences,
-                  decoration: const InputDecoration(
-                    hintText: 'What helped you feel focused today?',
+                  decoration: InputDecoration(
+                    hintText: journal.dailyPrompt,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -849,6 +849,20 @@ class TimerScreen extends StatelessWidget {
                   const Text(
                     'A private space saved only on this device.',
                     style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 14),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Text(
+                        'Today’s prompt: ${journal.dailyPrompt}',
+                        style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   FilledButton.icon(

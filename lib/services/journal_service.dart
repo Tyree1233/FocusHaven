@@ -7,9 +7,23 @@ import '../models/journal_entry.dart';
 
 class JournalService extends ChangeNotifier {
   static const _storageKey = 'journalEntries';
+  static const _prompts = [
+    'What is one thing you are grateful for today?',
+    'What helped you feel focused today?',
+    'What would make tomorrow feel a little lighter?',
+    'What small win are you proud of today?',
+    'What do you want to give yourself permission to release?',
+    'Who or what brought you a moment of calm today?',
+    'What is one kind thing you can do for yourself next?',
+  ];
   List<JournalEntry> _entries = [];
 
   List<JournalEntry> get entries => List.unmodifiable(_entries.reversed);
+  String get dailyPrompt {
+    final now = DateTime.now();
+    final dayOfYear = now.difference(DateTime(now.year)).inDays;
+    return _prompts[dayOfYear % _prompts.length];
+  }
   JournalEntry? get todayEntry {
     for (final entry in _entries.reversed) {
       if (_isToday(entry.createdAt)) return entry;
