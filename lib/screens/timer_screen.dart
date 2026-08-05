@@ -274,8 +274,7 @@ class TimerScreen extends StatelessWidget {
             height: MediaQuery.sizeOf(sheetContext).height * 0.7,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: ListView(
                 children: [
                   Text('Appearance', style: Theme.of(sheetContext).textTheme.titleLarge),
                   const SizedBox(height: 8),
@@ -816,6 +815,7 @@ class TimerScreen extends StatelessWidget {
   }
 
   Future<void> _showJournalSheet(BuildContext context) async {
+    final scrollController = ScrollController();
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -824,26 +824,31 @@ class TimerScreen extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) => SafeArea(
-        top: false,
-        child: Consumer<JournalService>(
-          builder: (context, journal, _) => SizedBox(
-            height: MediaQuery.sizeOf(sheetContext).height * 0.72,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: Container(
-                      height: 4,
-                      width: 42,
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                    ),
+          top: false,
+          child: SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * 0.78,
+            child: Consumer<JournalService>(
+            builder: (context, journal, _) => Column(
+              children: [
+                const SizedBox(height: 12),
+                Container(
+                  height: 4,
+                  width: 42,
+                  decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(99),
                   ),
-                  const SizedBox(height: 18),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+                    child: Scrollbar(
+                      controller: scrollController,
+                      thumbVisibility: false,
+                      interactive: true,
+                      child: ListView(
+                        controller: scrollController,
+                        children: [
                   Text('Reflection journal', style: Theme.of(sheetContext).textTheme.titleLarge),
                   const SizedBox(height: 6),
                   const Text(
@@ -864,6 +869,28 @@ class TimerScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  if (journal.recentMoodCounts.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Text('Mood snapshot', style: Theme.of(sheetContext).textTheme.titleMedium),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Over the last 7 days, you most often felt ${journal.mostCommonRecentMood?.toLowerCase()}.',
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: journal.recentMoodCounts.entries
+                          .map(
+                            (entry) => Chip(
+                              label: Text('${entry.key} ${entry.value}'),
+                              backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.13),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   FilledButton.icon(
                     onPressed: () => _editTodayJournal(sheetContext, journal),
@@ -878,35 +905,37 @@ class TimerScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   Text('Recent reflections', style: Theme.of(sheetContext).textTheme.titleMedium),
                   const SizedBox(height: 6),
-                  Expanded(
-                    child: journal.entries.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'Your first reflection will appear here.',
-                              style: TextStyle(color: Colors.white60),
-                            ),
-                          )
-                        : ListView.separated(
-                            itemCount: journal.entries.length,
-                            separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
-                            itemBuilder: (context, index) {
-                              final entry = journal.entries[index];
-                              return ListTile(
-                                contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                                leading: Icon(Icons.favorite_outline, color: Theme.of(context).colorScheme.primary),
-                                title: Text('${entry.mood} • ${_dateLabel(entry.createdAt)}'),
-                                subtitle: Text(entry.reflection, maxLines: 2, overflow: TextOverflow.ellipsis),
-                              );
-                            },
-                          ),
+                  if (journal.entries.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 30),
+                      child: Center(
+                        child: Text(
+                          'Your first reflection will appear here.',
+                          style: TextStyle(color: Colors.white60),
+                        ),
+                      ),
+                    )
+                  else
+                    ...journal.entries.map(
+                      (entry) => ListTile(
+                        contentPadding: const EdgeInsets.symmetric(vertical: 5),
+                        leading: Icon(Icons.favorite_outline, color: Theme.of(context).colorScheme.primary),
+                        title: Text('${entry.mood} • ${_dateLabel(entry.createdAt)}'),
+                        subtitle: Text(entry.reflection, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
+    scrollController.dispose();
   }
 
   @override

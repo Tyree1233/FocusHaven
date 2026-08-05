@@ -19,6 +19,22 @@ class JournalService extends ChangeNotifier {
   List<JournalEntry> _entries = [];
 
   List<JournalEntry> get entries => List.unmodifiable(_entries.reversed);
+  Map<String, int> get recentMoodCounts {
+    final cutoff = DateTime.now().subtract(const Duration(days: 6));
+    final counts = <String, int>{};
+    for (final entry in _entries) {
+      if (entry.createdAt.isAfter(cutoff)) {
+        counts.update(entry.mood, (count) => count + 1, ifAbsent: () => 1);
+      }
+    }
+    return counts;
+  }
+
+  String? get mostCommonRecentMood {
+    final counts = recentMoodCounts;
+    if (counts.isEmpty) return null;
+    return counts.entries.reduce((first, next) => first.value >= next.value ? first : next).key;
+  }
   String get dailyPrompt {
     final now = DateTime.now();
     final dayOfYear = now.difference(DateTime(now.year)).inDays;
