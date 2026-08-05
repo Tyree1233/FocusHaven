@@ -220,12 +220,103 @@ class TimerScreen extends StatelessWidget {
                       icon: const Icon(Icons.login),
                       label: const Text('Sign in with Google'),
                     ),
+                  const SizedBox(height: 8),
+                  TextButton.icon(
+                    onPressed: () => _showProSheet(context),
+                    icon: const Icon(Icons.workspace_premium_outlined),
+                    label: const Text('FocusHaven Pro'),
+                  ),
                 ],
               ),
             ),
           ),
         ),
       );
+  }
+
+  Future<void> _showProSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF352260),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) {
+        final purchases = sheetContext.read<IAPService>();
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Icon(Icons.workspace_premium, size: 42, color: _pink),
+                const SizedBox(height: 12),
+                Text(
+                  'FocusHaven Pro',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(sheetContext).textTheme.headlineSmall,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Protect your focus progress with secure cloud backup and restore it on your other devices.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 18),
+                const _ProBenefit(icon: Icons.cloud_done_outlined, label: 'Secure cloud backup'),
+                const _ProBenefit(icon: Icons.devices_outlined, label: 'Restore on another device'),
+                const _ProBenefit(icon: Icons.all_inclusive, label: 'One-time lifetime unlock'),
+                const SizedBox(height: 22),
+                FutureBuilder<String?>(
+                  future: purchases.proPrice(),
+                  builder: (context, snapshot) {
+                    final price = snapshot.data;
+                    return FilledButton(
+                      onPressed: price == null
+                          ? null
+                          : () async {
+                              try {
+                                await purchases.buyPro();
+                                if (sheetContext.mounted) {
+                                  ScaffoldMessenger.of(sheetContext).showSnackBar(
+                                    const SnackBar(content: Text('Complete your purchase in the store window')),
+                                  );
+                                }
+                              } on StateError catch (error) {
+                                if (sheetContext.mounted) {
+                                  ScaffoldMessenger.of(sheetContext).showSnackBar(
+                                    SnackBar(content: Text('${error.message}')),
+                                  );
+                                }
+                              }
+                            },
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _pink,
+                        foregroundColor: _ink,
+                        minimumSize: const Size.fromHeight(54),
+                      ),
+                      child: Text(price == null ? 'Pro is not available yet' : 'Unlock Pro for $price'),
+                    );
+                  },
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await purchases.restorePurchases();
+                    if (sheetContext.mounted) {
+                      ScaffoldMessenger.of(sheetContext).showSnackBar(
+                        const SnackBar(content: Text('Checking the store for previous purchases')),
+                      );
+                    }
+                  },
+                  child: const Text('Restore purchases'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _confirmClearHistory(BuildContext context, TimerService timer) async {
@@ -554,6 +645,27 @@ class _StatCard extends StatelessWidget {
             Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ProBenefit extends StatelessWidget {
+  const _ProBenefit({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        children: [
+          Icon(icon, color: TimerScreen._pink),
+          const SizedBox(width: 10),
+          Text(label),
+        ],
       ),
     );
   }

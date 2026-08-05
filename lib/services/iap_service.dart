@@ -33,6 +33,12 @@ class IAPService {
     return prefs.getBool(_proKey) ?? false;
   }
 
+  Future<String?> proPrice() async {
+    final response = await _iap.queryProductDetails({proProductId});
+    if (response.productDetails.isEmpty) return null;
+    return response.productDetails.first.price;
+  }
+
   Future<void> buyPro() async {
     final response = await _iap.queryProductDetails({proProductId});
     if (response.productDetails.isEmpty) throw StateError('FocusHaven Pro is not available.');
