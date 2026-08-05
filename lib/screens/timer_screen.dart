@@ -1054,6 +1054,56 @@ class TimerScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 14),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: timer.hasCompletedDailyChallenge
+                                ? const Color(0x2272E0B8)
+                                : Colors.white.withValues(alpha: 0.07),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 13, 16, 14),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      timer.hasCompletedDailyChallenge
+                                          ? Icons.emoji_events_outlined
+                                          : Icons.flag_outlined,
+                                      color: timer.hasCompletedDailyChallenge ? const Color(0xFF72E0B8) : _pink,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Expanded(
+                                      child: Text('Daily challenge', style: TextStyle(fontWeight: FontWeight.w600)),
+                                    ),
+                                    Text(
+                                      '${timer.todayFocusSessions}/${timer.dailyChallengeTarget}',
+                                      style: const TextStyle(color: Colors.white70),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  timer.hasCompletedDailyChallenge
+                                      ? 'Challenge complete — you showed up for yourself today.'
+                                      : 'Complete ${timer.dailyChallengeTarget} focus sessions today.',
+                                  style: const TextStyle(color: Colors.white70),
+                                ),
+                                const SizedBox(height: 10),
+                                LinearProgressIndicator(
+                                  value: timer.dailyChallengeProgress,
+                                  minHeight: 8,
+                                  borderRadius: BorderRadius.circular(99),
+                                  backgroundColor: Colors.white.withValues(alpha: 0.10),
+                                  color: timer.hasCompletedDailyChallenge ? const Color(0xFF72E0B8) : _lavender,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 22),
                         Row(
                           children: [

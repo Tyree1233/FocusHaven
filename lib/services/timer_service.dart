@@ -28,6 +28,7 @@ class TimerService extends ChangeNotifier {
   static const _defaultShortBreakSeconds = 5 * 60;
   static const _defaultLongBreakSeconds = 15 * 60;
   static const _defaultDailyGoalMinutes = 60;
+  static const _dailyChallengeTarget = 3;
 
   Timer? _ticker;
   int _focusSeconds = _defaultFocusSeconds;
@@ -65,6 +66,11 @@ class TimerService extends ChangeNotifier {
   int get todayFocusSeconds => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))
       .fold(0, (total, session) => total + session.durationSeconds);
+  int get todayFocusSessions =>
+      _focusHistory.where((session) => _isSameDay(session.completedAt, DateTime.now())).length;
+  int get dailyChallengeTarget => _dailyChallengeTarget;
+  double get dailyChallengeProgress => (todayFocusSessions / _dailyChallengeTarget).clamp(0, 1);
+  bool get hasCompletedDailyChallenge => todayFocusSessions >= _dailyChallengeTarget;
   double get dailyGoalProgress =>
       _dailyGoalMinutes == 0 ? 0 : (todayFocusSeconds / (_dailyGoalMinutes * 60)).clamp(0, 1);
   bool get hasReachedDailyGoal => todayFocusSeconds >= _dailyGoalMinutes * 60;
