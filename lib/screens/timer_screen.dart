@@ -8,20 +8,18 @@ import '../services/focus_profile_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/notification_service.dart';
+import '../services/theme_service.dart';
 import '../services/timer_service.dart';
 
 class TimerScreen extends StatelessWidget {
   const TimerScreen({super.key});
 
-  static const _pink = Color(0xFFF16FBA);
-  static const _mint = Color(0xFF72E0B8);
-  static const _lavender = Color(0xFF9B82FF);
   static const _ink = Color(0xFF211442);
 
-  Color _sessionColor(SessionType type) => switch (type) {
-        SessionType.focus => _pink,
-        SessionType.shortBreak => _mint,
-        SessionType.longBreak => _lavender,
+  Color _sessionColor(BuildContext context, SessionType type) => switch (type) {
+        SessionType.focus => Theme.of(context).colorScheme.primary,
+        SessionType.shortBreak => Theme.of(context).colorScheme.secondary,
+        SessionType.longBreak => Theme.of(context).colorScheme.tertiary,
       };
 
   String _formattedTime(int seconds) {
@@ -74,7 +72,7 @@ class TimerScreen extends StatelessWidget {
 
   Future<void> _chooseCustomDuration(BuildContext context, TimerService timer) async {
     const maximumMinutes = 180;
-    final sessionColor = _sessionColor(timer.sessionType);
+    final sessionColor = _sessionColor(context, timer.sessionType);
     final initialMinutes = (timer.totalSessionSeconds ~/ 60).clamp(0, maximumMinutes).toInt();
     final initialSeconds = timer.totalSessionSeconds % 60;
     var selectedMinutes = initialMinutes;
@@ -85,7 +83,7 @@ class TimerScreen extends StatelessWidget {
     final duration = await showModalBottomSheet<Duration>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352260),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -201,7 +199,7 @@ class TimerScreen extends StatelessWidget {
   Future<void> _showAccountSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
         context: context,
-        backgroundColor: const Color(0xFF352260),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
@@ -248,12 +246,56 @@ class TimerScreen extends StatelessWidget {
                     icon: const Icon(Icons.psychology_outlined),
                     label: const Text('Discover your focus profile'),
                   ),
+                  TextButton.icon(
+                    onPressed: () => _showThemeSheet(context),
+                    icon: const Icon(Icons.palette_outlined),
+                    label: const Text('Appearance'),
+                  ),
                 ],
               ),
             ),
           ),
         ),
       );
+  }
+
+  Future<void> _showThemeSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Consumer<ThemeService>(
+          builder: (context, themes, _) => Padding(
+            padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Appearance', style: Theme.of(sheetContext).textTheme.titleLarge),
+                const SizedBox(height: 8),
+                const Text('Choose the atmosphere that feels best for your focus.', style: TextStyle(color: Colors.white70)),
+                const SizedBox(height: 14),
+                ...FocusHavenTheme.values.map(
+                  (theme) => RadioListTile<FocusHavenTheme>(
+                    contentPadding: EdgeInsets.zero,
+                    value: theme,
+                    groupValue: themes.selectedTheme,
+                    onChanged: (value) {
+                      if (value != null) themes.setTheme(value);
+                    },
+                    title: Text(theme.label),
+                    secondary: CircleAvatar(backgroundColor: theme.primary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _showFocusProfileSheet(BuildContext context) async {
@@ -299,7 +341,7 @@ class TimerScreen extends StatelessWidget {
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF352260),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -313,7 +355,7 @@ class TimerScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.auto_awesome, size: 44, color: _pink),
+                    Icon(Icons.auto_awesome, size: 44, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(height: 12),
                     const Text('Your focus profile', style: TextStyle(fontSize: 16, color: Colors.white70)),
                     const SizedBox(height: 6),
@@ -327,7 +369,7 @@ class TimerScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     FilledButton(
                       onPressed: () => Navigator.pop(sheetContext),
-                      style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+                      style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
                       child: const Text('Use this profile'),
                     ),
                   ],
@@ -343,7 +385,7 @@ class TimerScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.psychology_outlined, size: 42, color: _pink),
+                    Icon(Icons.psychology_outlined, size: 42, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(height: 14),
                     Text('Find your focus profile', style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 10),
@@ -357,7 +399,7 @@ class TimerScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     FilledButton(
                       onPressed: () => setSheetState(() => page = 0),
-                      style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+                      style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
                       child: Text(activeType == null ? 'Start quiz' : 'Retake quiz'),
                     ),
                   ],
@@ -440,7 +482,7 @@ class TimerScreen extends StatelessWidget {
   Future<void> _showProSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF352260),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -453,7 +495,7 @@ class TimerScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.workspace_premium, size: 42, color: _pink),
+                Icon(Icons.workspace_premium, size: 42, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(height: 12),
                 Text(
                   'FocusHaven Pro',
@@ -495,7 +537,7 @@ class TimerScreen extends StatelessWidget {
                               }
                             },
                       style: FilledButton.styleFrom(
-                        backgroundColor: _pink,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: _ink,
                         minimumSize: const Size.fromHeight(54),
                       ),
@@ -537,7 +579,7 @@ class TimerScreen extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
             child: const Text('Clear history'),
           ),
         ],
@@ -576,7 +618,7 @@ class TimerScreen extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, controller.text),
-            style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
             child: const Text('Save'),
           ),
         ],
@@ -591,7 +633,7 @@ class TimerScreen extends StatelessWidget {
   Future<void> _showFocusHistory(BuildContext context, TimerService timer) async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF352260),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -631,9 +673,9 @@ class TimerScreen extends StatelessWidget {
                       );
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                        leading: const CircleAvatar(
-                          backgroundColor: Color(0x33F16FBA),
-                          child: Icon(Icons.auto_awesome, color: _pink),
+                        leading: CircleAvatar(
+                          backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                          child: Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary),
                         ),
                         title: Text(session.focusTask ?? _focusSessionLabel(session.durationSeconds)),
                         subtitle: Text(
@@ -675,7 +717,7 @@ class TimerScreen extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, int.tryParse(controller.text)),
-            style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
             child: const Text('Save goal'),
           ),
         ],
@@ -741,7 +783,7 @@ class TimerScreen extends StatelessWidget {
                 await journal.saveToday(mood: selectedMood, reflection: controller.text);
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
               },
-              style: FilledButton.styleFrom(backgroundColor: _pink, foregroundColor: _ink),
+              style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
               child: const Text('Save reflection'),
             ),
           ],
@@ -754,7 +796,7 @@ class TimerScreen extends StatelessWidget {
   Future<void> _showJournalSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF352260),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -792,7 +834,7 @@ class TimerScreen extends StatelessWidget {
                     icon: const Icon(Icons.edit_note),
                     label: Text(journal.todayEntry == null ? 'Write today’s reflection' : 'Update today’s reflection'),
                     style: FilledButton.styleFrom(
-                      backgroundColor: _pink,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: _ink,
                       minimumSize: const Size.fromHeight(52),
                     ),
@@ -815,7 +857,7 @@ class TimerScreen extends StatelessWidget {
                               final entry = journal.entries[index];
                               return ListTile(
                                 contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                                leading: const Icon(Icons.favorite_outline, color: _pink),
+                                leading: Icon(Icons.favorite_outline, color: Theme.of(context).colorScheme.primary),
                                 title: Text('${entry.mood} • ${_dateLabel(entry.createdAt)}'),
                                 subtitle: Text(entry.reflection, maxLines: 2, overflow: TextOverflow.ellipsis),
                               );
@@ -835,7 +877,10 @@ class TimerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
     final auth = context.watch<AuthService>();
-    final sessionColor = _sessionColor(timer.sessionType);
+    final sessionColor = _sessionColor(context, timer.sessionType);
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
+    final tertiaryColor = Theme.of(context).colorScheme.tertiary;
 
     return Scaffold(
       appBar: AppBar(
@@ -1029,7 +1074,7 @@ class TimerScreen extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                    const Icon(Icons.flag_outlined, color: _pink),
+                                    Icon(Icons.flag_outlined, color: primaryColor),
                                     const SizedBox(width: 8),
                                     const Expanded(
                                       child: Text('Daily focus goal', style: TextStyle(fontWeight: FontWeight.w600)),
@@ -1050,7 +1095,7 @@ class TimerScreen extends StatelessWidget {
                                   minHeight: 9,
                                   borderRadius: BorderRadius.circular(99),
                                   backgroundColor: Colors.white.withValues(alpha: 0.10),
-                                  color: timer.hasReachedDailyGoal ? const Color(0xFF72E0B8) : _pink,
+                                  color: timer.hasReachedDailyGoal ? secondaryColor : primaryColor,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
@@ -1067,7 +1112,7 @@ class TimerScreen extends StatelessWidget {
                         DecoratedBox(
                           decoration: BoxDecoration(
                             color: timer.hasCompletedDailyChallenge
-                                ? const Color(0x2272E0B8)
+                                ? secondaryColor.withValues(alpha: 0.14)
                                 : Colors.white.withValues(alpha: 0.07),
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -1082,7 +1127,7 @@ class TimerScreen extends StatelessWidget {
                                       timer.hasCompletedDailyChallenge
                                           ? Icons.emoji_events_outlined
                                           : Icons.flag_outlined,
-                                      color: timer.hasCompletedDailyChallenge ? const Color(0xFF72E0B8) : _pink,
+                                      color: timer.hasCompletedDailyChallenge ? secondaryColor : primaryColor,
                                     ),
                                     const SizedBox(width: 8),
                                     const Expanded(
@@ -1107,7 +1152,7 @@ class TimerScreen extends StatelessWidget {
                                   minHeight: 8,
                                   borderRadius: BorderRadius.circular(99),
                                   backgroundColor: Colors.white.withValues(alpha: 0.10),
-                                  color: timer.hasCompletedDailyChallenge ? const Color(0xFF72E0B8) : _lavender,
+                                  color: timer.hasCompletedDailyChallenge ? secondaryColor : tertiaryColor,
                                 ),
                               ],
                             ),
@@ -1136,9 +1181,9 @@ class TimerScreen extends StatelessWidget {
                           ...timer.recentFocusSessions.take(3).map(
                                 (session) => ListTile(
                                   contentPadding: EdgeInsets.zero,
-                                  leading: const CircleAvatar(
-                                    backgroundColor: Color(0x33F16FBA),
-                                    child: Icon(Icons.auto_awesome, color: _pink),
+                                  leading: CircleAvatar(
+                                    backgroundColor: primaryColor.withValues(alpha: 0.2),
+                                    child: Icon(Icons.auto_awesome, color: primaryColor),
                                   ),
                                   title: Text(session.focusTask ?? _focusSessionLabel(session.durationSeconds)),
                                   subtitle: session.focusTask == null
@@ -1248,7 +1293,7 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
         child: Column(
           children: [
-            Icon(icon, size: 18, color: TimerScreen._pink),
+            Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 4),
             Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
             Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
@@ -1271,7 +1316,7 @@ class _ProBenefit extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         children: [
-          Icon(icon, color: TimerScreen._pink),
+          Icon(icon, color: Theme.of(context).colorScheme.primary),
           const SizedBox(width: 10),
           Text(label),
         ],

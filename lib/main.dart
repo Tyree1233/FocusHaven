@@ -11,6 +11,7 @@ import 'services/iap_service.dart';
 import 'services/journal_service.dart';
 import 'services/notification_service.dart';
 import 'services/timer_service.dart';
+import 'services/theme_service.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
 
@@ -51,28 +52,42 @@ class FocusHavenApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => FocusProfileService()),
+        ChangeNotifierProvider(create: (_) => ThemeService()),
         ChangeNotifierProvider(create: (_) => JournalService()),
         Provider(create: (_) => IAPService()),
         Provider(create: (_) => CloudSyncService()),
         Provider.value(value: activeNotificationService),
       ],
-      child: MaterialApp(
-        title: 'FocusHaven',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          brightness: Brightness.dark,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFFF16FBA),
-            brightness: Brightness.dark,
-            surface: const Color(0xFF352260),
-          ),
-          scaffoldBackgroundColor: const Color(0xFF211442),
-          useMaterial3: true,
-        ),
-        initialRoute: showOnboarding ? '/' : '/timer',
-        routes: {
-          '/': (_) => const OnboardingScreen(),
-          '/timer': (_) => const TimerScreen(),
+      child: Consumer<ThemeService>(
+        builder: (context, themeService, _) {
+          final selectedTheme = themeService.selectedTheme;
+          return MaterialApp(
+            title: 'FocusHaven',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              brightness: Brightness.dark,
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: selectedTheme.primary,
+                brightness: Brightness.dark,
+              ).copyWith(
+                primary: selectedTheme.primary,
+                secondary: selectedTheme.shortBreak,
+                tertiary: selectedTheme.longBreak,
+                surface: selectedTheme.surface,
+              ),
+              scaffoldBackgroundColor: selectedTheme.background,
+              appBarTheme: AppBarTheme(
+                backgroundColor: selectedTheme.surface,
+                foregroundColor: Colors.white,
+              ),
+              useMaterial3: true,
+            ),
+            initialRoute: showOnboarding ? '/' : '/timer',
+            routes: {
+              '/': (_) => const OnboardingScreen(),
+              '/timer': (_) => const TimerScreen(),
+            },
+          );
         },
       ),
     );
