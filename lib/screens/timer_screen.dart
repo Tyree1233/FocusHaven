@@ -730,6 +730,15 @@ class TimerScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+                    if (queue.items.any((item) => item.isComplete))
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: queue.clearCompleted,
+                          icon: const Icon(Icons.delete_sweep_outlined),
+                          label: const Text('Clear completed'),
+                        ),
+                      ),
                   ],
                 ),
               ),

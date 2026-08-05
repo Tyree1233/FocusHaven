@@ -54,6 +54,12 @@ class FocusQueueService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> clearCompleted() async {
+    _items.removeWhere((item) => item.isComplete);
+    await _save();
+    notifyListeners();
+  }
+
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString(_storageKey);
