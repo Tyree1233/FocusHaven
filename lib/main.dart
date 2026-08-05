@@ -78,7 +78,7 @@ class FocusHavenApp extends StatelessWidget {
               scaffoldBackgroundColor: selectedTheme.background,
               appBarTheme: AppBarTheme(
                 backgroundColor: selectedTheme.surface,
-                foregroundColor: Colors.white,
+                foregroundColor: selectedTheme.primary,
               ),
               useMaterial3: true,
             ),

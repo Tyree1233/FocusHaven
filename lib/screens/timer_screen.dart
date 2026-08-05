@@ -262,35 +262,44 @@ class TimerScreen extends StatelessWidget {
   Future<void> _showThemeSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) => SafeArea(
         child: Consumer<ThemeService>(
-          builder: (context, themes, _) => Padding(
-            padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('Appearance', style: Theme.of(sheetContext).textTheme.titleLarge),
-                const SizedBox(height: 8),
-                const Text('Choose the atmosphere that feels best for your focus.', style: TextStyle(color: Colors.white70)),
-                const SizedBox(height: 14),
-                ...FocusHavenTheme.values.map(
-                  (theme) => RadioListTile<FocusHavenTheme>(
-                    contentPadding: EdgeInsets.zero,
-                    value: theme,
-                    groupValue: themes.selectedTheme,
-                    onChanged: (value) {
-                      if (value != null) themes.setTheme(value);
-                    },
-                    title: Text(theme.label),
-                    secondary: CircleAvatar(backgroundColor: theme.primary),
+          builder: (context, themes, _) => SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * 0.7,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Appearance', style: Theme.of(sheetContext).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  const Text('Choose the atmosphere that feels best for your focus.', style: TextStyle(color: Colors.white70)),
+                  const SizedBox(height: 14),
+                  Expanded(
+                    child: ListView(
+                      children: FocusHavenTheme.values
+                          .map(
+                            (theme) => RadioListTile<FocusHavenTheme>(
+                              contentPadding: EdgeInsets.zero,
+                              value: theme,
+                              groupValue: themes.selectedTheme,
+                              onChanged: (value) {
+                                if (value != null) themes.setTheme(value);
+                              },
+                              title: Text(theme.label),
+                              secondary: CircleAvatar(backgroundColor: theme.primary),
+                            ),
+                          )
+                          .toList(),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
