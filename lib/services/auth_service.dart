@@ -5,6 +5,9 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthService extends ChangeNotifier {
   User? user;
 
+  String? _signInError;
+  String? get signInError => _signInError;
+
   bool get isSignedIn => user != null && !user!.isAnonymous;
   String get displayName => user?.displayName ?? user?.email ?? 'Guest';
 
@@ -30,19 +33,31 @@ class AuthService extends ChangeNotifier {
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return null;
+      _signInError = null;
+      final googleSignIn = GoogleSignIn();
+      final googleUser =
+          await googleSignIn.signInSilently() ?? await googleSignIn.signIn();
+      if (googleUser == null) {
+        _signInError =
+            'Google sign-in was closed before an account was selected.';
+        notifyListeners();
+        debugPrint(
+            'Google sign-in was cancelled before an account was selected.');
+        return null;
+      }
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser?.isAnonymous ?? false) {
-        return currentUser!.linkWithCredential(credential);
-      }
+      // Sign in directly so a prior anonymous guest session cannot block
+      // returning to an existing Google account.
       return FirebaseAuth.instance.signInWithCredential(credential);
     } catch (error) {
+      _signInError = error is FirebaseAuthException
+          ? (error.message ?? error.code)
+          : 'Google sign-in could not start: ${error.runtimeType}';
+      notifyListeners();
       debugPrint('Google sign-in failed: $error');
       return null;
     }
@@ -50,11 +65,11 @@ class AuthService extends ChangeNotifier {
 
   Future<void> signOut() async {
     try {
-      await GoogleSignIn().signOut();
       await FirebaseAuth.instance.signOut();
-      await signInAnonymouslyIfNeeded();
     } catch (error) {
       debugPrint('Sign-out failed: $error');
     }
+    // Keep the Google session so signing back into FocusHaven is reliable.
+    await signInAnonymouslyIfNeeded();
   }
 }

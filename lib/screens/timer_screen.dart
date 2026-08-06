@@ -360,7 +360,8 @@ class TimerScreen extends StatelessWidget {
                     reminders.isEnabled ? 'Reminder is on' : 'Reminder is off',
                   ),
                   subtitle: Text(
-                    MaterialLocalizations.of(context).formatTimeOfDay(reminders.time),
+                    MaterialLocalizations.of(context)
+                        .formatTimeOfDay(reminders.time),
                   ),
                   trailing: Switch(
                     value: reminders.isEnabled,
@@ -371,12 +372,14 @@ class TimerScreen extends StatelessWidget {
                           initialTime: reminders.time,
                         );
                         if (selected == null || !sheetContext.mounted) return;
-                        final scheduled = await reminders.setDailyReminder(selected);
+                        final scheduled =
+                            await reminders.setDailyReminder(selected);
                         if (!sheetContext.mounted) return;
                         if (!scheduled) {
                           ScaffoldMessenger.of(sheetContext).showSnackBar(
                             const SnackBar(
-                              content: Text('Allow notifications to set a daily reminder.'),
+                              content: Text(
+                                  'Allow notifications to set a daily reminder.'),
                             ),
                           );
                         }
@@ -394,7 +397,8 @@ class TimerScreen extends StatelessWidget {
                       initialTime: reminders.time,
                     );
                     if (selected == null || !sheetContext.mounted) return;
-                    final scheduled = await reminders.setDailyReminder(selected);
+                    final scheduled =
+                        await reminders.setDailyReminder(selected);
                     if (!sheetContext.mounted) return;
                     ScaffoldMessenger.of(sheetContext).showSnackBar(
                       SnackBar(
@@ -417,7 +421,8 @@ class TimerScreen extends StatelessWidget {
                     if (!permitted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Allow notifications to send a test alert.'),
+                          content:
+                              Text('Allow notifications to send a test alert.'),
                         ),
                       );
                       return;
@@ -505,8 +510,18 @@ class TimerScreen extends StatelessWidget {
                     FilledButton.icon(
                       onPressed: () async {
                         final result = await auth.signInWithGoogle();
-                        if (result != null && sheetContext.mounted)
+                        if (!sheetContext.mounted) return;
+                        if (result != null) {
                           Navigator.pop(sheetContext);
+                        } else {
+                          final message = auth.signInError ??
+                              'Sign-in was not completed. Please try again.';
+                          ScaffoldMessenger.of(sheetContext).showSnackBar(
+                            SnackBar(
+                              content: Text(message),
+                            ),
+                          );
+                        }
                       },
                       icon: const Icon(Icons.login),
                       label: const Text('Sign in with Google'),
@@ -817,6 +832,7 @@ class TimerScreen extends StatelessWidget {
   Future<void> _showProSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -824,89 +840,96 @@ class TimerScreen extends StatelessWidget {
       builder: (sheetContext) {
         final purchases = sheetContext.read<IAPService>();
         return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Icon(Icons.workspace_premium,
-                    size: 42, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(height: 12),
-                Text(
-                  'FocusHaven Pro',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(sheetContext).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Protect your focus progress with secure cloud backup and restore it on your other devices.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 18),
-                const _ProBenefit(
-                    icon: Icons.cloud_done_outlined,
-                    label: 'Secure cloud backup'),
-                const _ProBenefit(
-                    icon: Icons.devices_outlined,
-                    label: 'Restore on another device'),
-                const _ProBenefit(
-                    icon: Icons.all_inclusive,
-                    label: 'One-time lifetime unlock'),
-                const SizedBox(height: 22),
-                FutureBuilder<String?>(
-                  future: purchases.proPrice(),
-                  builder: (context, snapshot) {
-                    final price = snapshot.data;
-                    return FilledButton(
-                      onPressed: price == null
-                          ? null
-                          : () async {
-                              try {
-                                await purchases.buyPro();
-                                if (sheetContext.mounted) {
-                                  ScaffoldMessenger.of(sheetContext)
-                                      .showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            'Complete your purchase in the store window')),
-                                  );
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.88,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Icon(Icons.workspace_premium,
+                      size: 42, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(height: 12),
+                  Text(
+                    'FocusHaven Pro',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(sheetContext).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Protect your focus progress with secure cloud backup and restore it on your other devices.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 18),
+                  const _ProBenefit(
+                      icon: Icons.cloud_done_outlined,
+                      label: 'Secure cloud backup'),
+                  const _ProBenefit(
+                      icon: Icons.devices_outlined,
+                      label: 'Restore on another device'),
+                  const _ProBenefit(
+                      icon: Icons.all_inclusive,
+                      label: 'One-time lifetime unlock'),
+                  const SizedBox(height: 22),
+                  FutureBuilder<String?>(
+                    future: purchases.proPrice(),
+                    builder: (context, snapshot) {
+                      final price = snapshot.data;
+                      return FilledButton(
+                        onPressed: price == null
+                            ? null
+                            : () async {
+                                try {
+                                  await purchases.buyPro();
+                                  if (sheetContext.mounted) {
+                                    ScaffoldMessenger.of(sheetContext)
+                                        .showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Complete your purchase in the store window')),
+                                    );
+                                  }
+                                } on StateError catch (error) {
+                                  if (sheetContext.mounted) {
+                                    ScaffoldMessenger.of(sheetContext)
+                                        .showSnackBar(
+                                      SnackBar(
+                                          content: Text('${error.message}')),
+                                    );
+                                  }
                                 }
-                              } on StateError catch (error) {
-                                if (sheetContext.mounted) {
-                                  ScaffoldMessenger.of(sheetContext)
-                                      .showSnackBar(
-                                    SnackBar(content: Text('${error.message}')),
-                                  );
-                                }
-                              }
-                            },
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: _ink,
-                        minimumSize: const Size.fromHeight(54),
-                      ),
-                      child: Text(price == null
-                          ? 'Pro is not available yet'
-                          : 'Unlock Pro for $price'),
-                    );
-                  },
-                ),
-                TextButton(
-                  onPressed: () async {
-                    await purchases.restorePurchases();
-                    if (sheetContext.mounted) {
-                      ScaffoldMessenger.of(sheetContext).showSnackBar(
-                        const SnackBar(
-                            content: Text(
-                                'Checking the store for previous purchases')),
+                              },
+                        style: FilledButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: _ink,
+                          minimumSize: const Size.fromHeight(54),
+                        ),
+                        child: Text(price == null
+                            ? 'Pro is not available yet'
+                            : 'Unlock Pro for $price'),
                       );
-                    }
-                  },
-                  child: const Text('Restore purchases'),
-                ),
-              ],
+                    },
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await purchases.restorePurchases();
+                      if (sheetContext.mounted) {
+                        ScaffoldMessenger.of(sheetContext).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Checking the store for previous purchases')),
+                        );
+                      }
+                    },
+                    child: const Text('Restore purchases'),
+                  ),
+                ],
+              ),
             ),
           ),
         );
