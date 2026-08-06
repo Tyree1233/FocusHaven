@@ -18,6 +18,13 @@ class FocusProfileService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> clearLocalData() async {
+    _focusType = null;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_profileKey);
+    notifyListeners();
+  }
+
   Future<void> _load() async {
     final preferences = await SharedPreferences.getInstance();
     _focusType = preferences.getString(_profileKey);

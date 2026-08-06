@@ -66,6 +66,13 @@ class JournalService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> clearLocalData() async {
+    _entries = [];
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_storageKey);
+    notifyListeners();
+  }
+
   Future<void> _load() async {
     final preferences = await SharedPreferences.getInstance();
     final saved = preferences.getString(_storageKey);

@@ -76,6 +76,13 @@ class ThemeService extends ChangeNotifier {
     await preferences.setString(_storageKey, theme.name);
   }
 
+  Future<void> clearLocalData() async {
+    _selectedTheme = FocusHavenTheme.twilight;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_storageKey);
+    notifyListeners();
+  }
+
   Future<void> _load() async {
     final preferences = await SharedPreferences.getInstance();
     final savedTheme = preferences.getString(_storageKey);

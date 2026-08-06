@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../services/auth_service.dart';
@@ -282,6 +283,46 @@ class TimerScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _confirmDeleteLocalData(BuildContext context) async {
+    final timer = context.read<TimerService>();
+    final journal = context.read<JournalService>();
+    final focusQueue = context.read<FocusQueueService>();
+    final profile = context.read<FocusProfileService>();
+    final themes = context.read<ThemeService>();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete local data?'),
+        content: const Text(
+          'This permanently removes your timer history, journal entries, tasks, parked thoughts, goals, profile, and appearance choices from this device. Your cloud backup will not be deleted.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Keep my data'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Delete local data'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final preferences = await SharedPreferences.getInstance();
+    await Future.wait([
+      timer.clearLocalData(),
+      journal.clearLocalData(),
+      focusQueue.clearLocalData(),
+      profile.clearLocalData(),
+      themes.clearLocalData(),
+      preferences.remove('hasCompletedOnboarding'),
+    ]);
+    if (!context.mounted) return;
+    Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+  }
+
   Future<void> _showAccountSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -364,6 +405,11 @@ class TimerScreen extends StatelessWidget {
                       icon: const Icon(Icons.delete_outline),
                       label: const Text('Delete cloud backup'),
                     ),
+                  TextButton.icon(
+                    onPressed: () => _confirmDeleteLocalData(context),
+                    icon: const Icon(Icons.delete_forever_outlined),
+                    label: const Text('Delete local data'),
+                  ),
                   const SizedBox(height: 8),
                   TextButton.icon(
                     onPressed: () => _showProSheet(context),

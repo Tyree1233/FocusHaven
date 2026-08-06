@@ -288,6 +288,44 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _saveToPrefs();
   }
 
+  Future<void> clearLocalData() async {
+    _ticker?.cancel();
+    _ticker = null;
+    _focusSeconds = _defaultFocusSeconds;
+    _shortBreakSeconds = _defaultShortBreakSeconds;
+    _longBreakSeconds = _defaultLongBreakSeconds;
+    _secondsRemaining = _defaultFocusSeconds;
+    _totalSessionSeconds = _defaultFocusSeconds;
+    _completedFocusSessions = 0;
+    _focusHistory = [];
+    _distractions = [];
+    _focusTask = '';
+    _dailyGoalMinutes = _defaultDailyGoalMinutes;
+    _isRunning = false;
+    _isComplete = false;
+    _hasPendingResume = false;
+    _endsAt = null;
+    _sessionType = SessionType.focus;
+
+    final prefs = await SharedPreferences.getInstance();
+    await Future.wait([
+      prefs.remove('focusSeconds'),
+      prefs.remove('shortBreakSeconds'),
+      prefs.remove('longBreakSeconds'),
+      prefs.remove('secondsRemaining'),
+      prefs.remove('totalSessionSeconds'),
+      prefs.remove('completedFocusSessions'),
+      prefs.remove('focusTask'),
+      prefs.remove('dailyGoalMinutes'),
+      prefs.remove('sessionType'),
+      prefs.remove(_timerEndsAtKey),
+      prefs.remove(_pendingResumeKey),
+      prefs.remove('focusHistory'),
+      prefs.remove('distractions'),
+    ]);
+    notifyListeners();
+  }
+
   bool restoreCloudBackup(Map<String, dynamic> backup) {
     try {
       final focusSeconds = backup['focusSeconds'];
