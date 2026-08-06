@@ -59,29 +59,46 @@ class TimerScreen extends StatelessWidget {
     if (seconds < 60) return '$seconds sec';
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
-    return remainingSeconds == 0 ? '$minutes min' : '$minutes min $remainingSeconds sec';
+    return remainingSeconds == 0
+        ? '$minutes min'
+        : '$minutes min $remainingSeconds sec';
   }
 
   String _dateLabel(DateTime date) {
     final now = DateTime.now();
     if (DateUtils.isSameDay(date, now)) return 'Today';
-    if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) return 'Yesterday';
+    if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1))))
+      return 'Yesterday';
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${months[date.month - 1]} ${date.day}';
   }
 
-  Future<void> _chooseCustomDuration(BuildContext context, TimerService timer) async {
+  Future<void> _chooseCustomDuration(
+      BuildContext context, TimerService timer) async {
     const maximumMinutes = 180;
     final sessionColor = _sessionColor(context, timer.sessionType);
-    final initialMinutes = (timer.totalSessionSeconds ~/ 60).clamp(0, maximumMinutes).toInt();
+    final initialMinutes =
+        (timer.totalSessionSeconds ~/ 60).clamp(0, maximumMinutes).toInt();
     final initialSeconds = timer.totalSessionSeconds % 60;
     var selectedMinutes = initialMinutes;
     var selectedSeconds = initialSeconds;
-    final pickerController = FixedExtentScrollController(initialItem: initialMinutes);
-    final secondsPickerController = FixedExtentScrollController(initialItem: initialSeconds);
+    final pickerController =
+        FixedExtentScrollController(initialItem: initialMinutes);
+    final secondsPickerController =
+        FixedExtentScrollController(initialItem: initialSeconds);
 
     final duration = await showModalBottomSheet<Duration>(
       context: context,
@@ -101,12 +118,16 @@ class TimerScreen extends StatelessWidget {
                 Container(
                   height: 4,
                   width: 42,
-                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)),
+                  decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(99)),
                 ),
                 const SizedBox(height: 20),
-                Text('${timer.sessionType.label} duration', style: Theme.of(context).textTheme.titleLarge),
+                Text('${timer.sessionType.label} duration',
+                    style: Theme.of(context).textTheme.titleLarge),
                 const SizedBox(height: 8),
-                const Text('Tap a favorite or scroll minutes and seconds.', style: TextStyle(color: Colors.white70)),
+                const Text('Tap a favorite or scroll minutes and seconds.',
+                    style: TextStyle(color: Colors.white70)),
                 const SizedBox(height: 18),
                 Wrap(
                   alignment: WrapAlignment.center,
@@ -146,13 +167,16 @@ class TimerScreen extends StatelessWidget {
                         child: CupertinoPicker.builder(
                           scrollController: pickerController,
                           itemExtent: 42,
-                          selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                          selectionOverlay:
+                              CupertinoPickerDefaultSelectionOverlay(
                             background: sessionColor.withValues(alpha: 0.15),
                           ),
-                          onSelectedItemChanged: (index) => setSheetState(() => selectedMinutes = index),
+                          onSelectedItemChanged: (index) =>
+                              setSheetState(() => selectedMinutes = index),
                           childCount: maximumMinutes + 1,
                           itemBuilder: (context, index) => Center(
-                            child: Text('$index min', style: const TextStyle(fontSize: 22)),
+                            child: Text('$index min',
+                                style: const TextStyle(fontSize: 22)),
                           ),
                         ),
                       ),
@@ -160,13 +184,17 @@ class TimerScreen extends StatelessWidget {
                         child: CupertinoPicker.builder(
                           scrollController: secondsPickerController,
                           itemExtent: 42,
-                          selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                          selectionOverlay:
+                              CupertinoPickerDefaultSelectionOverlay(
                             background: sessionColor.withValues(alpha: 0.15),
                           ),
-                          onSelectedItemChanged: (index) => setSheetState(() => selectedSeconds = index),
+                          onSelectedItemChanged: (index) =>
+                              setSheetState(() => selectedSeconds = index),
                           childCount: 60,
                           itemBuilder: (context, index) => Center(
-                            child: Text('${index.toString().padLeft(2, '0')} sec', style: const TextStyle(fontSize: 22)),
+                            child: Text(
+                                '${index.toString().padLeft(2, '0')} sec',
+                                style: const TextStyle(fontSize: 22)),
                           ),
                         ),
                       ),
@@ -177,13 +205,18 @@ class TimerScreen extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: () => Navigator.pop(sheetContext, Duration(minutes: selectedMinutes, seconds: selectedSeconds)),
+                    onPressed: () => Navigator.pop(
+                        sheetContext,
+                        Duration(
+                            minutes: selectedMinutes,
+                            seconds: selectedSeconds)),
                     style: FilledButton.styleFrom(
                       backgroundColor: sessionColor,
                       foregroundColor: _ink,
                       minimumSize: const Size.fromHeight(54),
                     ),
-                    child: Text('Set ${selectedMinutes.toString().padLeft(2, '0')}:${selectedSeconds.toString().padLeft(2, '0')}'),
+                    child: Text(
+                        'Set ${selectedMinutes.toString().padLeft(2, '0')}:${selectedSeconds.toString().padLeft(2, '0')}'),
                   ),
                 ),
               ],
@@ -200,26 +233,29 @@ class TimerScreen extends StatelessWidget {
   }
 
   Future<void> _openPrivacyPolicy(BuildContext context) async {
-    const policyUrl = 'https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html';
+    const policyUrl =
+        'https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html';
     final opened = await launchUrl(
       Uri.parse(policyUrl),
       mode: LaunchMode.externalApplication,
     );
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to open the privacy policy right now.')),
+        const SnackBar(
+            content: Text('Unable to open the privacy policy right now.')),
       );
     }
   }
 
   Future<void> _showAccountSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        builder: (sheetContext) => SafeArea(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Consumer<AuthService>(
@@ -227,13 +263,48 @@ class TimerScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Your FocusHaven account', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Your FocusHaven account',
+                      style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
                   Text(
                     auth.isSignedIn
                         ? 'Signed in as ${auth.displayName}'
                         : 'Sign in to protect your focus history and use cloud backup.',
                     style: const TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 16),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            auth.isSignedIn
+                                ? Icons.cloud_done_outlined
+                                : Icons.phone_android_outlined,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              auth.isSignedIn
+                                  ? 'Your focus data stays on this device. FocusHaven Pro can also back it up privately to your account.'
+                                  : 'Your focus data stays private on this device. Sign in only when you want optional cloud backup.',
+                              style: const TextStyle(
+                                  color: Colors.white70, height: 1.35),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   if (auth.isSignedIn)
@@ -246,7 +317,8 @@ class TimerScreen extends StatelessWidget {
                     FilledButton.icon(
                       onPressed: () async {
                         final result = await auth.signInWithGoogle();
-                        if (result != null && sheetContext.mounted) Navigator.pop(sheetContext);
+                        if (result != null && sheetContext.mounted)
+                          Navigator.pop(sheetContext);
                       },
                       icon: const Icon(Icons.login),
                       label: const Text('Sign in with Google'),
@@ -277,7 +349,8 @@ class TimerScreen extends StatelessWidget {
             ),
           ),
         ),
-      );
+      ),
+    );
   }
 
   Future<void> _showThemeSheet(BuildContext context) async {
@@ -296,9 +369,12 @@ class TimerScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
               child: ListView(
                 children: [
-                  Text('Appearance', style: Theme.of(sheetContext).textTheme.titleLarge),
+                  Text('Appearance',
+                      style: Theme.of(sheetContext).textTheme.titleLarge),
                   const SizedBox(height: 8),
-                  const Text('Choose the atmosphere that feels best for your focus.', style: TextStyle(color: Colors.white70)),
+                  const Text(
+                      'Choose the atmosphere that feels best for your focus.',
+                      style: TextStyle(color: Colors.white70)),
                   const SizedBox(height: 14),
                   ...FocusHavenTheme.values.map(
                     (theme) => RadioListTile<FocusHavenTheme>(
@@ -390,11 +466,14 @@ class TimerScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.auto_awesome, size: 44, color: Theme.of(context).colorScheme.primary),
+                    Icon(Icons.auto_awesome,
+                        size: 44, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(height: 12),
-                    const Text('Your focus profile', style: TextStyle(fontSize: 16, color: Colors.white70)),
+                    const Text('Your focus profile',
+                        style: TextStyle(fontSize: 16, color: Colors.white70)),
                     const SizedBox(height: 6),
-                    Text(activeType!, style: Theme.of(context).textTheme.headlineSmall),
+                    Text(activeType!,
+                        style: Theme.of(context).textTheme.headlineSmall),
                     const SizedBox(height: 12),
                     Text(
                       _focusProfileTip(activeType),
@@ -404,7 +483,10 @@ class TimerScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     FilledButton(
                       onPressed: () => Navigator.pop(sheetContext),
-                      style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
+                      style: FilledButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: _ink),
                       child: const Text('Use this profile'),
                     ),
                   ],
@@ -420,9 +502,11 @@ class TimerScreen extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.psychology_outlined, size: 42, color: Theme.of(context).colorScheme.primary),
+                    Icon(Icons.psychology_outlined,
+                        size: 42, color: Theme.of(context).colorScheme.primary),
                     const SizedBox(height: 14),
-                    Text('Find your focus profile', style: Theme.of(context).textTheme.titleLarge),
+                    Text('Find your focus profile',
+                        style: Theme.of(context).textTheme.titleLarge),
                     const SizedBox(height: 10),
                     Text(
                       activeType == null
@@ -434,8 +518,12 @@ class TimerScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     FilledButton(
                       onPressed: () => setSheetState(() => page = 0),
-                      style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
-                      child: Text(activeType == null ? 'Start quiz' : 'Retake quiz'),
+                      style: FilledButton.styleFrom(
+                          backgroundColor:
+                              Theme.of(context).colorScheme.primary,
+                          foregroundColor: _ink),
+                      child: Text(
+                          activeType == null ? 'Start quiz' : 'Retake quiz'),
                     ),
                   ],
                 ),
@@ -451,9 +539,11 @@ class TimerScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('${page + 1} of ${questions.length}', style: const TextStyle(color: Colors.white60)),
+                  Text('${page + 1} of ${questions.length}',
+                      style: const TextStyle(color: Colors.white60)),
                   const SizedBox(height: 14),
-                  Text(question.prompt, style: Theme.of(context).textTheme.titleLarge),
+                  Text(question.prompt,
+                      style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 20),
                   ...question.choices.map(
                     (choice) => Padding(
@@ -463,12 +553,18 @@ class TimerScreen extends StatelessWidget {
                           answers[page] = choice;
                           if (page == questions.length - 1) {
                             final scores = <String, int>{};
-                            for (final answer in answers.whereType<_FocusChoice>()) {
-                              scores.update(answer.focusType, (count) => count + 1, ifAbsent: () => 1);
+                            for (final answer
+                                in answers.whereType<_FocusChoice>()) {
+                              scores.update(
+                                  answer.focusType, (count) => count + 1,
+                                  ifAbsent: () => 1);
                             }
-                            final winner = scores.entries.reduce(
-                              (first, next) => first.value >= next.value ? first : next,
-                            ).key;
+                            final winner = scores.entries
+                                .reduce(
+                                  (first, next) =>
+                                      first.value >= next.value ? first : next,
+                                )
+                                .key;
                             await profile.saveFocusType(winner);
                             if (sheetContext.mounted) {
                               setSheetState(() {
@@ -506,11 +602,16 @@ class TimerScreen extends StatelessWidget {
   }
 
   String _focusProfileTip(String focusType) => switch (focusType) {
-        'Clear Starter' => 'Protect your best early window with one clear intention and a short timer.',
-        'Momentum Builder' => 'Start with a small five-minute step. Momentum is your best fuel.',
-        'Deep Diver' => 'Create a quiet, distraction-free block and let yourself stay with one meaningful task.',
-        'Gentle Flow' => 'Use calm transitions, a comfortable pace, and intentional breaks to stay steady.',
-        'Night Owl' => 'Plan your most important work for your later high-energy window and protect your wind-down.',
+        'Clear Starter' =>
+          'Protect your best early window with one clear intention and a short timer.',
+        'Momentum Builder' =>
+          'Start with a small five-minute step. Momentum is your best fuel.',
+        'Deep Diver' =>
+          'Create a quiet, distraction-free block and let yourself stay with one meaningful task.',
+        'Gentle Flow' =>
+          'Use calm transitions, a comfortable pace, and intentional breaks to stay steady.',
+        'Night Owl' =>
+          'Plan your most important work for your later high-energy window and protect your wind-down.',
         _ => 'Choose a calm space and one clear next step.',
       };
 
@@ -530,7 +631,8 @@ class TimerScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Icon(Icons.workspace_premium, size: 42, color: Theme.of(context).colorScheme.primary),
+                Icon(Icons.workspace_premium,
+                    size: 42, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(height: 12),
                 Text(
                   'FocusHaven Pro',
@@ -544,9 +646,15 @@ class TimerScreen extends StatelessWidget {
                   style: TextStyle(color: Colors.white70),
                 ),
                 const SizedBox(height: 18),
-                const _ProBenefit(icon: Icons.cloud_done_outlined, label: 'Secure cloud backup'),
-                const _ProBenefit(icon: Icons.devices_outlined, label: 'Restore on another device'),
-                const _ProBenefit(icon: Icons.all_inclusive, label: 'One-time lifetime unlock'),
+                const _ProBenefit(
+                    icon: Icons.cloud_done_outlined,
+                    label: 'Secure cloud backup'),
+                const _ProBenefit(
+                    icon: Icons.devices_outlined,
+                    label: 'Restore on another device'),
+                const _ProBenefit(
+                    icon: Icons.all_inclusive,
+                    label: 'One-time lifetime unlock'),
                 const SizedBox(height: 22),
                 FutureBuilder<String?>(
                   future: purchases.proPrice(),
@@ -559,13 +667,17 @@ class TimerScreen extends StatelessWidget {
                               try {
                                 await purchases.buyPro();
                                 if (sheetContext.mounted) {
-                                  ScaffoldMessenger.of(sheetContext).showSnackBar(
-                                    const SnackBar(content: Text('Complete your purchase in the store window')),
+                                  ScaffoldMessenger.of(sheetContext)
+                                      .showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Complete your purchase in the store window')),
                                   );
                                 }
                               } on StateError catch (error) {
                                 if (sheetContext.mounted) {
-                                  ScaffoldMessenger.of(sheetContext).showSnackBar(
+                                  ScaffoldMessenger.of(sheetContext)
+                                      .showSnackBar(
                                     SnackBar(content: Text('${error.message}')),
                                   );
                                 }
@@ -576,7 +688,9 @@ class TimerScreen extends StatelessWidget {
                         foregroundColor: _ink,
                         minimumSize: const Size.fromHeight(54),
                       ),
-                      child: Text(price == null ? 'Pro is not available yet' : 'Unlock Pro for $price'),
+                      child: Text(price == null
+                          ? 'Pro is not available yet'
+                          : 'Unlock Pro for $price'),
                     );
                   },
                 ),
@@ -585,7 +699,9 @@ class TimerScreen extends StatelessWidget {
                     await purchases.restorePurchases();
                     if (sheetContext.mounted) {
                       ScaffoldMessenger.of(sheetContext).showSnackBar(
-                        const SnackBar(content: Text('Checking the store for previous purchases')),
+                        const SnackBar(
+                            content: Text(
+                                'Checking the store for previous purchases')),
                       );
                     }
                   },
@@ -599,7 +715,8 @@ class TimerScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _confirmClearHistory(BuildContext context, TimerService timer) async {
+  Future<void> _confirmClearHistory(
+      BuildContext context, TimerService timer) async {
     final shouldClear = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -614,7 +731,9 @@ class TimerScreen extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, true),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: _ink),
             child: const Text('Clear history'),
           ),
         ],
@@ -624,7 +743,8 @@ class TimerScreen extends StatelessWidget {
       timer.clearFocusHistory();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Focus history cleared from this device')),
+          const SnackBar(
+              content: Text('Focus history cleared from this device')),
         );
       }
     }
@@ -653,7 +773,9 @@ class TimerScreen extends StatelessWidget {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, controller.text),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: _ink),
             child: const Text('Save'),
           ),
         ],
@@ -665,14 +787,16 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _showFocusQueueSheet(BuildContext context, TimerService timer) async {
+  Future<void> _showFocusQueueSheet(
+      BuildContext context, TimerService timer) async {
     final textController = TextEditingController();
     final scrollController = ScrollController();
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (sheetContext) => SafeArea(
         top: false,
         child: SizedBox(
@@ -687,16 +811,26 @@ class TimerScreen extends StatelessWidget {
                 child: ListView(
                   controller: scrollController,
                   children: [
-                    Center(child: Container(height: 4, width: 42, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)))),
+                    Center(
+                        child: Container(
+                            height: 4,
+                            width: 42,
+                            decoration: BoxDecoration(
+                                color: Colors.white24,
+                                borderRadius: BorderRadius.circular(99)))),
                     const SizedBox(height: 18),
-                    Text('Focus queue', style: Theme.of(sheetContext).textTheme.titleLarge),
+                    Text('Focus queue',
+                        style: Theme.of(sheetContext).textTheme.titleLarge),
                     const SizedBox(height: 5),
-                    const Text('Choose a task to make it your current focus intention.', style: TextStyle(color: Colors.white70)),
+                    const Text(
+                        'Choose a task to make it your current focus intention.',
+                        style: TextStyle(color: Colors.white70)),
                     if (queue.completedToday > 0) ...[
                       const SizedBox(height: 5),
                       Text(
                         '${queue.completedToday} ${queue.completedToday == 1 ? 'task' : 'tasks'} tended today — gentle progress.',
-                        style: TextStyle(color: Theme.of(sheetContext).colorScheme.primary),
+                        style: TextStyle(
+                            color: Theme.of(sheetContext).colorScheme.primary),
                       ),
                     ],
                     const SizedBox(height: 14),
@@ -706,7 +840,8 @@ class TimerScreen extends StatelessWidget {
                           child: TextField(
                             controller: textController,
                             maxLength: 100,
-                            decoration: const InputDecoration(hintText: 'Add a task', counterText: ''),
+                            decoration: const InputDecoration(
+                                hintText: 'Add a task', counterText: ''),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -724,7 +859,9 @@ class TimerScreen extends StatelessWidget {
                     if (queue.items.isEmpty)
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 34),
-                        child: Center(child: Text('Your next task can live here.', style: TextStyle(color: Colors.white60))),
+                        child: Center(
+                            child: Text('Your next task can live here.',
+                                style: TextStyle(color: Colors.white60))),
                       )
                     else
                       ...queue.items.map(
@@ -742,14 +879,20 @@ class TimerScreen extends StatelessWidget {
                               await queue.toggle(item.id);
                               if (!wasComplete && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('One thing handled. Take a breath.')),
+                                  const SnackBar(
+                                      content: Text(
+                                          'One thing handled. Take a breath.')),
                                 );
                               }
                             },
                           ),
                           title: Text(
                             item.title,
-                            style: item.isComplete ? const TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white54) : null,
+                            style: item.isComplete
+                                ? const TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: Colors.white54)
+                                : null,
                           ),
                           trailing: IconButton(
                             onPressed: () => queue.remove(item.id),
@@ -762,9 +905,11 @@ class TimerScreen extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton.icon(
-                          onPressed: () => _showCompletedTasksSheet(sheetContext),
+                          onPressed: () =>
+                              _showCompletedTasksSheet(sheetContext),
                           icon: const Icon(Icons.history_outlined),
-                          label: Text('Completed (${queue.completedItems.length})'),
+                          label: Text(
+                              'Completed (${queue.completedItems.length})'),
                         ),
                       ),
                   ],
@@ -775,7 +920,8 @@ class TimerScreen extends StatelessWidget {
         ),
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => textController.dispose());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => textController.dispose());
     scrollController.dispose();
   }
 
@@ -785,7 +931,8 @@ class TimerScreen extends StatelessWidget {
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (sheetContext) => SafeArea(
         top: false,
         child: SizedBox(
@@ -795,11 +942,18 @@ class TimerScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
               child: Column(
                 children: [
-                  Container(height: 4, width: 42, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99))),
+                  Container(
+                      height: 4,
+                      width: 42,
+                      decoration: BoxDecoration(
+                          color: Colors.white24,
+                          borderRadius: BorderRadius.circular(99))),
                   const SizedBox(height: 18),
-                  Text('Completed tasks', style: Theme.of(sheetContext).textTheme.titleLarge),
+                  Text('Completed tasks',
+                      style: Theme.of(sheetContext).textTheme.titleLarge),
                   const SizedBox(height: 5),
-                  const Text('A quiet record of what you handled.', style: TextStyle(color: Colors.white70)),
+                  const Text('A quiet record of what you handled.',
+                      style: TextStyle(color: Colors.white70)),
                   const SizedBox(height: 12),
                   Expanded(
                     child: Scrollbar(
@@ -809,13 +963,18 @@ class TimerScreen extends StatelessWidget {
                       child: ListView.separated(
                         controller: scrollController,
                         itemCount: queue.completedItems.length,
-                        separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                        separatorBuilder: (context, index) =>
+                            const Divider(height: 1, color: Colors.white12),
                         itemBuilder: (context, index) {
                           final item = queue.completedItems[index];
                           return ListTile(
-                            leading: Icon(Icons.check_circle_outline, color: Theme.of(sheetContext).colorScheme.primary),
+                            leading: Icon(Icons.check_circle_outline,
+                                color:
+                                    Theme.of(sheetContext).colorScheme.primary),
                             title: Text(item.title),
-                            subtitle: Text(item.completedAt == null ? 'Completed' : 'Completed ${_dateLabel(item.completedAt!)}'),
+                            subtitle: Text(item.completedAt == null
+                                ? 'Completed'
+                                : 'Completed ${_dateLabel(item.completedAt!)}'),
                             trailing: IconButton(
                               tooltip: 'Return to queue',
                               icon: const Icon(Icons.undo),
@@ -836,7 +995,8 @@ class TimerScreen extends StatelessWidget {
     scrollController.dispose();
   }
 
-  Future<void> _captureDistraction(BuildContext context, TimerService timer) async {
+  Future<void> _captureDistraction(
+      BuildContext context, TimerService timer) async {
     final controller = TextEditingController();
     final thought = await showDialog<String>(
       context: context,
@@ -854,10 +1014,14 @@ class TimerScreen extends StatelessWidget {
           onSubmitted: (value) => Navigator.pop(dialogContext, value),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel')),
           FilledButton(
             onPressed: () => Navigator.pop(dialogContext, controller.text),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: _ink),
             child: const Text('Save thought'),
           ),
         ],
@@ -869,12 +1033,14 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _showDistractionSheet(BuildContext context, TimerService timer) async {
+  Future<void> _showDistractionSheet(
+      BuildContext context, TimerService timer) async {
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (sheetContext) => SafeArea(
         top: false,
         child: SizedBox(
@@ -886,10 +1052,13 @@ class TimerScreen extends StatelessWidget {
                 Container(
                   height: 4,
                   width: 42,
-                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)),
+                  decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(99)),
                 ),
                 const SizedBox(height: 18),
-                Text('Distraction parking lot', style: Theme.of(sheetContext).textTheme.titleLarge),
+                Text('Distraction parking lot',
+                    style: Theme.of(sheetContext).textTheme.titleLarge),
                 const SizedBox(height: 6),
                 const Text(
                   'Your saved thoughts stay on this device until you clear them.',
@@ -907,9 +1076,12 @@ class TimerScreen extends StatelessWidget {
                         )
                       : ListView.separated(
                           itemCount: timer.distractions.length,
-                          separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                          separatorBuilder: (context, index) =>
+                              const Divider(height: 1, color: Colors.white12),
                           itemBuilder: (context, index) => ListTile(
-                            leading: Icon(Icons.bookmark_outline, color: Theme.of(sheetContext).colorScheme.primary),
+                            leading: Icon(Icons.bookmark_outline,
+                                color:
+                                    Theme.of(sheetContext).colorScheme.primary),
                             title: Text(timer.distractions[index]),
                           ),
                         ),
@@ -931,24 +1103,34 @@ class TimerScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _showMilestonesSheet(BuildContext context, TimerService timer) async {
+  Future<void> _showMilestonesSheet(
+      BuildContext context, TimerService timer) async {
     final scrollController = ScrollController();
     final milestones = [
-      _Milestone('First step', 'Complete your first focus session.', timer.completedFocusSessions >= 1),
-      _Milestone('Weekly rhythm', 'Complete 3 focus sessions in seven days.', timer.weeklyFocusSessions >= 3),
-      _Milestone('Momentum', 'Complete 5 focus sessions in total.', timer.completedFocusSessions >= 5),
-      _Milestone('Half-hour haven', 'Reach 30 total minutes of focus.', timer.totalFocusSeconds >= 30 * 60),
-      _Milestone('Century club', 'Reach 100 total minutes of focus.', timer.totalFocusSeconds >= 100 * 60),
-      _Milestone('Steady flame', 'Build a 3-day focus streak.', timer.currentStreak >= 3),
-      _Milestone('Deep roots', 'Build a 7-day focus streak.', timer.currentStreak >= 7),
-      _Milestone('Goal getter', 'Reach your daily focus goal.', timer.hasReachedDailyGoal),
+      _Milestone('First step', 'Complete your first focus session.',
+          timer.completedFocusSessions >= 1),
+      _Milestone('Weekly rhythm', 'Complete 3 focus sessions in seven days.',
+          timer.weeklyFocusSessions >= 3),
+      _Milestone('Momentum', 'Complete 5 focus sessions in total.',
+          timer.completedFocusSessions >= 5),
+      _Milestone('Half-hour haven', 'Reach 30 total minutes of focus.',
+          timer.totalFocusSeconds >= 30 * 60),
+      _Milestone('Century club', 'Reach 100 total minutes of focus.',
+          timer.totalFocusSeconds >= 100 * 60),
+      _Milestone('Steady flame', 'Build a 3-day focus streak.',
+          timer.currentStreak >= 3),
+      _Milestone('Deep roots', 'Build a 7-day focus streak.',
+          timer.currentStreak >= 7),
+      _Milestone('Goal getter', 'Reach your daily focus goal.',
+          timer.hasReachedDailyGoal),
     ];
     final unlocked = milestones.where((milestone) => milestone.unlocked).length;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (sheetContext) => SafeArea(
         top: false,
         child: SizedBox(
@@ -957,11 +1139,18 @@ class TimerScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
             child: Column(
               children: [
-                Container(height: 4, width: 42, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99))),
+                Container(
+                    height: 4,
+                    width: 42,
+                    decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(99))),
                 const SizedBox(height: 18),
-                Text('Focus milestones', style: Theme.of(sheetContext).textTheme.titleLarge),
+                Text('Focus milestones',
+                    style: Theme.of(sheetContext).textTheme.titleLarge),
                 const SizedBox(height: 5),
-                Text('$unlocked of ${milestones.length} unlocked', style: const TextStyle(color: Colors.white70)),
+                Text('$unlocked of ${milestones.length} unlocked',
+                    style: const TextStyle(color: Colors.white70)),
                 const SizedBox(height: 12),
                 Expanded(
                   child: Scrollbar(
@@ -971,21 +1160,35 @@ class TimerScreen extends StatelessWidget {
                     child: ListView.separated(
                       controller: scrollController,
                       itemCount: milestones.length,
-                      separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                      separatorBuilder: (context, index) =>
+                          const Divider(height: 1, color: Colors.white12),
                       itemBuilder: (context, index) {
                         final milestone = milestones[index];
                         return ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: Theme.of(sheetContext).colorScheme.primary.withValues(alpha: milestone.unlocked ? 0.22 : 0.08),
+                            backgroundColor: Theme.of(sheetContext)
+                                .colorScheme
+                                .primary
+                                .withValues(
+                                    alpha: milestone.unlocked ? 0.22 : 0.08),
                             child: Icon(
-                              milestone.unlocked ? Icons.emoji_events_outlined : Icons.lock_outline,
-                              color: milestone.unlocked ? Theme.of(sheetContext).colorScheme.primary : Colors.white38,
+                              milestone.unlocked
+                                  ? Icons.emoji_events_outlined
+                                  : Icons.lock_outline,
+                              color: milestone.unlocked
+                                  ? Theme.of(sheetContext).colorScheme.primary
+                                  : Colors.white38,
                             ),
                           ),
                           title: Text(milestone.title),
                           subtitle: Text(milestone.detail),
-                          trailing: Icon(milestone.unlocked ? Icons.check_circle : Icons.radio_button_unchecked,
-                              color: milestone.unlocked ? Theme.of(sheetContext).colorScheme.primary : Colors.white38),
+                          trailing: Icon(
+                              milestone.unlocked
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              color: milestone.unlocked
+                                  ? Theme.of(sheetContext).colorScheme.primary
+                                  : Colors.white38),
                         );
                       },
                     ),
@@ -1000,14 +1203,16 @@ class TimerScreen extends StatelessWidget {
     scrollController.dispose();
   }
 
-  Future<void> _showFocusHistory(BuildContext context, TimerService timer) async {
+  Future<void> _showFocusHistory(
+      BuildContext context, TimerService timer) async {
     final weeklySeconds = timer.lastSevenDaysFocusSeconds;
     final weeklyMinutes = timer.weeklyFocusSeconds ~/ 60;
     final weeklySessions = timer.weeklyFocusSessions;
     final weeklyDuration = timer.weeklyFocusSeconds < 60
         ? '${timer.weeklyFocusSeconds} ${timer.weeklyFocusSeconds == 1 ? 'second' : 'seconds'}'
         : '$weeklyMinutes ${weeklyMinutes == 1 ? 'minute' : 'minutes'}';
-    final highestDaySeconds = weeklySeconds.fold(1, (highest, seconds) => seconds > highest ? seconds : highest);
+    final highestDaySeconds = weeklySeconds.fold(
+        1, (highest, seconds) => seconds > highest ? seconds : highest);
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -1032,7 +1237,8 @@ class TimerScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 18),
-                Text('All focus sessions', style: Theme.of(sheetContext).textTheme.titleLarge),
+                Text('All focus sessions',
+                    style: Theme.of(sheetContext).textTheme.titleLarge),
                 const SizedBox(height: 8),
                 Text(
                   '${timer.completedFocusSessions} completed sessions',
@@ -1041,7 +1247,10 @@ class TimerScreen extends StatelessWidget {
                 const SizedBox(height: 14),
                 DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Theme.of(sheetContext).colorScheme.primary.withValues(alpha: 0.12),
+                    color: Theme.of(sheetContext)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Padding(
@@ -1049,7 +1258,8 @@ class TimerScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('This week', style: Theme.of(sheetContext).textTheme.titleSmall),
+                        Text('This week',
+                            style: Theme.of(sheetContext).textTheme.titleSmall),
                         const SizedBox(height: 2),
                         Text(
                           '$weeklyDuration • $weeklySessions ${weeklySessions == 1 ? 'session' : 'sessions'}',
@@ -1061,27 +1271,45 @@ class TimerScreen extends StatelessWidget {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: List.generate(7, (index) {
-                              final day = DateTime.now().subtract(Duration(days: 6 - index));
+                              final day = DateTime.now()
+                                  .subtract(Duration(days: 6 - index));
                               final double height = weeklySeconds[index] == 0
                                   ? 3.0
-                                  : 8.0 + (42 * weeklySeconds[index] / highestDaySeconds);
+                                  : 8.0 +
+                                      (42 *
+                                          weeklySeconds[index] /
+                                          highestDaySeconds);
                               return Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 3),
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Container(
                                         height: height,
                                         decoration: BoxDecoration(
-                                          color: Theme.of(sheetContext).colorScheme.primary,
-                                          borderRadius: BorderRadius.circular(99),
+                                          color: Theme.of(sheetContext)
+                                              .colorScheme
+                                              .primary,
+                                          borderRadius:
+                                              BorderRadius.circular(99),
                                         ),
                                       ),
                                       const SizedBox(height: 5),
                                       Text(
-                                        const ['M', 'T', 'W', 'T', 'F', 'S', 'S'][day.weekday - 1],
-                                        style: const TextStyle(fontSize: 11, color: Colors.white60),
+                                        const [
+                                          'M',
+                                          'T',
+                                          'W',
+                                          'T',
+                                          'F',
+                                          'S',
+                                          'S'
+                                        ][day.weekday - 1],
+                                        style: const TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.white60),
                                       ),
                                     ],
                                   ),
@@ -1098,19 +1326,26 @@ class TimerScreen extends StatelessWidget {
                 Expanded(
                   child: ListView.separated(
                     itemCount: timer.recentFocusSessions.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1, color: Colors.white12),
+                    separatorBuilder: (context, index) =>
+                        const Divider(height: 1, color: Colors.white12),
                     itemBuilder: (context, index) {
                       final session = timer.recentFocusSessions[index];
-                      final time = MaterialLocalizations.of(context).formatTimeOfDay(
+                      final time =
+                          MaterialLocalizations.of(context).formatTimeOfDay(
                         TimeOfDay.fromDateTime(session.completedAt),
                       );
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(vertical: 4),
                         leading: CircleAvatar(
-                          backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                          child: Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.primary),
+                          backgroundColor: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.2),
+                          child: Icon(Icons.auto_awesome,
+                              color: Theme.of(context).colorScheme.primary),
                         ),
-                        title: Text(session.focusTask ?? _focusSessionLabel(session.durationSeconds)),
+                        title: Text(session.focusTask ??
+                            _focusSessionLabel(session.durationSeconds)),
                         subtitle: Text(
                           '${_focusSessionLabel(session.durationSeconds)} • ${_dateLabel(session.completedAt)} at $time',
                           style: const TextStyle(color: Colors.white60),
@@ -1127,8 +1362,10 @@ class TimerScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _chooseDailyGoal(BuildContext context, TimerService timer) async {
-    final controller = TextEditingController(text: timer.dailyGoalMinutes.toString());
+  Future<void> _chooseDailyGoal(
+      BuildContext context, TimerService timer) async {
+    final controller =
+        TextEditingController(text: timer.dailyGoalMinutes.toString());
     final minutes = await showDialog<int>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -1141,7 +1378,8 @@ class TimerScreen extends StatelessWidget {
             labelText: 'Minutes per day',
             helperText: 'Choose between 5 and 480 minutes',
           ),
-          onSubmitted: (value) => Navigator.pop(dialogContext, int.tryParse(value)),
+          onSubmitted: (value) =>
+              Navigator.pop(dialogContext, int.tryParse(value)),
         ),
         actions: [
           TextButton(
@@ -1149,8 +1387,11 @@ class TimerScreen extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, int.tryParse(controller.text)),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
+            onPressed: () =>
+                Navigator.pop(dialogContext, int.tryParse(controller.text)),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: _ink),
             child: const Text('Save goal'),
           ),
         ],
@@ -1162,10 +1403,12 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
-  Future<void> _editTodayJournal(BuildContext context, JournalService journal) async {
+  Future<void> _editTodayJournal(
+      BuildContext context, JournalService journal) async {
     const moods = ['Calm', 'Focused', 'Tired', 'Stressed', 'Grateful'];
     var selectedMood = journal.todayEntry?.mood ?? moods.first;
-    final controller = TextEditingController(text: journal.todayEntry?.reflection ?? '');
+    final controller =
+        TextEditingController(text: journal.todayEntry?.reflection ?? '');
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -1186,7 +1429,8 @@ class TimerScreen extends StatelessWidget {
                         (mood) => ChoiceChip(
                           label: Text(mood),
                           selected: selectedMood == mood,
-                          onSelected: (_) => setDialogState(() => selectedMood = mood),
+                          onSelected: (_) =>
+                              setDialogState(() => selectedMood = mood),
                         ),
                       )
                       .toList(),
@@ -1213,10 +1457,13 @@ class TimerScreen extends StatelessWidget {
             ),
             FilledButton(
               onPressed: () async {
-                await journal.saveToday(mood: selectedMood, reflection: controller.text);
+                await journal.saveToday(
+                    mood: selectedMood, reflection: controller.text);
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
               },
-              style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary, foregroundColor: _ink),
+              style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: _ink),
               child: const Text('Save reflection'),
             ),
           ],
@@ -1236,10 +1483,10 @@ class TimerScreen extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) => SafeArea(
-          top: false,
-          child: SizedBox(
-            height: MediaQuery.sizeOf(sheetContext).height * 0.78,
-            child: Consumer<JournalService>(
+        top: false,
+        child: SizedBox(
+          height: MediaQuery.sizeOf(sheetContext).height * 0.78,
+          child: Consumer<JournalService>(
             builder: (context, journal, _) => Column(
               children: [
                 const SizedBox(height: 12),
@@ -1261,81 +1508,107 @@ class TimerScreen extends StatelessWidget {
                       child: ListView(
                         controller: scrollController,
                         children: [
-                  Text('Reflection journal', style: Theme.of(sheetContext).textTheme.titleLarge),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'A private space saved only on this device.',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  const SizedBox(height: 14),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(14),
-                      child: Text(
-                        'Today’s prompt: ${journal.dailyPrompt}',
-                        style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic),
-                      ),
-                    ),
-                  ),
-                  if (journal.recentMoodCounts.isNotEmpty) ...[
-                    const SizedBox(height: 16),
-                    Text('Mood snapshot', style: Theme.of(sheetContext).textTheme.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Over the last 7 days, you most often felt ${journal.mostCommonRecentMood?.toLowerCase()}.',
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      children: journal.recentMoodCounts.entries
-                          .map(
-                            (entry) => Chip(
-                              label: Text('${entry.key} ${entry.value}'),
-                              backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.13),
+                          Text('Reflection journal',
+                              style:
+                                  Theme.of(sheetContext).textTheme.titleLarge),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'A private space saved only on this device.',
+                            style: TextStyle(color: Colors.white70),
+                          ),
+                          const SizedBox(height: 14),
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(14),
                             ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  FilledButton.icon(
-                    onPressed: () => _editTodayJournal(sheetContext, journal),
-                    icon: const Icon(Icons.edit_note),
-                    label: Text(journal.todayEntry == null ? 'Write today’s reflection' : 'Update today’s reflection'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: _ink,
-                      minimumSize: const Size.fromHeight(52),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text('Recent reflections', style: Theme.of(sheetContext).textTheme.titleMedium),
-                  const SizedBox(height: 6),
-                  if (journal.entries.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 30),
-                      child: Center(
-                        child: Text(
-                          'Your first reflection will appear here.',
-                          style: TextStyle(color: Colors.white60),
-                        ),
-                      ),
-                    )
-                  else
-                    ...journal.entries.map(
-                      (entry) => ListTile(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 5),
-                        leading: Icon(Icons.favorite_outline, color: Theme.of(context).colorScheme.primary),
-                        title: Text('${entry.mood} • ${_dateLabel(entry.createdAt)}'),
-                        subtitle: Text(entry.reflection, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      ),
-                    ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Text(
+                                'Today’s prompt: ${journal.dailyPrompt}',
+                                style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                          ),
+                          if (journal.recentMoodCounts.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Text('Mood snapshot',
+                                style: Theme.of(sheetContext)
+                                    .textTheme
+                                    .titleMedium),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Over the last 7 days, you most often felt ${journal.mostCommonRecentMood?.toLowerCase()}.',
+                              style: const TextStyle(color: Colors.white70),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              children: journal.recentMoodCounts.entries
+                                  .map(
+                                    (entry) => Chip(
+                                      label:
+                                          Text('${entry.key} ${entry.value}'),
+                                      backgroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .primary
+                                          .withValues(alpha: 0.13),
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ],
+                          const SizedBox(height: 16),
+                          FilledButton.icon(
+                            onPressed: () =>
+                                _editTodayJournal(sheetContext, journal),
+                            icon: const Icon(Icons.edit_note),
+                            label: Text(journal.todayEntry == null
+                                ? 'Write today’s reflection'
+                                : 'Update today’s reflection'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor: _ink,
+                              minimumSize: const Size.fromHeight(52),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Text('Recent reflections',
+                              style:
+                                  Theme.of(sheetContext).textTheme.titleMedium),
+                          const SizedBox(height: 6),
+                          if (journal.entries.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 30),
+                              child: Center(
+                                child: Text(
+                                  'Your first reflection will appear here.',
+                                  style: TextStyle(color: Colors.white60),
+                                ),
+                              ),
+                            )
+                          else
+                            ...journal.entries.map(
+                              (entry) => ListTile(
+                                contentPadding:
+                                    const EdgeInsets.symmetric(vertical: 5),
+                                leading: Icon(Icons.favorite_outline,
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                                title: Text(
+                                    '${entry.mood} • ${_dateLabel(entry.createdAt)}'),
+                                subtitle: Text(entry.reflection,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis),
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -1354,7 +1627,8 @@ class TimerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final timer = context.watch<TimerService>();
     final auth = context.watch<AuthService>();
-    final queueRemaining = context.select<FocusQueueService, int>((queue) => queue.remainingCount);
+    final queueRemaining =
+        context.select<FocusQueueService, int>((queue) => queue.remainingCount);
     final sessionColor = _sessionColor(context, timer.sessionType);
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
@@ -1384,7 +1658,8 @@ class TimerScreen extends StatelessWidget {
               if (!granted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Enable FocusHaven notifications in macOS System Settings.'),
+                    content: Text(
+                        'Enable FocusHaven notifications in macOS System Settings.'),
                   ),
                 );
                 return;
@@ -1404,7 +1679,8 @@ class TimerScreen extends StatelessWidget {
           builder: (context, constraints) => SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight - 40),
+              constraints:
+                  BoxConstraints(minHeight: constraints.maxHeight - 40),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1419,19 +1695,27 @@ class TimerScreen extends StatelessWidget {
                                 label: Text(type.label),
                                 selected: timer.sessionType == type,
                                 onSelected: (_) => timer.selectSession(type),
-                                selectedColor: sessionColor.withValues(alpha: 0.32),
+                                selectedColor:
+                                    sessionColor.withValues(alpha: 0.32),
                               ),
                             )
                             .toList(),
                       ),
                       const SizedBox(height: 34),
                       Text(
-                        timer.isComplete ? 'SESSION COMPLETE' : timer.sessionType.label.toUpperCase(),
-                        style: TextStyle(color: sessionColor, fontWeight: FontWeight.bold, letterSpacing: 1.8),
+                        timer.isComplete
+                            ? 'SESSION COMPLETE'
+                            : timer.sessionType.label.toUpperCase(),
+                        style: TextStyle(
+                            color: sessionColor,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.8),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        timer.isComplete ? timer.completionMessage : timer.sessionType.encouragement,
+                        timer.isComplete
+                            ? timer.completionMessage
+                            : timer.sessionType.encouragement,
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.white70),
                       ),
@@ -1441,21 +1725,30 @@ class TimerScreen extends StatelessWidget {
                           onPressed: () => _editFocusTask(context, timer),
                           icon: const Icon(Icons.edit_outlined, size: 18),
                           label: Text(
-                            timer.focusTask.isEmpty ? 'Set a focus intention' : timer.focusTask,
+                            timer.focusTask.isEmpty
+                                ? 'Set a focus intention'
+                                : timer.focusTask,
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         TextButton.icon(
                           onPressed: () => _showFocusQueueSheet(context, timer),
-                          icon: const Icon(Icons.format_list_bulleted_outlined, size: 18),
-                          label: Text(queueRemaining == 0 ? 'Open focus queue' : 'Focus queue • $queueRemaining'),
+                          icon: const Icon(Icons.format_list_bulleted_outlined,
+                              size: 18),
+                          label: Text(queueRemaining == 0
+                              ? 'Open focus queue'
+                              : 'Focus queue • $queueRemaining'),
                         ),
                         if (timer.isRunning || timer.distractions.isNotEmpty)
                           TextButton.icon(
                             onPressed: () => timer.isRunning
                                 ? _captureDistraction(context, timer)
                                 : _showDistractionSheet(context, timer),
-                            icon: Icon(timer.isRunning ? Icons.add_task_outlined : Icons.bookmark_outline, size: 18),
+                            icon: Icon(
+                                timer.isRunning
+                                    ? Icons.add_task_outlined
+                                    : Icons.bookmark_outline,
+                                size: 18),
                             label: Text(
                               timer.isRunning
                                   ? 'Park a distraction${timer.distractions.isEmpty ? '' : ' • ${timer.distractions.length} saved'}'
@@ -1477,18 +1770,25 @@ class TimerScreen extends StatelessWidget {
                                 value: timer.progress.clamp(0, 1),
                                 strokeWidth: 11,
                                 strokeCap: StrokeCap.round,
-                                backgroundColor: Colors.white.withValues(alpha: 0.10),
+                                backgroundColor:
+                                    Colors.white.withValues(alpha: 0.10),
                                 color: sessionColor,
                               ),
                             ),
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(_formattedTime(timer.secondsRemaining), style: const TextStyle(fontSize: 60, fontWeight: FontWeight.w700, height: 1)),
+                                Text(_formattedTime(timer.secondsRemaining),
+                                    style: const TextStyle(
+                                        fontSize: 60,
+                                        fontWeight: FontWeight.w700,
+                                        height: 1)),
                                 const SizedBox(height: 10),
                                 Text(
                                   _durationLabel(timer.totalSessionSeconds),
-                                  style: const TextStyle(color: Colors.white60, letterSpacing: 1.2),
+                                  style: const TextStyle(
+                                      color: Colors.white60,
+                                      letterSpacing: 1.2),
                                 ),
                               ],
                             ),
@@ -1506,7 +1806,9 @@ class TimerScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(14),
                             child: Column(
                               children: [
-                                const Text('Resume your saved session?', style: TextStyle(fontWeight: FontWeight.w700)),
+                                const Text('Resume your saved session?',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.w700)),
                                 const SizedBox(height: 5),
                                 const Text(
                                   'Your timer was paused when FocusHaven reopened.',
@@ -1526,7 +1828,9 @@ class TimerScreen extends StatelessWidget {
                                     Expanded(
                                       child: FilledButton(
                                         onPressed: timer.resumePendingSession,
-                                        style: FilledButton.styleFrom(backgroundColor: sessionColor, foregroundColor: _ink),
+                                        style: FilledButton.styleFrom(
+                                            backgroundColor: sessionColor,
+                                            foregroundColor: _ink),
                                         child: const Text('Resume'),
                                       ),
                                     ),
@@ -1540,8 +1844,13 @@ class TimerScreen extends StatelessWidget {
                         FilledButton.icon(
                           onPressed: timer.beginNextSession,
                           icon: const Icon(Icons.arrow_forward),
-                          label: Text(timer.sessionType == SessionType.focus ? 'Take a break' : 'Begin focus'),
-                          style: FilledButton.styleFrom(backgroundColor: sessionColor, foregroundColor: _ink, minimumSize: const Size(210, 54)),
+                          label: Text(timer.sessionType == SessionType.focus
+                              ? 'Take a break'
+                              : 'Begin focus'),
+                          style: FilledButton.styleFrom(
+                              backgroundColor: sessionColor,
+                              foregroundColor: _ink,
+                              minimumSize: const Size(210, 54)),
                         )
                       else
                         Row(
@@ -1554,14 +1863,20 @@ class TimerScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 18),
                             FilledButton.icon(
-                              onPressed: timer.isRunning ? timer.pause : timer.start,
-                              icon: Icon(timer.isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded),
+                              onPressed:
+                                  timer.isRunning ? timer.pause : timer.start,
+                              icon: Icon(timer.isRunning
+                                  ? Icons.pause_rounded
+                                  : Icons.play_arrow_rounded),
                               label: Text(
                                 timer.isRunning
                                     ? 'Pause'
                                     : 'Begin ${timer.sessionType.label.toLowerCase()}',
                               ),
-                              style: FilledButton.styleFrom(backgroundColor: sessionColor, foregroundColor: _ink, minimumSize: const Size(172, 54)),
+                              style: FilledButton.styleFrom(
+                                  backgroundColor: sessionColor,
+                                  foregroundColor: _ink,
+                                  minimumSize: const Size(172, 54)),
                             ),
                           ],
                         ),
@@ -1570,7 +1885,8 @@ class TimerScreen extends StatelessWidget {
                         onPressed: () => _chooseCustomDuration(context, timer),
                         icon: const Icon(Icons.tune),
                         label: const Text('Custom duration'),
-                        style: TextButton.styleFrom(foregroundColor: sessionColor),
+                        style:
+                            TextButton.styleFrom(foregroundColor: sessionColor),
                       ),
                     ],
                   ),
@@ -1608,7 +1924,8 @@ class TimerScreen extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton.icon(
-                            onPressed: () => _showMilestonesSheet(context, timer),
+                            onPressed: () =>
+                                _showMilestonesSheet(context, timer),
                             icon: const Icon(Icons.emoji_events_outlined),
                             label: const Text('Milestones'),
                           ),
@@ -1626,13 +1943,17 @@ class TimerScreen extends StatelessWidget {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(Icons.flag_outlined, color: primaryColor),
+                                    Icon(Icons.flag_outlined,
+                                        color: primaryColor),
                                     const SizedBox(width: 8),
                                     const Expanded(
-                                      child: Text('Daily focus goal', style: TextStyle(fontWeight: FontWeight.w600)),
+                                      child: Text('Daily focus goal',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600)),
                                     ),
                                     TextButton(
-                                      onPressed: () => _chooseDailyGoal(context, timer),
+                                      onPressed: () =>
+                                          _chooseDailyGoal(context, timer),
                                       child: const Text('Change'),
                                     ),
                                   ],
@@ -1646,8 +1967,11 @@ class TimerScreen extends StatelessWidget {
                                   value: timer.dailyGoalProgress,
                                   minHeight: 9,
                                   borderRadius: BorderRadius.circular(99),
-                                  backgroundColor: Colors.white.withValues(alpha: 0.10),
-                                  color: timer.hasReachedDailyGoal ? secondaryColor : primaryColor,
+                                  backgroundColor:
+                                      Colors.white.withValues(alpha: 0.10),
+                                  color: timer.hasReachedDailyGoal
+                                      ? secondaryColor
+                                      : primaryColor,
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
@@ -1679,15 +2003,20 @@ class TimerScreen extends StatelessWidget {
                                       timer.hasCompletedDailyChallenge
                                           ? Icons.emoji_events_outlined
                                           : Icons.flag_outlined,
-                                      color: timer.hasCompletedDailyChallenge ? secondaryColor : primaryColor,
+                                      color: timer.hasCompletedDailyChallenge
+                                          ? secondaryColor
+                                          : primaryColor,
                                     ),
                                     const SizedBox(width: 8),
                                     const Expanded(
-                                      child: Text('Daily challenge', style: TextStyle(fontWeight: FontWeight.w600)),
+                                      child: Text('Daily challenge',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600)),
                                     ),
                                     Text(
                                       '${timer.todayFocusSessions}/${timer.dailyChallengeTarget}',
-                                      style: const TextStyle(color: Colors.white70),
+                                      style: const TextStyle(
+                                          color: Colors.white70),
                                     ),
                                   ],
                                 ),
@@ -1703,8 +2032,11 @@ class TimerScreen extends StatelessWidget {
                                   value: timer.dailyChallengeProgress,
                                   minHeight: 8,
                                   borderRadius: BorderRadius.circular(99),
-                                  backgroundColor: Colors.white.withValues(alpha: 0.10),
-                                  color: timer.hasCompletedDailyChallenge ? secondaryColor : tertiaryColor,
+                                  backgroundColor:
+                                      Colors.white.withValues(alpha: 0.10),
+                                  color: timer.hasCompletedDailyChallenge
+                                      ? secondaryColor
+                                      : tertiaryColor,
                                 ),
                               ],
                             ),
@@ -1714,11 +2046,14 @@ class TimerScreen extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: Text('Recent focus', style: Theme.of(context).textTheme.titleMedium),
+                              child: Text('Recent focus',
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium),
                             ),
                             if (timer.recentFocusSessions.isNotEmpty)
                               TextButton(
-                                onPressed: () => _showFocusHistory(context, timer),
+                                onPressed: () =>
+                                    _showFocusHistory(context, timer),
                                 child: const Text('View all'),
                               ),
                           ],
@@ -1727,31 +2062,43 @@ class TimerScreen extends StatelessWidget {
                         if (timer.recentFocusSessions.isEmpty)
                           const Align(
                             alignment: Alignment.centerLeft,
-                            child: Text('Complete a focus session to begin your history.', style: TextStyle(color: Colors.white60)),
+                            child: Text(
+                                'Complete a focus session to begin your history.',
+                                style: TextStyle(color: Colors.white60)),
                           )
                         else
                           ...timer.recentFocusSessions.take(3).map(
                                 (session) => ListTile(
                                   contentPadding: EdgeInsets.zero,
                                   leading: CircleAvatar(
-                                    backgroundColor: primaryColor.withValues(alpha: 0.2),
-                                    child: Icon(Icons.auto_awesome, color: primaryColor),
+                                    backgroundColor:
+                                        primaryColor.withValues(alpha: 0.2),
+                                    child: Icon(Icons.auto_awesome,
+                                        color: primaryColor),
                                   ),
-                                  title: Text(session.focusTask ?? _focusSessionLabel(session.durationSeconds)),
+                                  title: Text(session.focusTask ??
+                                      _focusSessionLabel(
+                                          session.durationSeconds)),
                                   subtitle: session.focusTask == null
                                       ? null
                                       : Text(
-                                          _focusSessionLabel(session.durationSeconds),
-                                          style: const TextStyle(color: Colors.white60),
+                                          _focusSessionLabel(
+                                              session.durationSeconds),
+                                          style: const TextStyle(
+                                              color: Colors.white60),
                                         ),
-                                  trailing: Text(_dateLabel(session.completedAt), style: const TextStyle(color: Colors.white60)),
+                                  trailing: Text(
+                                      _dateLabel(session.completedAt),
+                                      style: const TextStyle(
+                                          color: Colors.white60)),
+                                ),
                               ),
-                            ),
                         if (timer.recentFocusSessions.isNotEmpty)
                           Align(
                             alignment: Alignment.centerLeft,
                             child: TextButton.icon(
-                              onPressed: () => _confirmClearHistory(context, timer),
+                              onPressed: () =>
+                                  _confirmClearHistory(context, timer),
                               icon: const Icon(Icons.delete_outline),
                               label: const Text('Clear focus history'),
                             ),
@@ -1769,7 +2116,10 @@ class TimerScreen extends StatelessWidget {
                                     ? 'Sign in with Google to back up your focus data'
                                     : !isPro
                                         ? 'Upgrade to Pro to use cloud backup'
-                                        : await context.read<CloudSyncService>().syncFocusData(timer.cloudBackup)
+                                        : await context
+                                                .read<CloudSyncService>()
+                                                .syncFocusData(
+                                                    timer.cloudBackup)
                                             ? 'Focus data backed up securely'
                                             : 'Backup failed. Check your Firebase setup.';
                                 if (context.mounted) {
@@ -1787,11 +2137,15 @@ class TimerScreen extends StatelessWidget {
                                 if (!context.mounted) return;
                                 String message;
                                 if (!auth.isSignedIn) {
-                                  message = 'Sign in with Google to restore your focus data';
+                                  message =
+                                      'Sign in with Google to restore your focus data';
                                 } else if (!isPro) {
-                                  message = 'Upgrade to Pro to restore cloud backup';
+                                  message =
+                                      'Upgrade to Pro to restore cloud backup';
                                 } else {
-                                  final backup = await context.read<CloudSyncService>().fetchFocusData();
+                                  final backup = await context
+                                      .read<CloudSyncService>()
+                                      .fetchFocusData();
                                   if (!context.mounted) return;
                                   message = backup == null
                                       ? 'No cloud backup found yet'
@@ -1855,8 +2209,11 @@ class _StatCard extends StatelessWidget {
           children: [
             Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 4),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-            Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+            Text(value,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+            Text(label,
+                style: const TextStyle(color: Colors.white60, fontSize: 11)),
           ],
         ),
       ),
