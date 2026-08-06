@@ -37,4 +37,15 @@ void main() {
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey('focusHavenTheme'), isFalse);
   });
+
+  test('loads a previously selected appearance theme', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusHavenTheme': 'roseQuartz',
+    });
+
+    final service = await createThemeService();
+    addTearDown(service.dispose);
+
+    expect(service.selectedTheme, FocusHavenTheme.roseQuartz);
+  });
 }
