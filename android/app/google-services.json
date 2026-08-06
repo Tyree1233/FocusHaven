@@ -86,6 +86,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "791775983697-8vlin5q31fuge9ljpcns1s8447q9s3hc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.focushaven.app",
+            "certificate_hash": "ad684cc0b5298942089ba72e37d2c1a039a67371"
+          }
+        },
+        {
           "client_id": "791775983697-rph40grb8ghi320h312685u1lg9nv0bd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
