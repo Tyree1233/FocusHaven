@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
@@ -198,6 +199,19 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    const policyUrl = 'https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html';
+    final opened = await launchUrl(
+      Uri.parse(policyUrl),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to open the privacy policy right now.')),
+      );
+    }
+  }
+
   Future<void> _showAccountSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
         context: context,
@@ -252,6 +266,11 @@ class TimerScreen extends StatelessWidget {
                     onPressed: () => _showThemeSheet(context),
                     icon: const Icon(Icons.palette_outlined),
                     label: const Text('Appearance'),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => _openPrivacyPolicy(context),
+                    icon: const Icon(Icons.privacy_tip_outlined),
+                    label: const Text('Privacy Policy'),
                   ),
                 ],
               ),
