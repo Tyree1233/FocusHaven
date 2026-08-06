@@ -11,6 +11,7 @@ import '../services/focus_queue_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/notification_service.dart';
+import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
 import '../widgets/guided_breathing_sheet.dart';
@@ -321,6 +322,117 @@ class TimerScreen extends StatelessWidget {
     ]);
     if (!context.mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+  }
+
+  Future<void> _showReminderSheet(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Consumer<ReminderService>(
+            builder: (context, reminders, _) => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  'Daily focus reminder',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'One gentle invitation each day. You can change or turn it off at any time.',
+                  style: TextStyle(color: Colors.white70, height: 1.35),
+                ),
+                const SizedBox(height: 20),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(
+                    reminders.isEnabled
+                        ? Icons.notifications_active_outlined
+                        : Icons.notifications_off_outlined,
+                  ),
+                  title: Text(
+                    reminders.isEnabled ? 'Reminder is on' : 'Reminder is off',
+                  ),
+                  subtitle: Text(
+                    MaterialLocalizations.of(context).formatTimeOfDay(reminders.time),
+                  ),
+                  trailing: Switch(
+                    value: reminders.isEnabled,
+                    onChanged: (enabled) async {
+                      if (enabled) {
+                        final selected = await showTimePicker(
+                          context: sheetContext,
+                          initialTime: reminders.time,
+                        );
+                        if (selected == null || !sheetContext.mounted) return;
+                        final scheduled = await reminders.setDailyReminder(selected);
+                        if (!sheetContext.mounted) return;
+                        if (!scheduled) {
+                          ScaffoldMessenger.of(sheetContext).showSnackBar(
+                            const SnackBar(
+                              content: Text('Allow notifications to set a daily reminder.'),
+                            ),
+                          );
+                        }
+                      } else {
+                        await reminders.disableDailyReminder();
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final selected = await showTimePicker(
+                      context: sheetContext,
+                      initialTime: reminders.time,
+                    );
+                    if (selected == null || !sheetContext.mounted) return;
+                    final scheduled = await reminders.setDailyReminder(selected);
+                    if (!sheetContext.mounted) return;
+                    ScaffoldMessenger.of(sheetContext).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          scheduled
+                              ? 'Daily reminder set for ${MaterialLocalizations.of(sheetContext).formatTimeOfDay(selected)}.'
+                              : 'Allow notifications to set a daily reminder.',
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.schedule_outlined),
+                  label: const Text('Choose reminder time'),
+                ),
+                TextButton.icon(
+                  onPressed: () async {
+                    final notifications = context.read<NotificationService>();
+                    final permitted = await notifications.requestPermissions();
+                    if (!context.mounted) return;
+                    if (!permitted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Allow notifications to send a test alert.'),
+                        ),
+                      );
+                      return;
+                    }
+                    await notifications.showTestNotification();
+                  },
+                  icon: const Icon(Icons.notifications_outlined),
+                  label: const Text('Send a test notification'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _showAccountSheet(BuildContext context) async {
@@ -1737,22 +1849,8 @@ class TimerScreen extends StatelessWidget {
           ),
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
-            tooltip: 'Test notifications',
-            onPressed: () async {
-              final notifications = context.read<NotificationService>();
-              final granted = await notifications.requestPermissions();
-              if (!context.mounted) return;
-              if (!granted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                        'Enable FocusHaven notifications in macOS System Settings.'),
-                  ),
-                );
-                return;
-              }
-              await notifications.showTestNotification();
-            },
+            tooltip: 'Daily focus reminder',
+            onPressed: () => _showReminderSheet(context),
           ),
           IconButton(
             icon: const Icon(Icons.account_circle_outlined),

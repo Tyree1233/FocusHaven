@@ -1,9 +1,15 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
+  static const _dailyReminderId = 2001;
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
+  bool _timeZoneConfigured = false;
 
   Future<void> initialize() async {
     if (kIsWeb) return;
@@ -89,5 +95,62 @@ class NotificationService {
     } catch (error) {
       debugPrint('Notification display failed: $error');
     }
+  }
+
+  Future<bool> scheduleDailyReminder(TimeOfDay time) async {
+    if (kIsWeb) return false;
+
+    try {
+      await _configureLocalTimeZone();
+      final now = tz.TZDateTime.now(tz.local);
+      var scheduled = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        time.hour,
+        time.minute,
+      );
+      if (!scheduled.isAfter(now)) {
+        scheduled = scheduled.add(const Duration(days: 1));
+      }
+
+      const details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          'daily_focus_reminder',
+          'Daily focus reminder',
+          channelDescription: 'A gentle daily invitation to begin a focus session.',
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+        ),
+        iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        macOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+      );
+
+      await _notifications.zonedSchedule(
+        id: _dailyReminderId,
+        title: 'A gentle focus moment',
+        body: 'Whenever you are ready, make a little space for what matters.',
+        scheduledDate: scheduled,
+        notificationDetails: details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+      return true;
+    } catch (error) {
+      debugPrint('Daily reminder setup failed: $error');
+      return false;
+    }
+  }
+
+  Future<void> cancelDailyReminder() =>
+      _notifications.cancel(id: _dailyReminderId);
+
+  Future<void> _configureLocalTimeZone() async {
+    if (_timeZoneConfigured || kIsWeb) return;
+    tz.initializeTimeZones();
+    final timeZoneInfo = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneInfo.identifier));
+    _timeZoneConfigured = true;
   }
 }

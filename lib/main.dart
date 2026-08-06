@@ -11,6 +11,7 @@ import 'services/focus_queue_service.dart';
 import 'services/iap_service.dart';
 import 'services/journal_service.dart';
 import 'services/notification_service.dart';
+import 'services/reminder_service.dart';
 import 'services/timer_service.dart';
 import 'services/theme_service.dart';
 import 'screens/onboarding_screen.dart';
@@ -56,6 +57,11 @@ class FocusHavenApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FocusQueueService()),
         ChangeNotifierProvider(create: (_) => ThemeService()),
         ChangeNotifierProvider(create: (_) => JournalService()),
+        ChangeNotifierProvider(
+          create: (_) => ReminderService(
+            notificationService: activeNotificationService,
+          ),
+        ),
         Provider(create: (_) => IAPService()),
         Provider(create: (_) => CloudSyncService()),
         Provider.value(value: activeNotificationService),

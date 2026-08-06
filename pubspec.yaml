@@ -17,7 +17,9 @@ dependencies:
   in_app_purchase: ^3.0.7
   provider: ^6.0.5
   flutter_local_notifications: ^22.2.0
+  flutter_timezone: ^5.0.1
   intl: ^0.18.0
+  timezone: ^0.11.1
   url_launcher: ^6.3.1
 
 dev_dependencies:
