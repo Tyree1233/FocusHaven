@@ -247,6 +247,41 @@ class TimerScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _confirmDeleteCloudBackup(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete cloud backup?'),
+        content: const Text(
+          'This permanently deletes the FocusHaven backup stored in your account. Your data on this device will stay here.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Keep backup'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Delete backup'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+
+    final deleted = await context.read<CloudSyncService>().deleteFocusData();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          deleted
+              ? 'Cloud backup deleted. Your local focus data remains on this device.'
+              : 'Unable to delete the cloud backup right now.',
+        ),
+      ),
+    );
+  }
+
   Future<void> _showAccountSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -322,6 +357,12 @@ class TimerScreen extends StatelessWidget {
                       },
                       icon: const Icon(Icons.login),
                       label: const Text('Sign in with Google'),
+                    ),
+                  if (auth.isSignedIn)
+                    TextButton.icon(
+                      onPressed: () => _confirmDeleteCloudBackup(context),
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Delete cloud backup'),
                     ),
                   const SizedBox(height: 8),
                   TextButton.icon(
