@@ -37,4 +37,15 @@ void main() {
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey('focusProfile'), isFalse);
   });
+
+  test('loads the saved focus profile on launch', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusProfile': 'Structured planner',
+    });
+
+    final profile = await createProfile();
+    addTearDown(profile.dispose);
+
+    expect(profile.focusType, 'Structured planner');
+  });
 }
