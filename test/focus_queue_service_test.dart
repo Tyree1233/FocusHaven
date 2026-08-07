@@ -106,4 +106,16 @@ void main() {
     expect(queue.items.single.title, 'Review notes');
     expect(queue.completedItems.single.title, 'Plan tomorrow');
   });
+
+  test('starts with an empty queue when saved data is invalid', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': 'not valid JSON',
+    });
+
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+
+    expect(queue.items, isEmpty);
+    expect(queue.completedItems, isEmpty);
+  });
 }
