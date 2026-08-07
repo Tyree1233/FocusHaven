@@ -119,4 +119,28 @@ void main() {
 
     expect(timer.restoreCloudBackup({'focusSeconds': 20}), isFalse);
   });
+
+  test('loads a saved short-break timer after reopening', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1500,
+      'shortBreakSeconds': 185,
+      'longBreakSeconds': 900,
+      'secondsRemaining': 181,
+      'totalSessionSeconds': 185,
+      'sessionType': SessionType.shortBreak.index,
+      'completedFocusSessions': 2,
+      'focusTask': 'Finish the outline',
+      'dailyGoalMinutes': 75,
+    });
+
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.sessionType, SessionType.shortBreak);
+    expect(timer.secondsRemaining, 181);
+    expect(timer.totalSessionSeconds, 185);
+    expect(timer.completedFocusSessions, 2);
+    expect(timer.focusTask, 'Finish the outline');
+    expect(timer.dailyGoalMinutes, 75);
+  });
 }
