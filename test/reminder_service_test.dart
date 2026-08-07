@@ -40,6 +40,17 @@ void main() {
     expect(service.time, const TimeOfDay(hour: 18, minute: 30));
   });
 
+  test('clamps an invalid saved reminder time to a valid time', () async {
+    SharedPreferences.setMockInitialValues({
+      'dailyReminderHour': 42,
+      'dailyReminderMinute': -5,
+    });
+    final service = await createService(FakeReminderNotifications());
+    addTearDown(service.dispose);
+
+    expect(service.time, const TimeOfDay(hour: 23, minute: 0));
+  });
+
   test('does not enable a reminder when permission is declined', () async {
     final notifications = FakeReminderNotifications(permissionGranted: false);
     final service = await createService(notifications);
