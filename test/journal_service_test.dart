@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/services/journal_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,5 +63,24 @@ void main() {
     expect(journal.entries, isEmpty);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey('journalEntries'), isFalse);
+  });
+
+  test('loads saved reflections on launch', () async {
+    final savedAt = DateTime.now().subtract(const Duration(minutes: 1));
+    SharedPreferences.setMockInitialValues({
+      'journalEntries': jsonEncode([
+        {
+          'createdAt': savedAt.toIso8601String(),
+          'mood': 'Calm',
+          'reflection': 'I made room for a quiet moment.',
+        },
+      ]),
+    });
+
+    final journal = await createJournal();
+    addTearDown(journal.dispose);
+
+    expect(journal.entries.single.reflection, 'I made room for a quiet moment.');
+    expect(journal.mostCommonRecentMood, 'Calm');
   });
 }
