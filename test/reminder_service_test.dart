@@ -25,6 +25,7 @@ void main() {
 
     expect(service.isEnabled, isFalse);
     expect(service.time, const TimeOfDay(hour: 9, minute: 0));
+    expect(service.weekdays, {1, 2, 3, 4, 5, 6, 7});
   });
 
   test('loads a saved reminder time and enabled setting', () async {
@@ -32,12 +33,14 @@ void main() {
       'dailyReminderEnabled': true,
       'dailyReminderHour': 18,
       'dailyReminderMinute': 30,
+      'dailyReminderWeekdays': ['1', '3', '5'],
     });
     final service = await createService(FakeReminderNotifications());
     addTearDown(service.dispose);
 
     expect(service.isEnabled, isTrue);
     expect(service.time, const TimeOfDay(hour: 18, minute: 30));
+    expect(service.weekdays, {1, 3, 5});
   });
 
   test('clamps an invalid saved reminder time to a valid time', () async {
@@ -76,11 +79,34 @@ void main() {
     expect(enabled, isTrue);
     expect(service.isEnabled, isTrue);
     expect(service.time, reminderTime);
+    expect(service.weekdays, {1, 2, 3, 4, 5, 6, 7});
     expect(notifications.scheduledTimes, [reminderTime]);
+    expect(notifications.scheduledWeekdays, [
+      {1, 2, 3, 4, 5, 6, 7},
+    ]);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getBool('dailyReminderEnabled'), isTrue);
     expect(preferences.getInt('dailyReminderHour'), 10);
     expect(preferences.getInt('dailyReminderMinute'), 15);
+    expect(
+      preferences.getStringList('dailyReminderWeekdays'),
+      ['1', '2', '3', '4', '5', '6', '7'],
+    );
+  });
+
+  test('saves selected weekdays for a scheduled focus time', () async {
+    final notifications = FakeReminderNotifications();
+    final service = await createService(notifications);
+    addTearDown(service.dispose);
+
+    final enabled = await service.setDailyReminder(
+      const TimeOfDay(hour: 7, minute: 30),
+      weekdays: {DateTime.monday, DateTime.wednesday, DateTime.friday},
+    );
+
+    expect(enabled, isTrue);
+    expect(service.weekdays, {1, 3, 5});
+    expect(notifications.scheduledWeekdays.single, {1, 3, 5});
   });
 
   test('disabling a reminder cancels it and saves the disabled setting',
@@ -108,6 +134,7 @@ class FakeReminderNotifications implements ReminderNotificationClient {
   final bool permissionGranted;
   final bool scheduleSucceeds;
   final List<TimeOfDay> scheduledTimes = [];
+  final List<Set<int>> scheduledWeekdays = [];
   int cancelCalls = 0;
 
   @override
@@ -119,8 +146,14 @@ class FakeReminderNotifications implements ReminderNotificationClient {
   Future<bool> requestPermissions() async => permissionGranted;
 
   @override
-  Future<bool> scheduleDailyReminder(TimeOfDay time) async {
-    if (scheduleSucceeds) scheduledTimes.add(time);
+  Future<bool> scheduleDailyReminder(
+    TimeOfDay time,
+    Set<int> weekdays,
+  ) async {
+    if (scheduleSucceeds) {
+      scheduledTimes.add(time);
+      scheduledWeekdays.add(Set<int>.from(weekdays));
+    }
     return scheduleSucceeds;
   }
 }

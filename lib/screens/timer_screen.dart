@@ -326,114 +326,185 @@ class TimerScreen extends StatelessWidget {
   }
 
   Future<void> _showReminderSheet(BuildContext context) async {
+    final selectedWeekdays = context.read<ReminderService>().weekdays.toSet();
+    const weekdayLabels = <int, String>{
+      DateTime.monday: 'Mon',
+      DateTime.tuesday: 'Tue',
+      DateTime.wednesday: 'Wed',
+      DateTime.thursday: 'Thu',
+      DateTime.friday: 'Fri',
+      DateTime.saturday: 'Sat',
+      DateTime.sunday: 'Sun',
+    };
+
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Consumer<ReminderService>(
-            builder: (context, reminders, _) => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Daily focus reminder',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'One gentle invitation each day. You can change or turn it off at any time.',
-                  style: TextStyle(color: Colors.white70, height: 1.35),
-                ),
-                const SizedBox(height: 20),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Icon(
-                    reminders.isEnabled
-                        ? Icons.notifications_active_outlined
-                        : Icons.notifications_off_outlined,
-                  ),
-                  title: Text(
-                    reminders.isEnabled ? 'Reminder is on' : 'Reminder is off',
-                  ),
-                  subtitle: Text(
-                    MaterialLocalizations.of(context)
-                        .formatTimeOfDay(reminders.time),
-                  ),
-                  trailing: Switch(
-                    value: reminders.isEnabled,
-                    onChanged: (enabled) async {
-                      if (enabled) {
-                        final selected = await showTimePicker(
-                          context: sheetContext,
-                          initialTime: reminders.time,
-                        );
-                        if (selected == null || !sheetContext.mounted) return;
-                        final scheduled =
-                            await reminders.setDailyReminder(selected);
-                        if (!sheetContext.mounted) return;
-                        if (!scheduled) {
-                          ScaffoldMessenger.of(sheetContext).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Allow notifications to set a daily reminder.'),
-                            ),
-                          );
-                        }
-                      } else {
-                        await reminders.disableDailyReminder();
-                      }
-                    },
-                  ),
-                ),
-                const SizedBox(height: 8),
-                OutlinedButton.icon(
-                  onPressed: () async {
-                    final selected = await showTimePicker(
-                      context: sheetContext,
-                      initialTime: reminders.time,
-                    );
-                    if (selected == null || !sheetContext.mounted) return;
-                    final scheduled =
-                        await reminders.setDailyReminder(selected);
-                    if (!sheetContext.mounted) return;
-                    ScaffoldMessenger.of(sheetContext).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          scheduled
-                              ? 'Daily reminder set for ${MaterialLocalizations.of(sheetContext).formatTimeOfDay(selected)}.'
-                              : 'Allow notifications to set a daily reminder.',
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Consumer<ReminderService>(
+                builder: (context, reminders, _) {
+                  final scheduledDays = weekdayLabels.entries
+                      .where((entry) => reminders.weekdays.contains(entry.key))
+                      .map((entry) => entry.value)
+                      .join(', ');
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        'Scheduled focus time',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Choose the days and time for a gentle invitation to focus. You can change or turn it off at any time.',
+                        style: TextStyle(color: Colors.white70, height: 1.35),
+                      ),
+                      const SizedBox(height: 20),
+                      ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(
+                          reminders.isEnabled
+                              ? Icons.event_available_outlined
+                              : Icons.event_busy_outlined,
+                        ),
+                        title: Text(
+                          reminders.isEnabled
+                              ? 'Focus time is scheduled'
+                              : 'No focus time scheduled',
+                        ),
+                        subtitle: Text(
+                          '${MaterialLocalizations.of(context).formatTimeOfDay(reminders.time)}${reminders.isEnabled ? ' • $scheduledDays' : ''}',
+                        ),
+                        trailing: Switch(
+                          value: reminders.isEnabled,
+                          onChanged: (enabled) async {
+                            if (enabled) {
+                              final selected = await showTimePicker(
+                                context: sheetContext,
+                                initialTime: reminders.time,
+                              );
+                              if (selected == null || !sheetContext.mounted) {
+                                return;
+                              }
+                              final scheduled =
+                                  await reminders.setDailyReminder(
+                                selected,
+                                weekdays: selectedWeekdays,
+                              );
+                              if (!sheetContext.mounted || scheduled) return;
+                              ScaffoldMessenger.of(sheetContext).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Allow notifications to schedule a focus time.',
+                                  ),
+                                ),
+                              );
+                            } else {
+                              await reminders.disableDailyReminder();
+                            }
+                          },
                         ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.schedule_outlined),
-                  label: const Text('Choose reminder time'),
-                ),
-                TextButton.icon(
-                  onPressed: () async {
-                    final notifications = context.read<NotificationService>();
-                    final permitted = await notifications.requestPermissions();
-                    if (!context.mounted) return;
-                    if (!permitted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                              Text('Allow notifications to send a test alert.'),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Repeat on',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: weekdayLabels.entries
+                            .map(
+                              (entry) => FilterChip(
+                                label: Text(entry.value),
+                                selected: selectedWeekdays.contains(entry.key),
+                                onSelected: (selected) {
+                                  if (!selected &&
+                                      selectedWeekdays.length == 1) {
+                                    return;
+                                  }
+                                  setSheetState(() {
+                                    if (selected) {
+                                      selectedWeekdays.add(entry.key);
+                                    } else {
+                                      selectedWeekdays.remove(entry.key);
+                                    }
+                                  });
+                                },
+                              ),
+                            )
+                            .toList(),
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Choose at least one day. Changes are saved when you choose a focus time.',
+                        style: TextStyle(color: Colors.white60),
+                      ),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: () async {
+                          final selected = await showTimePicker(
+                            context: sheetContext,
+                            initialTime: reminders.time,
+                          );
+                          if (selected == null || !sheetContext.mounted) return;
+                          final scheduled = await reminders.setDailyReminder(
+                            selected,
+                            weekdays: selectedWeekdays,
+                          );
+                          if (!sheetContext.mounted) return;
+                          ScaffoldMessenger.of(sheetContext).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                scheduled
+                                    ? 'Focus time scheduled for ${MaterialLocalizations.of(sheetContext).formatTimeOfDay(selected)}.'
+                                    : 'Allow notifications to schedule a focus time.',
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.schedule_outlined),
+                        label: Text(
+                          reminders.isEnabled
+                              ? 'Update focus time'
+                              : 'Choose focus time',
                         ),
-                      );
-                      return;
-                    }
-                    await notifications.showTestNotification();
-                  },
-                  icon: const Icon(Icons.notifications_outlined),
-                  label: const Text('Send a test notification'),
-                ),
-              ],
+                      ),
+                      TextButton.icon(
+                        onPressed: () async {
+                          final notifications =
+                              context.read<NotificationService>();
+                          final permitted =
+                              await notifications.requestPermissions();
+                          if (!context.mounted) return;
+                          if (!permitted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'Allow notifications to send a test alert.',
+                                ),
+                              ),
+                            );
+                            return;
+                          }
+                          await notifications.showTestNotification();
+                        },
+                        icon: const Icon(Icons.notifications_outlined),
+                        label: const Text('Send a test notification'),
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),

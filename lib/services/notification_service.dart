@@ -7,12 +7,13 @@ import 'package:timezone/timezone.dart' as tz;
 
 abstract interface class ReminderNotificationClient {
   Future<bool> requestPermissions();
-  Future<bool> scheduleDailyReminder(TimeOfDay time);
+  Future<bool> scheduleDailyReminder(TimeOfDay time, Set<int> weekdays);
   Future<void> cancelDailyReminder();
 }
 
 class NotificationService implements ReminderNotificationClient {
-  static const _dailyReminderId = 2001;
+  static const _dailyReminderId = 2000;
+  static const _weekdays = <int>{1, 2, 3, 4, 5, 6, 7};
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
   bool _timeZoneConfigured = false;
@@ -105,30 +106,27 @@ class NotificationService implements ReminderNotificationClient {
   }
 
   @override
-  Future<bool> scheduleDailyReminder(TimeOfDay time) async {
+  Future<bool> scheduleDailyReminder(
+    TimeOfDay time,
+    Set<int> weekdays,
+  ) async {
     if (kIsWeb) return false;
 
     try {
+      final selectedWeekdays = weekdays.where(_weekdays.contains).toList()
+        ..sort();
+      if (selectedWeekdays.isEmpty) return false;
+
       await _configureLocalTimeZone();
+      await cancelDailyReminder();
       final now = tz.TZDateTime.now(tz.local);
-      var scheduled = tz.TZDateTime(
-        tz.local,
-        now.year,
-        now.month,
-        now.day,
-        time.hour,
-        time.minute,
-      );
-      if (!scheduled.isAfter(now)) {
-        scheduled = scheduled.add(const Duration(days: 1));
-      }
 
       const details = NotificationDetails(
         android: AndroidNotificationDetails(
           'daily_focus_reminder',
-          'Daily focus reminder',
+          'Scheduled focus time',
           channelDescription:
-              'A gentle daily invitation to begin a focus session.',
+              'A gentle invitation to begin a scheduled focus session.',
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),
@@ -137,25 +135,43 @@ class NotificationService implements ReminderNotificationClient {
             DarwinNotificationDetails(presentAlert: true, presentSound: true),
       );
 
-      await _notifications.zonedSchedule(
-        id: _dailyReminderId,
-        title: 'A gentle focus moment',
-        body: 'Whenever you are ready, make a little space for what matters.',
-        scheduledDate: scheduled,
-        notificationDetails: details,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
+      for (final weekday in selectedWeekdays) {
+        var scheduled = tz.TZDateTime(
+          tz.local,
+          now.year,
+          now.month,
+          now.day,
+          time.hour,
+          time.minute,
+        );
+        while (scheduled.weekday != weekday || !scheduled.isAfter(now)) {
+          scheduled = scheduled.add(const Duration(days: 1));
+        }
+
+        await _notifications.zonedSchedule(
+          id: _dailyReminderId + weekday,
+          title: 'Your scheduled focus time',
+          body: 'Whenever you are ready, make a little space for what matters.',
+          scheduledDate: scheduled,
+          notificationDetails: details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+        );
+      }
       return true;
     } catch (error) {
-      debugPrint('Daily reminder setup failed: $error');
+      await cancelDailyReminder();
+      debugPrint('Scheduled focus reminder setup failed: $error');
       return false;
     }
   }
 
   @override
-  Future<void> cancelDailyReminder() =>
-      _notifications.cancel(id: _dailyReminderId);
+  Future<void> cancelDailyReminder() async {
+    for (final weekday in _weekdays) {
+      await _notifications.cancel(id: _dailyReminderId + weekday);
+    }
+  }
 
   Future<void> _configureLocalTimeZone() async {
     if (_timeZoneConfigured || kIsWeb) return;
