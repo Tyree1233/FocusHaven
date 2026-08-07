@@ -16,6 +16,8 @@ import '../services/theme_service.dart';
 import '../services/timer_service.dart';
 import '../widgets/guided_breathing_sheet.dart';
 
+enum _HistoryFilter { all, today, week }
+
 class TimerScreen extends StatelessWidget {
   const TimerScreen({super.key});
 
@@ -1508,6 +1510,7 @@ class TimerScreen extends StatelessWidget {
         : '$weeklyMinutes ${weeklyMinutes == 1 ? 'minute' : 'minutes'}';
     final highestDaySeconds = weeklySeconds.fold(
         1, (highest, seconds) => seconds > highest ? seconds : highest);
+    var historyFilter = _HistoryFilter.all;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -1515,141 +1518,215 @@ class TimerScreen extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.72,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-            child: Column(
-              children: [
-                Container(
-                  height: 4,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text('All focus sessions',
-                    style: Theme.of(sheetContext).textTheme.titleLarge),
-                const SizedBox(height: 8),
-                Text(
-                  '${timer.completedFocusSessions} completed sessions',
-                  style: const TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 14),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: Theme.of(sheetContext)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('This week',
-                            style: Theme.of(sheetContext).textTheme.titleSmall),
-                        const SizedBox(height: 2),
-                        Text(
-                          '$weeklyDuration • $weeklySessions ${weeklySessions == 1 ? 'session' : 'sessions'}',
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          height: 76,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: List.generate(7, (index) {
-                              final day = DateTime.now()
-                                  .subtract(Duration(days: 6 - index));
-                              final double height = weeklySeconds[index] == 0
-                                  ? 3.0
-                                  : 8.0 +
-                                      (42 *
-                                          weeklySeconds[index] /
-                                          highestDaySeconds);
-                              return Expanded(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 3),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Container(
-                                        height: height,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(sheetContext)
-                                              .colorScheme
-                                              .primary,
-                                          borderRadius:
-                                              BorderRadius.circular(99),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      Text(
-                                        const [
-                                          'M',
-                                          'T',
-                                          'W',
-                                          'T',
-                                          'F',
-                                          'S',
-                                          'S'
-                                        ][day.weekday - 1],
-                                        style: const TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.white60),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                          ),
-                        ),
-                      ],
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setSheetState) => SafeArea(
+          top: false,
+          child: SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * 0.72,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: Column(
+                children: [
+                  Container(
+                    height: 4,
+                    width: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(99),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: timer.recentFocusSessions.length,
-                    separatorBuilder: (context, index) =>
-                        const Divider(height: 1, color: Colors.white12),
-                    itemBuilder: (context, index) {
-                      final session = timer.recentFocusSessions[index];
-                      final time =
-                          MaterialLocalizations.of(context).formatTimeOfDay(
-                        TimeOfDay.fromDateTime(session.completedAt),
-                      );
-                      return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                        leading: CircleAvatar(
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withValues(alpha: 0.2),
-                          child: Icon(Icons.auto_awesome,
-                              color: Theme.of(context).colorScheme.primary),
-                        ),
-                        title: Text(session.focusTask ??
-                            _focusSessionLabel(session.durationSeconds)),
-                        subtitle: Text(
-                          '${_focusSessionLabel(session.durationSeconds)} • ${_dateLabel(session.completedAt)} at $time',
-                          style: const TextStyle(color: Colors.white60),
-                        ),
-                      );
-                    },
+                  const SizedBox(height: 18),
+                  Text('All focus sessions',
+                      style: Theme.of(sheetContext).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${timer.completedFocusSessions} completed sessions',
+                    style: const TextStyle(color: Colors.white70),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 14),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Theme.of(sheetContext)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('This week',
+                              style:
+                                  Theme.of(sheetContext).textTheme.titleSmall),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$weeklyDuration • $weeklySessions ${weeklySessions == 1 ? 'session' : 'sessions'}',
+                            style: const TextStyle(color: Colors.white70),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 76,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: List.generate(7, (index) {
+                                final day = DateTime.now()
+                                    .subtract(Duration(days: 6 - index));
+                                final double height = weeklySeconds[index] == 0
+                                    ? 3.0
+                                    : 8.0 +
+                                        (42 *
+                                            weeklySeconds[index] /
+                                            highestDaySeconds);
+                                return Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 3),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Container(
+                                          height: height,
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(sheetContext)
+                                                .colorScheme
+                                                .primary,
+                                            borderRadius:
+                                                BorderRadius.circular(99),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 5),
+                                        Text(
+                                          const [
+                                            'M',
+                                            'T',
+                                            'W',
+                                            'T',
+                                            'F',
+                                            'S',
+                                            'S'
+                                          ][day.weekday - 1],
+                                          style: const TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.white60),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: Builder(
+                      builder: (context) {
+                        final now = DateTime.now();
+                        final sessions =
+                            timer.recentFocusSessions.where((session) {
+                          return switch (historyFilter) {
+                            _HistoryFilter.all => true,
+                            _HistoryFilter.today =>
+                              DateUtils.isSameDay(session.completedAt, now),
+                            _HistoryFilter.week => !session.completedAt
+                                .isBefore(
+                                    now.subtract(const Duration(days: 6))),
+                          };
+                        }).toList();
+
+                        return Column(
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: Wrap(
+                                spacing: 8,
+                                children: [
+                                  for (final option in _HistoryFilter.values)
+                                    ChoiceChip(
+                                      label: Text(switch (option) {
+                                        _HistoryFilter.all => 'All',
+                                        _HistoryFilter.today => 'Today',
+                                        _HistoryFilter.week => 'This week',
+                                      }),
+                                      selected: historyFilter == option,
+                                      onSelected: (_) => setSheetState(
+                                        () => historyFilter = option,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Expanded(
+                              child: sessions.isEmpty
+                                  ? const Center(
+                                      child: Text(
+                                        'No focus sessions in this time range yet.',
+                                        style: TextStyle(color: Colors.white60),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      itemCount: sessions.length,
+                                      separatorBuilder: (context, index) =>
+                                          const Divider(
+                                        height: 1,
+                                        color: Colors.white12,
+                                      ),
+                                      itemBuilder: (context, index) {
+                                        final session = sessions[index];
+                                        final time =
+                                            MaterialLocalizations.of(context)
+                                                .formatTimeOfDay(
+                                          TimeOfDay.fromDateTime(
+                                            session.completedAt,
+                                          ),
+                                        );
+                                        return ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                            vertical: 4,
+                                          ),
+                                          leading: CircleAvatar(
+                                            backgroundColor: Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withValues(alpha: 0.2),
+                                            child: Icon(
+                                              Icons.auto_awesome,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            session.focusTask ??
+                                                _focusSessionLabel(
+                                                  session.durationSeconds,
+                                                ),
+                                          ),
+                                          subtitle: Text(
+                                            '${_focusSessionLabel(session.durationSeconds)} • ${_dateLabel(session.completedAt)} at $time',
+                                            style: const TextStyle(
+                                              color: Colors.white60,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
