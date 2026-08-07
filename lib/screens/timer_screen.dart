@@ -1058,6 +1058,7 @@ class TimerScreen extends StatelessWidget {
           autofocus: true,
           maxLength: 80,
           textCapitalization: TextCapitalization.sentences,
+          textInputAction: TextInputAction.done,
           decoration: const InputDecoration(
             hintText: 'Example: Finish the project proposal',
           ),
@@ -1078,7 +1079,7 @@ class TimerScreen extends StatelessWidget {
         ],
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
     if (task != null) {
       timer.setFocusTask(task);
     }
@@ -1137,6 +1138,11 @@ class TimerScreen extends StatelessWidget {
                           child: TextField(
                             controller: textController,
                             maxLength: 100,
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (_) async {
+                              await queue.add(textController.text);
+                              textController.clear();
+                            },
                             decoration: const InputDecoration(
                                 hintText: 'Add a task', counterText: ''),
                           ),
@@ -1191,10 +1197,21 @@ class TimerScreen extends StatelessWidget {
                                     color: Colors.white54)
                                 : null,
                           ),
-                          trailing: IconButton(
-                            onPressed: () => queue.remove(item.id),
-                            icon: const Icon(Icons.close),
-                            tooltip: 'Remove task',
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () => _editFocusQueueTask(
+                                    sheetContext, queue, item),
+                                icon: const Icon(Icons.edit_outlined),
+                                tooltip: 'Edit task',
+                              ),
+                              IconButton(
+                                onPressed: () => queue.remove(item.id),
+                                icon: const Icon(Icons.close),
+                                tooltip: 'Remove task',
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -1220,6 +1237,49 @@ class TimerScreen extends StatelessWidget {
     WidgetsBinding.instance
         .addPostFrameCallback((_) => textController.dispose());
     scrollController.dispose();
+  }
+
+  Future<void> _editFocusQueueTask(
+    BuildContext context,
+    FocusQueueService queue,
+    FocusQueueItem item,
+  ) async {
+    final controller = TextEditingController(text: item.title);
+    final updated = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Edit task'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 100,
+          textInputAction: TextInputAction.done,
+          onSubmitted: (value) => Navigator.pop(dialogContext, value),
+          decoration: const InputDecoration(
+            hintText: 'What needs your attention?',
+            counterText: '',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    // The dialog route still owns the text field during its closing animation.
+    // Dispose after that animation so saving with Return is safe on desktop.
+    Future<void>.delayed(const Duration(milliseconds: 500), () {
+      controller.dispose();
+    });
+    if (updated != null) {
+      await queue.rename(item.id, updated);
+    }
   }
 
   Future<void> _showCompletedTasksSheet(BuildContext context) async {
@@ -1304,6 +1364,7 @@ class TimerScreen extends StatelessWidget {
           autofocus: true,
           maxLength: 140,
           textCapitalization: TextCapitalization.sentences,
+          textInputAction: TextInputAction.done,
           decoration: const InputDecoration(
             hintText: 'Example: Reply to Jordan after this session',
             helperText: 'Save it, then return to your focus.',
@@ -1324,10 +1385,59 @@ class TimerScreen extends StatelessWidget {
         ],
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
     if (thought != null) {
       timer.captureDistraction(thought);
     }
+  }
+
+  Future<String?> _editParkedThought(
+    BuildContext context, {
+    String? existingThought,
+  }) async {
+    final controller = TextEditingController(text: existingThought ?? '');
+    final thought = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          existingThought == null
+              ? 'Add a parked thought'
+              : 'Edit parked thought',
+        ),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLength: 140,
+          textCapitalization: TextCapitalization.sentences,
+          textInputAction: TextInputAction.done,
+          decoration: const InputDecoration(
+            hintText: 'Example: Reply to Jordan after this session',
+          ),
+          onSubmitted: (value) => Navigator.pop(dialogContext, value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: _ink,
+            ),
+            child: Text(
+              existingThought == null ? 'Add thought' : 'Save changes',
+            ),
+          ),
+        ],
+      ),
+    );
+    Future<void>.delayed(
+      const Duration(milliseconds: 500),
+      controller.dispose,
+    );
+    return thought;
   }
 
   Future<void> _showDistractionSheet(
@@ -1338,61 +1448,107 @@ class TimerScreen extends StatelessWidget {
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.62,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-            child: Column(
-              children: [
-                Container(
-                  height: 4,
-                  width: 42,
-                  decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(99)),
-                ),
-                const SizedBox(height: 18),
-                Text('Distraction parking lot',
-                    style: Theme.of(sheetContext).textTheme.titleLarge),
-                const SizedBox(height: 6),
-                const Text(
-                  'Your saved thoughts stay on this device until you clear them.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: timer.distractions.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'Nothing parked yet. Keep your attention where you want it.',
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                      : ListView.separated(
-                          itemCount: timer.distractions.length,
-                          separatorBuilder: (context, index) =>
-                              const Divider(height: 1, color: Colors.white12),
-                          itemBuilder: (context, index) => ListTile(
-                            leading: Icon(Icons.bookmark_outline,
-                                color:
-                                    Theme.of(sheetContext).colorScheme.primary),
-                            title: Text(timer.distractions[index]),
-                          ),
-                        ),
-                ),
-                if (timer.distractions.isNotEmpty)
-                  TextButton.icon(
-                    onPressed: () {
-                      timer.clearDistractions();
-                      Navigator.pop(sheetContext);
-                    },
-                    icon: const Icon(Icons.delete_outline),
-                    label: const Text('Clear parking lot'),
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (sheetContext, setSheetState) => SafeArea(
+          top: false,
+          child: SizedBox(
+            height: MediaQuery.sizeOf(sheetContext).height * 0.62,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              child: Column(
+                children: [
+                  Container(
+                    height: 4,
+                    width: 42,
+                    decoration: BoxDecoration(
+                        color: Colors.white24,
+                        borderRadius: BorderRadius.circular(99)),
                   ),
-              ],
+                  const SizedBox(height: 18),
+                  Text('Distraction parking lot',
+                      style: Theme.of(sheetContext).textTheme.titleLarge),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Your saved thoughts stay on this device until you clear them.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: () async {
+                      final thought = await _editParkedThought(context);
+                      if (thought == null) return;
+                      timer.captureDistraction(thought);
+                      setSheetState(() {});
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add a thought'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(sheetContext).colorScheme.primary,
+                      foregroundColor: _ink,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: timer.distractions.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'Nothing parked yet. Keep your attention where you want it.',
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : ListView.separated(
+                            itemCount: timer.distractions.length,
+                            separatorBuilder: (context, index) =>
+                                const Divider(height: 1, color: Colors.white12),
+                            itemBuilder: (context, index) => ListTile(
+                              leading: Icon(Icons.bookmark_outline,
+                                  color: Theme.of(sheetContext)
+                                      .colorScheme
+                                      .primary),
+                              title: Text(timer.distractions[index]),
+                              trailing: Wrap(
+                                spacing: 0,
+                                children: [
+                                  IconButton(
+                                    tooltip: 'Edit thought',
+                                    icon: const Icon(Icons.edit_outlined),
+                                    onPressed: () async {
+                                      final updated = await _editParkedThought(
+                                        context,
+                                        existingThought:
+                                            timer.distractions[index],
+                                      );
+                                      if (updated == null) return;
+                                      timer.updateDistraction(index, updated);
+                                      setSheetState(() {});
+                                    },
+                                  ),
+                                  IconButton(
+                                    tooltip: 'Remove thought',
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () {
+                                      timer.removeDistractionAt(index);
+                                      setSheetState(() {});
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                  ),
+                  if (timer.distractions.isNotEmpty)
+                    TextButton.icon(
+                      onPressed: () {
+                        timer.clearDistractions();
+                        Navigator.pop(sheetContext);
+                      },
+                      icon: const Icon(Icons.delete_outline),
+                      label: const Text('Clear parking lot'),
+                    ),
+                ],
+              ),
             ),
           ),
         ),
@@ -1746,6 +1902,7 @@ class TimerScreen extends StatelessWidget {
           controller: controller,
           autofocus: true,
           keyboardType: TextInputType.number,
+          textInputAction: TextInputAction.done,
           decoration: const InputDecoration(
             labelText: 'Minutes per day',
             helperText: 'Choose between 5 and 480 minutes',
@@ -1769,7 +1926,7 @@ class TimerScreen extends StatelessWidget {
         ],
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
     if (minutes != null) {
       timer.setDailyGoalMinutes(minutes);
     }
