@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -64,19 +63,23 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         'completedFocusSessions': _completedFocusSessions,
         'focusTask': _focusTask,
         'dailyGoalMinutes': _dailyGoalMinutes,
-        'focusHistory': _focusHistory.map((session) => session.toJson()).toList(),
+        'focusHistory':
+            _focusHistory.map((session) => session.toJson()).toList(),
       };
-  List<FocusSession> get recentFocusSessions => List.unmodifiable(_focusHistory.reversed);
+  List<FocusSession> get recentFocusSessions =>
+      List.unmodifiable(_focusHistory.reversed);
   List<String> get distractions => List.unmodifiable(_distractions.reversed);
-  int get totalFocusSeconds => _focusHistory.fold(0, (total, session) => total + session.durationSeconds);
+  int get totalFocusSeconds => _focusHistory.fold(
+      0, (total, session) => total + session.durationSeconds);
   int get todayFocusMinutes => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))
       .fold(0, (total, session) => total + (session.durationSeconds ~/ 60));
   int get todayFocusSeconds => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))
       .fold(0, (total, session) => total + session.durationSeconds);
-  int get todayFocusSessions =>
-      _focusHistory.where((session) => _isSameDay(session.completedAt, DateTime.now())).length;
+  int get todayFocusSessions => _focusHistory
+      .where((session) => _isSameDay(session.completedAt, DateTime.now()))
+      .length;
   List<int> get lastSevenDaysFocusSeconds {
     final today = DateTime.now();
     return List.generate(7, (index) {
@@ -86,19 +89,28 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
           .fold(0, (total, session) => total + session.durationSeconds);
     });
   }
-  int get weeklyFocusSeconds => lastSevenDaysFocusSeconds.fold(0, (total, seconds) => total + seconds);
+
+  int get weeklyFocusSeconds =>
+      lastSevenDaysFocusSeconds.fold(0, (total, seconds) => total + seconds);
   int get weeklyFocusSessions {
     final cutoff = DateTime.now().subtract(const Duration(days: 6));
-    return _focusHistory.where((session) => !session.completedAt.isBefore(cutoff)).length;
+    return _focusHistory
+        .where((session) => !session.completedAt.isBefore(cutoff))
+        .length;
   }
+
   int get dailyChallengeTarget => _dailyChallengeTarget;
-  double get dailyChallengeProgress => (todayFocusSessions / _dailyChallengeTarget).clamp(0, 1);
-  bool get hasCompletedDailyChallenge => todayFocusSessions >= _dailyChallengeTarget;
-  double get dailyGoalProgress =>
-      _dailyGoalMinutes == 0 ? 0 : (todayFocusSeconds / (_dailyGoalMinutes * 60)).clamp(0, 1);
+  double get dailyChallengeProgress =>
+      (todayFocusSessions / _dailyChallengeTarget).clamp(0, 1);
+  bool get hasCompletedDailyChallenge =>
+      todayFocusSessions >= _dailyChallengeTarget;
+  double get dailyGoalProgress => _dailyGoalMinutes == 0
+      ? 0
+      : (todayFocusSeconds / (_dailyGoalMinutes * 60)).clamp(0, 1);
   bool get hasReachedDailyGoal => todayFocusSeconds >= _dailyGoalMinutes * 60;
   int get currentStreak {
-    final completedDays = _focusHistory.map((session) => _dateKey(session.completedAt)).toSet();
+    final completedDays =
+        _focusHistory.map((session) => _dateKey(session.completedAt)).toSet();
     var streak = 0;
     var day = DateTime.now();
     while (completedDays.contains(_dateKey(day))) {
@@ -107,13 +119,15 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     }
     return streak;
   }
+
   bool get isRunning => _isRunning;
   bool get isComplete => _isComplete;
   bool get hasPendingResume => _hasPendingResume;
   SessionType get sessionType => _sessionType;
   String get completionMessage => _completionMessage;
-  double get progress =>
-      _totalSessionSeconds == 0 ? 0 : 1 - (_secondsRemaining / _totalSessionSeconds);
+  double get progress => _totalSessionSeconds == 0
+      ? 0
+      : 1 - (_secondsRemaining / _totalSessionSeconds);
 
   TimerService({NotificationService? notificationService})
       : _notificationService = notificationService {
@@ -136,7 +150,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
       final endsAt = _endsAt;
       if (endsAt == null) return;
-      final remaining = (endsAt.difference(DateTime.now()).inMilliseconds / 1000).ceil();
+      final remaining =
+          (endsAt.difference(DateTime.now()).inMilliseconds / 1000).ceil();
       if (remaining <= 0) {
         _secondsRemaining = 0;
         _finishSession();
@@ -150,7 +165,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   void _synchronizeWithDeadline() {
     final endsAt = _endsAt;
     if (endsAt == null) return;
-    final remaining = (endsAt.difference(DateTime.now()).inMilliseconds / 1000).ceil();
+    final remaining =
+        (endsAt.difference(DateTime.now()).inMilliseconds / 1000).ceil();
     if (remaining <= 0) {
       _secondsRemaining = 0;
       _finishSession();
@@ -214,8 +230,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void beginNextSession() {
     if (_sessionType == SessionType.focus) {
-      final isLongBreak = _completedFocusSessions > 0 && _completedFocusSessions % 4 == 0;
-      selectSession(isLongBreak ? SessionType.longBreak : SessionType.shortBreak);
+      final isLongBreak =
+          _completedFocusSessions > 0 && _completedFocusSessions % 4 == 0;
+      selectSession(
+          isLongBreak ? SessionType.longBreak : SessionType.shortBreak);
     } else {
       selectSession(SessionType.focus);
     }
@@ -234,7 +252,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void setCustomDuration(int minutes, int seconds) {
-    final totalSeconds = (minutes * 60 + seconds).clamp(1, 24 * 60 * 60).toInt();
+    final totalSeconds =
+        (minutes * 60 + seconds).clamp(1, 24 * 60 * 60).toInt();
     switch (_sessionType) {
       case SessionType.focus:
         _focusSeconds = totalSeconds;
@@ -263,7 +282,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   void captureDistraction(String distraction) {
     final cleaned = distraction.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (cleaned.isEmpty) return;
-    _distractions.add(cleaned.length > 140 ? cleaned.substring(0, 140) : cleaned);
+    _distractions
+        .add(cleaned.length > 140 ? cleaned.substring(0, 140) : cleaned);
     notifyListeners();
     _saveToPrefs();
   }
@@ -360,7 +380,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       _focusSeconds = focusSeconds.clamp(1, 24 * 60 * 60).toInt();
       _shortBreakSeconds = shortBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
       _longBreakSeconds = longBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
-      _completedFocusSessions = completedFocusSessions.clamp(0, 1 << 31).toInt();
+      _completedFocusSessions =
+          completedFocusSessions.clamp(0, 1 << 31).toInt();
       _focusHistory = restoredHistory;
       _focusTask = focusTask ?? '';
       if (dailyGoalMinutes != null) {
@@ -414,9 +435,12 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       };
 
   String get _completionMessage => switch (_sessionType) {
-        SessionType.focus => 'You showed up for what matters. Let yourself take a real breath.',
-        SessionType.shortBreak => 'A small pause counts. Return when you feel ready.',
-        SessionType.longBreak => 'You made room to restore. Carry the calm forward.',
+        SessionType.focus =>
+          'You showed up for what matters. Let yourself take a real breath.',
+        SessionType.shortBreak =>
+          'A small pause counts. Return when you feel ready.',
+        SessionType.longBreak =>
+          'You made room to restore. Carry the calm forward.',
       };
 
   Future<void> _saveToPrefs() async {
@@ -431,7 +455,9 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       prefs.setString('focusTask', _focusTask),
       prefs.setInt('dailyGoalMinutes', _dailyGoalMinutes),
       prefs.setInt('sessionType', _sessionType.index),
-      _endsAt == null ? prefs.remove(_timerEndsAtKey) : prefs.setInt(_timerEndsAtKey, _endsAt!.millisecondsSinceEpoch),
+      _endsAt == null
+          ? prefs.remove(_timerEndsAtKey)
+          : prefs.setInt(_timerEndsAtKey, _endsAt!.millisecondsSinceEpoch),
       prefs.setBool(_pendingResumeKey, _hasPendingResume),
       prefs.setString(
         'focusHistory',
@@ -444,7 +470,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     _focusSeconds = prefs.getInt('focusSeconds') ?? _focusSeconds;
-    _shortBreakSeconds = prefs.getInt('shortBreakSeconds') ?? _shortBreakSeconds;
+    _shortBreakSeconds =
+        prefs.getInt('shortBreakSeconds') ?? _shortBreakSeconds;
     _longBreakSeconds = prefs.getInt('longBreakSeconds') ?? _longBreakSeconds;
     _completedFocusSessions = prefs.getInt('completedFocusSessions') ?? 0;
     _focusTask = prefs.getString('focusTask') ?? '';
@@ -458,7 +485,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         if (decoded is List) {
           _focusHistory = decoded
               .whereType<Map>()
-              .map((item) => FocusSession.fromJson(Map<String, dynamic>.from(item)))
+              .map((item) =>
+                  FocusSession.fromJson(Map<String, dynamic>.from(item)))
               .toList();
         }
       } on FormatException {
@@ -468,12 +496,15 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       }
     }
     _sessionType = SessionType.values[prefs.getInt('sessionType') ?? 0];
-    _totalSessionSeconds = prefs.getInt('totalSessionSeconds') ?? _durationFor(_sessionType);
-    _secondsRemaining = prefs.getInt('secondsRemaining') ?? _totalSessionSeconds;
+    _totalSessionSeconds =
+        prefs.getInt('totalSessionSeconds') ?? _durationFor(_sessionType);
+    _secondsRemaining =
+        prefs.getInt('secondsRemaining') ?? _totalSessionSeconds;
     final savedEndsAt = prefs.getInt(_timerEndsAtKey);
     if (savedEndsAt != null) {
       _endsAt = DateTime.fromMillisecondsSinceEpoch(savedEndsAt);
-      final remaining = (_endsAt!.difference(DateTime.now()).inMilliseconds / 1000).ceil();
+      final remaining =
+          (_endsAt!.difference(DateTime.now()).inMilliseconds / 1000).ceil();
       if (remaining <= 0) {
         _secondsRemaining = 0;
         _finishSession();
@@ -496,7 +527,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   static bool _isSameDay(DateTime first, DateTime second) =>
-      first.year == second.year && first.month == second.month && first.day == second.day;
+      first.year == second.year &&
+      first.month == second.month &&
+      first.day == second.day;
 
-  static String _dateKey(DateTime date) => '${date.year}-${date.month}-${date.day}';
+  static String _dateKey(DateTime date) =>
+      '${date.year}-${date.month}-${date.day}';
 }

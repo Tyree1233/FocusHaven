@@ -69,8 +69,9 @@ class TimerScreen extends StatelessWidget {
   String _dateLabel(DateTime date) {
     final now = DateTime.now();
     if (DateUtils.isSameDay(date, now)) return 'Today';
-    if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1))))
+    if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) {
       return 'Yesterday';
+    }
     const months = [
       'Jan',
       'Feb',
@@ -581,28 +582,30 @@ class TimerScreen extends StatelessWidget {
             height: MediaQuery.sizeOf(sheetContext).height * 0.7,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-              child: ListView(
-                children: [
-                  Text('Appearance',
-                      style: Theme.of(sheetContext).textTheme.titleLarge),
-                  const SizedBox(height: 8),
-                  const Text(
-                      'Choose the atmosphere that feels best for your focus.',
-                      style: TextStyle(color: Colors.white70)),
-                  const SizedBox(height: 14),
-                  ...FocusHavenTheme.values.map(
-                    (theme) => RadioListTile<FocusHavenTheme>(
-                      contentPadding: EdgeInsets.zero,
-                      value: theme,
-                      groupValue: themes.selectedTheme,
-                      onChanged: (value) {
-                        if (value != null) themes.setTheme(value);
-                      },
-                      title: Text(theme.label),
-                      secondary: CircleAvatar(backgroundColor: theme.primary),
+              child: RadioGroup<FocusHavenTheme>(
+                groupValue: themes.selectedTheme,
+                onChanged: (value) {
+                  if (value != null) themes.setTheme(value);
+                },
+                child: ListView(
+                  children: [
+                    Text('Appearance',
+                        style: Theme.of(sheetContext).textTheme.titleLarge),
+                    const SizedBox(height: 8),
+                    const Text(
+                        'Choose the atmosphere that feels best for your focus.',
+                        style: TextStyle(color: Colors.white70)),
+                    const SizedBox(height: 14),
+                    ...FocusHavenTheme.values.map(
+                      (theme) => RadioListTile<FocusHavenTheme>(
+                        contentPadding: EdgeInsets.zero,
+                        value: theme,
+                        title: Text(theme.label),
+                        secondary: CircleAvatar(backgroundColor: theme.primary),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -897,8 +900,7 @@ class TimerScreen extends StatelessWidget {
                                   if (sheetContext.mounted) {
                                     ScaffoldMessenger.of(sheetContext)
                                         .showSnackBar(
-                                      SnackBar(
-                                          content: Text('${error.message}')),
+                                      SnackBar(content: Text(error.message)),
                                     );
                                   }
                                 }
