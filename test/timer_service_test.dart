@@ -143,4 +143,31 @@ void main() {
     expect(timer.focusTask, 'Finish the outline');
     expect(timer.dailyGoalMinutes, 75);
   });
+
+  test('clearing local data restores the timer defaults', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 120,
+      'secondsRemaining': 95,
+      'totalSessionSeconds': 120,
+      'sessionType': SessionType.shortBreak.index,
+      'completedFocusSessions': 6,
+      'focusTask': 'Finish the proposal',
+      'dailyGoalMinutes': 120,
+      'distractions': ['Reply to email'],
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    await timer.clearLocalData();
+
+    expect(timer.sessionType, SessionType.focus);
+    expect(timer.secondsRemaining, 25 * 60);
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(timer.completedFocusSessions, 0);
+    expect(timer.focusTask, isEmpty);
+    expect(timer.dailyGoalMinutes, 60);
+    expect(timer.distractions, isEmpty);
+    expect(timer.recentFocusSessions, isEmpty);
+    expect(timer.isRunning, isFalse);
+  });
 }
