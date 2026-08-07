@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,6 +34,23 @@ class TimerScreen extends StatelessWidget {
     final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
     final remaining = (seconds % 60).toString().padLeft(2, '0');
     return '$minutes:$remaining';
+  }
+
+  Future<void> _copyFocusHistory(
+    BuildContext context,
+    TimerService timer,
+  ) async {
+    await Clipboard.setData(ClipboardData(text: timer.focusHistoryExport));
+    if (!context.mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Focus summary copied. Paste it into Notes, email, or a document.',
+        ),
+      ),
+    );
   }
 
   String _durationLabel(int seconds) {
@@ -1699,6 +1717,15 @@ class TimerScreen extends StatelessWidget {
                     '${timer.completedFocusSessions} completed sessions',
                     style: const TextStyle(color: Colors.white70),
                   ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      onPressed: () => _copyFocusHistory(sheetContext, timer),
+                      icon: const Icon(Icons.copy_outlined),
+                      label: const Text('Copy full summary'),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
                   const SizedBox(height: 14),
                   DecoratedBox(
                     decoration: BoxDecoration(

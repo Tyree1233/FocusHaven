@@ -71,6 +71,38 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   List<String> get distractions => List.unmodifiable(_distractions.reversed);
   int get totalFocusSeconds => _focusHistory.fold(
       0, (total, session) => total + session.durationSeconds);
+
+  /// A private, readable summary that can be copied to the user's clipboard.
+  /// FocusHaven never sends this text anywhere on its own.
+  String get focusHistoryExport {
+    final buffer = StringBuffer()
+      ..writeln('FocusHaven focus history')
+      ..writeln('Exported: ${_exportDateTime(DateTime.now())}')
+      ..writeln()
+      ..writeln('Summary')
+      ..writeln('- Total focus time: ${_exportDuration(totalFocusSeconds)}')
+      ..writeln('- Completed sessions: $completedFocusSessions')
+      ..writeln(
+          '- Current streak: $currentStreak ${currentStreak == 1 ? 'day' : 'days'}')
+      ..writeln('- Daily goal: $dailyGoalMinutes minutes')
+      ..writeln()
+      ..writeln('Sessions');
+
+    if (_focusHistory.isEmpty) {
+      buffer.writeln('- No completed focus sessions yet.');
+    } else {
+      for (final session in recentFocusSessions) {
+        final task = session.focusTask?.trim();
+        final taskLabel = task == null || task.isEmpty ? 'Focus session' : task;
+        buffer.writeln(
+          '- ${_exportDateTime(session.completedAt)} — '
+          '${_exportDuration(session.durationSeconds)} — $taskLabel',
+        );
+      }
+    }
+    return buffer.toString().trimRight();
+  }
+
   int get todayFocusMinutes => _focusHistory
       .where((session) => _isSameDay(session.completedAt, DateTime.now()))
       .fold(0, (total, session) => total + (session.durationSeconds ~/ 60));
@@ -550,4 +582,26 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   static String _dateKey(DateTime date) =>
       '${date.year}-${date.month}-${date.day}';
+
+  static String _exportDateTime(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day $hour:$minute';
+  }
+
+  static String _exportDuration(int seconds) {
+    if (seconds < 60) {
+      return '$seconds ${seconds == 1 ? 'second' : 'seconds'}';
+    }
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    final minuteLabel = '$minutes ${minutes == 1 ? 'minute' : 'minutes'}';
+    if (remainingSeconds == 0) {
+      return minuteLabel;
+    }
+    return '$minuteLabel $remainingSeconds '
+        '${remainingSeconds == 1 ? 'second' : 'seconds'}';
+  }
 }
