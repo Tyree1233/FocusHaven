@@ -5,7 +5,13 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-class NotificationService {
+abstract interface class ReminderNotificationClient {
+  Future<bool> requestPermissions();
+  Future<bool> scheduleDailyReminder(TimeOfDay time);
+  Future<void> cancelDailyReminder();
+}
+
+class NotificationService implements ReminderNotificationClient {
   static const _dailyReminderId = 2001;
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
@@ -28,6 +34,7 @@ class NotificationService {
     }
   }
 
+  @override
   Future<bool> requestPermissions() async {
     if (kIsWeb) return false;
 
@@ -97,6 +104,7 @@ class NotificationService {
     }
   }
 
+  @override
   Future<bool> scheduleDailyReminder(TimeOfDay time) async {
     if (kIsWeb) return false;
 
@@ -119,12 +127,14 @@ class NotificationService {
         android: AndroidNotificationDetails(
           'daily_focus_reminder',
           'Daily focus reminder',
-          channelDescription: 'A gentle daily invitation to begin a focus session.',
+          channelDescription:
+              'A gentle daily invitation to begin a focus session.',
           importance: Importance.defaultImportance,
           priority: Priority.defaultPriority,
         ),
         iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
-        macOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+        macOS:
+            DarwinNotificationDetails(presentAlert: true, presentSound: true),
       );
 
       await _notifications.zonedSchedule(
@@ -143,6 +153,7 @@ class NotificationService {
     }
   }
 
+  @override
   Future<void> cancelDailyReminder() =>
       _notifications.cancel(id: _dailyReminderId);
 

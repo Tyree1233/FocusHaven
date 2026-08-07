@@ -8,12 +8,12 @@ class ReminderService extends ChangeNotifier {
   static const _hourKey = 'dailyReminderHour';
   static const _minuteKey = 'dailyReminderMinute';
 
-  ReminderService({required NotificationService notificationService})
+  ReminderService({required ReminderNotificationClient notificationService})
       : _notificationService = notificationService {
     _load();
   }
 
-  final NotificationService _notificationService;
+  final ReminderNotificationClient _notificationService;
   bool _isEnabled = false;
   TimeOfDay _time = const TimeOfDay(hour: 9, minute: 0);
 
