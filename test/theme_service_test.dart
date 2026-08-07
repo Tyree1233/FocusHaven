@@ -48,4 +48,12 @@ void main() {
 
     expect(service.selectedTheme, FocusHavenTheme.roseQuartz);
   });
+
+  test('keeps the default theme when a saved theme is unrecognized', () async {
+    SharedPreferences.setMockInitialValues({'focusHavenTheme': 'unknown'});
+    final service = await createThemeService();
+    addTearDown(service.dispose);
+
+    expect(service.selectedTheme, FocusHavenTheme.twilight);
+  });
 }
