@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -83,5 +85,25 @@ void main() {
     expect(queue.items, isEmpty);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey('focusQueue'), isFalse);
+  });
+
+  test('loads saved active and completed tasks on launch', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode([
+        {'id': 'active-1', 'title': 'Review notes', 'isComplete': false},
+        {
+          'id': 'done-1',
+          'title': 'Plan tomorrow',
+          'isComplete': true,
+          'completedAt': '2026-08-07T12:00:00.000',
+        },
+      ]),
+    });
+
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+
+    expect(queue.items.single.title, 'Review notes');
+    expect(queue.completedItems.single.title, 'Plan tomorrow');
   });
 }
