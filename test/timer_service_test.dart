@@ -170,4 +170,25 @@ void main() {
     expect(timer.recentFocusSessions, isEmpty);
     expect(timer.isRunning, isFalse);
   });
+
+  test('reopens an interrupted timer paused and ready to resume', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1500,
+      'secondsRemaining': 100,
+      'totalSessionSeconds': 1500,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now().add(const Duration(seconds: 100)).millisecondsSinceEpoch,
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.hasPendingResume, isTrue);
+    expect(timer.isRunning, isFalse);
+    expect(timer.isComplete, isFalse);
+    expect(timer.secondsRemaining, inInclusiveRange(1, 100));
+
+    timer.discardPendingSession();
+    expect(timer.hasPendingResume, isFalse);
+    expect(timer.secondsRemaining, 1500);
+  });
 }
