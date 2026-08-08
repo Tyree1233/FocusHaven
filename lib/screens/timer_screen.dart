@@ -781,7 +781,6 @@ class TimerScreen extends riverpod.ConsumerWidget {
         ],
       ),
     ];
-    final profile = context.read<FocusProfileService>();
     var page = -1;
     String? result;
     final answers = List<_FocusChoice?>.filled(questions.length, null);
@@ -793,164 +792,176 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) {
-          final activeType = result ?? profile.focusType;
-          if (page == questions.length && result != null) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.auto_awesome,
-                      size: 44,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Your focus profile',
-                      style: TextStyle(fontSize: 16, color: Colors.white70),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      activeType!,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      _focusProfileTip(activeType),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    const SizedBox(height: 24),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(sheetContext),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: _ink,
-                      ),
-                      child: const Text('Use this profile'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
+      builder: (sheetContext) => riverpod.Consumer(
+        builder: (context, ref, _) {
+          final savedFocusType = ref.watch(focusProfileTypeProvider);
+          final profile = ref.read(focusProfileServiceProvider);
 
-          if (page == -1) {
-            return SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.psychology_outlined,
-                      size: 42,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      'Find your focus profile',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      activeType == null
-                          ? 'Answer four quick questions for a practical focus style and tip.'
-                          : 'Your current profile is $activeType. Retake the quiz anytime as your habits change.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-                    const SizedBox(height: 24),
-                    FilledButton(
-                      onPressed: () => setSheetState(() => page = 0),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: _ink,
-                      ),
-                      child: Text(
-                        activeType == null ? 'Start quiz' : 'Retake quiz',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          final question = questions[page];
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 22, 24, 30),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    '${page + 1} of ${questions.length}',
-                    style: const TextStyle(color: Colors.white60),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    question.prompt,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 20),
-                  ...question.choices.map(
-                    (choice) => Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: OutlinedButton(
-                        onPressed: () async {
-                          answers[page] = choice;
-                          if (page == questions.length - 1) {
-                            final scores = <String, int>{};
-                            for (final answer
-                                in answers.whereType<_FocusChoice>()) {
-                              scores.update(
-                                answer.focusType,
-                                (count) => count + 1,
-                                ifAbsent: () => 1,
-                              );
-                            }
-                            final winner = scores.entries
-                                .reduce(
-                                  (first, next) =>
-                                      first.value >= next.value ? first : next,
-                                )
-                                .key;
-                            await profile.saveFocusType(winner);
-                            if (sheetContext.mounted) {
-                              setSheetState(() {
-                                result = winner;
-                                page = questions.length;
-                              });
-                            }
-                          } else {
-                            setSheetState(() => page++);
-                          }
-                        },
-                        style: OutlinedButton.styleFrom(
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.all(16),
+          return StatefulBuilder(
+            builder: (context, setSheetState) {
+              final activeType = result ?? savedFocusType;
+              if (page == questions.length && result != null) {
+                return SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.auto_awesome,
+                          size: 44,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
-                        child: Text(choice.label),
-                      ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Your focus profile',
+                          style: TextStyle(fontSize: 16, color: Colors.white70),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          activeType!,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _focusProfileTip(activeType),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton(
+                          onPressed: () => Navigator.pop(sheetContext),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: _ink,
+                          ),
+                          child: const Text('Use this profile'),
+                        ),
+                      ],
                     ),
                   ),
-                  if (page > 0) ...[
-                    const SizedBox(height: 4),
-                    TextButton.icon(
-                      onPressed: () => setSheetState(() => page--),
-                      icon: const Icon(Icons.arrow_back),
-                      label: const Text('Back to previous question'),
+                );
+              }
+
+              if (page == -1) {
+                return SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.psychology_outlined,
+                          size: 42,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          'Find your focus profile',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          activeType == null
+                              ? 'Answer four quick questions for a practical focus style and tip.'
+                              : 'Your current profile is $activeType. Retake the quiz anytime as your habits change.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                        const SizedBox(height: 24),
+                        FilledButton(
+                          onPressed: () => setSheetState(() => page = 0),
+                          style: FilledButton.styleFrom(
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.primary,
+                            foregroundColor: _ink,
+                          ),
+                          child: Text(
+                            activeType == null ? 'Start quiz' : 'Retake quiz',
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ],
-              ),
-            ),
+                  ),
+                );
+              }
+
+              final question = questions[page];
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 22, 24, 30),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        '${page + 1} of ${questions.length}',
+                        style: const TextStyle(color: Colors.white60),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        question.prompt,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 20),
+                      ...question.choices.map(
+                        (choice) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: OutlinedButton(
+                            onPressed: () async {
+                              answers[page] = choice;
+                              if (page == questions.length - 1) {
+                                final scores = <String, int>{};
+                                for (final answer
+                                    in answers.whereType<_FocusChoice>()) {
+                                  scores.update(
+                                    answer.focusType,
+                                    (count) => count + 1,
+                                    ifAbsent: () => 1,
+                                  );
+                                }
+                                final winner = scores.entries
+                                    .reduce(
+                                      (first, next) => first.value >= next.value
+                                          ? first
+                                          : next,
+                                    )
+                                    .key;
+                                await profile.saveFocusType(winner);
+                                if (sheetContext.mounted) {
+                                  setSheetState(() {
+                                    result = winner;
+                                    page = questions.length;
+                                  });
+                                }
+                              } else {
+                                setSheetState(() => page++);
+                              }
+                            },
+                            style: OutlinedButton.styleFrom(
+                              alignment: Alignment.centerLeft,
+                              padding: const EdgeInsets.all(16),
+                            ),
+                            child: Text(choice.label),
+                          ),
+                        ),
+                      ),
+                      if (page > 0) ...[
+                        const SizedBox(height: 4),
+                        TextButton.icon(
+                          onPressed: () => setSheetState(() => page--),
+                          icon: const Icon(Icons.arrow_back),
+                          label: const Text('Back to previous question'),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
@@ -2135,12 +2146,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
 
   Future<void> _editTodayJournal(
     BuildContext context,
+    JournalState journalState,
     JournalService journal,
   ) async {
     const moods = ['Calm', 'Focused', 'Tired', 'Stressed', 'Grateful'];
-    var selectedMood = journal.todayEntry?.mood ?? moods.first;
+    var selectedMood = journalState.todayEntry?.mood ?? moods.first;
     final controller = TextEditingController(
-      text: journal.todayEntry?.reflection ?? '',
+      text: journalState.todayEntry?.reflection ?? '',
     );
     await showDialog<void>(
       context: context,
@@ -2176,7 +2188,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                   maxLength: 800,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
-                    hintText: journal.dailyPrompt,
+                    hintText: journalState.dailyPrompt,
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -2222,149 +2234,163 @@ class TimerScreen extends riverpod.ConsumerWidget {
         top: false,
         child: SizedBox(
           height: MediaQuery.sizeOf(sheetContext).height * 0.78,
-          child: Consumer<JournalService>(
-            builder: (context, journal, _) => Column(
-              children: [
-                const SizedBox(height: 12),
-                Container(
-                  height: 4,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(99),
+          child: riverpod.Consumer(
+            builder: (context, ref, _) {
+              final journalState = ref.watch(journalStateProvider);
+              final journal = ref.read(journalServiceProvider);
+
+              return Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 4,
+                    width: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(99),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-                    child: Scrollbar(
-                      controller: scrollController,
-                      thumbVisibility: false,
-                      interactive: true,
-                      child: ListView(
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+                      child: Scrollbar(
                         controller: scrollController,
-                        children: [
-                          Text(
-                            'Reflection journal',
-                            style: Theme.of(sheetContext).textTheme.titleLarge,
-                          ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            'A private space saved only on this device.',
-                            style: TextStyle(color: Colors.white70),
-                          ),
-                          const SizedBox(height: 14),
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(14),
+                        thumbVisibility: false,
+                        interactive: true,
+                        child: ListView(
+                          controller: scrollController,
+                          children: [
+                            Text(
+                              'Reflection journal',
+                              style: Theme.of(
+                                sheetContext,
+                              ).textTheme.titleLarge,
                             ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Text(
-                                'Today’s prompt: ${journal.dailyPrompt}',
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontStyle: FontStyle.italic,
+                            const SizedBox(height: 6),
+                            const Text(
+                              'A private space saved only on this device.',
+                              style: TextStyle(color: Colors.white70),
+                            ),
+                            const SizedBox(height: 14),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(14),
+                                child: Text(
+                                  'Today’s prompt: ${journalState.dailyPrompt}',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontStyle: FontStyle.italic,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          if (journal.recentMoodCounts.isNotEmpty) ...[
+                            if (journalState.recentMoodCounts.isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              Text(
+                                'Mood snapshot',
+                                style: Theme.of(
+                                  sheetContext,
+                                ).textTheme.titleMedium,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Over the last 7 days, you most often felt ${journalState.mostCommonRecentMood?.toLowerCase()}.',
+                                style: const TextStyle(color: Colors.white70),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 6,
+                                children: journalState.recentMoodCounts.entries
+                                    .map(
+                                      (entry) => Chip(
+                                        label: Text(
+                                          '${entry.key} ${entry.value}',
+                                        ),
+                                        backgroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .primary
+                                            .withValues(alpha: 0.13),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
                             const SizedBox(height: 16),
+                            FilledButton.icon(
+                              onPressed: () => _editTodayJournal(
+                                sheetContext,
+                                journalState,
+                                journal,
+                              ),
+                              icon: const Icon(Icons.edit_note),
+                              label: Text(
+                                journalState.todayEntry == null
+                                    ? 'Write today’s reflection'
+                                    : 'Update today’s reflection',
+                              ),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                                foregroundColor: _ink,
+                                minimumSize: const Size.fromHeight(52),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
                             Text(
-                              'Mood snapshot',
+                              'Recent reflections',
                               style: Theme.of(
                                 sheetContext,
                               ).textTheme.titleMedium,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Over the last 7 days, you most often felt ${journal.mostCommonRecentMood?.toLowerCase()}.',
-                              style: const TextStyle(color: Colors.white70),
-                            ),
-                            const SizedBox(height: 8),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 6,
-                              children: journal.recentMoodCounts.entries
-                                  .map(
-                                    (entry) => Chip(
-                                      label: Text(
-                                        '${entry.key} ${entry.value}',
-                                      ),
-                                      backgroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .primary
-                                          .withValues(alpha: 0.13),
-                                    ),
-                                  )
-                                  .toList(),
-                            ),
+                            const SizedBox(height: 6),
+                            if (journalState.entries.isEmpty)
+                              const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 30),
+                                child: Center(
+                                  child: Text(
+                                    'Your first reflection will appear here.',
+                                    style: TextStyle(color: Colors.white60),
+                                  ),
+                                ),
+                              )
+                            else
+                              ...journalState.entries.map(
+                                (entry) => ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 5,
+                                  ),
+                                  leading: Icon(
+                                    Icons.favorite_outline,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                  title: Text(
+                                    '${entry.mood} • ${_dateLabel(entry.createdAt)}',
+                                  ),
+                                  subtitle: Text(
+                                    entry.reflection,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
                           ],
-                          const SizedBox(height: 16),
-                          FilledButton.icon(
-                            onPressed: () =>
-                                _editTodayJournal(sheetContext, journal),
-                            icon: const Icon(Icons.edit_note),
-                            label: Text(
-                              journal.todayEntry == null
-                                  ? 'Write today’s reflection'
-                                  : 'Update today’s reflection',
-                            ),
-                            style: FilledButton.styleFrom(
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.primary,
-                              foregroundColor: _ink,
-                              minimumSize: const Size.fromHeight(52),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'Recent reflections',
-                            style: Theme.of(sheetContext).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 6),
-                          if (journal.entries.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 30),
-                              child: Center(
-                                child: Text(
-                                  'Your first reflection will appear here.',
-                                  style: TextStyle(color: Colors.white60),
-                                ),
-                              ),
-                            )
-                          else
-                            ...journal.entries.map(
-                              (entry) => ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 5,
-                                ),
-                                leading: Icon(
-                                  Icons.favorite_outline,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                                title: Text(
-                                  '${entry.mood} • ${_dateLabel(entry.createdAt)}',
-                                ),
-                                subtitle: Text(
-                                  entry.reflection,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              );
+            },
           ),
         ),
       ),

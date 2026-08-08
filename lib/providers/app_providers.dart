@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../models/focus_session.dart';
+import '../models/journal_entry.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/focus_profile_service.dart';
@@ -53,6 +54,15 @@ typedef FocusQueueState = ({
   List<FocusQueueItem> activeItems,
   List<FocusQueueItem> completedItems,
   int completedToday,
+});
+
+/// Immutable journal data used by the Reflection Journal sheet.
+typedef JournalState = ({
+  List<JournalEntry> entries,
+  Map<String, int> recentMoodCounts,
+  String? mostCommonRecentMood,
+  String dailyPrompt,
+  JournalEntry? todayEntry,
 });
 
 /// Central ownership and dependency wiring for FocusHaven's application state.
@@ -176,10 +186,34 @@ final focusQueueStateProvider = Provider<FocusQueueState>((ref) {
   );
 }, name: 'focusQueueStateProvider');
 
+/// Immutable journal snapshot that changes only when entries are loaded,
+/// saved, replaced, or cleared.
+final journalStateProvider = Provider<JournalState>((ref) {
+  ref.watch(
+    journalServiceProvider.select((journal) => journal.journalRevision),
+  );
+
+  final journal = ref.read(journalServiceProvider);
+  return (
+    entries: journal.entries,
+    recentMoodCounts: Map.unmodifiable(journal.recentMoodCounts),
+    mostCommonRecentMood: journal.mostCommonRecentMood,
+    dailyPrompt: journal.dailyPrompt,
+    todayEntry: journal.todayEntry,
+  );
+}, name: 'journalStateProvider');
+
 /// Exposes authentication status without rebuilding for unrelated user data.
 final authIsSignedInProvider = Provider<bool>(
   (ref) => ref.watch(authServiceProvider).isSignedIn,
   name: 'authIsSignedInProvider',
+);
+
+/// Exposes the saved focus profile without rebuilding for unrelated service
+/// notifications.
+final focusProfileTypeProvider = Provider<String?>(
+  (ref) => ref.watch(focusProfileServiceProvider).focusType,
+  name: 'focusProfileTypeProvider',
 );
 
 /// Exposes the queue badge count independently from the queue item collection.

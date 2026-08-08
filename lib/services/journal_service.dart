@@ -17,8 +17,13 @@ class JournalService extends ChangeNotifier {
     'What is one kind thing you can do for yourself next?',
   ];
   List<JournalEntry> _entries = [];
+  int _journalRevision = 0;
 
   List<JournalEntry> get entries => List.unmodifiable(_entries.reversed);
+
+  /// Changes only when journal entries are loaded, saved, or cleared.
+  int get journalRevision => _journalRevision;
+
   Map<String, int> get recentMoodCounts {
     final cutoff = DateTime.now().subtract(const Duration(days: 6));
     final counts = <String, int>{};
@@ -33,13 +38,17 @@ class JournalService extends ChangeNotifier {
   String? get mostCommonRecentMood {
     final counts = recentMoodCounts;
     if (counts.isEmpty) return null;
-    return counts.entries.reduce((first, next) => first.value >= next.value ? first : next).key;
+    return counts.entries
+        .reduce((first, next) => first.value >= next.value ? first : next)
+        .key;
   }
+
   String get dailyPrompt {
     final now = DateTime.now();
     final dayOfYear = now.difference(DateTime(now.year)).inDays;
     return _prompts[dayOfYear % _prompts.length];
   }
+
   JournalEntry? get todayEntry {
     for (final entry in _entries.reversed) {
       if (_isToday(entry.createdAt)) return entry;
@@ -51,7 +60,10 @@ class JournalService extends ChangeNotifier {
     _load();
   }
 
-  Future<void> saveToday({required String mood, required String reflection}) async {
+  Future<void> saveToday({
+    required String mood,
+    required String reflection,
+  }) async {
     final cleanReflection = reflection.trim();
     if (cleanReflection.isEmpty) return;
 
@@ -61,16 +73,17 @@ class JournalService extends ChangeNotifier {
       mood: mood,
       reflection: cleanReflection,
     );
-    _entries = _entries.where((item) => !_isToday(item.createdAt)).toList()..add(entry);
+    _entries = _entries.where((item) => !_isToday(item.createdAt)).toList()
+      ..add(entry);
     await _save();
-    notifyListeners();
+    _notifyJournalChanged();
   }
 
   Future<void> clearLocalData() async {
     _entries = [];
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_storageKey);
-    notifyListeners();
+    _notifyJournalChanged();
   }
 
   Future<void> _load() async {
@@ -82,15 +95,22 @@ class JournalService extends ChangeNotifier {
       if (decoded is List) {
         _entries = decoded
             .whereType<Map>()
-            .map((item) => JournalEntry.fromJson(Map<String, dynamic>.from(item)))
+            .map(
+              (item) => JournalEntry.fromJson(Map<String, dynamic>.from(item)),
+            )
             .toList();
-        notifyListeners();
+        _notifyJournalChanged();
       }
     } on FormatException {
       _entries = [];
     } on TypeError {
       _entries = [];
     }
+  }
+
+  void _notifyJournalChanged() {
+    _journalRevision++;
+    notifyListeners();
   }
 
   Future<void> _save() async {
@@ -103,6 +123,8 @@ class JournalService extends ChangeNotifier {
 
   static bool _isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year && date.month == now.month && date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 }
