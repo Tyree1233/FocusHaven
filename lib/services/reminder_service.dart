@@ -10,8 +10,13 @@ class ReminderService extends ChangeNotifier {
   static const _weekdaysKey = 'dailyReminderWeekdays';
   static const _allWeekdays = <int>{1, 2, 3, 4, 5, 6, 7};
 
-  ReminderService({required ReminderNotificationClient notificationService})
-      : _notificationService = notificationService {
+  factory ReminderService({
+    required ReminderNotificationClient notificationService,
+  }) {
+    return ReminderService._(notificationService);
+  }
+
+  ReminderService._(this._notificationService) {
     _load();
   }
 
@@ -24,10 +29,7 @@ class ReminderService extends ChangeNotifier {
   TimeOfDay get time => _time;
   Set<int> get weekdays => Set<int>.unmodifiable(_weekdays);
 
-  Future<bool> setDailyReminder(
-    TimeOfDay time, {
-    Set<int>? weekdays,
-  }) async {
+  Future<bool> setDailyReminder(TimeOfDay time, {Set<int>? weekdays}) async {
     final selectedWeekdays = (weekdays ?? _weekdays)
         .where((day) => day >= DateTime.monday && day <= DateTime.sunday)
         .toSet();
@@ -74,10 +76,7 @@ class ReminderService extends ChangeNotifier {
     final hour = preferences.getInt(_hourKey);
     final minute = preferences.getInt(_minuteKey);
     if (hour != null && minute != null) {
-      _time = TimeOfDay(
-        hour: hour.clamp(0, 23),
-        minute: minute.clamp(0, 59),
-      );
+      _time = TimeOfDay(hour: hour.clamp(0, 23), minute: minute.clamp(0, 59));
     }
     final savedWeekdays = preferences.getStringList(_weekdaysKey);
     if (savedWeekdays != null) {
