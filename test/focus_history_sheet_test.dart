@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/models/focus_session.dart';
@@ -63,6 +65,45 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(copyCount, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes summary copies and contains clipboard failures', (
+    tester,
+  ) async {
+    await _useTallSurface(tester);
+    final pendingCopy = Completer<void>();
+    var copyCount = 0;
+
+    await tester.pumpWidget(
+      _app(
+        sessions: const [],
+        onCopySummary: () {
+          copyCount += 1;
+          return pendingCopy.future;
+        },
+      ),
+    );
+
+    final copyAction = find.widgetWithText(TextButton, 'Copy full summary');
+    final initialButton = tester.widget<TextButton>(copyAction);
+    initialButton.onPressed!.call();
+    initialButton.onPressed!.call();
+    await tester.pump();
+
+    expect(copyCount, 1);
+    expect(tester.widget<TextButton>(copyAction).onPressed, isNull);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    pendingCopy.completeError(StateError('clipboard unavailable'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Focus summary could not be copied right now.'),
+      findsOneWidget,
+    );
+    expect(tester.widget<TextButton>(copyAction).onPressed, isNotNull);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

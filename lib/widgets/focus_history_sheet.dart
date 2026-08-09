@@ -44,6 +44,14 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
     setState(() => _isCopying = true);
     try {
       await widget.onCopySummary();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Focus summary could not be copied right now.'),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isCopying = false);
