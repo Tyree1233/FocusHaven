@@ -22,7 +22,7 @@ class JournalService extends ChangeNotifier {
 
   List<JournalEntry> get entries => List.unmodifiable(_entries.reversed);
 
-  /// Changes only when journal entries are loaded, saved, or cleared.
+  /// Changes only when journal entries are loaded, added, updated, or cleared.
   int get journalRevision => _journalRevision;
 
   Map<String, int> get recentMoodCounts {
@@ -50,36 +50,59 @@ class JournalService extends ChangeNotifier {
     return _prompts[dayOfYear % _prompts.length];
   }
 
-  JournalEntry? get todayEntry {
-    for (final entry in _entries.reversed) {
-      if (_isToday(entry.createdAt)) return entry;
-    }
-    return null;
-  }
-
   JournalService() {
     _loadFuture = _load();
   }
 
-  Future<void> saveToday({
+  /// Appends a new reflection, even when other reflections already exist for
+  /// the same local calendar day.
+  Future<JournalEntry?> addEntry({
     required String mood,
     required String reflection,
   }) async {
+    final cleanMood = mood.trim();
     final cleanReflection = reflection.trim();
-    if (cleanReflection.isEmpty) return;
+    if (cleanMood.isEmpty || cleanReflection.isEmpty) return null;
 
     await _loadFuture;
 
-    final now = DateTime.now();
     final entry = JournalEntry(
-      createdAt: now,
-      mood: mood,
+      createdAt: _nextCreatedAt(),
+      mood: cleanMood,
       reflection: cleanReflection,
     );
-    _entries = _entries.where((item) => !_isToday(item.createdAt)).toList()
-      ..add(entry);
+    _entries.add(entry);
     await _save();
     _notifyJournalChanged();
+    return entry;
+  }
+
+  /// Updates exactly one persisted reflection without changing its identity or
+  /// original creation time.
+  Future<bool> updateEntry({
+    required DateTime createdAt,
+    required String mood,
+    required String reflection,
+  }) async {
+    final cleanMood = mood.trim();
+    final cleanReflection = reflection.trim();
+    if (cleanMood.isEmpty || cleanReflection.isEmpty) return false;
+
+    await _loadFuture;
+
+    final index = _entries.indexWhere(
+      (entry) => entry.createdAt.isAtSameMomentAs(createdAt),
+    );
+    if (index == -1) return false;
+
+    _entries[index] = JournalEntry(
+      createdAt: _entries[index].createdAt,
+      mood: cleanMood,
+      reflection: cleanReflection,
+    );
+    await _save();
+    _notifyJournalChanged();
+    return true;
   }
 
   Future<void> clearLocalData() async {
@@ -125,11 +148,13 @@ class JournalService extends ChangeNotifier {
     );
   }
 
-  static bool _isToday(DateTime date) {
-    final localDate = date.toLocal();
-    final localNow = DateTime.now().toLocal();
-    return localDate.year == localNow.year &&
-        localDate.month == localNow.month &&
-        localDate.day == localNow.day;
+  DateTime _nextCreatedAt() {
+    var candidate = DateTime.now();
+    while (_entries.any(
+      (entry) => entry.createdAt.isAtSameMomentAs(candidate),
+    )) {
+      candidate = candidate.add(const Duration(microseconds: 1));
+    }
+    return candidate;
   }
 }

@@ -61,10 +61,10 @@ typedef FocusQueueState = ({
 /// Immutable journal data used by the Reflection Journal sheet.
 typedef JournalState = ({
   List<JournalEntry> entries,
+  List<JournalEntry> todayEntries,
   Map<String, int> recentMoodCounts,
   String? mostCommonRecentMood,
   String dailyPrompt,
-  JournalEntry? todayEntry,
 });
 
 /// Immutable parking-lot data separated from the one-second timer state.
@@ -239,19 +239,28 @@ final focusQueueStateProvider = Provider<FocusQueueState>((ref) {
 }, name: 'focusQueueStateProvider');
 
 /// Immutable journal snapshot that changes only when entries are loaded,
-/// saved, replaced, or cleared.
+/// added, updated, replaced, or cleared.
 final journalStateProvider = Provider<JournalState>((ref) {
   ref.watch(
     journalServiceProvider.select((journal) => journal.journalRevision),
   );
 
   final journal = ref.read(journalServiceProvider);
+  final now = DateTime.now().toLocal();
+  final todayEntries = journal.entries
+      .where((entry) {
+        final createdAt = entry.createdAt.toLocal();
+        return createdAt.year == now.year &&
+            createdAt.month == now.month &&
+            createdAt.day == now.day;
+      })
+      .toList(growable: false);
   return (
     entries: journal.entries,
+    todayEntries: List.unmodifiable(todayEntries),
     recentMoodCounts: Map.unmodifiable(journal.recentMoodCounts),
     mostCommonRecentMood: journal.mostCommonRecentMood,
     dailyPrompt: journal.dailyPrompt,
-    todayEntry: journal.todayEntry,
   );
 }, name: 'journalStateProvider');
 

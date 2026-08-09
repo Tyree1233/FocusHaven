@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
 
 typedef JournalEntryEditor = Future<void> Function(BuildContext context);
+typedef SelectedJournalEntryEditor =
+    Future<void> Function(BuildContext context, JournalEntry entry);
 typedef JournalDateLabel = String Function(DateTime date);
 
 class ReflectionJournalSheet extends ConsumerStatefulWidget {
   const ReflectionJournalSheet({
-    required this.onEditToday,
     required this.dateLabel,
+    required this.onCreateEntry,
+    required this.onEditEntry,
     super.key,
   });
 
-  final JournalEntryEditor onEditToday;
+  /// Opens an empty editor and appends a new reflection.
+  final JournalEntryEditor onCreateEntry;
+
+  /// Opens an editor for exactly one existing reflection.
+  final SelectedJournalEntryEditor onEditEntry;
   final JournalDateLabel dateLabel;
 
   @override
@@ -32,14 +40,22 @@ class _ReflectionJournalSheetState
     super.dispose();
   }
 
-  Future<void> _editToday() async {
+  Future<void> _openEditor(Future<void> Function() editor) async {
     if (_isOpeningEditor) return;
     setState(() => _isOpeningEditor = true);
     try {
-      await widget.onEditToday(context);
+      await editor();
     } finally {
       if (mounted) setState(() => _isOpeningEditor = false);
     }
+  }
+
+  Future<void> _createEntry() async {
+    await _openEditor(() => widget.onCreateEntry(context));
+  }
+
+  Future<void> _editEntry(JournalEntry entry) async {
+    await _openEditor(() => widget.onEditEntry(context, entry));
   }
 
   @override
@@ -128,7 +144,7 @@ class _ReflectionJournalSheetState
                       ],
                       const SizedBox(height: 16),
                       FilledButton.icon(
-                        onPressed: _isOpeningEditor ? null : _editToday,
+                        onPressed: _isOpeningEditor ? null : _createEntry,
                         icon: _isOpeningEditor
                             ? const SizedBox.square(
                                 dimension: 18,
@@ -136,11 +152,11 @@ class _ReflectionJournalSheetState
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Icon(Icons.edit_note),
+                            : const Icon(Icons.add_comment_outlined),
                         label: Text(
-                          journalState.todayEntry == null
+                          journalState.todayEntries.isEmpty
                               ? 'Write today’s reflection'
-                              : 'Update today’s reflection',
+                              : 'Write another reflection',
                         ),
                         style: FilledButton.styleFrom(
                           backgroundColor: primaryColor,
@@ -183,6 +199,13 @@ class _ReflectionJournalSheetState
                               entry.reflection,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
+                            ),
+                            trailing: IconButton(
+                              tooltip: 'Edit reflection',
+                              onPressed: _isOpeningEditor
+                                  ? null
+                                  : () => _editEntry(entry),
+                              icon: const Icon(Icons.edit_outlined),
                             ),
                           ),
                         ),

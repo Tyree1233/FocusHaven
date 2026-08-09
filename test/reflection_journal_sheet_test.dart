@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/models/journal_entry.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/journal_service.dart';
 import 'package:focushaven/widgets/reflection_journal_sheet.dart';
@@ -11,7 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Widget _app(
   JournalService service, {
-  required JournalEntryEditor onEditToday,
+  required JournalEntryEditor onCreateEntry,
+  required SelectedJournalEntryEditor onEditEntry,
   required JournalDateLabel dateLabel,
 }) {
   return ProviderScope(
@@ -20,7 +22,8 @@ Widget _app(
       theme: ThemeData.dark(),
       home: Scaffold(
         body: ReflectionJournalSheet(
-          onEditToday: onEditToday,
+          onCreateEntry: onCreateEntry,
+          onEditEntry: onEditEntry,
           dateLabel: dateLabel,
         ),
       ),
@@ -31,7 +34,8 @@ Widget _app(
 Future<JournalService> _pumpJournal(
   WidgetTester tester, {
   List<Map<String, Object?>> entries = const [],
-  required JournalEntryEditor onEditToday,
+  required JournalEntryEditor onCreateEntry,
+  required SelectedJournalEntryEditor onEditEntry,
   required JournalDateLabel dateLabel,
 }) async {
   SharedPreferences.setMockInitialValues({
@@ -41,7 +45,12 @@ Future<JournalService> _pumpJournal(
   await tester.pump();
 
   await tester.pumpWidget(
-    _app(service, onEditToday: onEditToday, dateLabel: dateLabel),
+    _app(
+      service,
+      onCreateEntry: onCreateEntry,
+      onEditEntry: onEditEntry,
+      dateLabel: dateLabel,
+    ),
   );
   await tester.pump();
   return service;
@@ -54,7 +63,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('renders empty state and prevents duplicate editor requests', (
+  testWidgets('empty journal prevents duplicate new-entry requests', (
     tester,
   ) async {
     final editorFinished = Completer<void>();
@@ -62,10 +71,11 @@ void main() {
 
     await _pumpJournal(
       tester,
-      onEditToday: (_) {
+      onCreateEntry: (_) {
         editorRequests++;
         return editorFinished.future;
       },
+      onEditEntry: (_, _) async {},
       dateLabel: (_) => 'Today',
     );
 
@@ -91,51 +101,108 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets(
-    'shows today and previous-day reflections without losing either',
-    (tester) async {
-      await tester.binding.setSurfaceSize(const Size(900, 1400));
-      addTearDown(() => tester.binding.setSurfaceSize(null));
+  testWidgets('shows multiple same-day and previous-day reflections', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(900, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
 
-      final today = DateTime.now();
-      final yesterday = today.subtract(const Duration(days: 1));
-      final service = await _pumpJournal(
-        tester,
-        entries: [
-          {
-            'createdAt': yesterday.toIso8601String(),
-            'mood': 'Grateful',
-            'reflection': 'Yesterday remains in my journal.',
-          },
-          {
-            'createdAt': today.toIso8601String(),
-            'mood': 'Calm',
-            'reflection': 'Today has its own reflection.',
-          },
-        ],
-        onEditToday: (_) async {},
-        dateLabel: (date) {
-          return DateUtils.isSameDay(date, today)
-              ? 'Today label'
-              : 'Earlier label';
+    final today = DateTime.now();
+    final earlierToday = today.subtract(const Duration(minutes: 1));
+    final yesterday = today.subtract(const Duration(days: 1));
+    final service = await _pumpJournal(
+      tester,
+      entries: [
+        {
+          'createdAt': yesterday.toIso8601String(),
+          'mood': 'Grateful',
+          'reflection': 'Yesterday remains in my journal.',
         },
-      );
+        {
+          'createdAt': earlierToday.toIso8601String(),
+          'mood': 'Focused',
+          'reflection': 'My earlier reflection remains separate.',
+        },
+        {
+          'createdAt': today.toIso8601String(),
+          'mood': 'Calm',
+          'reflection': 'Today has its own reflection.',
+        },
+      ],
+      onCreateEntry: (_) async {},
+      onEditEntry: (_, _) async {},
+      dateLabel: (date) {
+        return DateUtils.isSameDay(date, today)
+            ? 'Today label'
+            : 'Earlier label';
+      },
+    );
 
-      expect(service.entries, hasLength(2));
-      expect(find.text('Update today’s reflection'), findsOneWidget);
-      expect(find.text('Calm 1'), findsOneWidget);
-      expect(find.text('Grateful 1'), findsOneWidget);
-      expect(find.text('Calm • Today label'), findsOneWidget);
-      expect(find.text('Today has its own reflection.'), findsOneWidget);
+    expect(service.entries, hasLength(3));
+    expect(find.text('Write another reflection'), findsOneWidget);
+    expect(find.text('Calm 1'), findsOneWidget);
+    expect(find.text('Focused 1'), findsOneWidget);
+    expect(find.text('Grateful 1'), findsOneWidget);
+    expect(find.text('Calm • Today label'), findsOneWidget);
+    expect(find.text('Today has its own reflection.'), findsOneWidget);
 
-      await tester.scrollUntilVisible(
-        find.text('Grateful • Earlier label'),
-        140,
-        scrollable: find.byType(Scrollable),
-      );
-      expect(find.text('Grateful • Earlier label'), findsOneWidget);
-      expect(find.text('Yesterday remains in my journal.'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    },
-  );
+    await tester.scrollUntilVisible(
+      find.text('Grateful • Earlier label'),
+      140,
+      scrollable: find.byType(Scrollable),
+    );
+    expect(find.text('Grateful • Earlier label'), findsOneWidget);
+    expect(find.text('Yesterday remains in my journal.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('edit action targets exactly the selected reflection', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(900, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    final newer = DateTime.now();
+    final selected = newer.subtract(const Duration(minutes: 1));
+    JournalEntry? requestedEntry;
+
+    await _pumpJournal(
+      tester,
+      entries: [
+        {
+          'createdAt': selected.toIso8601String(),
+          'mood': 'Focused',
+          'reflection': 'Edit this reflection.',
+        },
+        {
+          'createdAt': newer.toIso8601String(),
+          'mood': 'Calm',
+          'reflection': 'Do not edit this reflection.',
+        },
+      ],
+      onCreateEntry: (_) async {},
+      onEditEntry: (_, entry) async {
+        requestedEntry = entry;
+      },
+      dateLabel: (_) => 'Today',
+    );
+
+    await tester.scrollUntilVisible(
+      find.text('Edit this reflection.'),
+      140,
+      scrollable: find.byType(Scrollable),
+    );
+    final selectedTile = find.byKey(ValueKey(selected));
+    final selectedEditButton = find.descendant(
+      of: selectedTile,
+      matching: find.byTooltip('Edit reflection'),
+    );
+    await tester.tap(selectedEditButton);
+    await tester.pumpAndSettle();
+
+    expect(requestedEntry, isNotNull);
+    expect(requestedEntry!.createdAt.isAtSameMomentAs(selected), isTrue);
+    expect(requestedEntry!.reflection, 'Edit this reflection.');
+    expect(tester.takeException(), isNull);
+  });
 }

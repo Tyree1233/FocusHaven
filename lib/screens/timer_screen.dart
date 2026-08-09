@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/focus_milestone.dart';
 import '../models/focus_session.dart';
+import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
 import '../services/focus_queue_service.dart';
 import '../services/journal_service.dart';
@@ -33,6 +34,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
   const TimerScreen({super.key});
 
   static const _ink = Color(0xFF211442);
+  static const _journalMoods = [
+    'Calm',
+    'Focused',
+    'Tired',
+    'Stressed',
+    'Grateful',
+  ];
 
   Color _sessionColor(BuildContext context, SessionType type) => switch (type) {
     SessionType.focus => Theme.of(context).colorScheme.primary,
@@ -543,22 +551,43 @@ class TimerScreen extends riverpod.ConsumerWidget {
     }
   }
 
-  Future<void> _editTodayJournal(
+  Future<void> _createJournalEntry(
     BuildContext context,
     JournalState journalState,
     JournalService journal,
   ) async {
-    const moods = ['Calm', 'Focused', 'Tired', 'Stressed', 'Grateful'];
     final draft = await JournalEntryDialog.show(
       context,
-      initialMood: journalState.todayEntry?.mood ?? moods.first,
-      initialReflection: journalState.todayEntry?.reflection ?? '',
+      initialMood: _journalMoods.first,
+      initialReflection: '',
       prompt: journalState.dailyPrompt,
-      moods: moods,
+      moods: _journalMoods,
     );
     if (draft == null) return;
 
-    await journal.saveToday(mood: draft.mood, reflection: draft.reflection);
+    await journal.addEntry(mood: draft.mood, reflection: draft.reflection);
+  }
+
+  Future<void> _editJournalEntry(
+    BuildContext context,
+    JournalEntry entry,
+    JournalState journalState,
+    JournalService journal,
+  ) async {
+    final draft = await JournalEntryDialog.show(
+      context,
+      initialMood: entry.mood,
+      initialReflection: entry.reflection,
+      prompt: journalState.dailyPrompt,
+      moods: _journalMoods,
+    );
+    if (draft == null) return;
+
+    await journal.updateEntry(
+      createdAt: entry.createdAt,
+      mood: draft.mood,
+      reflection: draft.reflection,
+    );
   }
 
   Future<void> _showJournalSheet(
@@ -574,8 +603,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
       ),
       builder: (sheetContext) => ReflectionJournalSheet(
         dateLabel: _dateLabel,
-        onEditToday: (dialogContext) => _editTodayJournal(
+        onCreateEntry: (dialogContext) => _createJournalEntry(
           dialogContext,
+          ref.read(journalStateProvider),
+          ref.read(journalServiceProvider),
+        ),
+        onEditEntry: (dialogContext, entry) => _editJournalEntry(
+          dialogContext,
+          entry,
           ref.read(journalStateProvider),
           ref.read(journalServiceProvider),
         ),
