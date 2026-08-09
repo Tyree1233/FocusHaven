@@ -237,6 +237,37 @@ void main() {
     expect(journal.mostCommonRecentMood, 'Calm');
   });
 
+  test('recent moods include the full oldest local calendar day', () async {
+    final now = DateTime.now().toLocal();
+    final oldestDay = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
+    SharedPreferences.setMockInitialValues({
+      'journalEntries': jsonEncode([
+        {
+          'createdAt': oldestDay.toIso8601String(),
+          'mood': 'Included',
+          'reflection': 'The oldest calendar day still counts.',
+        },
+        {
+          'createdAt': oldestDay
+              .subtract(const Duration(microseconds: 1))
+              .toIso8601String(),
+          'mood': 'Excluded',
+          'reflection': 'This falls before the seven-day window.',
+        },
+      ]),
+    });
+
+    final journal = await createJournal();
+    addTearDown(journal.dispose);
+
+    expect(journal.recentMoodCounts, {'Included': 1});
+    expect(journal.mostCommonRecentMood, 'Included');
+  });
+
   test(
     'preserves and normalizes valid records beside corrupted data',
     () async {

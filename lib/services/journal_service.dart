@@ -32,10 +32,15 @@ class JournalService extends ChangeNotifier {
   int get journalRevision => _journalRevision;
 
   Map<String, int> get recentMoodCounts {
-    final cutoff = DateTime.now().subtract(const Duration(days: 6));
+    final now = DateTime.now().toLocal();
+    final cutoff = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
     final counts = <String, int>{};
     for (final entry in _entries) {
-      if (entry.createdAt.isAfter(cutoff)) {
+      if (!entry.createdAt.toLocal().isBefore(cutoff)) {
         counts.update(entry.mood, (count) => count + 1, ifAbsent: () => 1);
       }
     }
