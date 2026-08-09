@@ -97,6 +97,37 @@ void main() {
     expect(service.signInError, isNull);
   });
 
+  test(
+    'reports sign-out failures without replacing the signed-in user',
+    () async {
+      final cachedUser = _FakeUser();
+      final backend = _FakeAuthBackend(currentUser: cachedUser)
+        ..shouldFailSignOut = true;
+      final service = AuthService(
+        authBackend: backend,
+        googleAuthBackend: _FakeGoogleAuthBackend(null),
+      );
+      addTearDown(() => cleanUp(service, backend));
+      await service.initialized;
+
+      await expectLater(
+        service.signOut(),
+        throwsA(
+          isA<StateError>().having(
+            (error) => error.message,
+            'message',
+            'FocusHaven could not sign out of this account.',
+          ),
+        ),
+      );
+
+      expect(backend.signOutCalls, 1);
+      expect(backend.anonymousSignInCalls, 0);
+      expect(service.user, same(cachedUser));
+      expect(service.isSignedIn, isTrue);
+    },
+  );
+
   test('publishes the cached signed-in user during initialization', () async {
     final cachedUser = _FakeUser();
     final backend = _FakeAuthBackend(currentUser: cachedUser);
@@ -156,6 +187,7 @@ final class _FakeAuthBackend implements AuthBackend {
   int credentialSignInCalls = 0;
   int signOutCalls = 0;
   AuthCredential? lastCredential;
+  bool shouldFailSignOut = false;
 
   bool get hasStateListener => _authStates.hasListener;
 
@@ -179,6 +211,7 @@ final class _FakeAuthBackend implements AuthBackend {
   @override
   Future<void> signOut() async {
     signOutCalls += 1;
+    if (shouldFailSignOut) throw StateError('sign-out unavailable');
     currentUser = null;
   }
 

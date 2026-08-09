@@ -164,8 +164,12 @@ class AuthService extends ChangeNotifier {
     try {
       final backend = _resolvedAuthBackend;
       await backend.signOut();
-    } catch (error) {
+    } catch (error, stackTrace) {
       debugPrint('Sign-out failed: $error');
+      Error.throwWithStackTrace(
+        StateError('FocusHaven could not sign out of this account.'),
+        stackTrace,
+      );
     }
     if (_isDisposed) return;
     // Keep the Google session so signing back into FocusHaven is reliable.
