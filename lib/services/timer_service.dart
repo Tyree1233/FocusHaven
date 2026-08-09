@@ -511,19 +511,27 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       final dailyGoalMinutes = backup['dailyGoalMinutes'];
 
       if (focusSeconds is! int ||
+          focusSeconds < 1 ||
+          focusSeconds > _maxSessionSeconds ||
           shortBreakSeconds is! int ||
+          shortBreakSeconds < 1 ||
+          shortBreakSeconds > _maxSessionSeconds ||
           longBreakSeconds is! int ||
+          longBreakSeconds < 1 ||
+          longBreakSeconds > _maxSessionSeconds ||
           completedFocusSessions is! int ||
-          history is! List ||
+          completedFocusSessions < 0 ||
+          completedFocusSessions > (1 << 31) ||
           (focusTask != null && focusTask is! String) ||
-          (dailyGoalMinutes != null && dailyGoalMinutes is! int)) {
+          (dailyGoalMinutes != null &&
+              (dailyGoalMinutes is! int ||
+                  dailyGoalMinutes < 5 ||
+                  dailyGoalMinutes > 480))) {
         return false;
       }
 
-      final restoredHistory = history
-          .whereType<Map>()
-          .map((item) => FocusSession.fromJson(Map<String, dynamic>.from(item)))
-          .toList();
+      final restoredHistory = _parseCloudFocusHistory(history);
+      if (restoredHistory == null) return false;
 
       _ticker?.cancel();
       _ticker = null;
@@ -531,19 +539,15 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       _isComplete = false;
       _hasPendingResume = false;
       _endsAt = null;
-      _focusSeconds = focusSeconds.clamp(1, _maxSessionSeconds).toInt();
-      _shortBreakSeconds = shortBreakSeconds
-          .clamp(1, _maxSessionSeconds)
-          .toInt();
-      _longBreakSeconds = longBreakSeconds.clamp(1, _maxSessionSeconds).toInt();
-      _completedFocusSessions = completedFocusSessions
-          .clamp(0, 1 << 31)
-          .toInt();
+      _focusSeconds = focusSeconds;
+      _shortBreakSeconds = shortBreakSeconds;
+      _longBreakSeconds = longBreakSeconds;
+      _completedFocusSessions = completedFocusSessions;
       _focusHistory = restoredHistory;
       _focusHistoryRevision++;
       _focusTask = _cleanFocusTask(focusTask ?? '');
       if (dailyGoalMinutes != null) {
-        _dailyGoalMinutes = dailyGoalMinutes.clamp(5, 480).toInt();
+        _dailyGoalMinutes = dailyGoalMinutes;
       }
       _sessionType = SessionType.focus;
       _totalSessionSeconds = _focusSeconds;
@@ -556,6 +560,39 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     } on TypeError {
       return false;
     }
+  }
+
+  List<FocusSession>? _parseCloudFocusHistory(Object? value) {
+    if (value is! List) return null;
+
+    final sessions = <FocusSession>[];
+    for (final record in value) {
+      if (record is! Map) return null;
+
+      final json = Map<String, dynamic>.from(record);
+      final completedAtValue = json['completedAt'];
+      final durationSeconds = json['durationSeconds'];
+      final focusTask = json['focusTask'];
+      if (completedAtValue is! String ||
+          durationSeconds is! int ||
+          durationSeconds < 1 ||
+          durationSeconds > _maxSessionSeconds ||
+          (focusTask != null && focusTask is! String)) {
+        return null;
+      }
+
+      final completedAt = DateTime.tryParse(completedAtValue);
+      if (completedAt == null) return null;
+      final cleanedTask = focusTask == null ? '' : _cleanFocusTask(focusTask);
+      sessions.add(
+        FocusSession(
+          completedAt: completedAt,
+          durationSeconds: durationSeconds,
+          focusTask: cleanedTask.isEmpty ? null : cleanedTask,
+        ),
+      );
+    }
+    return sessions;
   }
 
   void _finishSession() {

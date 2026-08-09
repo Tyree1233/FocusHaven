@@ -130,6 +130,89 @@ void main() {
     expect(timer.restoreCloudBackup({'focusSeconds': 20}), isFalse);
   });
 
+  test(
+    'rejects partially corrupt cloud history without changing state',
+    () async {
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+      timer.setCustomDuration(35, 0);
+      timer.setFocusTask('Keep this local task');
+      timer.setDailyGoalMinutes(75);
+      final initialHistoryRevision = timer.focusHistoryRevision;
+      var notifications = 0;
+      timer.addListener(() => notifications++);
+
+      final restored = timer.restoreCloudBackup({
+        'focusSeconds': 45 * 60,
+        'shortBreakSeconds': 6 * 60,
+        'longBreakSeconds': 18 * 60,
+        'completedFocusSessions': 4,
+        'focusTask': 'Do not apply this task',
+        'dailyGoalMinutes': 90,
+        'focusHistory': [
+          {
+            'completedAt': DateTime(2026, 8, 6, 12).toIso8601String(),
+            'durationSeconds': 45 * 60,
+          },
+          null,
+        ],
+      });
+
+      expect(restored, isFalse);
+      expect(timer.secondsRemaining, 35 * 60);
+      expect(timer.focusTask, 'Keep this local task');
+      expect(timer.dailyGoalMinutes, 75);
+      expect(timer.completedFocusSessions, 0);
+      expect(timer.recentFocusSessions, isEmpty);
+      expect(timer.focusHistoryRevision, initialHistoryRevision);
+      expect(notifications, 0);
+    },
+  );
+
+  test('rejects out-of-range cloud values without changing state', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    timer.setCustomDuration(30, 0);
+    final validBackup = <String, dynamic>{
+      'focusSeconds': 45 * 60,
+      'shortBreakSeconds': 6 * 60,
+      'longBreakSeconds': 18 * 60,
+      'completedFocusSessions': 4,
+      'focusTask': 'Finish the proposal',
+      'dailyGoalMinutes': 90,
+      'focusHistory': <Object?>[],
+    };
+
+    final invalidBackups = [
+      {...validBackup, 'focusSeconds': 0},
+      {...validBackup, 'shortBreakSeconds': 24 * 60 * 60 + 1},
+      {...validBackup, 'completedFocusSessions': -1},
+      {...validBackup, 'dailyGoalMinutes': 481},
+      {
+        ...validBackup,
+        'focusHistory': [
+          {'completedAt': 'not-a-date', 'durationSeconds': 45 * 60},
+        ],
+      },
+      {
+        ...validBackup,
+        'focusHistory': [
+          {
+            'completedAt': DateTime(2026, 8, 6, 12).toIso8601String(),
+            'durationSeconds': 0,
+          },
+        ],
+      },
+    ];
+
+    for (final backup in invalidBackups) {
+      expect(timer.restoreCloudBackup(backup), isFalse);
+    }
+    expect(timer.secondsRemaining, 30 * 60);
+    expect(timer.completedFocusSessions, 0);
+    expect(timer.recentFocusSessions, isEmpty);
+  });
+
   test('loads a saved short-break timer after reopening', () async {
     SharedPreferences.setMockInitialValues({
       'focusSeconds': 1500,
