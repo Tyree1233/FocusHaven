@@ -84,25 +84,37 @@ class AuthService extends ChangeNotifier {
   String get displayName => user?.displayName ?? user?.email ?? 'Guest';
 
   AuthService({this.authBackend, this.googleAuthBackend}) {
+    initialized = _initialize();
+  }
+
+  /// Completes after cached auth state is read and its listener is attached.
+  late final Future<void> initialized;
+
+  Future<void> _initialize() {
     try {
       final backend = _resolvedAuthBackend;
+      user = backend.currentUser;
       _authSubscription = backend.authStateChanges().listen(
         (currentUser) {
-          if (_isDisposed) return;
+          if (_isDisposed || user == currentUser) return;
           user = currentUser;
           notifyListeners();
         },
         onError: (Object error) {
-          debugPrint('Authentication state stream failed: $error');
+          if (!_isDisposed) {
+            debugPrint('Authentication state stream failed: $error');
+          }
         },
       );
       unawaited(signInAnonymouslyIfNeeded());
     } catch (_) {
       // Authentication remains unavailable until Firebase is configured.
     }
+    return Future<void>.value();
   }
 
   Future<void> signInAnonymouslyIfNeeded() async {
+    if (_isDisposed) return;
     try {
       final backend = _resolvedAuthBackend;
       if (backend.currentUser == null) {
@@ -112,10 +124,12 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<UserCredential?> signInWithGoogle() async {
+    if (_isDisposed) return null;
     try {
       _setSignInError(null);
       final googleBackend = _resolvedGoogleAuthBackend;
       final googleAuth = await googleBackend.authenticate();
+      if (_isDisposed) return null;
       if (googleAuth == null) {
         _setSignInError(
           'Google sign-in was closed before an account was selected.',
@@ -145,6 +159,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    if (_isDisposed) return;
     _setSignInError(null);
     try {
       final backend = _resolvedAuthBackend;
@@ -152,6 +167,7 @@ class AuthService extends ChangeNotifier {
     } catch (error) {
       debugPrint('Sign-out failed: $error');
     }
+    if (_isDisposed) return;
     // Keep the Google session so signing back into FocusHaven is reliable.
     await signInAnonymouslyIfNeeded();
   }

@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:focushaven/main.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
+import 'package:focushaven/services/auth_service.dart';
 import 'package:focushaven/services/focus_profile_service.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/journal_service.dart';
@@ -219,6 +220,28 @@ void main() {
     expect(reminderState.isEnabled, isTrue);
     expect(reminderState.time, const TimeOfDay(hour: 18, minute: 30));
     expect(reminderState.weekdays, {1, 3, 5});
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('uses the pre-initialized auth supplied at app startup', (
+    WidgetTester tester,
+  ) async {
+    final authService = AuthService();
+    await authService.initialized;
+
+    await tester.pumpWidget(FocusHavenApp(authService: authService));
+    await tester.pump();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MaterialApp)),
+      listen: false,
+    );
+    expect(container.read(authServiceProvider), same(authService));
+
+    final authState = container.read(authStateProvider);
+    expect(authState.isSignedIn, isFalse);
+    expect(authState.displayName, 'Guest');
+    expect(authState.signInError, isNull);
     expect(tester.takeException(), isNull);
   });
 }

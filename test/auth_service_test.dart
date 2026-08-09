@@ -21,7 +21,7 @@ void main() {
       authBackend: backend,
       googleAuthBackend: _FakeGoogleAuthBackend(null),
     );
-    await settle();
+    await service.initialized;
 
     expect(backend.anonymousSignInCalls, 1);
     expect(backend.hasStateListener, isTrue);
@@ -41,7 +41,7 @@ void main() {
       googleAuthBackend: googleBackend,
     );
     addTearDown(() => cleanUp(service, backend));
-    await settle();
+    await service.initialized;
 
     final credential = await service.signInWithGoogle();
 
@@ -67,7 +67,7 @@ void main() {
       googleAuthBackend: googleBackend,
     );
     addTearDown(() => cleanUp(service, backend));
-    await settle();
+    await service.initialized;
 
     await service.signInWithGoogle();
 
@@ -85,7 +85,7 @@ void main() {
       googleAuthBackend: _FakeGoogleAuthBackend(null),
     );
     addTearDown(() => cleanUp(service, backend));
-    await settle();
+    await service.initialized;
 
     await service.signInWithGoogle();
     expect(service.signInError, isNotNull);
@@ -96,9 +96,55 @@ void main() {
     expect(backend.anonymousSignInCalls, 2);
     expect(service.signInError, isNull);
   });
+
+  test('publishes the cached signed-in user during initialization', () async {
+    final cachedUser = _FakeUser();
+    final backend = _FakeAuthBackend(currentUser: cachedUser);
+    final service = AuthService(
+      authBackend: backend,
+      googleAuthBackend: _FakeGoogleAuthBackend(null),
+    );
+    addTearDown(() => cleanUp(service, backend));
+
+    await service.initialized;
+
+    expect(service.user, same(cachedUser));
+    expect(service.isSignedIn, isTrue);
+    expect(service.displayName, 'Tyree');
+    expect(backend.anonymousSignInCalls, 0);
+    expect(backend.hasStateListener, isTrue);
+  });
+
+  test('account operations are ignored after disposal', () async {
+    final backend = _FakeAuthBackend();
+    final googleBackend = _FakeGoogleAuthBackend(
+      const GoogleAuthTokens(accessToken: 'ignored'),
+    );
+    final service = AuthService(
+      authBackend: backend,
+      googleAuthBackend: googleBackend,
+    );
+    await service.initialized;
+
+    service.dispose();
+    await settle();
+    await service.signInAnonymouslyIfNeeded();
+    final credential = await service.signInWithGoogle();
+    await service.signOut();
+
+    expect(credential, isNull);
+    expect(backend.anonymousSignInCalls, 1);
+    expect(backend.credentialSignInCalls, 0);
+    expect(backend.signOutCalls, 0);
+    expect(googleBackend.authenticationCalls, 0);
+    expect(backend.hasStateListener, isFalse);
+    await backend.close();
+  });
 }
 
 final class _FakeAuthBackend implements AuthBackend {
+  _FakeAuthBackend({this.currentUser});
+
   final StreamController<User?> _authStates = StreamController<User?>.broadcast(
     sync: true,
   );
@@ -149,5 +195,21 @@ final class _FakeGoogleAuthBackend implements GoogleAuthBackend {
   Future<GoogleAuthTokens?> authenticate() async {
     authenticationCalls += 1;
     return tokens;
+  }
+}
+
+final class _FakeUser implements User {
+  @override
+  bool get isAnonymous => false;
+
+  @override
+  String? get displayName => 'Tyree';
+
+  @override
+  String? get email => 'tyree@example.com';
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    return super.noSuchMethod(invocation);
   }
 }

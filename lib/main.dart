@@ -8,6 +8,7 @@ import 'firebase_options.dart';
 import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
+import 'services/auth_service.dart';
 import 'services/focus_profile_service.dart';
 import 'services/focus_queue_service.dart';
 import 'services/journal_service.dart';
@@ -26,6 +27,7 @@ Future<void> main() async {
   final preferences = await SharedPreferences.getInstance();
   final showOnboarding =
       !(preferences.getBool('hasCompletedOnboarding') ?? false);
+  final authService = AuthService();
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();
   final focusProfileService = FocusProfileService();
@@ -35,6 +37,7 @@ Future<void> main() async {
     notificationService: notificationService,
   );
   await Future.wait([
+    authService.initialized,
     timerService.initialized,
     themeService.initialized,
     focusProfileService.initialized,
@@ -45,6 +48,7 @@ Future<void> main() async {
 
   runApp(
     FocusHavenApp(
+      authService: authService,
       notificationService: notificationService,
       timerService: timerService,
       themeService: themeService,
@@ -60,6 +64,7 @@ Future<void> main() async {
 class FocusHavenApp extends StatelessWidget {
   const FocusHavenApp({
     super.key,
+    this.authService,
     this.notificationService,
     this.timerService,
     this.themeService,
@@ -70,6 +75,7 @@ class FocusHavenApp extends StatelessWidget {
     this.showOnboarding = true,
   });
 
+  final AuthService? authService;
   final NotificationService? notificationService;
   final TimerService? timerService;
   final ThemeService? themeService;
@@ -81,6 +87,7 @@ class FocusHavenApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final activeAuthService = authService;
     final activeNotificationService =
         notificationService ?? NotificationService();
     final activeTimerService = timerService;
@@ -92,6 +99,8 @@ class FocusHavenApp extends StatelessWidget {
 
     return ProviderScope(
       overrides: [
+        if (activeAuthService != null)
+          authServiceProvider.overrideWith((ref) => activeAuthService),
         notificationServiceProvider.overrideWithValue(
           activeNotificationService,
         ),
