@@ -11,6 +11,8 @@ import 'package:focushaven/screens/onboarding_screen.dart';
 import 'package:focushaven/services/focus_profile_service.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/journal_service.dart';
+import 'package:focushaven/services/notification_service.dart';
+import 'package:focushaven/services/reminder_service.dart';
 import 'package:focushaven/services/theme_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 
@@ -187,6 +189,36 @@ void main() {
     expect(queueState.activeItems.single.id, 'startup-task');
     expect(queueState.activeItems.single.title, 'Ready on the first frame');
     expect(queueState.completedItems, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('uses the pre-initialized reminder supplied at app startup', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'dailyReminderEnabled': true,
+      'dailyReminderHour': 18,
+      'dailyReminderMinute': 30,
+      'dailyReminderWeekdays': ['1', '3', '5'],
+    });
+    final reminderService = ReminderService(
+      notificationService: NotificationService(),
+    );
+    await reminderService.initialized;
+
+    await tester.pumpWidget(FocusHavenApp(reminderService: reminderService));
+    await tester.pump();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MaterialApp)),
+      listen: false,
+    );
+    expect(container.read(reminderServiceProvider), same(reminderService));
+
+    final reminderState = container.read(reminderStateProvider);
+    expect(reminderState.isEnabled, isTrue);
+    expect(reminderState.time, const TimeOfDay(hour: 18, minute: 30));
+    expect(reminderState.weekdays, {1, 3, 5});
     expect(tester.takeException(), isNull);
   });
 }

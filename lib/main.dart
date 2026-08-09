@@ -12,6 +12,7 @@ import 'services/focus_profile_service.dart';
 import 'services/focus_queue_service.dart';
 import 'services/journal_service.dart';
 import 'services/notification_service.dart';
+import 'services/reminder_service.dart';
 import 'services/theme_service.dart';
 import 'services/timer_service.dart';
 
@@ -30,12 +31,16 @@ Future<void> main() async {
   final focusProfileService = FocusProfileService();
   final focusQueueService = FocusQueueService();
   final journalService = JournalService();
+  final reminderService = ReminderService(
+    notificationService: notificationService,
+  );
   await Future.wait([
     timerService.initialized,
     themeService.initialized,
     focusProfileService.initialized,
     focusQueueService.initialized,
     journalService.initialized,
+    reminderService.initialized,
   ]);
 
   runApp(
@@ -46,6 +51,7 @@ Future<void> main() async {
       focusProfileService: focusProfileService,
       focusQueueService: focusQueueService,
       journalService: journalService,
+      reminderService: reminderService,
       showOnboarding: showOnboarding,
     ),
   );
@@ -60,6 +66,7 @@ class FocusHavenApp extends StatelessWidget {
     this.focusProfileService,
     this.focusQueueService,
     this.journalService,
+    this.reminderService,
     this.showOnboarding = true,
   });
 
@@ -69,6 +76,7 @@ class FocusHavenApp extends StatelessWidget {
   final FocusProfileService? focusProfileService;
   final FocusQueueService? focusQueueService;
   final JournalService? journalService;
+  final ReminderService? reminderService;
   final bool showOnboarding;
 
   @override
@@ -80,6 +88,7 @@ class FocusHavenApp extends StatelessWidget {
     final activeFocusProfileService = focusProfileService;
     final activeFocusQueueService = focusQueueService;
     final activeJournalService = journalService;
+    final activeReminderService = reminderService;
 
     return ProviderScope(
       overrides: [
@@ -100,6 +109,8 @@ class FocusHavenApp extends StatelessWidget {
           ),
         if (activeJournalService != null)
           journalServiceProvider.overrideWith((ref) => activeJournalService),
+        if (activeReminderService != null)
+          reminderServiceProvider.overrideWith((ref) => activeReminderService),
       ],
       child: _FocusHavenMaterialApp(showOnboarding: showOnboarding),
     );
