@@ -707,6 +707,13 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     final parkedThoughtsJson = prefs.getString(_parkedThoughtsKey);
     if (parkedThoughtsJson != null) {
       _parkedThoughts = _decodeParkedThoughts(parkedThoughtsJson);
+      final normalizedParkedThoughts = jsonEncode(
+        _parkedThoughts.map((thought) => thought.toJson()).toList(),
+      );
+      if (normalizedParkedThoughts != parkedThoughtsJson) {
+        await prefs.setString(_parkedThoughtsKey, normalizedParkedThoughts);
+      }
+      await prefs.remove('distractions');
     } else {
       final legacyThoughts =
           prefs.getStringList('distractions') ?? const <String>[];
@@ -730,6 +737,12 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     final historyJson = prefs.getString('focusHistory');
     if (historyJson != null) {
       _focusHistory = _decodeFocusHistory(historyJson);
+      final normalizedHistory = jsonEncode(
+        _focusHistory.map((session) => session.toJson()).toList(),
+      );
+      if (normalizedHistory != historyJson) {
+        await prefs.setString('focusHistory', normalizedHistory);
+      }
     }
     if (_focusHistory.isNotEmpty) {
       _focusHistoryRevision++;

@@ -274,6 +274,7 @@ void main() {
           'completedAt': '2026-08-06T09:00:00.000',
           'durationSeconds': 60,
           'focusTask': 'First valid session',
+          'accidentalMetadata': 'remove me',
         },
         {'durationSeconds': 120, 'focusTask': 'Missing completion date'},
         {
@@ -304,6 +305,21 @@ void main() {
       'First valid session',
     ]);
     expect(timer.totalFocusSeconds, 150);
+
+    final preferences = await SharedPreferences.getInstance();
+    final repaired = jsonDecode(preferences.getString('focusHistory')!) as List;
+    expect(repaired, [
+      {
+        'completedAt': '2026-08-06T09:00:00.000',
+        'durationSeconds': 60,
+        'focusTask': 'First valid session',
+      },
+      {
+        'completedAt': '2026-08-06T11:00:00.000',
+        'durationSeconds': 90,
+        'focusTask': 'Second valid session',
+      },
+    ]);
   });
 
   test('weekly statistics include the full oldest calendar day', () async {
@@ -436,6 +452,45 @@ void main() {
         reopenedTimer.completedParkedThoughts.single.text,
         'Schedule the appointment',
       );
+    },
+  );
+
+  test(
+    'repairs parked thought storage and removes stale legacy data',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'parkedThoughts': jsonEncode([
+          {
+            'id': 'thought-1',
+            'text': 'Call the dentist',
+            'createdAt': '2026-08-08T12:00:00.000',
+            'accidentalMetadata': 'remove me',
+          },
+          {
+            'id': 'broken-thought',
+            'text': 'Broken record',
+            'createdAt': 'not-a-date',
+          },
+          'not a parked thought',
+        ]),
+        'distractions': ['Stale legacy thought'],
+      });
+
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+
+      expect(timer.parkedThoughts, hasLength(1));
+      expect(timer.parkedThoughts.single.text, 'Call the dentist');
+      final preferences = await SharedPreferences.getInstance();
+      final repaired = jsonDecode(preferences.getString('parkedThoughts')!);
+      expect(repaired, [
+        {
+          'id': 'thought-1',
+          'text': 'Call the dentist',
+          'createdAt': '2026-08-08T12:00:00.000',
+        },
+      ]);
+      expect(preferences.getStringList('distractions'), isNull);
     },
   );
 
