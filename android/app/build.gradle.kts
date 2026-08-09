@@ -2,10 +2,26 @@ import java.util.Properties
 
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
+val isReleaseBuildRequested = gradle.startParameter.taskNames.any { taskName ->
+    taskName.contains("release", ignoreCase = true)
+}
 
 if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+} else if (isReleaseBuildRequested) {
+    throw GradleException(
+        "Release signing requires android/key.properties. " +
+            "Create it locally before building a release artifact.",
+    )
 }
+
+fun requiredSigningProperty(name: String): String {
+    return keystoreProperties.getProperty(name)?.takeIf { it.isNotBlank() }
+        ?: throw GradleException(
+            "Missing required release-signing property '$name' in android/key.properties.",
+        )
+}
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -35,21 +51,32 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-    signingConfigs {
-        create("release") {
-            keyAlias = keystoreProperties.getProperty("keyAlias")
-            keyPassword = keystoreProperties.getProperty("keyPassword")
-            storeFile = keystoreProperties.getProperty("storeFile")?.let { file(it) }
-            storePassword = keystoreProperties.getProperty("storePassword")
+    if (keystorePropertiesFile.exists()) {
+        signingConfigs {
+            create("release") {
+                keyAlias = requiredSigningProperty("keyAlias")
+                keyPassword = requiredSigningProperty("keyPassword")
+                val signingStoreFile = file(requiredSigningProperty("storeFile"))
+                if (!signingStoreFile.isFile) {
+                    throw GradleException(
+                        "Release keystore was not found at ${signingStoreFile.absolutePath}.",
+                    )
+                }
+                storeFile = signingStoreFile
+                storePassword = requiredSigningProperty("storePassword")
+            }
         }
     }
 
     buildTypes {
-        release {
-            signingConfig = signingConfigs.getByName("release")
+        getByName("release") {
+            signingConfigs.findByName("release")?.let { releaseSigningConfig ->
+                signingConfig = releaseSigningConfig
+            }
+        }
     }
 }
-}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

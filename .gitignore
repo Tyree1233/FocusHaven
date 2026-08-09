@@ -3,6 +3,7 @@
 *.iml
 *.class
 *.lock
+!pubspec.lock
 *.log
 *.pyc
 *.swp
@@ -58,6 +59,21 @@ unlinked_spec.ds
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+*.keystore
+
+# Environment, signing, and server credentials
+.env
+.env.*
+!.env.example
+*.p12
+*.p8
+*.pem
+*.key
+*.mobileprovision
+**/firebase-adminsdk-*.json
+**/service-account*.json
+**/*-service-account*.json
+**/client_secret_*.json
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

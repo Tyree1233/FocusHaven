@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -65,6 +66,16 @@ typedef JournalState = ({
   JournalEntry? todayEntry,
 });
 
+/// Immutable authentication data rendered by account-related views.
+typedef AuthState = ({
+  bool isSignedIn,
+  String displayName,
+  String? signInError,
+});
+
+/// Immutable reminder settings rendered by the reminder sheet.
+typedef ReminderState = ({bool isEnabled, TimeOfDay time, Set<int> weekdays});
+
 /// Central ownership and dependency wiring for FocusHaven's application state.
 ///
 /// Existing [ChangeNotifier] services use Riverpod's compatibility providers
@@ -87,6 +98,17 @@ final reminderServiceProvider = ChangeNotifierProvider<ReminderService>(
   ),
   name: 'reminderServiceProvider',
 );
+
+/// Narrow reminder snapshot that prevents views from depending on the complete
+/// mutable service and protects the selected weekdays from accidental changes.
+final reminderStateProvider = Provider<ReminderState>((ref) {
+  final reminder = ref.watch(reminderServiceProvider);
+  return (
+    isEnabled: reminder.isEnabled,
+    time: reminder.time,
+    weekdays: Set<int>.unmodifiable(reminder.weekdays),
+  );
+}, name: 'reminderStateProvider');
 
 final authServiceProvider = ChangeNotifierProvider<AuthService>(
   (ref) => AuthService(),
@@ -123,6 +145,15 @@ final iapServiceProvider = Provider<IAPService>((ref) {
   ref.onDispose(service.dispose);
   return service;
 }, name: 'iapServiceProvider');
+
+/// Loads the persisted Pro entitlement, then follows purchase and restore
+/// updates without coupling views to the store service implementation.
+final proEntitlementProvider = StreamProvider<bool>((ref) async* {
+  final service = ref.watch(iapServiceProvider);
+
+  yield await service.refreshEntitlement();
+  yield* service.entitlementChanges;
+}, name: 'proEntitlementProvider');
 
 /// Narrow read model for the one-second timer updates.
 final timerCountdownStateProvider = Provider<TimerCountdownState>((ref) {
@@ -203,10 +234,27 @@ final journalStateProvider = Provider<JournalState>((ref) {
   );
 }, name: 'journalStateProvider');
 
-/// Exposes authentication status without rebuilding for unrelated user data.
+/// Immutable authentication snapshot shared by account-related views.
+final authStateProvider = Provider<AuthState>((ref) {
+  final auth = ref.watch(authServiceProvider);
+  return (
+    isSignedIn: auth.isSignedIn,
+    displayName: auth.displayName,
+    signInError: auth.signInError,
+  );
+}, name: 'authStateProvider');
+
+/// Exposes authentication status independently from account presentation data.
 final authIsSignedInProvider = Provider<bool>(
-  (ref) => ref.watch(authServiceProvider).isSignedIn,
+  (ref) => ref.watch(authStateProvider.select((auth) => auth.isSignedIn)),
   name: 'authIsSignedInProvider',
+);
+
+/// Exposes the selected appearance palette without coupling views to the
+/// complete theme service.
+final selectedThemeProvider = Provider<FocusHavenTheme>(
+  (ref) => ref.watch(themeServiceProvider).selectedTheme,
+  name: 'selectedThemeProvider',
 );
 
 /// Exposes the saved focus profile without rebuilding for unrelated service

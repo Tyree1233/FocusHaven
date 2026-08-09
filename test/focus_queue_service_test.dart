@@ -48,6 +48,26 @@ void main() {
     expect(queue.items.single.title, hasLength(100));
   });
 
+  test('renames a task with a cleaned title', () async {
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+    await queue.add('Read notes');
+
+    await queue.rename(queue.items.single.id, '  Review   project notes ');
+
+    expect(queue.items.single.title, 'Review project notes');
+  });
+
+  test('does not replace a task title with an empty value', () async {
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+    await queue.add('Read notes');
+
+    await queue.rename(queue.items.single.id, '   ');
+
+    expect(queue.items.single.title, 'Read notes');
+  });
+
   test('completing a task moves it to completed items', () async {
     final queue = await createQueue();
     addTearDown(queue.dispose);

@@ -1,26 +1,33 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/focus_milestone.dart';
 import '../models/focus_session.dart';
 import '../providers/app_providers.dart';
-import '../services/auth_service.dart';
-import '../services/cloud_sync_service.dart';
-import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
-import '../services/iap_service.dart';
 import '../services/journal_service.dart';
-import '../services/notification_service.dart';
-import '../services/reminder_service.dart';
-import '../services/theme_service.dart';
 import '../services/timer_service.dart';
+import '../widgets/account_sheet.dart';
+import '../widgets/completed_tasks_sheet.dart';
+import '../widgets/confirmation_dialog.dart';
+import '../widgets/focus_queue_sheet.dart';
+import '../widgets/focus_history_sheet.dart';
+import '../widgets/custom_duration_sheet.dart';
+import '../widgets/reminder_sheet.dart';
+import '../widgets/appearance_sheet.dart';
+import '../widgets/distraction_parking_sheet.dart';
+import '../widgets/focus_milestones_sheet.dart';
+import '../widgets/focus_profile_sheet.dart';
 import '../widgets/guided_breathing_sheet.dart';
-
-enum _HistoryFilter { all, today, week }
+import '../widgets/journal_entry_dialog.dart';
+import '../widgets/pro_sheet.dart';
+import '../widgets/reflection_journal_sheet.dart';
+import '../widgets/stat_card.dart';
+import '../widgets/text_entry_dialog.dart';
+import '../widgets/timer_countdown.dart';
 
 class TimerScreen extends riverpod.ConsumerWidget {
   const TimerScreen({super.key});
@@ -116,21 +123,6 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
-    const maximumMinutes = 180;
-    final sessionColor = _sessionColor(context, timer.sessionType);
-    final initialMinutes = (timer.totalSessionSeconds ~/ 60)
-        .clamp(0, maximumMinutes)
-        .toInt();
-    final initialSeconds = timer.totalSessionSeconds % 60;
-    var selectedMinutes = initialMinutes;
-    var selectedSeconds = initialSeconds;
-    final pickerController = FixedExtentScrollController(
-      initialItem: initialMinutes,
-    );
-    final secondsPickerController = FixedExtentScrollController(
-      initialItem: initialSeconds,
-    );
-
     final duration = await showModalBottomSheet<Duration>(
       context: context,
       isScrollControlled: true,
@@ -138,141 +130,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 4,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  '${timer.sessionType.label} duration',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Tap a favorite or scroll minutes and seconds.',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 18),
-                Wrap(
-                  alignment: WrapAlignment.center,
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [5, 10, 15, 25, 45, 60]
-                      .map(
-                        (minutes) => ChoiceChip(
-                          label: Text('$minutes min'),
-                          selected: selectedMinutes == minutes,
-                          onSelected: (_) {
-                            setSheetState(() {
-                              selectedMinutes = minutes;
-                              selectedSeconds = 0;
-                            });
-                            pickerController.animateToItem(
-                              minutes,
-                              duration: const Duration(milliseconds: 220),
-                              curve: Curves.easeOut,
-                            );
-                            secondsPickerController.animateToItem(
-                              0,
-                              duration: const Duration(milliseconds: 220),
-                              curve: Curves.easeOut,
-                            );
-                          },
-                        ),
-                      )
-                      .toList(),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  height: 150,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: CupertinoPicker.builder(
-                          scrollController: pickerController,
-                          itemExtent: 42,
-                          selectionOverlay:
-                              CupertinoPickerDefaultSelectionOverlay(
-                                background: sessionColor.withValues(
-                                  alpha: 0.15,
-                                ),
-                              ),
-                          onSelectedItemChanged: (index) =>
-                              setSheetState(() => selectedMinutes = index),
-                          childCount: maximumMinutes + 1,
-                          itemBuilder: (context, index) => Center(
-                            child: Text(
-                              '$index min',
-                              style: const TextStyle(fontSize: 22),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: CupertinoPicker.builder(
-                          scrollController: secondsPickerController,
-                          itemExtent: 42,
-                          selectionOverlay:
-                              CupertinoPickerDefaultSelectionOverlay(
-                                background: sessionColor.withValues(
-                                  alpha: 0.15,
-                                ),
-                              ),
-                          onSelectedItemChanged: (index) =>
-                              setSheetState(() => selectedSeconds = index),
-                          childCount: 60,
-                          itemBuilder: (context, index) => Center(
-                            child: Text(
-                              '${index.toString().padLeft(2, '0')} sec',
-                              style: const TextStyle(fontSize: 22),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 18),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () => Navigator.pop(
-                      sheetContext,
-                      Duration(
-                        minutes: selectedMinutes,
-                        seconds: selectedSeconds,
-                      ),
-                    ),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: sessionColor,
-                      foregroundColor: _ink,
-                      minimumSize: const Size.fromHeight(54),
-                    ),
-                    child: Text(
-                      'Set ${selectedMinutes.toString().padLeft(2, '0')}:${selectedSeconds.toString().padLeft(2, '0')}',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      builder: (_) => CustomDurationSheet(
+        sessionLabel: timer.sessionType.label,
+        sessionColor: _sessionColor(context, timer.sessionType),
+        initialDuration: Duration(seconds: timer.totalSessionSeconds),
+        foregroundColor: _ink,
       ),
     );
-    pickerController.dispose();
-    secondsPickerController.dispose();
     if (duration != null && duration.inSeconds > 0) {
       timer.setCustomDuration(duration.inMinutes, duration.inSeconds % 60);
     }
@@ -294,29 +158,22 @@ class TimerScreen extends riverpod.ConsumerWidget {
     }
   }
 
-  Future<void> _confirmDeleteCloudBackup(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete cloud backup?'),
-        content: const Text(
+  Future<void> _confirmDeleteCloudBackup(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Delete cloud backup?',
+      message:
           'This permanently deletes the FocusHaven backup stored in your account. Your data on this device will stay here.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Keep backup'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Delete backup'),
-          ),
-        ],
-      ),
+      cancelLabel: 'Keep backup',
+      confirmLabel: 'Delete backup',
+      isDestructive: true,
     );
-    if (confirmed != true || !context.mounted) return;
+    if (!confirmed || !context.mounted) return;
 
-    final deleted = await context.read<CloudSyncService>().deleteFocusData();
+    final deleted = await ref.read(cloudSyncServiceProvider).deleteFocusData();
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -329,32 +186,25 @@ class TimerScreen extends riverpod.ConsumerWidget {
     );
   }
 
-  Future<void> _confirmDeleteLocalData(BuildContext context) async {
-    final timer = context.read<TimerService>();
-    final journal = context.read<JournalService>();
-    final focusQueue = context.read<FocusQueueService>();
-    final profile = context.read<FocusProfileService>();
-    final themes = context.read<ThemeService>();
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete local data?'),
-        content: const Text(
+  Future<void> _confirmDeleteLocalData(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    final timer = ref.read(timerServiceProvider);
+    final journal = ref.read(journalServiceProvider);
+    final focusQueue = ref.read(focusQueueServiceProvider);
+    final profile = ref.read(focusProfileServiceProvider);
+    final themes = ref.read(themeServiceProvider);
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Delete local data?',
+      message:
           'This permanently removes your timer history, journal entries, tasks, parked thoughts, goals, profile, and appearance choices from this device. Your cloud backup will not be deleted.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Keep my data'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Delete local data'),
-          ),
-        ],
-      ),
+      cancelLabel: 'Keep my data',
+      confirmLabel: 'Delete local data',
+      isDestructive: true,
     );
-    if (confirmed != true || !context.mounted) return;
+    if (!confirmed || !context.mounted) return;
 
     final preferences = await SharedPreferences.getInstance();
     await Future.wait([
@@ -370,317 +220,33 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _showReminderSheet(BuildContext context) async {
-    final selectedWeekdays = context.read<ReminderService>().weekdays.toSet();
-    const weekdayLabels = <int, String>{
-      DateTime.monday: 'Mon',
-      DateTime.tuesday: 'Tue',
-      DateTime.wednesday: 'Wed',
-      DateTime.thursday: 'Thu',
-      DateTime.friday: 'Fri',
-      DateTime.saturday: 'Sat',
-      DateTime.sunday: 'Sun',
-    };
-
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Consumer<ReminderService>(
-                builder: (context, reminders, _) {
-                  final scheduledDays = weekdayLabels.entries
-                      .where((entry) => reminders.weekdays.contains(entry.key))
-                      .map((entry) => entry.value)
-                      .join(', ');
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        'Scheduled focus time',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Choose the days and time for a gentle invitation to focus. You can change or turn it off at any time.',
-                        style: TextStyle(color: Colors.white70, height: 1.35),
-                      ),
-                      const SizedBox(height: 20),
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        leading: Icon(
-                          reminders.isEnabled
-                              ? Icons.event_available_outlined
-                              : Icons.event_busy_outlined,
-                        ),
-                        title: Text(
-                          reminders.isEnabled
-                              ? 'Focus time is scheduled'
-                              : 'No focus time scheduled',
-                        ),
-                        subtitle: Text(
-                          '${MaterialLocalizations.of(context).formatTimeOfDay(reminders.time)}${reminders.isEnabled ? ' • $scheduledDays' : ''}',
-                        ),
-                        trailing: Switch(
-                          value: reminders.isEnabled,
-                          onChanged: (enabled) async {
-                            if (enabled) {
-                              final selected = await showTimePicker(
-                                context: sheetContext,
-                                initialTime: reminders.time,
-                              );
-                              if (selected == null || !sheetContext.mounted) {
-                                return;
-                              }
-                              final scheduled = await reminders
-                                  .setDailyReminder(
-                                    selected,
-                                    weekdays: selectedWeekdays,
-                                  );
-                              if (!sheetContext.mounted || scheduled) return;
-                              ScaffoldMessenger.of(sheetContext).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Allow notifications to schedule a focus time.',
-                                  ),
-                                ),
-                              );
-                            } else {
-                              await reminders.disableDailyReminder();
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Repeat on',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: weekdayLabels.entries
-                            .map(
-                              (entry) => FilterChip(
-                                label: Text(entry.value),
-                                selected: selectedWeekdays.contains(entry.key),
-                                onSelected: (selected) {
-                                  if (!selected &&
-                                      selectedWeekdays.length == 1) {
-                                    return;
-                                  }
-                                  setSheetState(() {
-                                    if (selected) {
-                                      selectedWeekdays.add(entry.key);
-                                    } else {
-                                      selectedWeekdays.remove(entry.key);
-                                    }
-                                  });
-                                },
-                              ),
-                            )
-                            .toList(),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Choose at least one day. Changes are saved when you choose a focus time.',
-                        style: TextStyle(color: Colors.white60),
-                      ),
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: () async {
-                          final selected = await showTimePicker(
-                            context: sheetContext,
-                            initialTime: reminders.time,
-                          );
-                          if (selected == null || !sheetContext.mounted) return;
-                          final scheduled = await reminders.setDailyReminder(
-                            selected,
-                            weekdays: selectedWeekdays,
-                          );
-                          if (!sheetContext.mounted) return;
-                          ScaffoldMessenger.of(sheetContext).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                scheduled
-                                    ? 'Focus time scheduled for ${MaterialLocalizations.of(sheetContext).formatTimeOfDay(selected)}.'
-                                    : 'Allow notifications to schedule a focus time.',
-                              ),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.schedule_outlined),
-                        label: Text(
-                          reminders.isEnabled
-                              ? 'Update focus time'
-                              : 'Choose focus time',
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: () async {
-                          final notifications = context
-                              .read<NotificationService>();
-                          final permitted = await notifications
-                              .requestPermissions();
-                          if (!context.mounted) return;
-                          if (!permitted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Allow notifications to send a test alert.',
-                                ),
-                              ),
-                            );
-                            return;
-                          }
-                          await notifications.showTestNotification();
-                        },
-                        icon: const Icon(Icons.notifications_outlined),
-                        label: const Text('Send a test notification'),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
-        ),
-      ),
+      builder: (_) => const ReminderSheet(),
     );
   }
 
-  Future<void> _showAccountSheet(BuildContext context) async {
+  Future<void> _showAccountSheet(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Consumer<AuthService>(
-              builder: (context, auth, _) => Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Your FocusHaven account',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    auth.isSignedIn
-                        ? 'Signed in as ${auth.displayName}'
-                        : 'Sign in to protect your focus history and use cloud backup.',
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                  const SizedBox(height: 16),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(
-                            auth.isSignedIn
-                                ? Icons.cloud_done_outlined
-                                : Icons.phone_android_outlined,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              auth.isSignedIn
-                                  ? 'Your focus data stays on this device. FocusHaven Pro can also back it up privately to your account.'
-                                  : 'Your focus data stays private on this device. Sign in only when you want optional cloud backup.',
-                              style: const TextStyle(
-                                color: Colors.white70,
-                                height: 1.35,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  if (auth.isSignedIn)
-                    OutlinedButton.icon(
-                      onPressed: auth.signOut,
-                      icon: const Icon(Icons.logout),
-                      label: const Text('Sign out'),
-                    )
-                  else
-                    FilledButton.icon(
-                      onPressed: () async {
-                        final result = await auth.signInWithGoogle();
-                        if (!sheetContext.mounted) return;
-                        if (result != null) {
-                          Navigator.pop(sheetContext);
-                        } else {
-                          final message =
-                              auth.signInError ??
-                              'Sign-in was not completed. Please try again.';
-                          ScaffoldMessenger.of(
-                            sheetContext,
-                          ).showSnackBar(SnackBar(content: Text(message)));
-                        }
-                      },
-                      icon: const Icon(Icons.login),
-                      label: const Text('Sign in with Google'),
-                    ),
-                  if (auth.isSignedIn)
-                    TextButton.icon(
-                      onPressed: () => _confirmDeleteCloudBackup(context),
-                      icon: const Icon(Icons.delete_outline),
-                      label: const Text('Delete cloud backup'),
-                    ),
-                  TextButton.icon(
-                    onPressed: () => _confirmDeleteLocalData(context),
-                    icon: const Icon(Icons.delete_forever_outlined),
-                    label: const Text('Delete local data'),
-                  ),
-                  const SizedBox(height: 8),
-                  TextButton.icon(
-                    onPressed: () => _showProSheet(context),
-                    icon: const Icon(Icons.workspace_premium_outlined),
-                    label: const Text('FocusHaven Pro'),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _showFocusProfileSheet(context),
-                    icon: const Icon(Icons.psychology_outlined),
-                    label: const Text('Discover your focus profile'),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _showThemeSheet(context),
-                    icon: const Icon(Icons.palette_outlined),
-                    label: const Text('Appearance'),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => _openPrivacyPolicy(context),
-                    icon: const Icon(Icons.privacy_tip_outlined),
-                    label: const Text('Privacy Policy'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+      builder: (_) => AccountSheet(
+        deleteCloudBackup: () => _confirmDeleteCloudBackup(context, ref),
+        deleteLocalData: () => _confirmDeleteLocalData(context, ref),
+        openPro: () => _showProSheet(context),
+        openFocusProfile: () => _showFocusProfileSheet(context),
+        openAppearance: () => _showThemeSheet(context),
+        openPrivacyPolicy: () => _openPrivacyPolicy(context),
       ),
     );
   }
@@ -693,44 +259,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        child: Consumer<ThemeService>(
-          builder: (context, themes, _) => SizedBox(
-            height: MediaQuery.sizeOf(sheetContext).height * 0.7,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
-              child: RadioGroup<FocusHavenTheme>(
-                groupValue: themes.selectedTheme,
-                onChanged: (value) {
-                  if (value != null) themes.setTheme(value);
-                },
-                child: ListView(
-                  children: [
-                    Text(
-                      'Appearance',
-                      style: Theme.of(sheetContext).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Choose the atmosphere that feels best for your focus.',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    const SizedBox(height: 14),
-                    ...FocusHavenTheme.values.map(
-                      (theme) => RadioListTile<FocusHavenTheme>(
-                        contentPadding: EdgeInsets.zero,
-                        value: theme,
-                        title: Text(theme.label),
-                        secondary: CircleAvatar(backgroundColor: theme.primary),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+      builder: (_) => const AppearanceSheet(),
     );
   }
 
@@ -747,44 +276,6 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _showFocusProfileSheet(BuildContext context) async {
-    const questions = [
-      _FocusQuestion(
-        prompt: 'When does focused work feel most natural?',
-        choices: [
-          _FocusChoice('Early in the day', 'Clear Starter'),
-          _FocusChoice('Once I build momentum', 'Momentum Builder'),
-          _FocusChoice('Later in the evening', 'Night Owl'),
-        ],
-      ),
-      _FocusQuestion(
-        prompt: 'Which environment helps you settle in?',
-        choices: [
-          _FocusChoice('Quiet and uninterrupted', 'Deep Diver'),
-          _FocusChoice('Gentle music or ambient sound', 'Gentle Flow'),
-          _FocusChoice('A clear plan and small steps', 'Momentum Builder'),
-        ],
-      ),
-      _FocusQuestion(
-        prompt: 'When you feel stuck, what helps most?',
-        choices: [
-          _FocusChoice('Removing every distraction', 'Deep Diver'),
-          _FocusChoice('Taking a brief reset', 'Gentle Flow'),
-          _FocusChoice('Starting with one tiny action', 'Momentum Builder'),
-        ],
-      ),
-      _FocusQuestion(
-        prompt: 'What kind of session sounds best?',
-        choices: [
-          _FocusChoice('A long, uninterrupted block', 'Deep Diver'),
-          _FocusChoice('A calm, flexible rhythm', 'Gentle Flow'),
-          _FocusChoice('A quick, energizing sprint', 'Clear Starter'),
-        ],
-      ),
-    ];
-    var page = -1;
-    String? result;
-    final answers = List<_FocusChoice?>.filled(questions.length, null);
-
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -792,195 +283,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => riverpod.Consumer(
-        builder: (context, ref, _) {
-          final savedFocusType = ref.watch(focusProfileTypeProvider);
-          final profile = ref.read(focusProfileServiceProvider);
-
-          return StatefulBuilder(
-            builder: (context, setSheetState) {
-              final activeType = result ?? savedFocusType;
-              if (page == questions.length && result != null) {
-                return SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.auto_awesome,
-                          size: 44,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Your focus profile',
-                          style: TextStyle(fontSize: 16, color: Colors.white70),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          activeType!,
-                          style: Theme.of(context).textTheme.headlineSmall,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _focusProfileTip(activeType),
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                        const SizedBox(height: 24),
-                        FilledButton(
-                          onPressed: () => Navigator.pop(sheetContext),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            foregroundColor: _ink,
-                          ),
-                          child: const Text('Use this profile'),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              if (page == -1) {
-                return SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.psychology_outlined,
-                          size: 42,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        const SizedBox(height: 14),
-                        Text(
-                          'Find your focus profile',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          activeType == null
-                              ? 'Answer four quick questions for a practical focus style and tip.'
-                              : 'Your current profile is $activeType. Retake the quiz anytime as your habits change.',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                        const SizedBox(height: 24),
-                        FilledButton(
-                          onPressed: () => setSheetState(() => page = 0),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                            foregroundColor: _ink,
-                          ),
-                          child: Text(
-                            activeType == null ? 'Start quiz' : 'Retake quiz',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              final question = questions[page];
-              return SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 22, 24, 30),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        '${page + 1} of ${questions.length}',
-                        style: const TextStyle(color: Colors.white60),
-                      ),
-                      const SizedBox(height: 14),
-                      Text(
-                        question.prompt,
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 20),
-                      ...question.choices.map(
-                        (choice) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              answers[page] = choice;
-                              if (page == questions.length - 1) {
-                                final scores = <String, int>{};
-                                for (final answer
-                                    in answers.whereType<_FocusChoice>()) {
-                                  scores.update(
-                                    answer.focusType,
-                                    (count) => count + 1,
-                                    ifAbsent: () => 1,
-                                  );
-                                }
-                                final winner = scores.entries
-                                    .reduce(
-                                      (first, next) => first.value >= next.value
-                                          ? first
-                                          : next,
-                                    )
-                                    .key;
-                                await profile.saveFocusType(winner);
-                                if (sheetContext.mounted) {
-                                  setSheetState(() {
-                                    result = winner;
-                                    page = questions.length;
-                                  });
-                                }
-                              } else {
-                                setSheetState(() => page++);
-                              }
-                            },
-                            style: OutlinedButton.styleFrom(
-                              alignment: Alignment.centerLeft,
-                              padding: const EdgeInsets.all(16),
-                            ),
-                            child: Text(choice.label),
-                          ),
-                        ),
-                      ),
-                      if (page > 0) ...[
-                        const SizedBox(height: 4),
-                        TextButton.icon(
-                          onPressed: () => setSheetState(() => page--),
-                          icon: const Icon(Icons.arrow_back),
-                          label: const Text('Back to previous question'),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        },
-      ),
+      builder: (_) => const FocusProfileSheet(),
     );
   }
-
-  String _focusProfileTip(String focusType) => switch (focusType) {
-    'Clear Starter' =>
-      'Protect your best early window with one clear intention and a short timer.',
-    'Momentum Builder' =>
-      'Start with a small five-minute step. Momentum is your best fuel.',
-    'Deep Diver' =>
-      'Create a quiet, distraction-free block and let yourself stay with one meaningful task.',
-    'Gentle Flow' =>
-      'Use calm transitions, a comfortable pace, and intentional breaks to stay steady.',
-    'Night Owl' =>
-      'Plan your most important work for your later high-energy window and protect your wind-down.',
-    _ => 'Choose a calm space and one clear next step.',
-  };
 
   Future<void> _showProSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
@@ -990,117 +295,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) {
-        final purchases = sheetContext.read<IAPService>();
-        return SafeArea(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.88,
-            ),
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(24, 18, 24, 28),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Icon(
-                    Icons.workspace_premium,
-                    size: 42,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'FocusHaven Pro',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(sheetContext).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Protect your focus progress with secure cloud backup and restore it on your other devices.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  const SizedBox(height: 18),
-                  const _ProBenefit(
-                    icon: Icons.cloud_done_outlined,
-                    label: 'Secure cloud backup',
-                  ),
-                  const _ProBenefit(
-                    icon: Icons.devices_outlined,
-                    label: 'Restore on another device',
-                  ),
-                  const _ProBenefit(
-                    icon: Icons.all_inclusive,
-                    label: 'One-time lifetime unlock',
-                  ),
-                  const SizedBox(height: 22),
-                  FutureBuilder<String?>(
-                    future: purchases.proPrice(),
-                    builder: (context, snapshot) {
-                      final price = snapshot.data;
-                      return FilledButton(
-                        onPressed: price == null
-                            ? null
-                            : () async {
-                                try {
-                                  await purchases.buyPro();
-                                  if (sheetContext.mounted) {
-                                    ScaffoldMessenger.of(
-                                      sheetContext,
-                                    ).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Complete your purchase in the store window',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                } on StateError catch (error) {
-                                  if (sheetContext.mounted) {
-                                    ScaffoldMessenger.of(
-                                      sheetContext,
-                                    ).showSnackBar(
-                                      SnackBar(content: Text(error.message)),
-                                    );
-                                  }
-                                }
-                              },
-                        style: FilledButton.styleFrom(
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.primary,
-                          foregroundColor: _ink,
-                          minimumSize: const Size.fromHeight(54),
-                        ),
-                        child: Text(
-                          price == null
-                              ? 'Pro is not available yet'
-                              : 'Unlock Pro for $price',
-                        ),
-                      );
-                    },
-                  ),
-                  TextButton(
-                    onPressed: () async {
-                      await purchases.restorePurchases();
-                      if (sheetContext.mounted) {
-                        ScaffoldMessenger.of(sheetContext).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Checking the store for previous purchases',
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('Restore purchases'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+      builder: (_) => const ProSheet(),
     );
   }
 
@@ -1108,30 +303,16 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
-    final shouldClear = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Clear focus history?'),
-        content: const Text(
+    final shouldClear = await ConfirmationDialog.show(
+      context,
+      title: 'Clear focus history?',
+      message:
           'This removes all saved focus sessions on this device and resets your completed count and streak.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Keep history'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: _ink,
-            ),
-            child: const Text('Clear history'),
-          ),
-        ],
-      ),
+      cancelLabel: 'Keep history',
+      confirmLabel: 'Clear history',
+      isDestructive: true,
     );
-    if (shouldClear == true) {
+    if (shouldClear) {
       timer.clearFocusHistory();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1144,39 +325,16 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _editFocusTask(BuildContext context, TimerService timer) async {
-    final controller = TextEditingController(text: timer.focusTask);
-    final task = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('What are you focusing on?'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 80,
-          textCapitalization: TextCapitalization.sentences,
-          textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            hintText: 'Example: Finish the project proposal',
-          ),
-          onSubmitted: (value) => Navigator.pop(dialogContext, value),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, ''),
-            child: const Text('Clear'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, controller.text),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: _ink,
-            ),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+    final task = await TextEntryDialog.show(
+      context,
+      title: 'What are you focusing on?',
+      confirmLabel: 'Save',
+      initialValue: timer.focusTask,
+      hintText: 'Example: Finish the project proposal',
+      cancelLabel: null,
+      clearLabel: 'Clear',
+      maxLength: 80,
     );
-    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
     if (task != null) {
       timer.setFocusTask(task);
     }
@@ -1185,9 +343,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
   Future<void> _showFocusQueueSheet(
     BuildContext context,
     TimerService timer,
+    riverpod.WidgetRef ref,
   ) async {
-    final textController = TextEditingController();
-    final scrollController = ScrollController();
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -1195,172 +352,16 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.72,
-          child: riverpod.Consumer(
-            builder: (context, ref, _) {
-              final queueState = ref.watch(focusQueueStateProvider);
-              final queue = ref.read(focusQueueServiceProvider);
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                child: Scrollbar(
-                  controller: scrollController,
-                  thumbVisibility: false,
-                  interactive: true,
-                  child: ListView(
-                    controller: scrollController,
-                    children: [
-                      Center(
-                        child: Container(
-                          height: 4,
-                          width: 42,
-                          decoration: BoxDecoration(
-                            color: Colors.white24,
-                            borderRadius: BorderRadius.circular(99),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        'Focus queue',
-                        style: Theme.of(sheetContext).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        'Choose a task to make it your current focus intention.',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                      if (queueState.completedToday > 0) ...[
-                        const SizedBox(height: 5),
-                        Text(
-                          '${queueState.completedToday} ${queueState.completedToday == 1 ? 'task' : 'tasks'} tended today — gentle progress.',
-                          style: TextStyle(
-                            color: Theme.of(sheetContext).colorScheme.primary,
-                          ),
-                        ),
-                      ],
-                      const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: textController,
-                              maxLength: 100,
-                              textInputAction: TextInputAction.done,
-                              onSubmitted: (_) async {
-                                await queue.add(textController.text);
-                                textController.clear();
-                              },
-                              decoration: const InputDecoration(
-                                hintText: 'Add a task',
-                                counterText: '',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton.filled(
-                            onPressed: () async {
-                              await queue.add(textController.text);
-                              textController.clear();
-                            },
-                            icon: const Icon(Icons.add),
-                            tooltip: 'Add task',
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      if (queueState.activeItems.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 34),
-                          child: Center(
-                            child: Text(
-                              'Your next task can live here.',
-                              style: TextStyle(color: Colors.white60),
-                            ),
-                          ),
-                        )
-                      else
-                        ...queueState.activeItems.map(
-                          (item) => ListTile(
-                            onTap: item.isComplete
-                                ? null
-                                : () {
-                                    timer.setFocusTask(item.title);
-                                    Navigator.pop(sheetContext);
-                                  },
-                            leading: Checkbox(
-                              value: item.isComplete,
-                              onChanged: (_) async {
-                                final wasComplete = item.isComplete;
-                                await queue.toggle(item.id);
-                                if (!wasComplete && context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'One thing handled. Take a breath.',
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            title: Text(
-                              item.title,
-                              style: item.isComplete
-                                  ? const TextStyle(
-                                      decoration: TextDecoration.lineThrough,
-                                      color: Colors.white54,
-                                    )
-                                  : null,
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  onPressed: () => _editFocusQueueTask(
-                                    sheetContext,
-                                    queue,
-                                    item,
-                                  ),
-                                  icon: const Icon(Icons.edit_outlined),
-                                  tooltip: 'Edit task',
-                                ),
-                                IconButton(
-                                  onPressed: () => queue.remove(item.id),
-                                  icon: const Icon(Icons.close),
-                                  tooltip: 'Remove task',
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      if (queueState.completedItems.isNotEmpty)
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton.icon(
-                            onPressed: () =>
-                                _showCompletedTasksSheet(sheetContext),
-                            icon: const Icon(Icons.history_outlined),
-                            label: Text(
-                              'Completed (${queueState.completedItems.length})',
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+      builder: (sheetContext) => FocusQueueSheet(
+        onTaskSelected: timer.setFocusTask,
+        onEditTask: (item) => _editFocusQueueTask(
+          sheetContext,
+          ref.read(focusQueueServiceProvider),
+          item,
         ),
+        onShowCompleted: () => _showCompletedTasksSheet(sheetContext),
       ),
     );
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => textController.dispose(),
-    );
-    scrollController.dispose();
   }
 
   Future<void> _editFocusQueueTask(
@@ -1368,46 +369,21 @@ class TimerScreen extends riverpod.ConsumerWidget {
     FocusQueueService queue,
     FocusQueueItem item,
   ) async {
-    final controller = TextEditingController(text: item.title);
-    final updated = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Edit task'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 100,
-          textInputAction: TextInputAction.done,
-          onSubmitted: (value) => Navigator.pop(dialogContext, value),
-          decoration: const InputDecoration(
-            hintText: 'What needs your attention?',
-            counterText: '',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, controller.text),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
+    final updated = await TextEntryDialog.show(
+      context,
+      title: 'Edit task',
+      confirmLabel: 'Save',
+      initialValue: item.title,
+      hintText: 'What needs your attention?',
+      maxLength: 100,
+      hideCounter: true,
     );
-    // The dialog route still owns the text field during its closing animation.
-    // Dispose after that animation so saving with Return is safe on desktop.
-    Future<void>.delayed(const Duration(milliseconds: 500), () {
-      controller.dispose();
-    });
     if (updated != null) {
       await queue.rename(item.id, updated);
     }
   }
 
   Future<void> _showCompletedTasksSheet(BuildContext context) async {
-    final scrollController = ScrollController();
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -1415,170 +391,25 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.62,
-          child: riverpod.Consumer(
-            builder: (context, ref, _) {
-              final queueState = ref.watch(focusQueueStateProvider);
-              final queue = ref.read(focusQueueServiceProvider);
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-                child: Column(
-                  children: [
-                    Container(
-                      height: 4,
-                      width: 42,
-                      decoration: BoxDecoration(
-                        color: Colors.white24,
-                        borderRadius: BorderRadius.circular(99),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Text(
-                      'Completed tasks',
-                      style: Theme.of(sheetContext).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 5),
-                    const Text(
-                      'A quiet record of what you handled.',
-                      style: TextStyle(color: Colors.white70),
-                    ),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: Scrollbar(
-                        controller: scrollController,
-                        thumbVisibility: false,
-                        interactive: true,
-                        child: ListView.separated(
-                          controller: scrollController,
-                          itemCount: queueState.completedItems.length,
-                          separatorBuilder: (context, index) =>
-                              const Divider(height: 1, color: Colors.white12),
-                          itemBuilder: (context, index) {
-                            final item = queueState.completedItems[index];
-                            return ListTile(
-                              leading: Icon(
-                                Icons.check_circle_outline,
-                                color: Theme.of(
-                                  sheetContext,
-                                ).colorScheme.primary,
-                              ),
-                              title: Text(item.title),
-                              subtitle: Text(
-                                item.completedAt == null
-                                    ? 'Completed'
-                                    : 'Completed ${_dateLabel(item.completedAt!)}',
-                              ),
-                              trailing: IconButton(
-                                tooltip: 'Return to queue',
-                                icon: const Icon(Icons.undo),
-                                onPressed: () => queue.toggle(item.id),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ),
+      builder: (_) => CompletedTasksSheet(dateLabel: _dateLabel),
     );
-    scrollController.dispose();
   }
 
   Future<void> _captureDistraction(
     BuildContext context,
     TimerService timer,
   ) async {
-    final controller = TextEditingController();
-    final thought = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Park this thought'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 140,
-          textCapitalization: TextCapitalization.sentences,
-          textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            hintText: 'Example: Reply to Jordan after this session',
-            helperText: 'Save it, then return to your focus.',
-          ),
-          onSubmitted: (value) => Navigator.pop(dialogContext, value),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, controller.text),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: _ink,
-            ),
-            child: const Text('Save thought'),
-          ),
-        ],
-      ),
+    final thought = await TextEntryDialog.show(
+      context,
+      title: 'Park this thought',
+      confirmLabel: 'Save thought',
+      hintText: 'Example: Reply to Jordan after this session',
+      helperText: 'Save it, then return to your focus.',
+      maxLength: 140,
     );
-    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
     if (thought != null) {
       timer.captureDistraction(thought);
     }
-  }
-
-  Future<String?> _editParkedThought(
-    BuildContext context, {
-    String? existingThought,
-  }) async {
-    final controller = TextEditingController(text: existingThought ?? '');
-    final thought = await showDialog<String>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(
-          existingThought == null
-              ? 'Add a parked thought'
-              : 'Edit parked thought',
-        ),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          maxLength: 140,
-          textCapitalization: TextCapitalization.sentences,
-          textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            hintText: 'Example: Reply to Jordan after this session',
-          ),
-          onSubmitted: (value) => Navigator.pop(dialogContext, value),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext, controller.text),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: _ink,
-            ),
-            child: Text(
-              existingThought == null ? 'Add thought' : 'Save changes',
-            ),
-          ),
-        ],
-      ),
-    );
-    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
-    return thought;
   }
 
   Future<void> _showDistractionSheet(
@@ -1592,116 +423,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (sheetContext, setSheetState) => SafeArea(
-          top: false,
-          child: SizedBox(
-            height: MediaQuery.sizeOf(sheetContext).height * 0.62,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              child: Column(
-                children: [
-                  Container(
-                    height: 4,
-                    width: 42,
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'Distraction parking lot',
-                    style: Theme.of(sheetContext).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Your saved thoughts stay on this device until you clear them.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton.icon(
-                    onPressed: () async {
-                      final thought = await _editParkedThought(context);
-                      if (thought == null) return;
-                      timer.captureDistraction(thought);
-                      setSheetState(() {});
-                    },
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add a thought'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Theme.of(
-                        sheetContext,
-                      ).colorScheme.primary,
-                      foregroundColor: _ink,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: timer.distractions.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'Nothing parked yet. Keep your attention where you want it.',
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        : ListView.separated(
-                            itemCount: timer.distractions.length,
-                            separatorBuilder: (context, index) =>
-                                const Divider(height: 1, color: Colors.white12),
-                            itemBuilder: (context, index) => ListTile(
-                              leading: Icon(
-                                Icons.bookmark_outline,
-                                color: Theme.of(
-                                  sheetContext,
-                                ).colorScheme.primary,
-                              ),
-                              title: Text(timer.distractions[index]),
-                              trailing: Wrap(
-                                spacing: 0,
-                                children: [
-                                  IconButton(
-                                    tooltip: 'Edit thought',
-                                    icon: const Icon(Icons.edit_outlined),
-                                    onPressed: () async {
-                                      final updated = await _editParkedThought(
-                                        context,
-                                        existingThought:
-                                            timer.distractions[index],
-                                      );
-                                      if (updated == null) return;
-                                      timer.updateDistraction(index, updated);
-                                      setSheetState(() {});
-                                    },
-                                  ),
-                                  IconButton(
-                                    tooltip: 'Remove thought',
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () {
-                                      timer.removeDistractionAt(index);
-                                      setSheetState(() {});
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                  ),
-                  if (timer.distractions.isNotEmpty)
-                    TextButton.icon(
-                      onPressed: () {
-                        timer.clearDistractions();
-                        Navigator.pop(sheetContext);
-                      },
-                      icon: const Icon(Icons.delete_outline),
-                      label: const Text('Clear parking lot'),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
+      builder: (_) => DistractionParkingSheet(
+        readThoughts: () => timer.distractions,
+        addThought: timer.captureDistraction,
+        updateThought: timer.updateDistraction,
+        removeThought: timer.removeDistractionAt,
+        clearThoughts: timer.clearDistractions,
+        foregroundColor: _ink,
       ),
     );
   }
@@ -1710,50 +438,48 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
-    final scrollController = ScrollController();
     final milestones = [
-      _Milestone(
-        'First step',
-        'Complete your first focus session.',
-        timer.completedFocusSessions >= 1,
+      FocusMilestone(
+        title: 'First step',
+        detail: 'Complete your first focus session.',
+        unlocked: timer.completedFocusSessions >= 1,
       ),
-      _Milestone(
-        'Weekly rhythm',
-        'Complete 3 focus sessions in seven days.',
-        timer.weeklyFocusSessions >= 3,
+      FocusMilestone(
+        title: 'Weekly rhythm',
+        detail: 'Complete 3 focus sessions in seven days.',
+        unlocked: timer.weeklyFocusSessions >= 3,
       ),
-      _Milestone(
-        'Momentum',
-        'Complete 5 focus sessions in total.',
-        timer.completedFocusSessions >= 5,
+      FocusMilestone(
+        title: 'Momentum',
+        detail: 'Complete 5 focus sessions in total.',
+        unlocked: timer.completedFocusSessions >= 5,
       ),
-      _Milestone(
-        'Half-hour haven',
-        'Reach 30 total minutes of focus.',
-        timer.totalFocusSeconds >= 30 * 60,
+      FocusMilestone(
+        title: 'Half-hour haven',
+        detail: 'Reach 30 total minutes of focus.',
+        unlocked: timer.totalFocusSeconds >= 30 * 60,
       ),
-      _Milestone(
-        'Century club',
-        'Reach 100 total minutes of focus.',
-        timer.totalFocusSeconds >= 100 * 60,
+      FocusMilestone(
+        title: 'Century club',
+        detail: 'Reach 100 total minutes of focus.',
+        unlocked: timer.totalFocusSeconds >= 100 * 60,
       ),
-      _Milestone(
-        'Steady flame',
-        'Build a 3-day focus streak.',
-        timer.currentStreak >= 3,
+      FocusMilestone(
+        title: 'Steady flame',
+        detail: 'Build a 3-day focus streak.',
+        unlocked: timer.currentStreak >= 3,
       ),
-      _Milestone(
-        'Deep roots',
-        'Build a 7-day focus streak.',
-        timer.currentStreak >= 7,
+      FocusMilestone(
+        title: 'Deep roots',
+        detail: 'Build a 7-day focus streak.',
+        unlocked: timer.currentStreak >= 7,
       ),
-      _Milestone(
-        'Goal getter',
-        'Reach your daily focus goal.',
-        timer.hasReachedDailyGoal,
+      FocusMilestone(
+        title: 'Goal getter',
+        detail: 'Reach your daily focus goal.',
+        unlocked: timer.hasReachedDailyGoal,
       ),
     ];
-    final unlocked = milestones.where((milestone) => milestone.unlocked).length;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -1761,84 +487,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.6,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-            child: Column(
-              children: [
-                Container(
-                  height: 4,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white24,
-                    borderRadius: BorderRadius.circular(99),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Focus milestones',
-                  style: Theme.of(sheetContext).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  '$unlocked of ${milestones.length} unlocked',
-                  style: const TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: Scrollbar(
-                    controller: scrollController,
-                    thumbVisibility: false,
-                    interactive: true,
-                    child: ListView.separated(
-                      controller: scrollController,
-                      itemCount: milestones.length,
-                      separatorBuilder: (context, index) =>
-                          const Divider(height: 1, color: Colors.white12),
-                      itemBuilder: (context, index) {
-                        final milestone = milestones[index];
-                        return ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Theme.of(sheetContext)
-                                .colorScheme
-                                .primary
-                                .withValues(
-                                  alpha: milestone.unlocked ? 0.22 : 0.08,
-                                ),
-                            child: Icon(
-                              milestone.unlocked
-                                  ? Icons.emoji_events_outlined
-                                  : Icons.lock_outline,
-                              color: milestone.unlocked
-                                  ? Theme.of(sheetContext).colorScheme.primary
-                                  : Colors.white38,
-                            ),
-                          ),
-                          title: Text(milestone.title),
-                          subtitle: Text(milestone.detail),
-                          trailing: Icon(
-                            milestone.unlocked
-                                ? Icons.check_circle
-                                : Icons.radio_button_unchecked,
-                            color: milestone.unlocked
-                                ? Theme.of(sheetContext).colorScheme.primary
-                                : Colors.white38,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      builder: (sheetContext) => FocusMilestonesSheet(milestones: milestones),
     );
-    scrollController.dispose();
   }
 
   Future<void> _showFocusHistory(
@@ -1846,17 +496,6 @@ class TimerScreen extends riverpod.ConsumerWidget {
     TimerService timer,
     List<FocusSession> focusHistory,
   ) async {
-    final weeklySeconds = timer.lastSevenDaysFocusSeconds;
-    final weeklyMinutes = timer.weeklyFocusSeconds ~/ 60;
-    final weeklySessions = timer.weeklyFocusSessions;
-    final weeklyDuration = timer.weeklyFocusSeconds < 60
-        ? '${timer.weeklyFocusSeconds} ${timer.weeklyFocusSeconds == 1 ? 'second' : 'seconds'}'
-        : '$weeklyMinutes ${weeklyMinutes == 1 ? 'minute' : 'minutes'}';
-    final highestDaySeconds = weeklySeconds.fold(
-      1,
-      (highest, seconds) => seconds > highest ? seconds : highest,
-    );
-    var historyFilter = _HistoryFilter.all;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -1864,236 +503,15 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => StatefulBuilder(
-        builder: (context, setSheetState) => SafeArea(
-          top: false,
-          child: SizedBox(
-            height: MediaQuery.sizeOf(sheetContext).height * 0.72,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              child: Column(
-                children: [
-                  Container(
-                    height: 4,
-                    width: 42,
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'All focus sessions',
-                    style: Theme.of(sheetContext).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${timer.completedFocusSessions} completed sessions',
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      onPressed: () => _copyFocusHistory(sheetContext, timer),
-                      icon: const Icon(Icons.copy_outlined),
-                      label: const Text('Copy full summary'),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const SizedBox(height: 14),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        sheetContext,
-                      ).colorScheme.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'This week',
-                            style: Theme.of(sheetContext).textTheme.titleSmall,
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '$weeklyDuration • $weeklySessions ${weeklySessions == 1 ? 'session' : 'sessions'}',
-                            style: const TextStyle(color: Colors.white70),
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            height: 76,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: List.generate(7, (index) {
-                                final day = DateTime.now().subtract(
-                                  Duration(days: 6 - index),
-                                );
-                                final double height = weeklySeconds[index] == 0
-                                    ? 3.0
-                                    : 8.0 +
-                                          (42 *
-                                              weeklySeconds[index] /
-                                              highestDaySeconds);
-                                return Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 3,
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Container(
-                                          height: height,
-                                          decoration: BoxDecoration(
-                                            color: Theme.of(
-                                              sheetContext,
-                                            ).colorScheme.primary,
-                                            borderRadius: BorderRadius.circular(
-                                              99,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          const [
-                                            'M',
-                                            'T',
-                                            'W',
-                                            'T',
-                                            'F',
-                                            'S',
-                                            'S',
-                                          ][day.weekday - 1],
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            color: Colors.white60,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: Builder(
-                      builder: (context) {
-                        final now = DateTime.now();
-                        final sessions = focusHistory.where((session) {
-                          return switch (historyFilter) {
-                            _HistoryFilter.all => true,
-                            _HistoryFilter.today => DateUtils.isSameDay(
-                              session.completedAt,
-                              now,
-                            ),
-                            _HistoryFilter.week =>
-                              !session.completedAt.isBefore(
-                                now.subtract(const Duration(days: 6)),
-                              ),
-                          };
-                        }).toList();
-
-                        return Column(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: Wrap(
-                                spacing: 8,
-                                children: [
-                                  for (final option in _HistoryFilter.values)
-                                    ChoiceChip(
-                                      label: Text(switch (option) {
-                                        _HistoryFilter.all => 'All',
-                                        _HistoryFilter.today => 'Today',
-                                        _HistoryFilter.week => 'This week',
-                                      }),
-                                      selected: historyFilter == option,
-                                      onSelected: (_) => setSheetState(
-                                        () => historyFilter = option,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Expanded(
-                              child: sessions.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                        'No focus sessions in this time range yet.',
-                                        style: TextStyle(color: Colors.white60),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : ListView.separated(
-                                      itemCount: sessions.length,
-                                      separatorBuilder: (context, index) =>
-                                          const Divider(
-                                            height: 1,
-                                            color: Colors.white12,
-                                          ),
-                                      itemBuilder: (context, index) {
-                                        final session = sessions[index];
-                                        final time =
-                                            MaterialLocalizations.of(
-                                              context,
-                                            ).formatTimeOfDay(
-                                              TimeOfDay.fromDateTime(
-                                                session.completedAt,
-                                              ),
-                                            );
-                                        return ListTile(
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                vertical: 4,
-                                              ),
-                                          leading: CircleAvatar(
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .primary
-                                                .withValues(alpha: 0.2),
-                                            child: Icon(
-                                              Icons.auto_awesome,
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.primary,
-                                            ),
-                                          ),
-                                          title: Text(
-                                            session.focusTask ??
-                                                _focusSessionLabel(
-                                                  session.durationSeconds,
-                                                ),
-                                          ),
-                                          subtitle: Text(
-                                            '${_focusSessionLabel(session.durationSeconds)} • ${_dateLabel(session.completedAt)} at $time',
-                                            style: const TextStyle(
-                                              color: Colors.white60,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      builder: (sheetContext) => FocusHistorySheet(
+        completedSessions: timer.completedFocusSessions,
+        weeklyFocusSeconds: timer.weeklyFocusSeconds,
+        weeklyFocusSessions: timer.weeklyFocusSessions,
+        lastSevenDaysFocusSeconds: List<int>.unmodifiable(
+          timer.lastSevenDaysFocusSeconds,
         ),
+        sessions: List<FocusSession>.unmodifiable(focusHistory),
+        onCopySummary: () => _copyFocusHistory(sheetContext, timer),
       ),
     );
   }
@@ -2102,43 +520,17 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
-    final controller = TextEditingController(
-      text: timer.dailyGoalMinutes.toString(),
+    final value = await TextEntryDialog.show(
+      context,
+      title: 'Set daily focus goal',
+      confirmLabel: 'Save goal',
+      initialValue: timer.dailyGoalMinutes.toString(),
+      hintText: 'Minutes per day',
+      helperText: 'Choose between 5 and 480 minutes',
+      keyboardType: TextInputType.number,
+      textCapitalization: TextCapitalization.none,
     );
-    final minutes = await showDialog<int>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Set daily focus goal'),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(
-            labelText: 'Minutes per day',
-            helperText: 'Choose between 5 and 480 minutes',
-          ),
-          onSubmitted: (value) =>
-              Navigator.pop(dialogContext, int.tryParse(value)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () =>
-                Navigator.pop(dialogContext, int.tryParse(controller.text)),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              foregroundColor: _ink,
-            ),
-            child: const Text('Save goal'),
-          ),
-        ],
-      ),
-    );
-    Future<void>.delayed(const Duration(milliseconds: 500), controller.dispose);
+    final minutes = value == null ? null : int.tryParse(value);
     if (minutes != null) {
       timer.setDailyGoalMinutes(minutes);
     }
@@ -2150,79 +542,22 @@ class TimerScreen extends riverpod.ConsumerWidget {
     JournalService journal,
   ) async {
     const moods = ['Calm', 'Focused', 'Tired', 'Stressed', 'Grateful'];
-    var selectedMood = journalState.todayEntry?.mood ?? moods.first;
-    final controller = TextEditingController(
-      text: journalState.todayEntry?.reflection ?? '',
+    final draft = await JournalEntryDialog.show(
+      context,
+      initialMood: journalState.todayEntry?.mood ?? moods.first,
+      initialReflection: journalState.todayEntry?.reflection ?? '',
+      prompt: journalState.dailyPrompt,
+      moods: moods,
     );
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text("Today's reflection"),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('How are you feeling?'),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: moods
-                      .map(
-                        (mood) => ChoiceChip(
-                          label: Text(mood),
-                          selected: selectedMood == mood,
-                          onSelected: (_) =>
-                              setDialogState(() => selectedMood = mood),
-                        ),
-                      )
-                      .toList(),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: controller,
-                  autofocus: true,
-                  maxLines: 5,
-                  maxLength: 800,
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(
-                    hintText: journalState.dailyPrompt,
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                await journal.saveToday(
-                  mood: selectedMood,
-                  reflection: controller.text,
-                );
-                if (dialogContext.mounted) Navigator.pop(dialogContext);
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: _ink,
-              ),
-              child: const Text('Save reflection'),
-            ),
-          ],
-        ),
-      ),
-    );
-    WidgetsBinding.instance.addPostFrameCallback((_) => controller.dispose());
+    if (draft == null) return;
+
+    await journal.saveToday(mood: draft.mood, reflection: draft.reflection);
   }
 
-  Future<void> _showJournalSheet(BuildContext context) async {
-    final scrollController = ScrollController();
+  Future<void> _showJournalSheet(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -2230,172 +565,15 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (sheetContext) => SafeArea(
-        top: false,
-        child: SizedBox(
-          height: MediaQuery.sizeOf(sheetContext).height * 0.78,
-          child: riverpod.Consumer(
-            builder: (context, ref, _) {
-              final journalState = ref.watch(journalStateProvider);
-              final journal = ref.read(journalServiceProvider);
-
-              return Column(
-                children: [
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 4,
-                    width: 42,
-                    decoration: BoxDecoration(
-                      color: Colors.white24,
-                      borderRadius: BorderRadius.circular(99),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
-                      child: Scrollbar(
-                        controller: scrollController,
-                        thumbVisibility: false,
-                        interactive: true,
-                        child: ListView(
-                          controller: scrollController,
-                          children: [
-                            Text(
-                              'Reflection journal',
-                              style: Theme.of(
-                                sheetContext,
-                              ).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              'A private space saved only on this device.',
-                              style: TextStyle(color: Colors.white70),
-                            ),
-                            const SizedBox(height: 14),
-                            DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Text(
-                                  'Today’s prompt: ${journalState.dailyPrompt}',
-                                  style: const TextStyle(
-                                    color: Colors.white70,
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            if (journalState.recentMoodCounts.isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              Text(
-                                'Mood snapshot',
-                                style: Theme.of(
-                                  sheetContext,
-                                ).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                'Over the last 7 days, you most often felt ${journalState.mostCommonRecentMood?.toLowerCase()}.',
-                                style: const TextStyle(color: Colors.white70),
-                              ),
-                              const SizedBox(height: 8),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 6,
-                                children: journalState.recentMoodCounts.entries
-                                    .map(
-                                      (entry) => Chip(
-                                        label: Text(
-                                          '${entry.key} ${entry.value}',
-                                        ),
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withValues(alpha: 0.13),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            ],
-                            const SizedBox(height: 16),
-                            FilledButton.icon(
-                              onPressed: () => _editTodayJournal(
-                                sheetContext,
-                                journalState,
-                                journal,
-                              ),
-                              icon: const Icon(Icons.edit_note),
-                              label: Text(
-                                journalState.todayEntry == null
-                                    ? 'Write today’s reflection'
-                                    : 'Update today’s reflection',
-                              ),
-                              style: FilledButton.styleFrom(
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.primary,
-                                foregroundColor: _ink,
-                                minimumSize: const Size.fromHeight(52),
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Text(
-                              'Recent reflections',
-                              style: Theme.of(
-                                sheetContext,
-                              ).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 6),
-                            if (journalState.entries.isEmpty)
-                              const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 30),
-                                child: Center(
-                                  child: Text(
-                                    'Your first reflection will appear here.',
-                                    style: TextStyle(color: Colors.white60),
-                                  ),
-                                ),
-                              )
-                            else
-                              ...journalState.entries.map(
-                                (entry) => ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 5,
-                                  ),
-                                  leading: Icon(
-                                    Icons.favorite_outline,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
-                                  ),
-                                  title: Text(
-                                    '${entry.mood} • ${_dateLabel(entry.createdAt)}',
-                                  ),
-                                  subtitle: Text(
-                                    entry.reflection,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
+      builder: (sheetContext) => ReflectionJournalSheet(
+        dateLabel: _dateLabel,
+        onEditToday: (dialogContext) => _editTodayJournal(
+          dialogContext,
+          ref.read(journalStateProvider),
+          ref.read(journalServiceProvider),
         ),
       ),
     );
-    scrollController.dispose();
   }
 
   @override
@@ -2423,7 +601,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.menu_book_outlined),
             tooltip: 'Reflection journal',
-            onPressed: () => _showJournalSheet(context),
+            onPressed: () => _showJournalSheet(context, ref),
           ),
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
@@ -2433,7 +611,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.account_circle_outlined),
             tooltip: isSignedIn ? 'Account' : 'Sign in',
-            onPressed: () => _showAccountSheet(context),
+            onPressed: () => _showAccountSheet(context, ref),
           ),
         ],
       ),
@@ -2498,7 +676,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           ),
                         ),
                         TextButton.icon(
-                          onPressed: () => _showFocusQueueSheet(context, timer),
+                          onPressed: () =>
+                              _showFocusQueueSheet(context, timer, ref),
                           icon: const Icon(
                             Icons.format_list_bulleted_outlined,
                             size: 18,
@@ -2528,7 +707,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           ),
                       ],
                       const SizedBox(height: 30),
-                      _TimerCountdown(
+                      TimerCountdown(
                         sessionColor: sessionColor,
                         formatTime: _formattedTime,
                         durationLabel: _durationLabel,
@@ -2645,7 +824,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: _StatCard(
+                              child: StatCard(
                                 icon: Icons.today_outlined,
                                 value: '${summary.todayFocusMinutes}m',
                                 label: 'today',
@@ -2653,7 +832,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: _StatCard(
+                              child: StatCard(
                                 icon: Icons.local_fire_department_outlined,
                                 value: '${summary.currentStreak}',
                                 label: 'day streak',
@@ -2661,7 +840,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: _StatCard(
+                              child: StatCard(
                                 icon: Icons.check_circle_outline,
                                 value: '${summary.completedFocusSessions}',
                                 label: 'completed',
@@ -2886,14 +1065,16 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           children: [
                             TextButton.icon(
                               onPressed: () async {
-                                final isPro = await IAPService.isProUser();
+                                final isPro = await ref
+                                    .read(iapServiceProvider)
+                                    .refreshEntitlement();
                                 if (!context.mounted) return;
                                 final message = !isSignedIn
                                     ? 'Sign in with Google to back up your focus data'
                                     : !isPro
                                     ? 'Upgrade to Pro to use cloud backup'
-                                    : await context
-                                          .read<CloudSyncService>()
+                                    : await ref
+                                          .read(cloudSyncServiceProvider)
                                           .syncFocusData(timer.cloudBackup)
                                     ? 'Focus data backed up securely'
                                     : 'Backup failed. Check your Firebase setup.';
@@ -2908,7 +1089,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             ),
                             TextButton.icon(
                               onPressed: () async {
-                                final isPro = await IAPService.isProUser();
+                                final isPro = await ref
+                                    .read(iapServiceProvider)
+                                    .refreshEntitlement();
                                 if (!context.mounted) return;
                                 String message;
                                 if (!isSignedIn) {
@@ -2918,8 +1101,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                   message =
                                       'Upgrade to Pro to restore cloud backup';
                                 } else {
-                                  final backup = await context
-                                      .read<CloudSyncService>()
+                                  final backup = await ref
+                                      .read(cloudSyncServiceProvider)
                                       .fetchFocusData();
                                   if (!context.mounted) return;
                                   message = backup == null
@@ -2950,146 +1133,4 @@ class TimerScreen extends riverpod.ConsumerWidget {
       ),
     );
   }
-}
-
-/// The only timer-screen subtree that rebuilds for each one-second tick.
-class _TimerCountdown extends riverpod.ConsumerWidget {
-  const _TimerCountdown({
-    required this.sessionColor,
-    required this.formatTime,
-    required this.durationLabel,
-  });
-
-  final Color sessionColor;
-  final String Function(int seconds) formatTime;
-  final String Function(int seconds) durationLabel;
-
-  @override
-  Widget build(BuildContext context, riverpod.WidgetRef ref) {
-    final countdown = ref.watch(timerCountdownStateProvider);
-
-    return SizedBox(
-      width: 270,
-      height: 270,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SizedBox(
-            width: 270,
-            height: 270,
-            child: CircularProgressIndicator(
-              value: countdown.progress.clamp(0, 1),
-              strokeWidth: 11,
-              strokeCap: StrokeCap.round,
-              backgroundColor: Colors.white.withValues(alpha: 0.10),
-              color: sessionColor,
-            ),
-          ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                formatTime(countdown.secondsRemaining),
-                style: const TextStyle(
-                  fontSize: 60,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                durationLabel(countdown.totalSessionSeconds),
-                style: const TextStyle(
-                  color: Colors.white60,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Milestone {
-  const _Milestone(this.title, this.detail, this.unlocked);
-
-  final String title;
-  final String detail;
-  final bool unlocked;
-}
-
-class _StatCard extends StatelessWidget {
-  const _StatCard({
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  final IconData icon;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 6),
-        child: Column(
-          children: [
-            Icon(icon, size: 18, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-            ),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white60, fontSize: 11),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ProBenefit extends StatelessWidget {
-  const _ProBenefit({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 7),
-      child: Row(
-        children: [
-          Icon(icon, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(width: 10),
-          Text(label),
-        ],
-      ),
-    );
-  }
-}
-
-class _FocusQuestion {
-  const _FocusQuestion({required this.prompt, required this.choices});
-
-  final String prompt;
-  final List<_FocusChoice> choices;
-}
-
-class _FocusChoice {
-  const _FocusChoice(this.label, this.focusType);
-
-  final String label;
-  final String focusType;
 }

@@ -50,13 +50,50 @@ void main() {
     expect(journal.todayEntry!.reflection, 'Updated reflection');
   });
 
+  test(
+    'saving today preserves a previous-day reflection during startup',
+    () async {
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      SharedPreferences.setMockInitialValues({
+        'journalEntries': jsonEncode([
+          {
+            'createdAt': yesterday.toIso8601String(),
+            'mood': 'Grateful',
+            'reflection': 'Yesterday remains part of my journal.',
+          },
+        ]),
+      });
+
+      final journal = JournalService();
+      addTearDown(journal.dispose);
+
+      // Save immediately to cover the startup-loading race that previously
+      // allowed an older journal history to be overwritten.
+      await journal.saveToday(
+        mood: 'Focused',
+        reflection: 'Today is a new entry.',
+      );
+
+      expect(journal.entries, hasLength(2));
+      expect(
+        journal.entries.map((entry) => entry.reflection),
+        containsAll([
+          'Yesterday remains part of my journal.',
+          'Today is a new entry.',
+        ]),
+      );
+
+      final preferences = await SharedPreferences.getInstance();
+      final saved =
+          jsonDecode(preferences.getString('journalEntries')!) as List;
+      expect(saved, hasLength(2));
+    },
+  );
+
   test('clearing local data removes saved journal entries', () async {
     final journal = await createJournal();
     addTearDown(journal.dispose);
-    await journal.saveToday(
-      mood: 'Calm',
-      reflection: 'A private thought',
-    );
+    await journal.saveToday(mood: 'Calm', reflection: 'A private thought');
 
     await journal.clearLocalData();
 
@@ -80,7 +117,10 @@ void main() {
     final journal = await createJournal();
     addTearDown(journal.dispose);
 
-    expect(journal.entries.single.reflection, 'I made room for a quiet moment.');
+    expect(
+      journal.entries.single.reflection,
+      'I made room for a quiet moment.',
+    );
     expect(journal.mostCommonRecentMood, 'Calm');
   });
 }

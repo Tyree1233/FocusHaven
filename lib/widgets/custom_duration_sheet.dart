@@ -1,0 +1,187 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class CustomDurationSheet extends StatefulWidget {
+  const CustomDurationSheet({
+    required this.sessionLabel,
+    required this.sessionColor,
+    required this.initialDuration,
+    this.maximumMinutes = 180,
+    this.foregroundColor = const Color(0xFF211442),
+    super.key,
+  });
+
+  final String sessionLabel;
+  final Color sessionColor;
+  final Duration initialDuration;
+  final int maximumMinutes;
+  final Color foregroundColor;
+
+  @override
+  State<CustomDurationSheet> createState() => _CustomDurationSheetState();
+}
+
+class _CustomDurationSheetState extends State<CustomDurationSheet> {
+  static const _favoriteMinutes = <int>[5, 10, 15, 25, 45, 60];
+
+  late final FixedExtentScrollController _minutesController;
+  late final FixedExtentScrollController _secondsController;
+  late int _selectedMinutes;
+  late int _selectedSeconds;
+
+  @override
+  void initState() {
+    super.initState();
+    final totalSeconds = widget.initialDuration.inSeconds.clamp(
+      0,
+      widget.maximumMinutes * 60 + 59,
+    );
+    _selectedMinutes = totalSeconds ~/ 60;
+    _selectedSeconds = totalSeconds % 60;
+    _minutesController = FixedExtentScrollController(
+      initialItem: _selectedMinutes,
+    );
+    _secondsController = FixedExtentScrollController(
+      initialItem: _selectedSeconds,
+    );
+  }
+
+  @override
+  void dispose() {
+    _minutesController.dispose();
+    _secondsController.dispose();
+    super.dispose();
+  }
+
+  void _selectFavorite(int minutes) {
+    setState(() {
+      _selectedMinutes = minutes;
+      _selectedSeconds = 0;
+    });
+    _minutesController.animateToItem(
+      minutes,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+    _secondsController.animateToItem(
+      0,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _submit() {
+    Navigator.pop(
+      context,
+      Duration(minutes: _selectedMinutes, seconds: _selectedSeconds),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 4,
+              width: 42,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(99),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              '${widget.sessionLabel} duration',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tap a favorite or scroll minutes and seconds.',
+              style: TextStyle(color: Colors.white70),
+            ),
+            const SizedBox(height: 18),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: _favoriteMinutes
+                  .where((minutes) => minutes <= widget.maximumMinutes)
+                  .map(
+                    (minutes) => ChoiceChip(
+                      label: Text('$minutes min'),
+                      selected: _selectedMinutes == minutes,
+                      onSelected: (_) => _selectFavorite(minutes),
+                    ),
+                  )
+                  .toList(growable: false),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              height: 150,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CupertinoPicker.builder(
+                      scrollController: _minutesController,
+                      itemExtent: 42,
+                      selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                        background: widget.sessionColor.withValues(alpha: 0.15),
+                      ),
+                      onSelectedItemChanged: (index) =>
+                          setState(() => _selectedMinutes = index),
+                      childCount: widget.maximumMinutes + 1,
+                      itemBuilder: (context, index) => Center(
+                        child: Text(
+                          '$index min',
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: CupertinoPicker.builder(
+                      scrollController: _secondsController,
+                      itemExtent: 42,
+                      selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
+                        background: widget.sessionColor.withValues(alpha: 0.15),
+                      ),
+                      onSelectedItemChanged: (index) =>
+                          setState(() => _selectedSeconds = index),
+                      childCount: 60,
+                      itemBuilder: (context, index) => Center(
+                        child: Text(
+                          '${index.toString().padLeft(2, '0')} sec',
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _submit,
+                style: FilledButton.styleFrom(
+                  backgroundColor: widget.sessionColor,
+                  foregroundColor: widget.foregroundColor,
+                  minimumSize: const Size.fromHeight(54),
+                ),
+                child: Text(
+                  'Set ${_selectedMinutes.toString().padLeft(2, '0')}:${_selectedSeconds.toString().padLeft(2, '0')}',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

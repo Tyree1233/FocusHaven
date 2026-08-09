@@ -335,7 +335,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     if (index < 0 || index >= _distractions.length) return;
     final cleaned = distraction.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (cleaned.isEmpty) return;
-    _distractions[index] = cleaned.length > 140
+    final storageIndex = _distractions.length - 1 - index;
+    _distractions[storageIndex] = cleaned.length > 140
         ? cleaned.substring(0, 140)
         : cleaned;
     notifyListeners();
@@ -344,7 +345,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void removeDistractionAt(int index) {
     if (index < 0 || index >= _distractions.length) return;
-    _distractions.removeAt(index);
+    final storageIndex = _distractions.length - 1 - index;
+    _distractions.removeAt(storageIndex);
     notifyListeners();
     _saveToPrefs();
   }

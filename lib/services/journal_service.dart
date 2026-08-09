@@ -18,6 +18,7 @@ class JournalService extends ChangeNotifier {
   ];
   List<JournalEntry> _entries = [];
   int _journalRevision = 0;
+  late final Future<void> _loadFuture;
 
   List<JournalEntry> get entries => List.unmodifiable(_entries.reversed);
 
@@ -57,7 +58,7 @@ class JournalService extends ChangeNotifier {
   }
 
   JournalService() {
-    _load();
+    _loadFuture = _load();
   }
 
   Future<void> saveToday({
@@ -66,6 +67,8 @@ class JournalService extends ChangeNotifier {
   }) async {
     final cleanReflection = reflection.trim();
     if (cleanReflection.isEmpty) return;
+
+    await _loadFuture;
 
     final now = DateTime.now();
     final entry = JournalEntry(
@@ -80,6 +83,7 @@ class JournalService extends ChangeNotifier {
   }
 
   Future<void> clearLocalData() async {
+    await _loadFuture;
     _entries = [];
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_storageKey);
@@ -122,9 +126,10 @@ class JournalService extends ChangeNotifier {
   }
 
   static bool _isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
+    final localDate = date.toLocal();
+    final localNow = DateTime.now().toLocal();
+    return localDate.year == localNow.year &&
+        localDate.month == localNow.month &&
+        localDate.day == localNow.day;
   }
 }
