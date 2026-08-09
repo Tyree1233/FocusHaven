@@ -52,7 +52,9 @@ class _ProSheetState extends ConsumerState<ProSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final isPro = ref.watch(proEntitlementProvider).value ?? false;
+    final entitlement = ref.watch(proEntitlementProvider);
+    final isPro = entitlement.value;
+    final entitlementFailed = entitlement.hasError;
 
     return SafeArea(
       child: ConstrainedBox(
@@ -126,15 +128,21 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                   builder: (context, snapshot) {
                     final price = snapshot.data;
                     return FilledButton(
-                      onPressed: isPro || price == null ? null : _buyPro,
+                      onPressed: isPro == false && price != null
+                          ? _buyPro
+                          : null,
                       style: FilledButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         foregroundColor: _ink,
                         minimumSize: const Size.fromHeight(54),
                       ),
                       child: Text(
-                        isPro
+                        isPro == true
                             ? 'FocusHaven Pro is active'
+                            : isPro == null
+                            ? entitlementFailed
+                                  ? 'Pro status is unavailable'
+                                  : 'Checking Pro status'
                             : price == null
                             ? 'Pro is not available yet'
                             : 'Unlock Pro for $price',
@@ -142,7 +150,7 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                     );
                   },
                 ),
-                if (!isPro)
+                if (isPro == false || entitlementFailed)
                   TextButton(
                     onPressed: _restorePurchases,
                     child: const Text('Restore purchases'),

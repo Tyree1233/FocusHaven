@@ -61,10 +61,14 @@ ProductDetails _product() => ProductDetails(
 );
 
 Widget _app(IAPService service, {required bool isPro}) {
+  return _appWithEntitlement(service, Stream.value(isPro));
+}
+
+Widget _appWithEntitlement(IAPService service, Stream<bool> entitlement) {
   return ProviderScope(
     overrides: [
       iapServiceProvider.overrideWithValue(service),
-      proEntitlementProvider.overrideWith((ref) => Stream.value(isPro)),
+      proEntitlementProvider.overrideWith((ref) => entitlement),
     ],
     child: MaterialApp(
       theme: ThemeData.dark(),
@@ -146,6 +150,41 @@ void main() {
       find.text('Complete your purchase in the store window'),
       findsOneWidget,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keeps purchase actions hidden while entitlement loads', (
+    tester,
+  ) async {
+    final platform = _FakeIapPlatform(product: _product());
+    InAppPurchasePlatform.instance = platform;
+    final service = IAPService(inAppPurchase: inAppPurchase);
+    final entitlement = StreamController<bool>();
+    addTearDown(() async {
+      service.dispose();
+      await entitlement.close();
+      await platform.dispose();
+    });
+
+    await tester.pumpWidget(_appWithEntitlement(service, entitlement.stream));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Checking Pro status'), findsOneWidget);
+    expect(find.text(r'Unlock Pro for $4.99'), findsNothing);
+    expect(find.text('Restore purchases'), findsNothing);
+    final loadingButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Checking Pro status'),
+    );
+    expect(loadingButton.onPressed, isNull);
+    expect(platform.buyCalls, 0);
+    expect(platform.restoreCalls, 0);
+
+    entitlement.add(true);
+    await tester.pumpAndSettle();
+
+    expect(find.text('FocusHaven Pro is active'), findsOneWidget);
+    expect(find.text('Checking Pro status'), findsNothing);
+    expect(find.text('Restore purchases'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
