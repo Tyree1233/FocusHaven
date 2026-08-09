@@ -158,7 +158,8 @@ final iapServiceProvider = Provider<IAPService>((ref) {
 final proEntitlementProvider = StreamProvider<bool>((ref) async* {
   final service = ref.watch(iapServiceProvider);
 
-  yield await service.refreshEntitlement();
+  await service.initialized;
+  yield service.lastKnownIsPro ?? await service.refreshEntitlement();
   yield* service.entitlementChanges;
 }, name: 'proEntitlementProvider');
 
