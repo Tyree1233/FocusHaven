@@ -60,18 +60,19 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
   }
 
   List<FocusSession> get _filteredSessions {
-    final now = DateTime.now();
+    final now = DateTime.now().toLocal();
+    final weekStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
     return widget.sessions
         .where((session) {
+          final completedAt = session.completedAt.toLocal();
           return switch (_filter) {
             _HistoryFilter.all => true,
-            _HistoryFilter.today => DateUtils.isSameDay(
-              session.completedAt,
-              now,
-            ),
-            _HistoryFilter.week => !session.completedAt.isBefore(
-              now.subtract(const Duration(days: 6)),
-            ),
+            _HistoryFilter.today => DateUtils.isSameDay(completedAt, now),
+            _HistoryFilter.week => !completedAt.isBefore(weekStart),
           };
         })
         .toList(growable: false);

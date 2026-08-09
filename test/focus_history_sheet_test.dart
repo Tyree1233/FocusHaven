@@ -207,4 +207,37 @@ void main() {
     expect(find.text('Old task'), findsNothing);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('This week includes the full oldest local calendar day', (
+    tester,
+  ) async {
+    await _useTallSurface(tester);
+    final now = DateTime.now().toLocal();
+    final oldestDay = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
+    final sessions = [
+      FocusSession(
+        completedAt: oldestDay.add(const Duration(minutes: 1)),
+        durationSeconds: 60,
+        focusTask: 'Oldest included day',
+      ),
+      FocusSession(
+        completedAt: oldestDay.subtract(const Duration(seconds: 1)),
+        durationSeconds: 60,
+        focusTask: 'Before calendar window',
+      ),
+    ];
+
+    await tester.pumpWidget(_app(sessions: sessions));
+    await tester.tap(_filterChip('This week'));
+    await tester.pump();
+
+    expect(_historyItemCount(tester), 1);
+    expect(find.text('Oldest included day'), findsOneWidget);
+    expect(find.text('Before calendar window'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }
