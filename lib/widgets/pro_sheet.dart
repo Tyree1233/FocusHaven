@@ -16,6 +16,7 @@ class _ProSheetState extends ConsumerState<ProSheet> {
 
   final ScrollController _scrollController = ScrollController();
   late final Future<String?> _priceFuture;
+  bool _storeActionInProgress = false;
 
   @override
   void initState() {
@@ -36,18 +37,40 @@ class _ProSheetState extends ConsumerState<ProSheet> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  bool _beginStoreAction() {
+    if (_storeActionInProgress) return false;
+    setState(() => _storeActionInProgress = true);
+    return true;
+  }
+
+  void _finishStoreAction() {
+    if (mounted) setState(() => _storeActionInProgress = false);
+  }
+
   Future<void> _buyPro() async {
+    if (!_beginStoreAction()) return;
     try {
       await ref.read(iapServiceProvider).buyPro();
       _showMessage('Complete your purchase in the store window');
     } on StateError catch (error) {
       _showMessage(error.message);
+    } catch (_) {
+      _showMessage('The store could not start this purchase right now');
+    } finally {
+      _finishStoreAction();
     }
   }
 
   Future<void> _restorePurchases() async {
-    await ref.read(iapServiceProvider).restorePurchases();
-    _showMessage('Checking the store for previous purchases');
+    if (!_beginStoreAction()) return;
+    try {
+      await ref.read(iapServiceProvider).restorePurchases();
+      _showMessage('Checking the store for previous purchases');
+    } catch (_) {
+      _showMessage('Previous purchases could not be checked right now');
+    } finally {
+      _finishStoreAction();
+    }
   }
 
   @override
@@ -128,7 +151,10 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                   builder: (context, snapshot) {
                     final price = snapshot.data;
                     return FilledButton(
-                      onPressed: isPro == false && price != null
+                      onPressed:
+                          isPro == false &&
+                              price != null &&
+                              !_storeActionInProgress
                           ? _buyPro
                           : null,
                       style: FilledButton.styleFrom(
@@ -152,7 +178,9 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                 ),
                 if (isPro == false || entitlementFailed)
                   TextButton(
-                    onPressed: _restorePurchases,
+                    onPressed: _storeActionInProgress
+                        ? null
+                        : _restorePurchases,
                     child: const Text('Restore purchases'),
                   ),
               ],

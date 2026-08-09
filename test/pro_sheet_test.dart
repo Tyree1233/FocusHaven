@@ -16,6 +16,8 @@ class _FakeIapPlatform extends InAppPurchasePlatform {
 
   final ProductDetails? product;
   final _purchases = StreamController<List<PurchaseDetails>>.broadcast();
+  Completer<bool>? pendingPurchase;
+  Completer<void>? pendingRestore;
   var buyCalls = 0;
   var restoreCalls = 0;
 
@@ -39,12 +41,20 @@ class _FakeIapPlatform extends InAppPurchasePlatform {
   @override
   Future<bool> buyNonConsumable({required PurchaseParam purchaseParam}) async {
     buyCalls += 1;
+    final pending = pendingPurchase;
+    if (pending != null) {
+      return pending.future;
+    }
     return true;
   }
 
   @override
   Future<void> restorePurchases({String? applicationUserName}) async {
     restoreCalls += 1;
+    final pending = pendingRestore;
+    if (pending != null) {
+      await pending.future;
+    }
   }
 
   Future<void> dispose() => _purchases.close();
@@ -150,6 +160,96 @@ void main() {
       find.text('Complete your purchase in the store window'),
       findsOneWidget,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('blocks duplicate purchases and contains store failures', (
+    tester,
+  ) async {
+    final platform = _FakeIapPlatform(product: _product());
+    platform.pendingPurchase = Completer<bool>();
+    InAppPurchasePlatform.instance = platform;
+    final service = IAPService(inAppPurchase: inAppPurchase);
+    addTearDown(() async {
+      service.dispose();
+      await platform.dispose();
+    });
+
+    await tester.pumpWidget(_app(service, isPro: false));
+    await tester.pumpAndSettle();
+
+    final purchaseAction = find.widgetWithText(
+      FilledButton,
+      r'Unlock Pro for $4.99',
+    );
+    final purchaseButton = tester.widget<FilledButton>(purchaseAction);
+    purchaseButton.onPressed!.call();
+    purchaseButton.onPressed!.call();
+    await tester.pump();
+
+    expect(platform.buyCalls, 1);
+    expect(tester.widget<FilledButton>(purchaseAction).onPressed, isNull);
+    final restoreAction = find.widgetWithText(TextButton, 'Restore purchases');
+    expect(tester.widget<TextButton>(restoreAction).onPressed, isNull);
+    expect(
+      tester
+          .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.arrow_back))
+          .onPressed,
+      isNotNull,
+    );
+
+    platform.pendingPurchase!.completeError(Exception('store unavailable'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('The store could not start this purchase right now'),
+      findsOneWidget,
+    );
+    expect(tester.widget<FilledButton>(purchaseAction).onPressed, isNotNull);
+    expect(tester.widget<TextButton>(restoreAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('blocks duplicate restores and contains store failures', (
+    tester,
+  ) async {
+    final platform = _FakeIapPlatform();
+    platform.pendingRestore = Completer<void>();
+    InAppPurchasePlatform.instance = platform;
+    final service = IAPService(inAppPurchase: inAppPurchase);
+    addTearDown(() async {
+      service.dispose();
+      await platform.dispose();
+    });
+
+    await tester.pumpWidget(_app(service, isPro: false));
+    await tester.pumpAndSettle();
+
+    final restoreAction = find.widgetWithText(TextButton, 'Restore purchases');
+    await tester.ensureVisible(restoreAction);
+    await tester.pumpAndSettle();
+    final restoreButton = tester.widget<TextButton>(restoreAction);
+    restoreButton.onPressed!.call();
+    restoreButton.onPressed!.call();
+    await tester.pump();
+
+    expect(platform.restoreCalls, 1);
+    expect(tester.widget<TextButton>(restoreAction).onPressed, isNull);
+    expect(
+      tester
+          .widget<IconButton>(find.widgetWithIcon(IconButton, Icons.arrow_back))
+          .onPressed,
+      isNotNull,
+    );
+
+    platform.pendingRestore!.completeError(Exception('store unavailable'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Previous purchases could not be checked right now'),
+      findsOneWidget,
+    );
+    expect(tester.widget<TextButton>(restoreAction).onPressed, isNotNull);
     expect(tester.takeException(), isNull);
   });
 
