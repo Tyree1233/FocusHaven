@@ -33,6 +33,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static const _defaultLongBreakSeconds = 15 * 60;
   static const _defaultDailyGoalMinutes = 60;
   static const _dailyChallengeTarget = 3;
+  static const _maxSessionSeconds = 24 * 60 * 60;
 
   Timer? _ticker;
   int _focusSeconds = _defaultFocusSeconds;
@@ -51,9 +52,11 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   bool _isComplete = false;
   bool _hasPendingResume = false;
   bool _hasLoaded = false;
+  bool _isDisposed = false;
   DateTime? _endsAt;
   SessionType _sessionType = SessionType.focus;
   final NotificationService? _notificationService;
+  late final Future<void> _initialization;
 
   int get secondsRemaining => _secondsRemaining;
   int get totalSessionSeconds => _totalSessionSeconds;
@@ -142,10 +145,16 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   int get weeklyFocusSeconds =>
       lastSevenDaysFocusSeconds.fold(0, (total, seconds) => total + seconds);
   int get weeklyFocusSessions {
-    final cutoff = DateTime.now().subtract(const Duration(days: 6));
-    return _focusHistory
-        .where((session) => !session.completedAt.isBefore(cutoff))
-        .length;
+    final now = DateTime.now().toLocal();
+    final cutoff = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 6));
+    return _focusHistory.where((session) {
+      final completedAt = session.completedAt.toLocal();
+      return !completedAt.isBefore(cutoff);
+    }).length;
   }
 
   int get dailyChallengeTarget => _dailyChallengeTarget;
@@ -173,6 +182,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   bool get isRunning => _isRunning;
   bool get isComplete => _isComplete;
   bool get hasPendingResume => _hasPendingResume;
+  Future<void> get initialized => _initialization;
   SessionType get sessionType => _sessionType;
   String get completionMessage => _completionMessage;
   double get progress => _totalSessionSeconds == 0
@@ -185,7 +195,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   TimerService._(this._notificationService) {
     WidgetsBinding.instance.addObserver(this);
-    _loadFromPrefs();
+    _initialization = _loadFromPrefs();
   }
 
   void start() {
@@ -307,7 +317,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void setCustomDuration(int minutes, int seconds) {
     final totalSeconds = (minutes * 60 + seconds)
-        .clamp(1, 24 * 60 * 60)
+        .clamp(1, _maxSessionSeconds)
         .toInt();
     switch (_sessionType) {
       case SessionType.focus:
@@ -326,10 +336,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   void setCustomMinutes(int minutes) => setCustomDuration(minutes, 0);
 
   void setFocusTask(String task) {
-    _focusTask = task.trim().replaceAll(RegExp(r'\s+'), ' ');
-    if (_focusTask.length > 80) {
-      _focusTask = _focusTask.substring(0, 80);
-    }
+    _focusTask = _cleanFocusTask(task);
     notifyListeners();
     _saveToPrefs();
   }
@@ -524,15 +531,17 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       _isComplete = false;
       _hasPendingResume = false;
       _endsAt = null;
-      _focusSeconds = focusSeconds.clamp(1, 24 * 60 * 60).toInt();
-      _shortBreakSeconds = shortBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
-      _longBreakSeconds = longBreakSeconds.clamp(1, 24 * 60 * 60).toInt();
+      _focusSeconds = focusSeconds.clamp(1, _maxSessionSeconds).toInt();
+      _shortBreakSeconds = shortBreakSeconds
+          .clamp(1, _maxSessionSeconds)
+          .toInt();
+      _longBreakSeconds = longBreakSeconds.clamp(1, _maxSessionSeconds).toInt();
       _completedFocusSessions = completedFocusSessions
           .clamp(0, 1 << 31)
           .toInt();
       _focusHistory = restoredHistory;
       _focusHistoryRevision++;
-      _focusTask = focusTask ?? '';
+      _focusTask = _cleanFocusTask(focusTask ?? '');
       if (dailyGoalMinutes != null) {
         _dailyGoalMinutes = dailyGoalMinutes.clamp(5, 480).toInt();
       }
@@ -623,14 +632,40 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
+    if (_isDisposed) return;
+
     var migratedLegacyThoughts = false;
-    _focusSeconds = prefs.getInt('focusSeconds') ?? _focusSeconds;
-    _shortBreakSeconds =
-        prefs.getInt('shortBreakSeconds') ?? _shortBreakSeconds;
-    _longBreakSeconds = prefs.getInt('longBreakSeconds') ?? _longBreakSeconds;
-    _completedFocusSessions = prefs.getInt('completedFocusSessions') ?? 0;
-    _focusTask = prefs.getString('focusTask') ?? '';
-    _dailyGoalMinutes = prefs.getInt('dailyGoalMinutes') ?? _dailyGoalMinutes;
+    _focusSeconds = _clampStoredInt(
+      prefs.getInt('focusSeconds'),
+      _focusSeconds,
+      1,
+      _maxSessionSeconds,
+    );
+    _shortBreakSeconds = _clampStoredInt(
+      prefs.getInt('shortBreakSeconds'),
+      _shortBreakSeconds,
+      1,
+      _maxSessionSeconds,
+    );
+    _longBreakSeconds = _clampStoredInt(
+      prefs.getInt('longBreakSeconds'),
+      _longBreakSeconds,
+      1,
+      _maxSessionSeconds,
+    );
+    _completedFocusSessions = _clampStoredInt(
+      prefs.getInt('completedFocusSessions'),
+      0,
+      0,
+      1 << 31,
+    );
+    _focusTask = _cleanFocusTask(prefs.getString('focusTask') ?? '');
+    _dailyGoalMinutes = _clampStoredInt(
+      prefs.getInt('dailyGoalMinutes'),
+      _dailyGoalMinutes,
+      5,
+      480,
+    );
     _hasPendingResume = prefs.getBool(_pendingResumeKey) ?? false;
     final parkedThoughtsJson = prefs.getString(_parkedThoughtsKey);
     if (parkedThoughtsJson != null) {
@@ -657,31 +692,24 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     }
     final historyJson = prefs.getString('focusHistory');
     if (historyJson != null) {
-      try {
-        final decoded = jsonDecode(historyJson);
-        if (decoded is List) {
-          _focusHistory = decoded
-              .whereType<Map>()
-              .map(
-                (item) =>
-                    FocusSession.fromJson(Map<String, dynamic>.from(item)),
-              )
-              .toList();
-        }
-      } on FormatException {
-        _focusHistory = [];
-      } on TypeError {
-        _focusHistory = [];
-      }
+      _focusHistory = _decodeFocusHistory(historyJson);
     }
     if (_focusHistory.isNotEmpty) {
       _focusHistoryRevision++;
     }
-    _sessionType = SessionType.values[prefs.getInt('sessionType') ?? 0];
-    _totalSessionSeconds =
-        prefs.getInt('totalSessionSeconds') ?? _durationFor(_sessionType);
-    _secondsRemaining =
-        prefs.getInt('secondsRemaining') ?? _totalSessionSeconds;
+    _sessionType = _sessionTypeFromIndex(prefs.getInt('sessionType'));
+    _totalSessionSeconds = _clampStoredInt(
+      prefs.getInt('totalSessionSeconds'),
+      _durationFor(_sessionType),
+      1,
+      _maxSessionSeconds,
+    );
+    _secondsRemaining = _clampStoredInt(
+      prefs.getInt('secondsRemaining'),
+      _totalSessionSeconds,
+      0,
+      _totalSessionSeconds,
+    );
     final savedEndsAt = prefs.getInt(_timerEndsAtKey);
     if (savedEndsAt != null) {
       _endsAt = DateTime.fromMillisecondsSinceEpoch(savedEndsAt);
@@ -700,6 +728,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     if (migratedLegacyThoughts) {
       await _saveToPrefs();
     }
+    if (_isDisposed) return;
+
     _hasLoaded = true;
     notifyListeners();
   }
@@ -727,27 +757,80 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  static List<FocusSession> _decodeFocusHistory(String source) {
+    try {
+      final decoded = jsonDecode(source);
+      if (decoded is! List) return [];
+
+      final sessions = <FocusSession>[];
+      for (final value in decoded.whereType<Map>()) {
+        try {
+          final session = FocusSession.fromJson(
+            Map<String, dynamic>.from(value),
+          );
+          if (session.durationSeconds > 0 &&
+              session.durationSeconds <= _maxSessionSeconds) {
+            sessions.add(session);
+          }
+        } on FormatException {
+          // Ignore one damaged record without discarding valid focus history.
+        } on TypeError {
+          // Ignore values with an unexpected persisted shape.
+        }
+      }
+      return sessions;
+    } on FormatException {
+      return [];
+    }
+  }
+
+  static int _clampStoredInt(
+    int? value,
+    int fallback,
+    int minimum,
+    int maximum,
+  ) => (value ?? fallback).clamp(minimum, maximum).toInt();
+
+  static SessionType _sessionTypeFromIndex(int? index) {
+    if (index == null || index < 0 || index >= SessionType.values.length) {
+      return SessionType.focus;
+    }
+    return SessionType.values[index];
+  }
+
+  static String _cleanFocusTask(String task) {
+    final cleaned = task.trim().replaceAll(RegExp(r'\s+'), ' ');
+    return cleaned.length > 80 ? cleaned.substring(0, 80) : cleaned;
+  }
+
   @override
   void dispose() {
+    _isDisposed = true;
     _ticker?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
-  static bool _isSameDay(DateTime first, DateTime second) =>
-      first.year == second.year &&
-      first.month == second.month &&
-      first.day == second.day;
+  static bool _isSameDay(DateTime first, DateTime second) {
+    final localFirst = first.toLocal();
+    final localSecond = second.toLocal();
+    return localFirst.year == localSecond.year &&
+        localFirst.month == localSecond.month &&
+        localFirst.day == localSecond.day;
+  }
 
-  static String _dateKey(DateTime date) =>
-      '${date.year}-${date.month}-${date.day}';
+  static String _dateKey(DateTime date) {
+    final localDate = date.toLocal();
+    return '${localDate.year}-${localDate.month}-${localDate.day}';
+  }
 
   static String _exportDateTime(DateTime date) {
-    final month = date.month.toString().padLeft(2, '0');
-    final day = date.day.toString().padLeft(2, '0');
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    return '${date.year}-$month-$day $hour:$minute';
+    final localDate = date.toLocal();
+    final month = localDate.month.toString().padLeft(2, '0');
+    final day = localDate.day.toString().padLeft(2, '0');
+    final hour = localDate.hour.toString().padLeft(2, '0');
+    final minute = localDate.minute.toString().padLeft(2, '0');
+    return '${localDate.year}-$month-$day $hour:$minute';
   }
 
   static String _exportDuration(int seconds) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,9 +14,17 @@ void main() {
 
   Future<TimerService> createTimer() async {
     final timer = TimerService();
-    await Future<void>.delayed(Duration.zero);
+    await timer.initialized;
     return timer;
   }
+
+  test('initialization completes safely after immediate disposal', () async {
+    final timer = TimerService();
+
+    timer.dispose();
+
+    await expectLater(timer.initialized, completes);
+  });
 
   test('starts with a 25-minute focus session', () async {
     final timer = await createTimer();
@@ -142,6 +152,106 @@ void main() {
     expect(timer.completedFocusSessions, 2);
     expect(timer.focusTask, 'Finish the outline');
     expect(timer.dailyGoalMinutes, 75);
+  });
+
+  test('clamps corrupted saved timer values to safe limits', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': -25,
+      'shortBreakSeconds': 999999,
+      'longBreakSeconds': 0,
+      'completedFocusSessions': -4,
+      'focusTask': '  ${List.filled(90, 'a').join()}  ',
+      'dailyGoalMinutes': 999,
+      'sessionType': 99,
+      'totalSessionSeconds': -50,
+      'secondsRemaining': 999999,
+    });
+
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.sessionType, SessionType.focus);
+    expect(timer.totalSessionSeconds, 1);
+    expect(timer.secondsRemaining, 1);
+    expect(timer.completedFocusSessions, 0);
+    expect(timer.focusTask, hasLength(80));
+    expect(timer.dailyGoalMinutes, 480);
+
+    timer.selectSession(SessionType.shortBreak);
+    expect(timer.secondsRemaining, 24 * 60 * 60);
+
+    timer.selectSession(SessionType.longBreak);
+    expect(timer.secondsRemaining, 1);
+  });
+
+  test('preserves valid focus history around damaged saved records', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusHistory': jsonEncode([
+        {
+          'completedAt': '2026-08-06T09:00:00.000',
+          'durationSeconds': 60,
+          'focusTask': 'First valid session',
+        },
+        {'durationSeconds': 120, 'focusTask': 'Missing completion date'},
+        {
+          'completedAt': 'not-a-date',
+          'durationSeconds': 180,
+          'focusTask': 'Invalid completion date',
+        },
+        {
+          'completedAt': '2026-08-06T10:00:00.000',
+          'durationSeconds': 0,
+          'focusTask': 'Impossible duration',
+        },
+        'not a focus session',
+        {
+          'completedAt': '2026-08-06T11:00:00.000',
+          'durationSeconds': 90,
+          'focusTask': 'Second valid session',
+        },
+      ]),
+    });
+
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.recentFocusSessions, hasLength(2));
+    expect(timer.recentFocusSessions.map((session) => session.focusTask), [
+      'Second valid session',
+      'First valid session',
+    ]);
+    expect(timer.totalFocusSeconds, 150);
+  });
+
+  test('weekly statistics include the full oldest calendar day', () async {
+    final now = DateTime.now().toLocal();
+    final startOfToday = DateTime(now.year, now.month, now.day);
+    final oldestIncluded = startOfToday
+        .subtract(const Duration(days: 6))
+        .add(const Duration(minutes: 1));
+    final previousDay = startOfToday
+        .subtract(const Duration(days: 7))
+        .add(const Duration(hours: 23, minutes: 59));
+    SharedPreferences.setMockInitialValues({
+      'focusHistory': jsonEncode([
+        {
+          'completedAt': previousDay.toIso8601String(),
+          'durationSeconds': 120,
+          'focusTask': 'Outside the seven-day window',
+        },
+        {
+          'completedAt': oldestIncluded.toIso8601String(),
+          'durationSeconds': 60,
+          'focusTask': 'Oldest included day',
+        },
+      ]),
+    });
+
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.weeklyFocusSessions, 1);
+    expect(timer.weeklyFocusSeconds, 60);
   });
 
   test('clearing local data restores the timer defaults', () async {

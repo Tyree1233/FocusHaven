@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/main.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
+import 'package:focushaven/services/timer_service.dart';
 
 void main() {
   setUp(() {
@@ -45,5 +46,26 @@ void main() {
     expect(preferences.getBool('hasCompletedOnboarding'), isTrue);
     expect(find.text('Welcome to FocusHaven'), findsNothing);
     expect(find.text('Timer destination'), findsOneWidget);
+  });
+
+  testWidgets('uses the pre-initialized timer supplied at app startup', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 90,
+      'totalSessionSeconds': 90,
+      'secondsRemaining': 90,
+    });
+    final timer = TimerService();
+    await timer.initialized;
+
+    await tester.pumpWidget(
+      FocusHavenApp(timerService: timer, showOnboarding: false),
+    );
+    await tester.pump();
+
+    expect(find.text('01:30'), findsOneWidget);
+    expect(find.text('Begin focus'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

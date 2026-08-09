@@ -10,6 +10,7 @@ import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
 import 'services/notification_service.dart';
 import 'services/theme_service.dart';
+import 'services/timer_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,10 +22,13 @@ Future<void> main() async {
   final preferences = await SharedPreferences.getInstance();
   final showOnboarding =
       !(preferences.getBool('hasCompletedOnboarding') ?? false);
+  final timerService = TimerService(notificationService: notificationService);
+  await timerService.initialized;
 
   runApp(
     FocusHavenApp(
       notificationService: notificationService,
+      timerService: timerService,
       showOnboarding: showOnboarding,
     ),
   );
@@ -34,22 +38,27 @@ class FocusHavenApp extends StatelessWidget {
   const FocusHavenApp({
     super.key,
     this.notificationService,
+    this.timerService,
     this.showOnboarding = true,
   });
 
   final NotificationService? notificationService;
+  final TimerService? timerService;
   final bool showOnboarding;
 
   @override
   Widget build(BuildContext context) {
     final activeNotificationService =
         notificationService ?? NotificationService();
+    final activeTimerService = timerService;
 
     return ProviderScope(
       overrides: [
         notificationServiceProvider.overrideWithValue(
           activeNotificationService,
         ),
+        if (activeTimerService != null)
+          timerServiceProvider.overrideWith((ref) => activeTimerService),
       ],
       child: _FocusHavenMaterialApp(showOnboarding: showOnboarding),
     );
