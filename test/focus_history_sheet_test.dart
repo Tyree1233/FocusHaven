@@ -157,6 +157,58 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('renders restored timestamps in the device local time', (
+    tester,
+  ) async {
+    await _useTallSurface(tester);
+    final completedAt = DateTime.utc(2026, 1, 2, 2, 15);
+    final localCompletedAt = completedAt.toLocal();
+
+    await tester.pumpWidget(
+      _app(
+        sessions: [
+          FocusSession(
+            completedAt: completedAt,
+            durationSeconds: 60,
+            focusTask: 'Restored UTC session',
+          ),
+        ],
+      ),
+    );
+
+    final localizations = MaterialLocalizations.of(
+      tester.element(find.byType(FocusHistorySheet)),
+    );
+    final expectedTime = localizations.formatTimeOfDay(
+      TimeOfDay.fromDateTime(localCompletedAt),
+    );
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final expectedDate =
+        '${months[localCompletedAt.month - 1]} ${localCompletedAt.day}';
+
+    expect(find.text('Restored UTC session'), findsOneWidget);
+    expect(
+      find.textContaining(
+        '1-minute focus session • $expectedDate at $expectedTime',
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Today and This week filters include only matching sessions', (
     tester,
   ) async {

@@ -91,11 +91,12 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
   }
 
   String _dateLabel(DateTime date) {
-    final now = DateTime.now();
-    if (DateUtils.isSameDay(date, now)) {
+    final localDate = date.toLocal();
+    final now = DateTime.now().toLocal();
+    if (DateUtils.isSameDay(localDate, now)) {
       return 'Today';
     }
-    if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) {
+    if (DateUtils.isSameDay(localDate, now.subtract(const Duration(days: 1)))) {
       return 'Yesterday';
     }
     const months = [
@@ -112,7 +113,7 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
       'Nov',
       'Dec',
     ];
-    return '${months[date.month - 1]} ${date.day}';
+    return '${months[localDate.month - 1]} ${localDate.day}';
   }
 
   String get _weeklyDuration {
@@ -296,9 +297,11 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                               const Divider(height: 1, color: Colors.white12),
                           itemBuilder: (context, index) {
                             final session = sessions[index];
+                            final localCompletedAt = session.completedAt
+                                .toLocal();
                             final time = MaterialLocalizations.of(context)
                                 .formatTimeOfDay(
-                                  TimeOfDay.fromDateTime(session.completedAt),
+                                  TimeOfDay.fromDateTime(localCompletedAt),
                                 );
                             return ListTile(
                               key: ValueKey(
@@ -322,7 +325,7 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                               ),
                               subtitle: Text(
                                 '${_focusSessionLabel(session.durationSeconds)} '
-                                '• ${_dateLabel(session.completedAt)} at $time',
+                                '• ${_dateLabel(localCompletedAt)} at $time',
                                 style: const TextStyle(color: Colors.white60),
                               ),
                             );
