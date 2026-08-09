@@ -18,7 +18,13 @@ class JournalService extends ChangeNotifier {
   ];
   List<JournalEntry> _entries = [];
   int _journalRevision = 0;
-  late final Future<void> _loadFuture;
+  bool _isDisposed = false;
+
+  JournalService() {
+    initialized = _load();
+  }
+
+  late final Future<void> initialized;
 
   List<JournalEntry> get entries => List.unmodifiable(_entries.reversed);
 
@@ -50,10 +56,6 @@ class JournalService extends ChangeNotifier {
     return _prompts[dayOfYear % _prompts.length];
   }
 
-  JournalService() {
-    _loadFuture = _load();
-  }
-
   /// Appends a new reflection, even when other reflections already exist for
   /// the same local calendar day.
   Future<JournalEntry?> addEntry({
@@ -64,15 +66,19 @@ class JournalService extends ChangeNotifier {
     final cleanReflection = reflection.trim();
     if (cleanMood.isEmpty || cleanReflection.isEmpty) return null;
 
-    await _loadFuture;
+    await initialized;
+    if (_isDisposed) return null;
 
     final entry = JournalEntry(
       createdAt: _nextCreatedAt(),
       mood: cleanMood,
       reflection: cleanReflection,
     );
-    _entries.add(entry);
-    await _save();
+    final updatedEntries = [..._entries, entry];
+    await _saveEntries(updatedEntries);
+    if (_isDisposed) return null;
+
+    _entries = updatedEntries;
     _notifyJournalChanged();
     return entry;
   }
@@ -88,63 +94,135 @@ class JournalService extends ChangeNotifier {
     final cleanReflection = reflection.trim();
     if (cleanMood.isEmpty || cleanReflection.isEmpty) return false;
 
-    await _loadFuture;
+    await initialized;
+    if (_isDisposed) return false;
 
     final index = _entries.indexWhere(
       (entry) => entry.createdAt.isAtSameMomentAs(createdAt),
     );
     if (index == -1) return false;
+    final existingEntry = _entries[index];
+    if (existingEntry.mood == cleanMood &&
+        existingEntry.reflection == cleanReflection) {
+      return true;
+    }
 
-    _entries[index] = JournalEntry(
-      createdAt: _entries[index].createdAt,
+    final updatedEntries = List<JournalEntry>.of(_entries);
+    updatedEntries[index] = JournalEntry(
+      createdAt: existingEntry.createdAt,
       mood: cleanMood,
       reflection: cleanReflection,
     );
-    await _save();
+    await _saveEntries(updatedEntries);
+    if (_isDisposed) return false;
+
+    _entries = updatedEntries;
     _notifyJournalChanged();
     return true;
   }
 
   Future<void> clearLocalData() async {
-    await _loadFuture;
-    _entries = [];
+    await initialized;
+    if (_isDisposed) return;
+
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_storageKey);
-    _notifyJournalChanged();
+    if (_isDisposed) return;
+
+    final changed = _entries.isNotEmpty;
+    _entries = [];
+    if (changed) _notifyJournalChanged();
   }
 
   Future<void> _load() async {
-    final preferences = await SharedPreferences.getInstance();
-    final saved = preferences.getString(_storageKey);
-    if (saved == null) return;
     try {
+      final preferences = await SharedPreferences.getInstance();
+      if (_isDisposed) return;
+
+      final saved = preferences.getString(_storageKey);
+      if (saved == null) return;
       final decoded = jsonDecode(saved);
-      if (decoded is List) {
-        _entries = decoded
-            .whereType<Map>()
-            .map(
-              (item) => JournalEntry.fromJson(Map<String, dynamic>.from(item)),
-            )
-            .toList();
-        _notifyJournalChanged();
+      if (decoded is! List) {
+        await preferences.remove(_storageKey);
+        return;
       }
+
+      final loadedEntries = <JournalEntry>[];
+      final loadedTimestamps = <int>{};
+      for (final value in decoded) {
+        final entry = _decodeJournalEntry(value);
+        if (entry != null &&
+            loadedTimestamps.add(entry.createdAt.microsecondsSinceEpoch)) {
+          loadedEntries.add(entry);
+        }
+      }
+      if (_isDisposed) return;
+
+      if (loadedEntries.isEmpty) {
+        await preferences.remove(_storageKey);
+      } else {
+        final normalizedStorage = jsonEncode(
+          loadedEntries.map((entry) => entry.toJson()).toList(),
+        );
+        if (normalizedStorage != saved) {
+          await preferences.setString(_storageKey, normalizedStorage);
+        }
+      }
+      if (_isDisposed) return;
+
+      _entries = loadedEntries;
+      _notifyJournalChanged();
     } on FormatException {
-      _entries = [];
+      await _removeCorruptedStorage();
     } on TypeError {
-      _entries = [];
+      await _removeCorruptedStorage();
+    } catch (error) {
+      debugPrint('Journal entries could not be loaded: $error');
+    }
+  }
+
+  JournalEntry? _decodeJournalEntry(Object? value) {
+    if (value is! Map) return null;
+
+    try {
+      final entry = JournalEntry.fromJson(Map<String, dynamic>.from(value));
+      final mood = entry.mood.trim();
+      final reflection = entry.reflection.trim();
+      if (mood.isEmpty || reflection.isEmpty) return null;
+
+      return JournalEntry(
+        createdAt: entry.createdAt,
+        mood: mood,
+        reflection: reflection,
+      );
+    } on FormatException {
+      return null;
+    } on TypeError {
+      return null;
+    }
+  }
+
+  Future<void> _removeCorruptedStorage() async {
+    if (_isDisposed) return;
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.remove(_storageKey);
+    } catch (error) {
+      debugPrint('Corrupted journal storage could not be removed: $error');
     }
   }
 
   void _notifyJournalChanged() {
+    if (_isDisposed) return;
     _journalRevision++;
     notifyListeners();
   }
 
-  Future<void> _save() async {
+  Future<void> _saveEntries(List<JournalEntry> entries) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(
       _storageKey,
-      jsonEncode(_entries.map((entry) => entry.toJson()).toList()),
+      jsonEncode(entries.map((entry) => entry.toJson()).toList()),
     );
   }
 
@@ -156,5 +234,11 @@ class JournalService extends ChangeNotifier {
       candidate = candidate.add(const Duration(microseconds: 1));
     }
     return candidate;
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }

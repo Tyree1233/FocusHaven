@@ -13,7 +13,7 @@ void main() {
 
   Future<JournalService> createJournal() async {
     final journal = JournalService();
-    await Future<void>.delayed(Duration.zero);
+    await journal.initialized;
     return journal;
   }
 
@@ -235,5 +235,133 @@ void main() {
       'I made room for a quiet moment.',
     );
     expect(journal.mostCommonRecentMood, 'Calm');
+  });
+
+  test(
+    'preserves and normalizes valid records beside corrupted data',
+    () async {
+      final createdAt = DateTime(2026, 8, 8, 12);
+      SharedPreferences.setMockInitialValues({
+        'journalEntries': jsonEncode([
+          {
+            'createdAt': createdAt.toIso8601String(),
+            'mood': '  Calm  ',
+            'reflection': '  This valid reflection remains.  ',
+          },
+          'not a journal record',
+          {
+            'createdAt': 'not-a-date',
+            'mood': 'Focused',
+            'reflection': 'Invalid timestamp',
+          },
+          {
+            'createdAt': createdAt.toIso8601String(),
+            'mood': 'Duplicate',
+            'reflection': 'Duplicate identity',
+          },
+          {
+            'createdAt': DateTime(2026, 8, 7).toIso8601String(),
+            'mood': '   ',
+            'reflection': 'Blank mood',
+          },
+        ]),
+      });
+
+      final journal = await createJournal();
+      addTearDown(journal.dispose);
+
+      expect(journal.entries, hasLength(1));
+      expect(journal.entries.single.createdAt, createdAt);
+      expect(journal.entries.single.mood, 'Calm');
+      expect(
+        journal.entries.single.reflection,
+        'This valid reflection remains.',
+      );
+
+      final preferences = await SharedPreferences.getInstance();
+      final repaired =
+          jsonDecode(preferences.getString('journalEntries')!) as List;
+      expect(repaired, hasLength(1));
+      expect((repaired.single as Map)['mood'], 'Calm');
+      expect(
+        (repaired.single as Map)['reflection'],
+        'This valid reflection remains.',
+      );
+    },
+  );
+
+  test('removes malformed and incorrectly shaped journal storage', () async {
+    SharedPreferences.setMockInitialValues({
+      'journalEntries': '{malformed json',
+    });
+    final malformedJournal = await createJournal();
+    addTearDown(malformedJournal.dispose);
+    var preferences = await SharedPreferences.getInstance();
+
+    expect(malformedJournal.entries, isEmpty);
+    expect(preferences.containsKey('journalEntries'), isFalse);
+
+    SharedPreferences.setMockInitialValues({
+      'journalEntries': jsonEncode({'entry': 'not a list'}),
+    });
+    final wrongShapeJournal = await createJournal();
+    addTearDown(wrongShapeJournal.dispose);
+    preferences = await SharedPreferences.getInstance();
+
+    expect(wrongShapeJournal.entries, isEmpty);
+    expect(preferences.containsKey('journalEntries'), isFalse);
+  });
+
+  test('an unchanged update does not publish another revision', () async {
+    final journal = await createJournal();
+    addTearDown(journal.dispose);
+    final entry = await journal.addEntry(
+      mood: 'Calm',
+      reflection: 'Keep this reflection unchanged.',
+    );
+    final revision = journal.journalRevision;
+    var notifications = 0;
+    journal.addListener(() => notifications++);
+
+    final updated = await journal.updateEntry(
+      createdAt: entry!.createdAt,
+      mood: '  Calm  ',
+      reflection: '  Keep this reflection unchanged.  ',
+    );
+
+    expect(updated, isTrue);
+    expect(journal.journalRevision, revision);
+    expect(notifications, 0);
+    expect(journal.entries.single, same(entry));
+  });
+
+  test('initialization and mutations are safe after disposal', () async {
+    SharedPreferences.setMockInitialValues({
+      'journalEntries': jsonEncode([
+        {
+          'createdAt': DateTime(2026, 8, 8).toIso8601String(),
+          'mood': 'Calm',
+          'reflection': 'Do not publish after disposal.',
+        },
+      ]),
+    });
+    final journal = JournalService();
+    journal.dispose();
+
+    await journal.initialized;
+    final added = await journal.addEntry(
+      mood: 'Focused',
+      reflection: 'This should not be added.',
+    );
+    final updated = await journal.updateEntry(
+      createdAt: DateTime(2026, 8, 8),
+      mood: 'Focused',
+      reflection: 'This should not be updated.',
+    );
+    await journal.clearLocalData();
+
+    expect(added, isNull);
+    expect(updated, isFalse);
+    expect(journal.entries, isEmpty);
   });
 }

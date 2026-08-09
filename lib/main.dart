@@ -9,6 +9,7 @@ import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
 import 'services/focus_profile_service.dart';
+import 'services/journal_service.dart';
 import 'services/notification_service.dart';
 import 'services/theme_service.dart';
 import 'services/timer_service.dart';
@@ -26,10 +27,12 @@ Future<void> main() async {
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();
   final focusProfileService = FocusProfileService();
+  final journalService = JournalService();
   await Future.wait([
     timerService.initialized,
     themeService.initialized,
     focusProfileService.initialized,
+    journalService.initialized,
   ]);
 
   runApp(
@@ -38,6 +41,7 @@ Future<void> main() async {
       timerService: timerService,
       themeService: themeService,
       focusProfileService: focusProfileService,
+      journalService: journalService,
       showOnboarding: showOnboarding,
     ),
   );
@@ -50,6 +54,7 @@ class FocusHavenApp extends StatelessWidget {
     this.timerService,
     this.themeService,
     this.focusProfileService,
+    this.journalService,
     this.showOnboarding = true,
   });
 
@@ -57,6 +62,7 @@ class FocusHavenApp extends StatelessWidget {
   final TimerService? timerService;
   final ThemeService? themeService;
   final FocusProfileService? focusProfileService;
+  final JournalService? journalService;
   final bool showOnboarding;
 
   @override
@@ -66,6 +72,7 @@ class FocusHavenApp extends StatelessWidget {
     final activeTimerService = timerService;
     final activeThemeService = themeService;
     final activeFocusProfileService = focusProfileService;
+    final activeJournalService = journalService;
 
     return ProviderScope(
       overrides: [
@@ -80,6 +87,8 @@ class FocusHavenApp extends StatelessWidget {
           focusProfileServiceProvider.overrideWith(
             (ref) => activeFocusProfileService,
           ),
+        if (activeJournalService != null)
+          journalServiceProvider.overrideWith((ref) => activeJournalService),
       ],
       child: _FocusHavenMaterialApp(showOnboarding: showOnboarding),
     );

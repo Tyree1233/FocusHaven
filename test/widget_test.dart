@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +9,7 @@ import 'package:focushaven/main.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
 import 'package:focushaven/services/focus_profile_service.dart';
+import 'package:focushaven/services/journal_service.dart';
 import 'package:focushaven/services/theme_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 
@@ -115,4 +118,40 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('uses the pre-initialized journal supplied at app startup', (
+    WidgetTester tester,
+  ) async {
+    final createdAt = DateTime(2026, 8, 8, 12);
+    SharedPreferences.setMockInitialValues({
+      'journalEntries': jsonEncode([
+        {
+          'createdAt': createdAt.toIso8601String(),
+          'mood': 'Grateful',
+          'reflection': 'This reflection is ready on the first frame.',
+        },
+      ]),
+    });
+    final journalService = JournalService();
+    await journalService.initialized;
+
+    await tester.pumpWidget(FocusHavenApp(journalService: journalService));
+    await tester.pump();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MaterialApp)),
+      listen: false,
+    );
+    expect(container.read(journalServiceProvider), same(journalService));
+
+    final journalState = container.read(journalStateProvider);
+    expect(journalState.entries, hasLength(1));
+    expect(journalState.entries.single.createdAt, createdAt);
+    expect(journalState.entries.single.mood, 'Grateful');
+    expect(
+      journalState.entries.single.reflection,
+      'This reflection is ready on the first frame.',
+    );
+    expect(tester.takeException(), isNull);
+  });
 }
