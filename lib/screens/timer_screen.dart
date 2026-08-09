@@ -12,6 +12,7 @@ import '../services/focus_queue_service.dart';
 import '../services/journal_service.dart';
 import '../services/timer_service.dart';
 import '../widgets/account_sheet.dart';
+import '../widgets/cloud_backup_actions.dart';
 import '../widgets/completed_tasks_sheet.dart';
 import '../widgets/confirmation_dialog.dart';
 import '../widgets/focus_queue_sheet.dart';
@@ -1108,68 +1109,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             ),
                           ),
                         const SizedBox(height: 4),
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          spacing: 4,
-                          children: [
-                            TextButton.icon(
-                              onPressed: () async {
-                                final isPro = await ref
-                                    .read(iapServiceProvider)
-                                    .refreshEntitlement();
-                                if (!context.mounted) return;
-                                final message = !isSignedIn
-                                    ? 'Sign in with Google to back up your focus data'
-                                    : !isPro
-                                    ? 'Upgrade to Pro to use cloud backup'
-                                    : await ref
-                                          .read(cloudSyncServiceProvider)
-                                          .syncFocusData(timer.cloudBackup)
-                                    ? 'Focus data backed up securely'
-                                    : 'Backup failed. Check your Firebase setup.';
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(message)),
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.cloud_upload_outlined),
-                              label: const Text('Back up'),
-                            ),
-                            TextButton.icon(
-                              onPressed: () async {
-                                final isPro = await ref
-                                    .read(iapServiceProvider)
-                                    .refreshEntitlement();
-                                if (!context.mounted) return;
-                                String message;
-                                if (!isSignedIn) {
-                                  message =
-                                      'Sign in with Google to restore your focus data';
-                                } else if (!isPro) {
-                                  message =
-                                      'Upgrade to Pro to restore cloud backup';
-                                } else {
-                                  final backup = await ref
-                                      .read(cloudSyncServiceProvider)
-                                      .fetchFocusData();
-                                  if (!context.mounted) return;
-                                  message = backup == null
-                                      ? 'No cloud backup found yet'
-                                      : timer.restoreCloudBackup(backup)
-                                      ? 'Focus data restored from cloud'
-                                      : 'That cloud backup could not be restored';
-                                }
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(message)),
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.cloud_download_outlined),
-                              label: const Text('Restore'),
-                            ),
-                          ],
+                        CloudBackupActions(
+                          isSignedIn: isSignedIn,
+                          backup: timer.cloudBackup,
+                          restoreBackup: timer.restoreCloudBackup,
                         ),
                       ],
                     ),
