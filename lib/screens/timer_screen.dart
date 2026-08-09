@@ -106,9 +106,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   String _dateLabel(DateTime date) {
-    final now = DateTime.now();
-    if (DateUtils.isSameDay(date, now)) return 'Today';
-    if (DateUtils.isSameDay(date, now.subtract(const Duration(days: 1)))) {
+    final localDate = date.toLocal();
+    final now = DateTime.now().toLocal();
+    if (DateUtils.isSameDay(localDate, now)) return 'Today';
+    if (DateUtils.isSameDay(localDate, now.subtract(const Duration(days: 1)))) {
       return 'Yesterday';
     }
     const months = [
@@ -125,7 +126,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       'Nov',
       'Dec',
     ];
-    return '${months[date.month - 1]} ${date.day}';
+    return '${months[localDate.month - 1]} ${localDate.day}';
   }
 
   Future<void> _chooseCustomDuration(

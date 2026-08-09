@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -107,6 +109,53 @@ void main() {
 
     expect(timer.isRunning, isFalse);
     expect(find.widgetWithText(FilledButton, 'Begin focus'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('renders restored dashboard dates in the device local time', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(900, 1400));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    final completedAt = DateTime.utc(2000, 1, 2, 2, 15);
+    final localCompletedAt = completedAt.toLocal();
+    SharedPreferences.setMockInitialValues({
+      'completedFocusSessions': 1,
+      'focusHistory': jsonEncode([
+        {
+          'completedAt': completedAt.toIso8601String(),
+          'durationSeconds': 60,
+          'focusTask': 'Restored UTC dashboard session',
+        },
+      ]),
+    });
+    final timer = TimerService();
+    await timer.initialized;
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+    await tester.ensureVisible(find.text('Restored UTC dashboard session'));
+    await tester.pumpAndSettle();
+
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final expectedDate =
+        '${months[localCompletedAt.month - 1]} ${localCompletedAt.day}';
+
+    expect(find.text('Restored UTC dashboard session'), findsOneWidget);
+    expect(find.text(expectedDate), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
