@@ -415,6 +415,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   Future<void> _showDistractionSheet(
     BuildContext context,
     TimerService timer,
+    riverpod.WidgetRef ref,
   ) async {
     await showModalBottomSheet<void>(
       context: context,
@@ -423,12 +424,18 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) => DistractionParkingSheet(
-        readThoughts: () => timer.distractions,
+      builder: (_) => DistractionParkingSheet.withHistory(
+        readActiveThoughts: () =>
+            ref.read(parkedThoughtStateProvider).activeThoughts,
+        readCompletedThoughts: () =>
+            ref.read(parkedThoughtStateProvider).completedThoughts,
         addThought: timer.captureDistraction,
-        updateThought: timer.updateDistraction,
-        removeThought: timer.removeDistractionAt,
+        renameThought: timer.renameParkedThought,
+        completeThought: timer.completeParkedThought,
+        reopenThought: timer.reopenParkedThought,
+        removeThoughtById: timer.removeParkedThought,
         clearThoughts: timer.clearDistractions,
+        clearCompletedThoughts: timer.clearCompletedParkedThoughts,
         foregroundColor: _ink,
       ),
     );
@@ -584,6 +591,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final summary = ref.watch(timerSummaryStateProvider);
     final isSignedIn = ref.watch(authIsSignedInProvider);
     final queueRemaining = ref.watch(focusQueueRemainingCountProvider);
+    final parkedThoughtState = ref.watch(parkedThoughtStateProvider);
+    final activeThoughtCount = parkedThoughtState.activeThoughts.length;
+    final completedThoughtCount = parkedThoughtState.completedThoughts.length;
+    final hasParkedThoughts =
+        activeThoughtCount > 0 || completedThoughtCount > 0;
     final sessionColor = _sessionColor(context, session.sessionType);
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
@@ -688,11 +700,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                 : 'Focus queue • $queueRemaining',
                           ),
                         ),
-                        if (session.isRunning || session.parkedThoughtCount > 0)
+                        if (session.isRunning || hasParkedThoughts)
                           TextButton.icon(
                             onPressed: () => session.isRunning
                                 ? _captureDistraction(context, timer)
-                                : _showDistractionSheet(context, timer),
+                                : _showDistractionSheet(context, timer, ref),
                             icon: Icon(
                               session.isRunning
                                   ? Icons.add_task_outlined
@@ -701,8 +713,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             ),
                             label: Text(
                               session.isRunning
-                                  ? 'Park a distraction${session.parkedThoughtCount == 0 ? '' : ' • ${session.parkedThoughtCount} saved'}'
-                                  : 'Review ${session.parkedThoughtCount} parked thought${session.parkedThoughtCount == 1 ? '' : 's'}',
+                                  ? 'Park a distraction${activeThoughtCount == 0 ? '' : ' • $activeThoughtCount saved'}'
+                                  : activeThoughtCount == 0
+                                  ? 'Review $completedThoughtCount completed thought${completedThoughtCount == 1 ? '' : 's'}'
+                                  : 'Review $activeThoughtCount parked thought${activeThoughtCount == 1 ? '' : 's'}${completedThoughtCount == 0 ? '' : ' • $completedThoughtCount completed'}',
                             ),
                           ),
                       ],

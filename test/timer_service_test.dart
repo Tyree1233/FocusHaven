@@ -177,7 +177,9 @@ void main() {
       'secondsRemaining': 100,
       'totalSessionSeconds': 1500,
       'sessionType': SessionType.focus.index,
-      'timerEndsAt': DateTime.now().add(const Duration(seconds: 100)).millisecondsSinceEpoch,
+      'timerEndsAt': DateTime.now()
+          .add(const Duration(seconds: 100))
+          .millisecondsSinceEpoch,
     });
     final timer = await createTimer();
     addTearDown(timer.dispose);
@@ -190,5 +192,76 @@ void main() {
     timer.discardPendingSession();
     expect(timer.hasPendingResume, isFalse);
     expect(timer.secondsRemaining, 1500);
+  });
+
+  test(
+    'completed parked thoughts remain available and can be reopened',
+    () async {
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+
+      timer.captureDistraction('First thought');
+      timer.captureDistraction('Second thought');
+      final firstThought = timer.parkedThoughts.last;
+
+      timer.completeParkedThought(firstThought.id);
+
+      expect(timer.distractions, ['Second thought']);
+      expect(timer.completedParkedThoughts, hasLength(1));
+      expect(timer.completedParkedThoughts.single.text, 'First thought');
+      expect(timer.completedParkedThoughts.single.completedAt, isNotNull);
+
+      timer.clearDistractions();
+
+      expect(timer.parkedThoughts, isEmpty);
+      expect(timer.completedParkedThoughts, hasLength(1));
+
+      timer.reopenParkedThought(firstThought.id);
+
+      expect(timer.completedParkedThoughts, isEmpty);
+      expect(timer.distractions, ['First thought']);
+    },
+  );
+
+  test(
+    'parked thought completion history survives reopening the app',
+    () async {
+      final firstTimer = await createTimer();
+      addTearDown(firstTimer.dispose);
+      firstTimer.captureDistraction('Schedule the appointment');
+      final thoughtId = firstTimer.parkedThoughts.single.id;
+      firstTimer.completeParkedThought(thoughtId);
+      await Future<void>.delayed(Duration.zero);
+
+      final reopenedTimer = await createTimer();
+      addTearDown(reopenedTimer.dispose);
+
+      expect(reopenedTimer.parkedThoughts, isEmpty);
+      expect(reopenedTimer.completedParkedThoughts, hasLength(1));
+      expect(reopenedTimer.completedParkedThoughts.single.id, thoughtId);
+      expect(
+        reopenedTimer.completedParkedThoughts.single.text,
+        'Schedule the appointment',
+      );
+    },
+  );
+
+  test('legacy parked thoughts migrate without changing their order', () async {
+    SharedPreferences.setMockInitialValues({
+      'distractions': ['First saved thought', 'Second saved thought'],
+    });
+
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.distractions, ['Second saved thought', 'First saved thought']);
+    expect(
+      timer.parkedThoughts.every((thought) => !thought.isCompleted),
+      isTrue,
+    );
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('parkedThoughts'), isNotNull);
+    expect(preferences.getStringList('distractions'), isNull);
   });
 }

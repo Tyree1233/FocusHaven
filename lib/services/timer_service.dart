@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/focus_session.dart';
+import '../models/parked_thought.dart';
 import 'notification_service.dart';
 
 enum SessionType { focus, shortBreak, longBreak }
@@ -26,6 +27,7 @@ extension SessionTypeDetails on SessionType {
 class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static const _timerEndsAtKey = 'timerEndsAt';
   static const _pendingResumeKey = 'hasPendingTimerResume';
+  static const _parkedThoughtsKey = 'parkedThoughts';
   static const _defaultFocusSeconds = 25 * 60;
   static const _defaultShortBreakSeconds = 5 * 60;
   static const _defaultLongBreakSeconds = 15 * 60;
@@ -40,8 +42,9 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   int _totalSessionSeconds = _defaultFocusSeconds;
   int _completedFocusSessions = 0;
   int _focusHistoryRevision = 0;
+  int _parkedThoughtsRevision = 0;
   List<FocusSession> _focusHistory = [];
-  List<String> _distractions = [];
+  List<ParkedThought> _parkedThoughts = [];
   String _focusTask = '';
   int _dailyGoalMinutes = _defaultDailyGoalMinutes;
   bool _isRunning = false;
@@ -56,6 +59,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   int get totalSessionSeconds => _totalSessionSeconds;
   int get completedFocusSessions => _completedFocusSessions;
   int get focusHistoryRevision => _focusHistoryRevision;
+  int get parkedThoughtsRevision => _parkedThoughtsRevision;
   String get focusTask => _focusTask;
   int get dailyGoalMinutes => _dailyGoalMinutes;
   Map<String, dynamic> get cloudBackup => {
@@ -69,7 +73,16 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   };
   List<FocusSession> get recentFocusSessions =>
       List.unmodifiable(_focusHistory.reversed);
-  List<String> get distractions => List.unmodifiable(_distractions.reversed);
+  List<ParkedThought> get parkedThoughts => List.unmodifiable(
+    _parkedThoughts.where((thought) => !thought.isCompleted).toList().reversed,
+  );
+  List<ParkedThought> get completedParkedThoughts => List.unmodifiable(
+    _parkedThoughts.where((thought) => thought.isCompleted).toList().reversed,
+  );
+
+  /// Temporary compatibility view for screens that still render plain text.
+  List<String> get distractions =>
+      List.unmodifiable(parkedThoughts.map((thought) => thought.text));
   int get totalFocusSeconds => _focusHistory.fold(
     0,
     (total, session) => total + session.durationSeconds,
@@ -324,39 +337,98 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   void captureDistraction(String distraction) {
     final cleaned = distraction.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (cleaned.isEmpty) return;
-    _distractions.add(
-      cleaned.length > 140 ? cleaned.substring(0, 140) : cleaned,
+    final now = DateTime.now();
+    _parkedThoughts.add(
+      ParkedThought(
+        id: '${now.microsecondsSinceEpoch}-${_parkedThoughts.length}',
+        text: cleaned.length > 140 ? cleaned.substring(0, 140) : cleaned,
+        createdAt: now,
+      ),
     );
+    _parkedThoughtsRevision++;
     notifyListeners();
     _saveToPrefs();
   }
 
   void updateDistraction(int index, String distraction) {
-    if (index < 0 || index >= _distractions.length) return;
+    final activeThoughts = parkedThoughts;
+    if (index < 0 || index >= activeThoughts.length) return;
+    renameParkedThought(activeThoughts[index].id, distraction);
+  }
+
+  void renameParkedThought(String id, String distraction) {
     final cleaned = distraction.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (cleaned.isEmpty) return;
-    final storageIndex = _distractions.length - 1 - index;
-    _distractions[storageIndex] = cleaned.length > 140
+    final storageIndex = _indexOfParkedThought(id);
+    if (storageIndex == -1) return;
+    final updatedText = cleaned.length > 140
         ? cleaned.substring(0, 140)
         : cleaned;
+    _parkedThoughts[storageIndex] = _parkedThoughts[storageIndex].rename(
+      updatedText,
+    );
+    _parkedThoughtsRevision++;
     notifyListeners();
     _saveToPrefs();
   }
 
   void removeDistractionAt(int index) {
-    if (index < 0 || index >= _distractions.length) return;
-    final storageIndex = _distractions.length - 1 - index;
-    _distractions.removeAt(storageIndex);
+    final activeThoughts = parkedThoughts;
+    if (index < 0 || index >= activeThoughts.length) return;
+    removeParkedThought(activeThoughts[index].id);
+  }
+
+  void completeParkedThought(String id) {
+    final storageIndex = _indexOfParkedThought(id);
+    if (storageIndex == -1 || _parkedThoughts[storageIndex].isCompleted) return;
+    _parkedThoughts[storageIndex] = _parkedThoughts[storageIndex].complete(
+      DateTime.now(),
+    );
+    _parkedThoughtsRevision++;
+    notifyListeners();
+    _saveToPrefs();
+  }
+
+  void reopenParkedThought(String id) {
+    final storageIndex = _indexOfParkedThought(id);
+    if (storageIndex == -1 || !_parkedThoughts[storageIndex].isCompleted) {
+      return;
+    }
+    _parkedThoughts[storageIndex] = _parkedThoughts[storageIndex].reopen();
+    _parkedThoughtsRevision++;
+    notifyListeners();
+    _saveToPrefs();
+  }
+
+  void removeParkedThought(String id) {
+    final storageIndex = _indexOfParkedThought(id);
+    if (storageIndex == -1) return;
+    _parkedThoughts.removeAt(storageIndex);
+    _parkedThoughtsRevision++;
     notifyListeners();
     _saveToPrefs();
   }
 
   void clearDistractions() {
-    if (_distractions.isEmpty) return;
-    _distractions = [];
+    final previousLength = _parkedThoughts.length;
+    _parkedThoughts.removeWhere((thought) => !thought.isCompleted);
+    if (_parkedThoughts.length == previousLength) return;
+    _parkedThoughtsRevision++;
     notifyListeners();
     _saveToPrefs();
   }
+
+  void clearCompletedParkedThoughts() {
+    final previousLength = _parkedThoughts.length;
+    _parkedThoughts.removeWhere((thought) => thought.isCompleted);
+    if (_parkedThoughts.length == previousLength) return;
+    _parkedThoughtsRevision++;
+    notifyListeners();
+    _saveToPrefs();
+  }
+
+  int _indexOfParkedThought(String id) =>
+      _parkedThoughts.indexWhere((thought) => thought.id == id);
 
   void setDailyGoalMinutes(int minutes) {
     _dailyGoalMinutes = minutes.clamp(5, 480).toInt();
@@ -389,7 +461,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     if (hadHistory) {
       _focusHistoryRevision++;
     }
-    _distractions = [];
+    if (_parkedThoughts.isNotEmpty) {
+      _parkedThoughts = [];
+      _parkedThoughtsRevision++;
+    }
     _focusTask = '';
     _dailyGoalMinutes = _defaultDailyGoalMinutes;
     _isRunning = false;
@@ -413,6 +488,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       prefs.remove(_pendingResumeKey),
       prefs.remove('focusHistory'),
       prefs.remove('distractions'),
+      prefs.remove(_parkedThoughtsKey),
     ]);
     notifyListeners();
   }
@@ -537,12 +613,17 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         'focusHistory',
         jsonEncode(_focusHistory.map((session) => session.toJson()).toList()),
       ),
-      prefs.setStringList('distractions', _distractions),
+      prefs.setString(
+        _parkedThoughtsKey,
+        jsonEncode(_parkedThoughts.map((thought) => thought.toJson()).toList()),
+      ),
+      prefs.remove('distractions'),
     ]);
   }
 
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
+    var migratedLegacyThoughts = false;
     _focusSeconds = prefs.getInt('focusSeconds') ?? _focusSeconds;
     _shortBreakSeconds =
         prefs.getInt('shortBreakSeconds') ?? _shortBreakSeconds;
@@ -551,7 +632,29 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _focusTask = prefs.getString('focusTask') ?? '';
     _dailyGoalMinutes = prefs.getInt('dailyGoalMinutes') ?? _dailyGoalMinutes;
     _hasPendingResume = prefs.getBool(_pendingResumeKey) ?? false;
-    _distractions = prefs.getStringList('distractions') ?? [];
+    final parkedThoughtsJson = prefs.getString(_parkedThoughtsKey);
+    if (parkedThoughtsJson != null) {
+      _parkedThoughts = _decodeParkedThoughts(parkedThoughtsJson);
+    } else {
+      final legacyThoughts =
+          prefs.getStringList('distractions') ?? const <String>[];
+      if (legacyThoughts.isNotEmpty) {
+        final migrationTime = DateTime.now();
+        _parkedThoughts = [
+          for (var index = 0; index < legacyThoughts.length; index++)
+            if (legacyThoughts[index].trim().isNotEmpty)
+              ParkedThought(
+                id: 'legacy-${migrationTime.microsecondsSinceEpoch}-$index',
+                text: legacyThoughts[index],
+                createdAt: migrationTime.add(Duration(microseconds: index)),
+              ),
+        ];
+        migratedLegacyThoughts = true;
+      }
+    }
+    if (_parkedThoughts.isNotEmpty) {
+      _parkedThoughtsRevision++;
+    }
     final historyJson = prefs.getString('focusHistory');
     if (historyJson != null) {
       try {
@@ -594,8 +697,34 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         _saveToPrefs();
       }
     }
+    if (migratedLegacyThoughts) {
+      await _saveToPrefs();
+    }
     _hasLoaded = true;
     notifyListeners();
+  }
+
+  static List<ParkedThought> _decodeParkedThoughts(String source) {
+    try {
+      final decoded = jsonDecode(source);
+      if (decoded is! List) return [];
+
+      final thoughts = <ParkedThought>[];
+      for (final value in decoded.whereType<Map>()) {
+        try {
+          thoughts.add(
+            ParkedThought.fromJson(Map<String, dynamic>.from(value)),
+          );
+        } on FormatException {
+          // Ignore one damaged record without discarding valid local history.
+        } on TypeError {
+          // Ignore values with an unexpected persisted shape.
+        }
+      }
+      return thoughts;
+    } on FormatException {
+      return [];
+    }
   }
 
   @override

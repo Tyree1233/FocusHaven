@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../models/focus_session.dart';
 import '../models/journal_entry.dart';
+import '../models/parked_thought.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/focus_profile_service.dart';
@@ -64,6 +65,12 @@ typedef JournalState = ({
   String? mostCommonRecentMood,
   String dailyPrompt,
   JournalEntry? todayEntry,
+});
+
+/// Immutable parking-lot data separated from the one-second timer state.
+typedef ParkedThoughtState = ({
+  List<ParkedThought> activeThoughts,
+  List<ParkedThought> completedThoughts,
 });
 
 /// Immutable authentication data rendered by account-related views.
@@ -203,6 +210,20 @@ final timerFocusHistoryProvider = Provider<List<FocusSession>>((ref) {
 
   return ref.read(timerServiceProvider).recentFocusSessions;
 }, name: 'timerFocusHistoryProvider');
+
+/// Parking-lot snapshot that changes only when a thought is captured, edited,
+/// completed, reopened, removed, migrated, or cleared.
+final parkedThoughtStateProvider = Provider<ParkedThoughtState>((ref) {
+  ref.watch(
+    timerServiceProvider.select((timer) => timer.parkedThoughtsRevision),
+  );
+
+  final timer = ref.read(timerServiceProvider);
+  return (
+    activeThoughts: timer.parkedThoughts,
+    completedThoughts: timer.completedParkedThoughts,
+  );
+}, name: 'parkedThoughtStateProvider');
 
 /// Immutable queue snapshot that changes only when queue data is loaded,
 /// added, edited, completed, restored, removed, or cleared.
