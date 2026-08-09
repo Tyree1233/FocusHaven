@@ -22,6 +22,9 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
   };
 
   late final Set<int> _selectedWeekdays;
+  String? _activeAction;
+
+  bool get _isActionInProgress => _activeAction != null;
 
   @override
   void initState() {
@@ -29,74 +32,100 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
     _selectedWeekdays = ref.read(reminderStateProvider).weekdays.toSet();
   }
 
+  bool _beginAction(String action) {
+    if (_isActionInProgress) return false;
+    setState(() => _activeAction = action);
+    return true;
+  }
+
+  void _finishAction() {
+    if (mounted) setState(() => _activeAction = null);
+  }
+
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _toggleReminder(bool enabled, TimeOfDay currentTime) async {
-    final reminderService = ref.read(reminderServiceProvider);
+    if (!_beginAction(enabled ? 'enable' : 'disable')) return;
+    try {
+      final reminderService = ref.read(reminderServiceProvider);
 
-    if (!enabled) {
-      await reminderService.disableDailyReminder();
-      return;
+      if (!enabled) {
+        await reminderService.disableDailyReminder();
+        return;
+      }
+
+      final selected = await showTimePicker(
+        context: context,
+        initialTime: currentTime,
+      );
+      if (selected == null || !mounted) return;
+
+      final scheduled = await reminderService.setDailyReminder(
+        selected,
+        weekdays: _selectedWeekdays,
+      );
+      if (!mounted || scheduled) return;
+
+      _showMessage('Allow notifications to schedule a focus time.');
+    } catch (_) {
+      _showMessage('Reminder settings could not be updated right now.');
+    } finally {
+      _finishAction();
     }
-
-    final selected = await showTimePicker(
-      context: context,
-      initialTime: currentTime,
-    );
-    if (selected == null || !mounted) return;
-
-    final scheduled = await reminderService.setDailyReminder(
-      selected,
-      weekdays: _selectedWeekdays,
-    );
-    if (!mounted || scheduled) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Allow notifications to schedule a focus time.'),
-      ),
-    );
   }
 
   Future<void> _chooseTimeAndSchedule(TimeOfDay currentTime) async {
-    final selected = await showTimePicker(
-      context: context,
-      initialTime: currentTime,
-    );
-    if (selected == null || !mounted) return;
+    if (!_beginAction('schedule')) return;
+    try {
+      final selected = await showTimePicker(
+        context: context,
+        initialTime: currentTime,
+      );
+      if (selected == null || !mounted) return;
 
-    final scheduled = await ref
-        .read(reminderServiceProvider)
-        .setDailyReminder(selected, weekdays: _selectedWeekdays);
-    if (!mounted) return;
+      final scheduled = await ref
+          .read(reminderServiceProvider)
+          .setDailyReminder(selected, weekdays: _selectedWeekdays);
+      if (!mounted) return;
 
-    final formattedTime = MaterialLocalizations.of(
-      context,
-    ).formatTimeOfDay(selected);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          scheduled
-              ? 'Focus time scheduled for $formattedTime.'
-              : 'Allow notifications to schedule a focus time.',
-        ),
-      ),
-    );
+      final formattedTime = MaterialLocalizations.of(
+        context,
+      ).formatTimeOfDay(selected);
+      _showMessage(
+        scheduled
+            ? 'Focus time scheduled for $formattedTime.'
+            : 'Allow notifications to schedule a focus time.',
+      );
+    } catch (_) {
+      _showMessage('Reminder settings could not be updated right now.');
+    } finally {
+      _finishAction();
+    }
   }
 
   Future<void> _sendTestNotification() async {
-    final notifications = ref.read(notificationServiceProvider);
-    final permitted = await notifications.requestPermissions();
-    if (!mounted) return;
+    if (!_beginAction('test')) return;
+    try {
+      final notifications = ref.read(notificationServiceProvider);
+      final permitted = await notifications.requestPermissions();
+      if (!mounted) return;
 
-    if (!permitted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Allow notifications to send a test alert.'),
-        ),
-      );
-      return;
+      if (!permitted) {
+        _showMessage('Allow notifications to send a test alert.');
+        return;
+      }
+
+      await notifications.showTestNotification();
+    } catch (_) {
+      _showMessage('The test notification could not be sent right now.');
+    } finally {
+      _finishAction();
     }
-
-    await notifications.showTestNotification();
   }
 
   void _toggleWeekday(int weekday, bool selected) {
@@ -114,6 +143,8 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
   @override
   Widget build(BuildContext context) {
     final reminderState = ref.watch(reminderStateProvider);
+    final activeAction = _activeAction;
+    final isBusy = activeAction != null;
     final scheduledDays = _weekdayLabels.entries
         .where((entry) => reminderState.weekdays.contains(entry.key))
         .map((entry) => entry.value)
@@ -159,8 +190,10 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
                 ),
                 trailing: Switch(
                   value: reminderState.isEnabled,
-                  onChanged: (enabled) =>
-                      _toggleReminder(enabled, reminderState.time),
+                  onChanged: isBusy
+                      ? null
+                      : (enabled) =>
+                            _toggleReminder(enabled, reminderState.time),
                 ),
               ),
               const SizedBox(height: 8),
@@ -174,8 +207,9 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
                       (entry) => FilterChip(
                         label: Text(entry.value),
                         selected: _selectedWeekdays.contains(entry.key),
-                        onSelected: (selected) =>
-                            _toggleWeekday(entry.key, selected),
+                        onSelected: isBusy
+                            ? null
+                            : (selected) => _toggleWeekday(entry.key, selected),
                       ),
                     )
                     .toList(),
@@ -188,18 +222,26 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
-                onPressed: () => _chooseTimeAndSchedule(reminderState.time),
+                onPressed: isBusy
+                    ? null
+                    : () => _chooseTimeAndSchedule(reminderState.time),
                 icon: const Icon(Icons.schedule_outlined),
                 label: Text(
-                  reminderState.isEnabled
+                  activeAction == 'schedule'
+                      ? 'Saving focus time…'
+                      : reminderState.isEnabled
                       ? 'Update focus time'
                       : 'Choose focus time',
                 ),
               ),
               TextButton.icon(
-                onPressed: _sendTestNotification,
+                onPressed: isBusy ? null : _sendTestNotification,
                 icon: const Icon(Icons.notifications_outlined),
-                label: const Text('Send a test notification'),
+                label: Text(
+                  activeAction == 'test'
+                      ? 'Sending test notification…'
+                      : 'Send a test notification',
+                ),
               ),
             ],
           ),
