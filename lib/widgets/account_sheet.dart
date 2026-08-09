@@ -5,7 +5,7 @@ import '../providers/app_providers.dart';
 
 typedef AccountSheetAction = Future<void> Function();
 
-class AccountSheet extends riverpod.ConsumerWidget {
+class AccountSheet extends riverpod.ConsumerStatefulWidget {
   const AccountSheet({
     required this.deleteCloudBackup,
     required this.deleteLocalData,
@@ -24,9 +24,15 @@ class AccountSheet extends riverpod.ConsumerWidget {
   final AccountSheetAction openPrivacyPolicy;
 
   @override
-  Widget build(BuildContext context, riverpod.WidgetRef ref) {
+  riverpod.ConsumerState<AccountSheet> createState() => _AccountSheetState();
+}
+
+class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
+  bool _authActionInProgress = false;
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
-    final authService = ref.read(authServiceProvider);
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -85,45 +91,51 @@ class AccountSheet extends riverpod.ConsumerWidget {
               const SizedBox(height: 20),
               if (authState.isSignedIn)
                 OutlinedButton.icon(
-                  onPressed: authService.signOut,
+                  onPressed: _authActionInProgress ? null : _signOut,
                   icon: const Icon(Icons.logout),
-                  label: const Text('Sign out'),
+                  label: Text(
+                    _authActionInProgress ? 'Signing out…' : 'Sign out',
+                  ),
                 )
               else
                 FilledButton.icon(
-                  onPressed: () => _signIn(context, ref),
+                  onPressed: _authActionInProgress ? null : _signIn,
                   icon: const Icon(Icons.login),
-                  label: const Text('Sign in with Google'),
+                  label: Text(
+                    _authActionInProgress
+                        ? 'Signing in…'
+                        : 'Sign in with Google',
+                  ),
                 ),
               if (authState.isSignedIn)
                 TextButton.icon(
-                  onPressed: deleteCloudBackup,
+                  onPressed: widget.deleteCloudBackup,
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('Delete cloud backup'),
                 ),
               TextButton.icon(
-                onPressed: deleteLocalData,
+                onPressed: widget.deleteLocalData,
                 icon: const Icon(Icons.delete_forever_outlined),
                 label: const Text('Delete local data'),
               ),
               const SizedBox(height: 8),
               TextButton.icon(
-                onPressed: openPro,
+                onPressed: widget.openPro,
                 icon: const Icon(Icons.workspace_premium_outlined),
                 label: const Text('FocusHaven Pro'),
               ),
               TextButton.icon(
-                onPressed: openFocusProfile,
+                onPressed: widget.openFocusProfile,
                 icon: const Icon(Icons.psychology_outlined),
                 label: const Text('Discover your focus profile'),
               ),
               TextButton.icon(
-                onPressed: openAppearance,
+                onPressed: widget.openAppearance,
                 icon: const Icon(Icons.palette_outlined),
                 label: const Text('Appearance'),
               ),
               TextButton.icon(
-                onPressed: openPrivacyPolicy,
+                onPressed: widget.openPrivacyPolicy,
                 icon: const Icon(Icons.privacy_tip_outlined),
                 label: const Text('Privacy Policy'),
               ),
@@ -134,20 +146,53 @@ class AccountSheet extends riverpod.ConsumerWidget {
     );
   }
 
-  Future<void> _signIn(BuildContext context, riverpod.WidgetRef ref) async {
-    final result = await ref.read(authServiceProvider).signInWithGoogle();
-    if (!context.mounted) return;
+  bool _beginAuthAction() {
+    if (_authActionInProgress) return false;
+    setState(() => _authActionInProgress = true);
+    return true;
+  }
 
-    if (result != null) {
-      Navigator.pop(context);
-      return;
-    }
+  void _finishAuthAction() {
+    if (mounted) setState(() => _authActionInProgress = false);
+  }
 
-    final message =
-        ref.read(authStateProvider).signInError ??
-        'Sign-in was not completed. Please try again.';
+  void _showMessage(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _signIn() async {
+    if (!_beginAuthAction()) return;
+    try {
+      final result = await ref.read(authServiceProvider).signInWithGoogle();
+      if (!mounted) return;
+
+      if (result != null) {
+        Navigator.pop(context);
+        return;
+      }
+
+      final message =
+          ref.read(authStateProvider).signInError ??
+          'Sign-in was not completed. Please try again.';
+      _showMessage(message);
+    } catch (_) {
+      _showMessage('Sign-in could not be completed. Please try again.');
+    } finally {
+      _finishAuthAction();
+    }
+  }
+
+  Future<void> _signOut() async {
+    if (!_beginAuthAction()) return;
+    try {
+      await ref.read(authServiceProvider).signOut();
+    } catch (_) {
+      _showMessage('Sign-out could not be completed. Please try again.');
+    } finally {
+      _finishAuthAction();
+    }
   }
 }

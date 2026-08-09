@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +16,8 @@ class _FakeAuthService extends AuthService {
   final String? error;
   var signInCalls = 0;
   var signOutCalls = 0;
+  Completer<UserCredential?>? pendingSignIn;
+  Completer<void>? pendingSignOut;
 
   @override
   bool get isSignedIn => signedIn;
@@ -27,12 +31,20 @@ class _FakeAuthService extends AuthService {
   @override
   Future<UserCredential?> signInWithGoogle() async {
     signInCalls += 1;
+    final pending = pendingSignIn;
+    if (pending != null) {
+      return pending.future;
+    }
     return null;
   }
 
   @override
   Future<void> signOut() async {
     signOutCalls += 1;
+    final pending = pendingSignOut;
+    if (pending != null) {
+      await pending.future;
+    }
   }
 }
 
@@ -142,6 +154,47 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('blocks duplicate sign-ins and contains unexpected failures', (
+    tester,
+  ) async {
+    final auth = _FakeAuthService(signedIn: false);
+    auth.pendingSignIn = Completer<UserCredential?>();
+    final actions = _ActionLog();
+
+    await tester.pumpWidget(_app(auth, actions));
+    await tester.pumpAndSettle();
+
+    final signInAction = find.widgetWithText(
+      FilledButton,
+      'Sign in with Google',
+    );
+    final signInButton = tester.widget<FilledButton>(signInAction);
+    signInButton.onPressed!.call();
+    signInButton.onPressed!.call();
+    await tester.pump();
+
+    expect(auth.signInCalls, 1);
+    expect(find.text('Signing in…'), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Signing in…'),
+          )
+          .onPressed,
+      isNull,
+    );
+
+    auth.pendingSignIn!.completeError(Exception('provider unavailable'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Sign-in could not be completed. Please try again.'),
+      findsOneWidget,
+    );
+    expect(find.text('Sign in with Google'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'shows signed-in account controls and dispatches secure actions',
     (tester) async {
@@ -168,4 +221,42 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('blocks duplicate sign-outs and contains unexpected failures', (
+    tester,
+  ) async {
+    final auth = _FakeAuthService(signedIn: true, name: 'Tyree Jones');
+    auth.pendingSignOut = Completer<void>();
+    final actions = _ActionLog();
+
+    await tester.pumpWidget(_app(auth, actions));
+    await tester.pumpAndSettle();
+
+    final signOutAction = find.widgetWithText(OutlinedButton, 'Sign out');
+    final signOutButton = tester.widget<OutlinedButton>(signOutAction);
+    signOutButton.onPressed!.call();
+    signOutButton.onPressed!.call();
+    await tester.pump();
+
+    expect(auth.signOutCalls, 1);
+    expect(find.text('Signing out…'), findsOneWidget);
+    expect(
+      tester
+          .widget<OutlinedButton>(
+            find.widgetWithText(OutlinedButton, 'Signing out…'),
+          )
+          .onPressed,
+      isNull,
+    );
+
+    auth.pendingSignOut!.completeError(Exception('provider unavailable'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Sign-out could not be completed. Please try again.'),
+      findsOneWidget,
+    );
+    expect(find.text('Sign out'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
