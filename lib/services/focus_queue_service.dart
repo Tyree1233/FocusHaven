@@ -20,11 +20,12 @@ class FocusQueueItem {
     String? title,
     bool? isComplete,
     DateTime? completedAt,
+    bool clearCompletedAt = false,
   }) => FocusQueueItem(
     id: id,
     title: title ?? this.title,
     isComplete: isComplete ?? this.isComplete,
-    completedAt: completedAt,
+    completedAt: clearCompletedAt ? null : completedAt ?? this.completedAt,
   );
 
   Map<String, dynamic> toJson() => {
@@ -48,9 +49,10 @@ class FocusQueueService extends ChangeNotifier {
   static const _storageKey = 'focusQueue';
   List<FocusQueueItem> _items = [];
   int _queueRevision = 0;
+  late final Future<void> _loadFuture;
 
   FocusQueueService() {
-    _load();
+    _loadFuture = _load();
   }
 
   List<FocusQueueItem> get items =>
@@ -63,21 +65,19 @@ class FocusQueueService extends ChangeNotifier {
   int get completedToday => _items.where((item) {
     final completedAt = item.completedAt;
     if (completedAt == null) return false;
-    final now = DateTime.now();
-    return completedAt.year == now.year &&
-        completedAt.month == now.month &&
-        completedAt.day == now.day;
+    final localCompletedAt = completedAt.toLocal();
+    final localNow = DateTime.now().toLocal();
+    return localCompletedAt.year == localNow.year &&
+        localCompletedAt.month == localNow.month &&
+        localCompletedAt.day == localNow.day;
   }).length;
 
   Future<void> add(String title) async {
     final limited = _cleanTitle(title);
     if (limited == null) return;
-    _items.add(
-      FocusQueueItem(
-        id: DateTime.now().microsecondsSinceEpoch.toString(),
-        title: limited,
-      ),
-    );
+    await _loadFuture;
+
+    _items.add(FocusQueueItem(id: _nextItemId(), title: limited));
     await _save();
     _notifyQueueChanged();
   }
@@ -85,35 +85,46 @@ class FocusQueueService extends ChangeNotifier {
   Future<void> rename(String id, String title) async {
     final limited = _cleanTitle(title);
     if (limited == null) return;
-    _items = _items
-        .map((item) => item.id == id ? item.copyWith(title: limited) : item)
-        .toList();
+    await _loadFuture;
+
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index == -1 || _items[index].title == limited) return;
+
+    _items[index] = _items[index].copyWith(title: limited);
     await _save();
     _notifyQueueChanged();
   }
 
   Future<void> toggle(String id) async {
-    _items = _items
-        .map(
-          (item) => item.id == id
-              ? item.copyWith(
-                  isComplete: !item.isComplete,
-                  completedAt: item.isComplete ? null : DateTime.now(),
-                )
-              : item,
-        )
-        .toList();
+    await _loadFuture;
+
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index == -1) return;
+
+    final item = _items[index];
+    _items[index] = item.copyWith(
+      isComplete: !item.isComplete,
+      completedAt: item.isComplete ? null : DateTime.now(),
+      clearCompletedAt: item.isComplete,
+    );
     await _save();
     _notifyQueueChanged();
   }
 
   Future<void> remove(String id) async {
-    _items.removeWhere((item) => item.id == id);
+    await _loadFuture;
+
+    final index = _items.indexWhere((item) => item.id == id);
+    if (index == -1) return;
+
+    _items.removeAt(index);
     await _save();
     _notifyQueueChanged();
   }
 
   Future<void> clearLocalData() async {
+    await _loadFuture;
+
     _items = [];
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_storageKey);
@@ -127,19 +138,39 @@ class FocusQueueService extends ChangeNotifier {
     try {
       final decoded = jsonDecode(saved);
       if (decoded is List) {
-        _items = decoded
-            .whereType<Map>()
-            .map(
-              (item) =>
-                  FocusQueueItem.fromJson(Map<String, dynamic>.from(item)),
-            )
-            .toList();
+        final loadedItems = <FocusQueueItem>[];
+        final loadedIds = <String>{};
+        for (final value in decoded) {
+          final item = _decodeQueueItem(value);
+          if (item != null && loadedIds.add(item.id)) {
+            loadedItems.add(item);
+          }
+        }
+        _items = loadedItems;
         _notifyQueueChanged();
       }
     } on FormatException {
       _items = [];
+    }
+  }
+
+  FocusQueueItem? _decodeQueueItem(Object? value) {
+    if (value is! Map) return null;
+
+    try {
+      final item = FocusQueueItem.fromJson(Map<String, dynamic>.from(value));
+      final id = item.id.trim();
+      final title = _cleanTitle(item.title);
+      if (id.isEmpty || title == null) return null;
+
+      return FocusQueueItem(
+        id: id,
+        title: title,
+        isComplete: item.isComplete,
+        completedAt: item.isComplete ? item.completedAt : null,
+      );
     } on TypeError {
-      _items = [];
+      return null;
     }
   }
 
@@ -154,6 +185,14 @@ class FocusQueueService extends ChangeNotifier {
       _storageKey,
       jsonEncode(_items.map((item) => item.toJson()).toList()),
     );
+  }
+
+  String _nextItemId() {
+    var candidate = DateTime.now().microsecondsSinceEpoch;
+    while (_items.any((item) => item.id == candidate.toString())) {
+      candidate++;
+    }
+    return candidate.toString();
   }
 }
 

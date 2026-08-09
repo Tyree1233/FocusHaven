@@ -30,6 +30,29 @@ void main() {
     expect(preferences.getString('focusQueue'), isNotNull);
   });
 
+  test('adding during startup preserves the saved queue', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode([
+        {'id': 'saved-1', 'title': 'Saved before launch', 'isComplete': false},
+      ]),
+    });
+
+    final queue = FocusQueueService();
+    addTearDown(queue.dispose);
+
+    await queue.add('Added immediately');
+
+    expect(queue.items, hasLength(2));
+    expect(
+      queue.items.map((item) => item.title),
+      containsAll(['Saved before launch', 'Added immediately']),
+    );
+
+    final preferences = await SharedPreferences.getInstance();
+    final saved = jsonDecode(preferences.getString('focusQueue')!) as List;
+    expect(saved, hasLength(2));
+  });
+
   test('does not add an empty task', () async {
     final queue = await createQueue();
     addTearDown(queue.dispose);
@@ -58,6 +81,38 @@ void main() {
     expect(queue.items.single.title, 'Review project notes');
   });
 
+  test(
+    'renaming a completed task preserves its completion timestamp',
+    () async {
+      final completedAt = DateTime.now().subtract(const Duration(minutes: 1));
+      SharedPreferences.setMockInitialValues({
+        'focusQueue': jsonEncode([
+          {
+            'id': 'done-1',
+            'title': 'Original completed task',
+            'isComplete': true,
+            'completedAt': completedAt.toIso8601String(),
+          },
+        ]),
+      });
+
+      final queue = await createQueue();
+      addTearDown(queue.dispose);
+
+      await queue.rename('done-1', 'Renamed completed task');
+
+      final item = queue.completedItems.single;
+      expect(item.title, 'Renamed completed task');
+      expect(item.completedAt, isNotNull);
+      expect(item.completedAt!.isAtSameMomentAs(completedAt), isTrue);
+
+      final preferences = await SharedPreferences.getInstance();
+      final saved = jsonDecode(preferences.getString('focusQueue')!) as List;
+      final savedItem = Map<String, dynamic>.from(saved.single as Map);
+      expect(savedItem['completedAt'], completedAt.toIso8601String());
+    },
+  );
+
   test('does not replace a task title with an empty value', () async {
     final queue = await createQueue();
     addTearDown(queue.dispose);
@@ -66,6 +121,28 @@ void main() {
     await queue.rename(queue.items.single.id, '   ');
 
     expect(queue.items.single.title, 'Read notes');
+  });
+
+  test('no-op task actions do not persist or notify listeners', () async {
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+    await queue.add('Keep this task');
+
+    final preferences = await SharedPreferences.getInstance();
+    final savedBefore = preferences.getString('focusQueue');
+    final revisionBefore = queue.queueRevision;
+    var notifications = 0;
+    queue.addListener(() => notifications++);
+
+    await queue.rename(queue.items.single.id, '  Keep   this task  ');
+    await queue.rename('missing-id', 'Missing task');
+    await queue.toggle('missing-id');
+    await queue.remove('missing-id');
+
+    expect(queue.queueRevision, revisionBefore);
+    expect(notifications, 0);
+    expect(preferences.getString('focusQueue'), savedBefore);
+    expect(queue.items.single.title, 'Keep this task');
   });
 
   test('completing a task moves it to completed items', () async {
@@ -92,6 +169,7 @@ void main() {
     await queue.toggle(id);
 
     expect(queue.items, hasLength(1));
+    expect(queue.items.single.completedAt, isNull);
     expect(queue.completedItems, isEmpty);
   });
 
@@ -127,10 +205,55 @@ void main() {
     expect(queue.completedItems.single.title, 'Plan tomorrow');
   });
 
-  test('starts with an empty queue when saved data is invalid', () async {
+  test(
+    'preserves valid tasks when individual saved records are invalid',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'focusQueue': jsonEncode([
+          {
+            'id': 'active-1',
+            'title': '  Review   notes  ',
+            'isComplete': false,
+          },
+          {'id': 'missing-title', 'isComplete': false},
+          {'id': 42, 'title': 'Invalid ID', 'isComplete': false},
+          'not a queue record',
+          {
+            'id': 'done-1',
+            'title': 'Plan tomorrow',
+            'isComplete': true,
+            'completedAt': '2026-08-07T12:00:00.000',
+          },
+        ]),
+      });
+
+      final queue = await createQueue();
+      addTearDown(queue.dispose);
+
+      expect(queue.items, hasLength(1));
+      expect(queue.items.single.title, 'Review notes');
+      expect(queue.completedItems, hasLength(1));
+      expect(queue.completedItems.single.title, 'Plan tomorrow');
+    },
+  );
+
+  test('keeps only the first saved task when IDs are duplicated', () async {
     SharedPreferences.setMockInitialValues({
-      'focusQueue': 'not valid JSON',
+      'focusQueue': jsonEncode([
+        {'id': 'same-id', 'title': 'First task', 'isComplete': false},
+        {'id': 'same-id', 'title': 'Duplicate task', 'isComplete': false},
+      ]),
     });
+
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+
+    expect(queue.items, hasLength(1));
+    expect(queue.items.single.title, 'First task');
+  });
+
+  test('starts with an empty queue when saved data is invalid', () async {
+    SharedPreferences.setMockInitialValues({'focusQueue': 'not valid JSON'});
 
     final queue = await createQueue();
     addTearDown(queue.dispose);
