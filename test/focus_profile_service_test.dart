@@ -11,7 +11,7 @@ void main() {
 
   Future<FocusProfileService> createProfile() async {
     final profile = FocusProfileService();
-    await Future<void>.delayed(Duration.zero);
+    await profile.initialized;
     return profile;
   }
 
@@ -38,14 +38,59 @@ void main() {
     expect(preferences.containsKey('focusProfile'), isFalse);
   });
 
-  test('loads the saved focus profile on launch', () async {
+  test('loads and normalizes the saved focus profile on launch', () async {
     SharedPreferences.setMockInitialValues({
-      'focusProfile': 'Structured planner',
+      'focusProfile': '  Structured planner  ',
     });
 
     final profile = await createProfile();
     addTearDown(profile.dispose);
 
     expect(profile.focusType, 'Structured planner');
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('focusProfile'), 'Structured planner');
+  });
+
+  test('rejects invalid values and suppresses duplicate updates', () async {
+    final profile = await createProfile();
+    addTearDown(profile.dispose);
+    var notifications = 0;
+    profile.addListener(() => notifications += 1);
+
+    await profile.saveFocusType('  Deep work  ');
+    expect(profile.focusType, 'Deep work');
+    expect(notifications, 1);
+
+    await profile.saveFocusType('Deep work');
+    await profile.saveFocusType('   ');
+    await profile.saveFocusType(List<String>.filled(81, 'x').join());
+
+    expect(profile.focusType, 'Deep work');
+    expect(notifications, 1);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('focusProfile'), 'Deep work');
+  });
+
+  test('removes an invalid saved profile value', () async {
+    SharedPreferences.setMockInitialValues({'focusProfile': '   '});
+
+    final profile = await createProfile();
+    addTearDown(profile.dispose);
+
+    expect(profile.focusType, isNull);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('focusProfile'), isFalse);
+  });
+
+  test('initialization and mutations are safe after disposal', () async {
+    SharedPreferences.setMockInitialValues({'focusProfile': 'Deep Diver'});
+    final profile = FocusProfileService();
+
+    profile.dispose();
+    await profile.initialized;
+    await profile.saveFocusType('Gentle Flow');
+    await profile.clearLocalData();
+
+    expect(profile.focusType, isNull);
   });
 }

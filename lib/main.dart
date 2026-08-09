@@ -8,6 +8,7 @@ import 'firebase_options.dart';
 import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
+import 'services/focus_profile_service.dart';
 import 'services/notification_service.dart';
 import 'services/theme_service.dart';
 import 'services/timer_service.dart';
@@ -23,12 +24,20 @@ Future<void> main() async {
   final showOnboarding =
       !(preferences.getBool('hasCompletedOnboarding') ?? false);
   final timerService = TimerService(notificationService: notificationService);
-  await timerService.initialized;
+  final themeService = ThemeService();
+  final focusProfileService = FocusProfileService();
+  await Future.wait([
+    timerService.initialized,
+    themeService.initialized,
+    focusProfileService.initialized,
+  ]);
 
   runApp(
     FocusHavenApp(
       notificationService: notificationService,
       timerService: timerService,
+      themeService: themeService,
+      focusProfileService: focusProfileService,
       showOnboarding: showOnboarding,
     ),
   );
@@ -39,11 +48,15 @@ class FocusHavenApp extends StatelessWidget {
     super.key,
     this.notificationService,
     this.timerService,
+    this.themeService,
+    this.focusProfileService,
     this.showOnboarding = true,
   });
 
   final NotificationService? notificationService;
   final TimerService? timerService;
+  final ThemeService? themeService;
+  final FocusProfileService? focusProfileService;
   final bool showOnboarding;
 
   @override
@@ -51,6 +64,8 @@ class FocusHavenApp extends StatelessWidget {
     final activeNotificationService =
         notificationService ?? NotificationService();
     final activeTimerService = timerService;
+    final activeThemeService = themeService;
+    final activeFocusProfileService = focusProfileService;
 
     return ProviderScope(
       overrides: [
@@ -59,6 +74,12 @@ class FocusHavenApp extends StatelessWidget {
         ),
         if (activeTimerService != null)
           timerServiceProvider.overrideWith((ref) => activeTimerService),
+        if (activeThemeService != null)
+          themeServiceProvider.overrideWith((ref) => activeThemeService),
+        if (activeFocusProfileService != null)
+          focusProfileServiceProvider.overrideWith(
+            (ref) => activeFocusProfileService,
+          ),
       ],
       child: _FocusHavenMaterialApp(showOnboarding: showOnboarding),
     );

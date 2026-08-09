@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/main.dart';
+import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
+import 'package:focushaven/services/focus_profile_service.dart';
+import 'package:focushaven/services/theme_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 
 void main() {
@@ -68,4 +72,47 @@ void main() {
     expect(find.text('Begin focus'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'uses pre-initialized theme and focus profile supplied at app startup',
+    (WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({
+        'focusHavenTheme': FocusHavenTheme.forest.name,
+        'focusProfile': '  Deep Diver  ',
+      });
+      final themeService = ThemeService();
+      final focusProfileService = FocusProfileService();
+      await Future.wait([
+        themeService.initialized,
+        focusProfileService.initialized,
+      ]);
+
+      await tester.pumpWidget(
+        FocusHavenApp(
+          themeService: themeService,
+          focusProfileService: focusProfileService,
+        ),
+      );
+      await tester.pump();
+
+      final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(
+        materialApp.theme?.scaffoldBackgroundColor,
+        FocusHavenTheme.forest.background,
+      );
+
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(MaterialApp)),
+        listen: false,
+      );
+      expect(container.read(themeServiceProvider), same(themeService));
+      expect(
+        container.read(focusProfileServiceProvider),
+        same(focusProfileService),
+      );
+      expect(container.read(selectedThemeProvider), FocusHavenTheme.forest);
+      expect(container.read(focusProfileTypeProvider), 'Deep Diver');
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

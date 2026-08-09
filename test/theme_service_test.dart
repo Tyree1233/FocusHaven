@@ -11,7 +11,7 @@ void main() {
 
   Future<ThemeService> createThemeService() async {
     final service = ThemeService();
-    await Future<void>.delayed(Duration.zero);
+    await service.initialized;
     return service;
   }
 
@@ -39,9 +39,7 @@ void main() {
   });
 
   test('loads a previously selected appearance theme', () async {
-    SharedPreferences.setMockInitialValues({
-      'focusHavenTheme': 'roseQuartz',
-    });
+    SharedPreferences.setMockInitialValues({'focusHavenTheme': 'roseQuartz'});
 
     final service = await createThemeService();
     addTearDown(service.dispose);
@@ -53,6 +51,36 @@ void main() {
     SharedPreferences.setMockInitialValues({'focusHavenTheme': 'unknown'});
     final service = await createThemeService();
     addTearDown(service.dispose);
+
+    expect(service.selectedTheme, FocusHavenTheme.twilight);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('focusHavenTheme'), isFalse);
+  });
+
+  test('does not rebuild for repeated selection of the active theme', () async {
+    final service = await createThemeService();
+    addTearDown(service.dispose);
+    var notifications = 0;
+    service.addListener(() => notifications += 1);
+
+    await service.setTheme(FocusHavenTheme.twilight);
+    expect(notifications, 0);
+
+    await service.setTheme(FocusHavenTheme.forest);
+    expect(notifications, 1);
+
+    await service.setTheme(FocusHavenTheme.forest);
+    expect(notifications, 1);
+  });
+
+  test('initialization and mutations are safe after disposal', () async {
+    SharedPreferences.setMockInitialValues({'focusHavenTheme': 'forest'});
+    final service = ThemeService();
+
+    service.dispose();
+    await service.initialized;
+    await service.setTheme(FocusHavenTheme.sunset);
+    await service.clearLocalData();
 
     expect(service.selectedTheme, FocusHavenTheme.twilight);
   });

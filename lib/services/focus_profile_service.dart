@@ -3,31 +3,83 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class FocusProfileService extends ChangeNotifier {
   static const _profileKey = 'focusProfile';
+  static const _maximumFocusTypeLength = 80;
+
   String? _focusType;
+  bool _isDisposed = false;
+
+  FocusProfileService() {
+    initialized = _load();
+  }
+
+  late final Future<void> initialized;
 
   String? get focusType => _focusType;
 
-  FocusProfileService() {
-    _load();
-  }
-
   Future<void> saveFocusType(String focusType) async {
-    _focusType = focusType;
+    await initialized;
+    if (_isDisposed) return;
+
+    final normalizedFocusType = _normalizeFocusType(focusType);
+    if (normalizedFocusType == null || _focusType == normalizedFocusType) {
+      return;
+    }
+
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(_profileKey, focusType);
+    await preferences.setString(_profileKey, normalizedFocusType);
+    if (_isDisposed) return;
+
+    _focusType = normalizedFocusType;
     notifyListeners();
   }
 
   Future<void> clearLocalData() async {
-    _focusType = null;
+    await initialized;
+    if (_isDisposed) return;
+
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_profileKey);
-    notifyListeners();
+    if (_isDisposed) return;
+
+    final changed = _focusType != null;
+    _focusType = null;
+    if (changed) notifyListeners();
   }
 
   Future<void> _load() async {
-    final preferences = await SharedPreferences.getInstance();
-    _focusType = preferences.getString(_profileKey);
-    notifyListeners();
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      if (_isDisposed) return;
+
+      final savedFocusType = preferences.getString(_profileKey);
+      final normalizedFocusType = savedFocusType == null
+          ? null
+          : _normalizeFocusType(savedFocusType);
+      if (normalizedFocusType == null) {
+        if (savedFocusType != null) await preferences.remove(_profileKey);
+      } else {
+        _focusType = normalizedFocusType;
+        if (normalizedFocusType != savedFocusType) {
+          await preferences.setString(_profileKey, normalizedFocusType);
+        }
+      }
+    } catch (error) {
+      debugPrint('Focus profile could not be loaded: $error');
+    }
+    if (!_isDisposed) notifyListeners();
+  }
+
+  String? _normalizeFocusType(String value) {
+    final normalized = value.trim();
+    if (normalized.isEmpty || normalized.length > _maximumFocusTypeLength) {
+      return null;
+    }
+    return normalized;
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }
