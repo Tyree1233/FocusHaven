@@ -9,6 +9,7 @@ import 'package:focushaven/main.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
 import 'package:focushaven/services/focus_profile_service.dart';
+import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/journal_service.dart';
 import 'package:focushaven/services/theme_service.dart';
 import 'package:focushaven/services/timer_service.dart';
@@ -152,6 +153,40 @@ void main() {
       journalState.entries.single.reflection,
       'This reflection is ready on the first frame.',
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('uses the pre-initialized queue supplied at app startup', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode([
+        {
+          'id': 'startup-task',
+          'title': 'Ready on the first frame',
+          'isComplete': false,
+        },
+      ]),
+    });
+    final focusQueueService = FocusQueueService();
+    await focusQueueService.initialized;
+
+    await tester.pumpWidget(
+      FocusHavenApp(focusQueueService: focusQueueService),
+    );
+    await tester.pump();
+
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MaterialApp)),
+      listen: false,
+    );
+    expect(container.read(focusQueueServiceProvider), same(focusQueueService));
+
+    final queueState = container.read(focusQueueStateProvider);
+    expect(queueState.activeItems, hasLength(1));
+    expect(queueState.activeItems.single.id, 'startup-task');
+    expect(queueState.activeItems.single.title, 'Ready on the first frame');
+    expect(queueState.completedItems, isEmpty);
     expect(tester.takeException(), isNull);
   });
 }

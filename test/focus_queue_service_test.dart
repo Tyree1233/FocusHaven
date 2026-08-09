@@ -13,7 +13,7 @@ void main() {
 
   Future<FocusQueueService> createQueue() async {
     final queue = FocusQueueService();
-    await Future<void>.delayed(Duration.zero);
+    await queue.initialized;
     return queue;
   }
 
@@ -260,5 +260,39 @@ void main() {
 
     expect(queue.items, isEmpty);
     expect(queue.completedItems, isEmpty);
+  });
+
+  test('initialization and mutations are safe after disposal', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode([
+        {
+          'id': 'saved-1',
+          'title': 'Saved before disposal',
+          'isComplete': false,
+        },
+      ]),
+    });
+    final queue = FocusQueueService();
+    queue.dispose();
+
+    await queue.initialized;
+    await queue.add('Ignored task');
+    await queue.rename('saved-1', 'Ignored rename');
+    await queue.toggle('saved-1');
+    await queue.remove('saved-1');
+    await queue.clearLocalData();
+
+    expect(queue.queueRevision, 0);
+    expect(queue.items, hasLength(1));
+    expect(queue.items.single.title, 'Saved before disposal');
+    expect(queue.completedItems, isEmpty);
+
+    final preferences = await SharedPreferences.getInstance();
+    final saved = jsonDecode(preferences.getString('focusQueue')!) as List;
+    expect(saved, hasLength(1));
+    expect(
+      Map<String, dynamic>.from(saved.single as Map)['title'],
+      'Saved before disposal',
+    );
   });
 }

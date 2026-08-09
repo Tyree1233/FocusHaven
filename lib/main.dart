@@ -9,6 +9,7 @@ import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
 import 'services/focus_profile_service.dart';
+import 'services/focus_queue_service.dart';
 import 'services/journal_service.dart';
 import 'services/notification_service.dart';
 import 'services/theme_service.dart';
@@ -27,11 +28,13 @@ Future<void> main() async {
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();
   final focusProfileService = FocusProfileService();
+  final focusQueueService = FocusQueueService();
   final journalService = JournalService();
   await Future.wait([
     timerService.initialized,
     themeService.initialized,
     focusProfileService.initialized,
+    focusQueueService.initialized,
     journalService.initialized,
   ]);
 
@@ -41,6 +44,7 @@ Future<void> main() async {
       timerService: timerService,
       themeService: themeService,
       focusProfileService: focusProfileService,
+      focusQueueService: focusQueueService,
       journalService: journalService,
       showOnboarding: showOnboarding,
     ),
@@ -54,6 +58,7 @@ class FocusHavenApp extends StatelessWidget {
     this.timerService,
     this.themeService,
     this.focusProfileService,
+    this.focusQueueService,
     this.journalService,
     this.showOnboarding = true,
   });
@@ -62,6 +67,7 @@ class FocusHavenApp extends StatelessWidget {
   final TimerService? timerService;
   final ThemeService? themeService;
   final FocusProfileService? focusProfileService;
+  final FocusQueueService? focusQueueService;
   final JournalService? journalService;
   final bool showOnboarding;
 
@@ -72,6 +78,7 @@ class FocusHavenApp extends StatelessWidget {
     final activeTimerService = timerService;
     final activeThemeService = themeService;
     final activeFocusProfileService = focusProfileService;
+    final activeFocusQueueService = focusQueueService;
     final activeJournalService = journalService;
 
     return ProviderScope(
@@ -86,6 +93,10 @@ class FocusHavenApp extends StatelessWidget {
         if (activeFocusProfileService != null)
           focusProfileServiceProvider.overrideWith(
             (ref) => activeFocusProfileService,
+          ),
+        if (activeFocusQueueService != null)
+          focusQueueServiceProvider.overrideWith(
+            (ref) => activeFocusQueueService,
           ),
         if (activeJournalService != null)
           journalServiceProvider.overrideWith((ref) => activeJournalService),

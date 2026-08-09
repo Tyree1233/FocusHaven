@@ -49,11 +49,13 @@ class FocusQueueService extends ChangeNotifier {
   static const _storageKey = 'focusQueue';
   List<FocusQueueItem> _items = [];
   int _queueRevision = 0;
-  late final Future<void> _loadFuture;
+  bool _isDisposed = false;
 
   FocusQueueService() {
-    _loadFuture = _load();
+    initialized = _load();
   }
+
+  late final Future<void> initialized;
 
   List<FocusQueueItem> get items =>
       List.unmodifiable(_items.where((item) => !item.isComplete));
@@ -75,7 +77,8 @@ class FocusQueueService extends ChangeNotifier {
   Future<void> add(String title) async {
     final limited = _cleanTitle(title);
     if (limited == null) return;
-    await _loadFuture;
+    await initialized;
+    if (_isDisposed) return;
 
     _items.add(FocusQueueItem(id: _nextItemId(), title: limited));
     await _save();
@@ -85,7 +88,8 @@ class FocusQueueService extends ChangeNotifier {
   Future<void> rename(String id, String title) async {
     final limited = _cleanTitle(title);
     if (limited == null) return;
-    await _loadFuture;
+    await initialized;
+    if (_isDisposed) return;
 
     final index = _items.indexWhere((item) => item.id == id);
     if (index == -1 || _items[index].title == limited) return;
@@ -96,7 +100,8 @@ class FocusQueueService extends ChangeNotifier {
   }
 
   Future<void> toggle(String id) async {
-    await _loadFuture;
+    await initialized;
+    if (_isDisposed) return;
 
     final index = _items.indexWhere((item) => item.id == id);
     if (index == -1) return;
@@ -112,7 +117,8 @@ class FocusQueueService extends ChangeNotifier {
   }
 
   Future<void> remove(String id) async {
-    await _loadFuture;
+    await initialized;
+    if (_isDisposed) return;
 
     final index = _items.indexWhere((item) => item.id == id);
     if (index == -1) return;
@@ -123,11 +129,14 @@ class FocusQueueService extends ChangeNotifier {
   }
 
   Future<void> clearLocalData() async {
-    await _loadFuture;
+    await initialized;
+    if (_isDisposed) return;
 
     _items = [];
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_storageKey);
+    if (_isDisposed) return;
+
     _notifyQueueChanged();
   }
 
@@ -175,6 +184,7 @@ class FocusQueueService extends ChangeNotifier {
   }
 
   void _notifyQueueChanged() {
+    if (_isDisposed) return;
     _queueRevision++;
     notifyListeners();
   }
@@ -193,6 +203,12 @@ class FocusQueueService extends ChangeNotifier {
       candidate++;
     }
     return candidate.toString();
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }
 
