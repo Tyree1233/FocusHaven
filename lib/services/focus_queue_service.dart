@@ -146,20 +146,36 @@ class FocusQueueService extends ChangeNotifier {
     if (saved == null) return;
     try {
       final decoded = jsonDecode(saved);
-      if (decoded is List) {
-        final loadedItems = <FocusQueueItem>[];
-        final loadedIds = <String>{};
-        for (final value in decoded) {
-          final item = _decodeQueueItem(value);
-          if (item != null && loadedIds.add(item.id)) {
-            loadedItems.add(item);
-          }
-        }
-        _items = loadedItems;
-        _notifyQueueChanged();
+      if (decoded is! List) {
+        await prefs.remove(_storageKey);
+        return;
       }
+
+      final loadedItems = <FocusQueueItem>[];
+      final loadedIds = <String>{};
+      for (final value in decoded) {
+        final item = _decodeQueueItem(value);
+        if (item != null && loadedIds.add(item.id)) {
+          loadedItems.add(item);
+        }
+      }
+
+      if (loadedItems.isEmpty) {
+        await prefs.remove(_storageKey);
+      } else {
+        final normalizedStorage = jsonEncode(
+          loadedItems.map((item) => item.toJson()).toList(),
+        );
+        if (normalizedStorage != saved) {
+          await prefs.setString(_storageKey, normalizedStorage);
+        }
+      }
+
+      _items = loadedItems;
+      _notifyQueueChanged();
     } on FormatException {
       _items = [];
+      await prefs.remove(_storageKey);
     }
   }
 

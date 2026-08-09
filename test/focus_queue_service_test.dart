@@ -214,7 +214,9 @@ void main() {
             'id': 'active-1',
             'title': '  Review   notes  ',
             'isComplete': false,
+            'accidentalMetadata': 'remove me',
           },
+          {'id': 'active-1', 'title': 'Duplicate task', 'isComplete': false},
           {'id': 'missing-title', 'isComplete': false},
           {'id': 42, 'title': 'Invalid ID', 'isComplete': false},
           'not a queue record',
@@ -234,6 +236,18 @@ void main() {
       expect(queue.items.single.title, 'Review notes');
       expect(queue.completedItems, hasLength(1));
       expect(queue.completedItems.single.title, 'Plan tomorrow');
+
+      final preferences = await SharedPreferences.getInstance();
+      final repaired = jsonDecode(preferences.getString('focusQueue')!) as List;
+      expect(repaired, [
+        {'id': 'active-1', 'title': 'Review notes', 'isComplete': false},
+        {
+          'id': 'done-1',
+          'title': 'Plan tomorrow',
+          'isComplete': true,
+          'completedAt': '2026-08-07T12:00:00.000',
+        },
+      ]);
     },
   );
 
@@ -260,6 +274,22 @@ void main() {
 
     expect(queue.items, isEmpty);
     expect(queue.completedItems, isEmpty);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('focusQueue'), isFalse);
+  });
+
+  test('removes saved queue data with the wrong shape', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode({'task': 'not a queue list'}),
+    });
+
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+
+    expect(queue.items, isEmpty);
+    expect(queue.completedItems, isEmpty);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('focusQueue'), isFalse);
   });
 
   test('initialization and mutations are safe after disposal', () async {
