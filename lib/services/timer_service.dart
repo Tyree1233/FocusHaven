@@ -342,13 +342,13 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void captureDistraction(String distraction) {
-    final cleaned = distraction.trim().replaceAll(RegExp(r'\s+'), ' ');
+    final cleaned = _cleanParkedThoughtText(distraction);
     if (cleaned.isEmpty) return;
     final now = DateTime.now();
     _parkedThoughts.add(
       ParkedThought(
         id: '${now.microsecondsSinceEpoch}-${_parkedThoughts.length}',
-        text: cleaned.length > 140 ? cleaned.substring(0, 140) : cleaned,
+        text: cleaned,
         createdAt: now,
       ),
     );
@@ -364,15 +364,12 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void renameParkedThought(String id, String distraction) {
-    final cleaned = distraction.trim().replaceAll(RegExp(r'\s+'), ' ');
+    final cleaned = _cleanParkedThoughtText(distraction);
     if (cleaned.isEmpty) return;
     final storageIndex = _indexOfParkedThought(id);
     if (storageIndex == -1) return;
-    final updatedText = cleaned.length > 140
-        ? cleaned.substring(0, 140)
-        : cleaned;
     _parkedThoughts[storageIndex] = _parkedThoughts[storageIndex].rename(
-      updatedText,
+      cleaned,
     );
     _parkedThoughtsRevision++;
     notifyListeners();
@@ -724,7 +721,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
             if (legacyThoughts[index].trim().isNotEmpty)
               ParkedThought(
                 id: 'legacy-${migrationTime.microsecondsSinceEpoch}-$index',
-                text: legacyThoughts[index],
+                text: _cleanParkedThoughtText(legacyThoughts[index]),
                 createdAt: migrationTime.add(Duration(microseconds: index)),
               ),
         ];
@@ -790,10 +787,22 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       if (decoded is! List) return [];
 
       final thoughts = <ParkedThought>[];
+      final loadedIds = <String>{};
       for (final value in decoded.whereType<Map>()) {
         try {
+          final thought = ParkedThought.fromJson(
+            Map<String, dynamic>.from(value),
+          );
+          final id = thought.id.trim();
+          if (!loadedIds.add(id)) continue;
+          final text = _cleanParkedThoughtText(thought.text);
           thoughts.add(
-            ParkedThought.fromJson(Map<String, dynamic>.from(value)),
+            ParkedThought(
+              id: id,
+              text: text,
+              createdAt: thought.createdAt,
+              completedAt: thought.completedAt,
+            ),
           );
         } on FormatException {
           // Ignore one damaged record without discarding valid local history.
@@ -820,7 +829,16 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
           );
           if (session.durationSeconds > 0 &&
               session.durationSeconds <= _maxSessionSeconds) {
-            sessions.add(session);
+            final cleanedTask = session.focusTask == null
+                ? ''
+                : _cleanFocusTask(session.focusTask!);
+            sessions.add(
+              FocusSession(
+                completedAt: session.completedAt,
+                durationSeconds: session.durationSeconds,
+                focusTask: cleanedTask.isEmpty ? null : cleanedTask,
+              ),
+            );
           }
         } on FormatException {
           // Ignore one damaged record without discarding valid focus history.
@@ -851,6 +869,11 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static String _cleanFocusTask(String task) {
     final cleaned = task.trim().replaceAll(RegExp(r'\s+'), ' ');
     return cleaned.length > 80 ? cleaned.substring(0, 80) : cleaned;
+  }
+
+  static String _cleanParkedThoughtText(String text) {
+    final cleaned = text.trim().replaceAll(RegExp(r'\s+'), ' ');
+    return cleaned.length > 140 ? cleaned.substring(0, 140) : cleaned;
   }
 
   @override

@@ -273,7 +273,7 @@ void main() {
         {
           'completedAt': '2026-08-06T09:00:00.000',
           'durationSeconds': 60,
-          'focusTask': 'First valid session',
+          'focusTask': '  First   valid session  ',
           'accidentalMetadata': 'remove me',
         },
         {'durationSeconds': 120, 'focusTask': 'Missing completion date'},
@@ -461,10 +461,15 @@ void main() {
       SharedPreferences.setMockInitialValues({
         'parkedThoughts': jsonEncode([
           {
-            'id': 'thought-1',
-            'text': 'Call the dentist',
+            'id': '  thought-1  ',
+            'text': '  Call   the dentist  ',
             'createdAt': '2026-08-08T12:00:00.000',
             'accidentalMetadata': 'remove me',
+          },
+          {
+            'id': 'thought-1',
+            'text': 'Duplicate identity',
+            'createdAt': '2026-08-08T13:00:00.000',
           },
           {
             'id': 'broken-thought',
@@ -480,6 +485,7 @@ void main() {
       addTearDown(timer.dispose);
 
       expect(timer.parkedThoughts, hasLength(1));
+      expect(timer.parkedThoughts.single.id, 'thought-1');
       expect(timer.parkedThoughts.single.text, 'Call the dentist');
       final preferences = await SharedPreferences.getInstance();
       final repaired = jsonDecode(preferences.getString('parkedThoughts')!);
@@ -496,7 +502,7 @@ void main() {
 
   test('legacy parked thoughts migrate without changing their order', () async {
     SharedPreferences.setMockInitialValues({
-      'distractions': ['First saved thought', 'Second saved thought'],
+      'distractions': ['  First   saved thought  ', ' Second   saved thought '],
     });
 
     final timer = await createTimer();
