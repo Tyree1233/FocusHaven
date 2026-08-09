@@ -116,6 +116,41 @@ void main() {
     expect(await service.fetchFocusData(), isNull);
   });
 
+  test('reports distinct cloud backup download outcomes', () async {
+    final backend = _FakeCloudSyncBackend();
+    final service = CloudSyncService(backend: backend);
+
+    var result = await service.fetchFocusDataResult();
+    expect(result.status, CloudBackupFetchStatus.unauthenticated);
+    expect(result.backup, isNull);
+
+    backend.identity = const CloudSyncIdentity(
+      uid: 'account-123',
+      isAnonymous: false,
+    );
+    result = await service.fetchFocusDataResult();
+    expect(result.status, CloudBackupFetchStatus.notFound);
+    expect(result.backup, isNull);
+
+    backend.loadedBackup = 'not a backup map';
+    result = await service.fetchFocusDataResult();
+    expect(result.status, CloudBackupFetchStatus.invalid);
+    expect(result.backup, isNull);
+
+    backend.loadedBackup = <Object?, Object?>{
+      'focusSeconds': 1500,
+      'focusHistory': <Object?>[],
+    };
+    result = await service.fetchFocusDataResult();
+    expect(result.status, CloudBackupFetchStatus.found);
+    expect(result.backup, {'focusSeconds': 1500, 'focusHistory': <Object?>[]});
+
+    backend.shouldThrow = true;
+    result = await service.fetchFocusDataResult();
+    expect(result.status, CloudBackupFetchStatus.unavailable);
+    expect(result.backup, isNull);
+  });
+
   test('deletes only the authenticated users backup', () async {
     final backend = _FakeCloudSyncBackend.signedIn();
     final service = CloudSyncService(backend: backend);

@@ -10,6 +10,37 @@ final class CloudSyncIdentity {
   final bool isAnonymous;
 }
 
+enum CloudBackupFetchStatus {
+  found,
+  notFound,
+  unauthenticated,
+  invalid,
+  unavailable,
+}
+
+@immutable
+final class CloudBackupFetchResult {
+  const CloudBackupFetchResult._(this.status, this.backup);
+
+  const CloudBackupFetchResult.notFound()
+    : this._(CloudBackupFetchStatus.notFound, null);
+
+  const CloudBackupFetchResult.unauthenticated()
+    : this._(CloudBackupFetchStatus.unauthenticated, null);
+
+  const CloudBackupFetchResult.invalid()
+    : this._(CloudBackupFetchStatus.invalid, null);
+
+  const CloudBackupFetchResult.unavailable()
+    : this._(CloudBackupFetchStatus.unavailable, null);
+
+  factory CloudBackupFetchResult.found(Map<String, dynamic> backup) =>
+      CloudBackupFetchResult._(CloudBackupFetchStatus.found, backup);
+
+  final CloudBackupFetchStatus status;
+  final Map<String, dynamic>? backup;
+}
+
 abstract interface class CloudSyncBackend {
   CloudSyncIdentity? get currentIdentity;
 
@@ -85,16 +116,32 @@ class CloudSyncService {
     }
   }
 
-  Future<Map<String, dynamic>?> fetchFocusData() async {
+  Future<Map<String, dynamic>?> fetchFocusData() async =>
+      (await fetchFocusDataResult()).backup;
+
+  Future<CloudBackupFetchResult> fetchFocusDataResult() async {
     try {
       final identity = _authenticatedIdentity;
-      if (identity == null) return null;
+      if (identity == null) {
+        return const CloudBackupFetchResult.unauthenticated();
+      }
 
       final backup = await _resolvedBackend.loadBackup(identity.uid);
-      return backup is Map ? _copyBackup(backup) : null;
+      if (backup == null) {
+        return const CloudBackupFetchResult.notFound();
+      }
+      if (backup is! Map) {
+        return const CloudBackupFetchResult.invalid();
+      }
+
+      final safeBackup = _copyBackup(backup);
+      if (safeBackup == null) {
+        return const CloudBackupFetchResult.invalid();
+      }
+      return CloudBackupFetchResult.found(safeBackup);
     } catch (error) {
       debugPrint('Cloud backup download failed: ${error.runtimeType}');
-      return null;
+      return const CloudBackupFetchResult.unavailable();
     }
   }
 

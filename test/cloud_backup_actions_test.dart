@@ -46,6 +46,7 @@ final class _FakeCloudBackend implements CloudSyncBackend {
   Completer<Object?>? pendingLoad;
   Object? loadedBackup;
   bool failSave = false;
+  bool failLoad = false;
   int saveCalls = 0;
   int loadCalls = 0;
   Map<String, dynamic>? savedBackup;
@@ -65,6 +66,7 @@ final class _FakeCloudBackend implements CloudSyncBackend {
   @override
   Future<Object?> loadBackup(String uid) async {
     loadCalls += 1;
+    if (failLoad) throw StateError('download failed');
     final pending = pendingLoad;
     return pending == null ? loadedBackup : pending.future;
   }
@@ -270,6 +272,78 @@ void main() {
 
     expect(restoredBackup, {'focusSeconds': 900, 'focusHistory': <Object?>[]});
     expect(find.text('Focus data restored from cloud'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'reports unavailable cloud restore without claiming it is empty',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({'isProUser': true});
+      final store = _FakeStoreBackend();
+      final iapService = _iapService(store);
+      final cloudBackend = _FakeCloudBackend()..failLoad = true;
+      var restoreCalls = 0;
+
+      await tester.pumpWidget(
+        _app(
+          iapService: iapService,
+          cloudService: CloudSyncService(backend: cloudBackend),
+          isSignedIn: true,
+          restoreBackup: (_) {
+            restoreCalls += 1;
+            return true;
+          },
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      _invokeTextButton(tester, 'Restore');
+      await tester.pumpAndSettle();
+
+      expect(cloudBackend.loadCalls, 1);
+      expect(restoreCalls, 0);
+      expect(
+        find.text(
+          'Cloud restore is unavailable. Check your connection and try again.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('No cloud backup found yet'), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('rejects malformed downloaded backup before restoration', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'isProUser': true});
+    final store = _FakeStoreBackend();
+    final iapService = _iapService(store);
+    final cloudBackend = _FakeCloudBackend()..loadedBackup = 'not a backup map';
+    var restoreCalls = 0;
+
+    await tester.pumpWidget(
+      _app(
+        iapService: iapService,
+        cloudService: CloudSyncService(backend: cloudBackend),
+        isSignedIn: true,
+        restoreBackup: (_) {
+          restoreCalls += 1;
+          return true;
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    _invokeTextButton(tester, 'Restore');
+    await tester.pumpAndSettle();
+
+    expect(cloudBackend.loadCalls, 1);
+    expect(restoreCalls, 0);
+    expect(
+      find.text('That cloud backup could not be restored'),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 

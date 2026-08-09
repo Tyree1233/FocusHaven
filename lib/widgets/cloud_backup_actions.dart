@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/app_providers.dart';
+import '../services/cloud_sync_service.dart';
 
 typedef CloudBackupRestorer = bool Function(Map<String, dynamic> backup);
 
@@ -86,15 +87,24 @@ class _CloudBackupActionsState extends ConsumerState<CloudBackupActions> {
         return;
       }
 
-      final backup = await ref.read(cloudSyncServiceProvider).fetchFocusData();
+      final result = await ref
+          .read(cloudSyncServiceProvider)
+          .fetchFocusDataResult();
       if (!mounted) return;
-      _showMessage(
-        backup == null
-            ? 'No cloud backup found yet'
-            : widget.restoreBackup(backup)
-            ? 'Focus data restored from cloud'
-            : 'That cloud backup could not be restored',
-      );
+      final message = switch (result.status) {
+        CloudBackupFetchStatus.found =>
+          widget.restoreBackup(result.backup!)
+              ? 'Focus data restored from cloud'
+              : 'That cloud backup could not be restored',
+        CloudBackupFetchStatus.notFound => 'No cloud backup found yet',
+        CloudBackupFetchStatus.unauthenticated =>
+          'Sign in with Google to restore your focus data',
+        CloudBackupFetchStatus.invalid =>
+          'That cloud backup could not be restored',
+        CloudBackupFetchStatus.unavailable =>
+          'Cloud restore is unavailable. Check your connection and try again.',
+      };
+      _showMessage(message);
     } catch (_) {
       _showMessage('Cloud restore could not be completed right now');
     } finally {
