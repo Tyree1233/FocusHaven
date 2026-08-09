@@ -55,6 +55,7 @@ class _ActionLog {
   var openProfileCalls = 0;
   var openAppearanceCalls = 0;
   var openPrivacyCalls = 0;
+  Completer<void>? pendingDeleteLocal;
 
   Future<void> deleteCloud() async {
     deleteCloudCalls += 1;
@@ -62,6 +63,10 @@ class _ActionLog {
 
   Future<void> deleteLocal() async {
     deleteLocalCalls += 1;
+    final pending = pendingDeleteLocal;
+    if (pending != null) {
+      await pending.future;
+    }
   }
 
   Future<void> openPro() async {
@@ -140,17 +145,66 @@ void main() {
     expect(find.text('Choose a Google account to continue.'), findsOneWidget);
 
     _invokeTextButton(tester, 'Delete local data');
+    await tester.pumpAndSettle();
     _invokeTextButton(tester, 'FocusHaven Pro');
+    await tester.pumpAndSettle();
     _invokeTextButton(tester, 'Discover your focus profile');
+    await tester.pumpAndSettle();
     _invokeTextButton(tester, 'Appearance');
+    await tester.pumpAndSettle();
     _invokeTextButton(tester, 'Privacy Policy');
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(actions.deleteLocalCalls, 1);
     expect(actions.openProCalls, 1);
     expect(actions.openProfileCalls, 1);
     expect(actions.openAppearanceCalls, 1);
     expect(actions.openPrivacyCalls, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes account actions and contains callback failures', (
+    tester,
+  ) async {
+    final auth = _FakeAuthService(signedIn: false);
+    final actions = _ActionLog()..pendingDeleteLocal = Completer<void>();
+
+    await tester.pumpWidget(_app(auth, actions));
+    await tester.pumpAndSettle();
+
+    final deleteAction = find.widgetWithText(TextButton, 'Delete local data');
+    final deleteButton = tester.widget<TextButton>(deleteAction);
+    deleteButton.onPressed!.call();
+    deleteButton.onPressed!.call();
+    await tester.pump();
+
+    expect(actions.deleteLocalCalls, 1);
+    expect(tester.widget<TextButton>(deleteAction).onPressed, isNull);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Sign in with Google'),
+          )
+          .onPressed,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'FocusHaven Pro'))
+          .onPressed,
+      isNull,
+    );
+
+    actions.pendingDeleteLocal!.completeError(Exception('action failed'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'That account action could not be completed. Please try again.',
+      ),
+      findsOneWidget,
+    );
+    expect(tester.widget<TextButton>(deleteAction).onPressed, isNotNull);
     expect(tester.takeException(), isNull);
   });
 
@@ -213,8 +267,9 @@ void main() {
         find.widgetWithText(OutlinedButton, 'Sign out'),
       );
       signOutButton.onPressed!.call();
+      await tester.pumpAndSettle();
       _invokeTextButton(tester, 'Delete cloud backup');
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(auth.signOutCalls, 1);
       expect(actions.deleteCloudCalls, 1);

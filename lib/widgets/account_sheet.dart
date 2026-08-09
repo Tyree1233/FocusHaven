@@ -29,6 +29,10 @@ class AccountSheet extends riverpod.ConsumerStatefulWidget {
 
 class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
   bool _authActionInProgress = false;
+  bool _sheetActionInProgress = false;
+
+  bool get _isActionInProgress =>
+      _authActionInProgress || _sheetActionInProgress;
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +95,7 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
               const SizedBox(height: 20),
               if (authState.isSignedIn)
                 OutlinedButton.icon(
-                  onPressed: _authActionInProgress ? null : _signOut,
+                  onPressed: _isActionInProgress ? null : _signOut,
                   icon: const Icon(Icons.logout),
                   label: Text(
                     _authActionInProgress ? 'Signing out…' : 'Sign out',
@@ -99,7 +103,7 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                 )
               else
                 FilledButton.icon(
-                  onPressed: _authActionInProgress ? null : _signIn,
+                  onPressed: _isActionInProgress ? null : _signIn,
                   icon: const Icon(Icons.login),
                   label: Text(
                     _authActionInProgress
@@ -109,33 +113,45 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                 ),
               if (authState.isSignedIn)
                 TextButton.icon(
-                  onPressed: widget.deleteCloudBackup,
+                  onPressed: _isActionInProgress
+                      ? null
+                      : () => _runSheetAction(widget.deleteCloudBackup),
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('Delete cloud backup'),
                 ),
               TextButton.icon(
-                onPressed: widget.deleteLocalData,
+                onPressed: _isActionInProgress
+                    ? null
+                    : () => _runSheetAction(widget.deleteLocalData),
                 icon: const Icon(Icons.delete_forever_outlined),
                 label: const Text('Delete local data'),
               ),
               const SizedBox(height: 8),
               TextButton.icon(
-                onPressed: widget.openPro,
+                onPressed: _isActionInProgress
+                    ? null
+                    : () => _runSheetAction(widget.openPro),
                 icon: const Icon(Icons.workspace_premium_outlined),
                 label: const Text('FocusHaven Pro'),
               ),
               TextButton.icon(
-                onPressed: widget.openFocusProfile,
+                onPressed: _isActionInProgress
+                    ? null
+                    : () => _runSheetAction(widget.openFocusProfile),
                 icon: const Icon(Icons.psychology_outlined),
                 label: const Text('Discover your focus profile'),
               ),
               TextButton.icon(
-                onPressed: widget.openAppearance,
+                onPressed: _isActionInProgress
+                    ? null
+                    : () => _runSheetAction(widget.openAppearance),
                 icon: const Icon(Icons.palette_outlined),
                 label: const Text('Appearance'),
               ),
               TextButton.icon(
-                onPressed: widget.openPrivacyPolicy,
+                onPressed: _isActionInProgress
+                    ? null
+                    : () => _runSheetAction(widget.openPrivacyPolicy),
                 icon: const Icon(Icons.privacy_tip_outlined),
                 label: const Text('Privacy Policy'),
               ),
@@ -146,8 +162,22 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
     );
   }
 
+  Future<void> _runSheetAction(AccountSheetAction action) async {
+    if (_isActionInProgress) return;
+    setState(() => _sheetActionInProgress = true);
+    try {
+      await action();
+    } catch (_) {
+      _showMessage(
+        'That account action could not be completed. Please try again.',
+      );
+    } finally {
+      if (mounted) setState(() => _sheetActionInProgress = false);
+    }
+  }
+
   bool _beginAuthAction() {
-    if (_authActionInProgress) return false;
+    if (_isActionInProgress) return false;
     setState(() => _authActionInProgress = true);
     return true;
   }
