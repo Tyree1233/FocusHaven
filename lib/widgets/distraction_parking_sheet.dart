@@ -7,7 +7,8 @@ import 'text_entry_dialog.dart';
 
 typedef ParkedThoughtAdder = FutureOr<void> Function(String thought);
 typedef ParkedThoughtRecordsReader = List<ParkedThought> Function();
-typedef ParkedThoughtIdAction = void Function(String id);
+typedef ParkedThoughtIdAction = FutureOr<void> Function(String id);
+typedef ParkedThoughtClearAction = FutureOr<void> Function();
 typedef ParkedThoughtIdUpdater =
     FutureOr<void> Function(String id, String thought);
 
@@ -33,8 +34,8 @@ class DistractionParkingSheet extends StatefulWidget {
   final ParkedThoughtIdAction completeThought;
   final ParkedThoughtIdAction reopenThought;
   final ParkedThoughtIdAction removeThoughtById;
-  final VoidCallback clearThoughts;
-  final VoidCallback clearCompletedThoughts;
+  final ParkedThoughtClearAction clearThoughts;
+  final ParkedThoughtClearAction clearCompletedThoughts;
   final Color foregroundColor;
 
   @override
@@ -44,6 +45,9 @@ class DistractionParkingSheet extends StatefulWidget {
 
 class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
   bool _isEditingThought = false;
+  final Set<String> _pendingThoughtIds = <String>{};
+  bool _isClearingActiveThoughts = false;
+  bool _isClearingCompletedThoughts = false;
 
   void _showEditorFailure(String message) {
     if (!mounted) return;
@@ -145,17 +149,23 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
   }
 
   Widget _buildActiveThought(BuildContext context, ParkedThought thought) {
+    final actionsDisabled =
+        _pendingThoughtIds.contains(thought.id) || _isClearingActiveThoughts;
     return ListTile(
       key: ValueKey('parked-thought-${thought.id}'),
       contentPadding: EdgeInsets.zero,
       leading: IconButton(
+        key: ValueKey<String>('complete-parked-thought-${thought.id}'),
         tooltip: 'Mark thought complete',
         color: Theme.of(context).colorScheme.primary,
         icon: const Icon(Icons.radio_button_unchecked),
-        onPressed: () {
-          widget.completeThought(thought.id);
-          setState(() {});
-        },
+        onPressed: actionsDisabled
+            ? null
+            : () => _runThoughtAction(
+                thought.id,
+                widget.completeThought,
+                'Thought could not be completed. Please try again.',
+              ),
       ),
       title: Text(thought.text),
       trailing: Wrap(
@@ -165,17 +175,21 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
             key: ValueKey<String>('edit-parked-thought-${thought.id}'),
             tooltip: 'Edit thought',
             icon: const Icon(Icons.edit_outlined),
-            onPressed: _isEditingThought
+            onPressed: _isEditingThought || actionsDisabled
                 ? null
                 : () => _editHistoryThought(thought),
           ),
           IconButton(
+            key: ValueKey<String>('remove-parked-thought-${thought.id}'),
             tooltip: 'Remove thought',
             icon: const Icon(Icons.close),
-            onPressed: () {
-              widget.removeThoughtById(thought.id);
-              setState(() {});
-            },
+            onPressed: actionsDisabled
+                ? null
+                : () => _runThoughtAction(
+                    thought.id,
+                    widget.removeThoughtById,
+                    'Thought could not be removed. Please try again.',
+                  ),
           ),
         ],
       ),
@@ -184,6 +198,8 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
 
   Widget _buildCompletedThought(BuildContext context, ParkedThought thought) {
     final completedAt = thought.completedAt;
+    final actionsDisabled =
+        _pendingThoughtIds.contains(thought.id) || _isClearingCompletedThoughts;
     return ListTile(
       key: ValueKey('completed-thought-${thought.id}'),
       contentPadding: EdgeInsets.zero,
@@ -208,20 +224,28 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
         spacing: 0,
         children: [
           IconButton(
+            key: ValueKey<String>('reopen-parked-thought-${thought.id}'),
             tooltip: 'Return thought to parking lot',
             icon: const Icon(Icons.undo),
-            onPressed: () {
-              widget.reopenThought(thought.id);
-              setState(() {});
-            },
+            onPressed: actionsDisabled
+                ? null
+                : () => _runThoughtAction(
+                    thought.id,
+                    widget.reopenThought,
+                    'Thought could not be returned to the parking lot. Please try again.',
+                  ),
           ),
           IconButton(
+            key: ValueKey<String>('remove-completed-thought-${thought.id}'),
             tooltip: 'Remove completed thought',
             icon: const Icon(Icons.delete_outline),
-            onPressed: () {
-              widget.removeThoughtById(thought.id);
-              setState(() {});
-            },
+            onPressed: actionsDisabled
+                ? null
+                : () => _runThoughtAction(
+                    thought.id,
+                    widget.removeThoughtById,
+                    'Thought could not be removed. Please try again.',
+                  ),
           ),
         ],
       ),
@@ -232,29 +256,91 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
     List<ParkedThought> activeThoughts,
     List<ParkedThought> completedThoughts,
   ) {
+    final activeActionsPending = activeThoughts.any(
+      (thought) => _pendingThoughtIds.contains(thought.id),
+    );
+    final completedActionsPending = completedThoughts.any(
+      (thought) => _pendingThoughtIds.contains(thought.id),
+    );
     return Wrap(
       alignment: WrapAlignment.center,
       children: [
         if (activeThoughts.isNotEmpty)
           TextButton.icon(
-            onPressed: () {
-              widget.clearThoughts();
-              setState(() {});
-            },
+            key: const ValueKey<String>('clear-parked-thoughts'),
+            onPressed: _isClearingActiveThoughts || activeActionsPending
+                ? null
+                : () => _runClearAction(
+                    completed: false,
+                    action: widget.clearThoughts,
+                    failureMessage:
+                        'Parked thoughts could not be cleared. Please try again.',
+                  ),
             icon: const Icon(Icons.clear_all),
             label: const Text('Clear parked'),
           ),
         if (completedThoughts.isNotEmpty)
           TextButton.icon(
-            onPressed: () {
-              widget.clearCompletedThoughts();
-              setState(() {});
-            },
+            key: const ValueKey<String>('clear-completed-thoughts'),
+            onPressed: _isClearingCompletedThoughts || completedActionsPending
+                ? null
+                : () => _runClearAction(
+                    completed: true,
+                    action: widget.clearCompletedThoughts,
+                    failureMessage:
+                        'Completed thoughts could not be cleared. Please try again.',
+                  ),
             icon: const Icon(Icons.delete_sweep_outlined),
             label: const Text('Clear completed'),
           ),
       ],
     );
+  }
+
+  Future<void> _runThoughtAction(
+    String id,
+    ParkedThoughtIdAction action,
+    String failureMessage,
+  ) async {
+    if (_pendingThoughtIds.contains(id)) return;
+    setState(() => _pendingThoughtIds.add(id));
+    try {
+      await action(id);
+    } catch (_) {
+      _showEditorFailure(failureMessage);
+    } finally {
+      _pendingThoughtIds.remove(id);
+      if (mounted) setState(() {});
+    }
+  }
+
+  Future<void> _runClearAction({
+    required bool completed,
+    required ParkedThoughtClearAction action,
+    required String failureMessage,
+  }) async {
+    if (completed ? _isClearingCompletedThoughts : _isClearingActiveThoughts) {
+      return;
+    }
+    setState(() {
+      if (completed) {
+        _isClearingCompletedThoughts = true;
+      } else {
+        _isClearingActiveThoughts = true;
+      }
+    });
+    try {
+      await action();
+    } catch (_) {
+      _showEditorFailure(failureMessage);
+    } finally {
+      if (completed) {
+        _isClearingCompletedThoughts = false;
+      } else {
+        _isClearingActiveThoughts = false;
+      }
+      if (mounted) setState(() {});
+    }
   }
 
   Future<void> _addThought() async {

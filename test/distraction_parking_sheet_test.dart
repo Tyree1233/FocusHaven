@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/models/parked_thought.dart';
@@ -58,6 +60,11 @@ Widget _historyApp(
   _ThoughtHistoryStore store, {
   ParkedThoughtAdder? addThought,
   ParkedThoughtIdUpdater? renameThought,
+  ParkedThoughtIdAction? completeThought,
+  ParkedThoughtIdAction? reopenThought,
+  ParkedThoughtIdAction? removeThoughtById,
+  ParkedThoughtClearAction? clearThoughts,
+  ParkedThoughtClearAction? clearCompletedThoughts,
 }) {
   return MaterialApp(
     theme: ThemeData.dark(),
@@ -72,11 +79,12 @@ Widget _historyApp(
               readCompletedThoughts: store.readCompleted,
               addThought: addThought ?? store.add,
               renameThought: renameThought ?? store.rename,
-              completeThought: store.complete,
-              reopenThought: store.reopen,
-              removeThoughtById: store.remove,
-              clearThoughts: store.clearActive,
-              clearCompletedThoughts: store.clearCompleted,
+              completeThought: completeThought ?? store.complete,
+              reopenThought: reopenThought ?? store.reopen,
+              removeThoughtById: removeThoughtById ?? store.remove,
+              clearThoughts: clearThoughts ?? store.clearActive,
+              clearCompletedThoughts:
+                  clearCompletedThoughts ?? store.clearCompleted,
             ),
           ),
           child: const Text('Open thought history'),
@@ -91,9 +99,23 @@ Future<void> _openHistorySheet(
   _ThoughtHistoryStore store, {
   ParkedThoughtAdder? addThought,
   ParkedThoughtIdUpdater? renameThought,
+  ParkedThoughtIdAction? completeThought,
+  ParkedThoughtIdAction? reopenThought,
+  ParkedThoughtIdAction? removeThoughtById,
+  ParkedThoughtClearAction? clearThoughts,
+  ParkedThoughtClearAction? clearCompletedThoughts,
 }) async {
   await tester.pumpWidget(
-    _historyApp(store, addThought: addThought, renameThought: renameThought),
+    _historyApp(
+      store,
+      addThought: addThought,
+      renameThought: renameThought,
+      completeThought: completeThought,
+      reopenThought: reopenThought,
+      removeThoughtById: removeThoughtById,
+      clearThoughts: clearThoughts,
+      clearCompletedThoughts: clearCompletedThoughts,
+    ),
   );
   await tester.tap(find.text('Open thought history'));
   await tester.pumpAndSettle();
@@ -399,6 +421,211 @@ void main() {
     expect(store.thoughts.single.id, 'thought');
     expect(store.thoughts.single.text, 'Keep this thought unchanged');
     expect(tester.widget<IconButton>(editAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes history actions per parked thought', (tester) async {
+    final store = _ThoughtHistoryStore([
+      ParkedThought(
+        id: 'thought',
+        text: 'Complete this once',
+        createdAt: DateTime.utc(2026, 8, 8, 10),
+      ),
+    ]);
+    final completion = Completer<void>();
+    var calls = 0;
+    await _openHistorySheet(
+      tester,
+      store,
+      completeThought: (id) async {
+        calls += 1;
+        await completion.future;
+        store.complete(id);
+      },
+    );
+    final action = find.byKey(
+      const ValueKey<String>('complete-parked-thought-thought'),
+    );
+    final onPressed = tester.widget<IconButton>(action).onPressed!;
+
+    onPressed();
+    onPressed();
+    await tester.pump();
+
+    expect(calls, 1);
+    expect(tester.widget<IconButton>(action).onPressed, isNull);
+    expect(store.readActive().single.id, 'thought');
+
+    completion.complete();
+    await tester.pumpAndSettle();
+
+    expect(store.readActive(), isEmpty);
+    expect(store.readCompleted().single.id, 'thought');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains history action failures and restores controls', (
+    tester,
+  ) async {
+    final store = _ThoughtHistoryStore([
+      ParkedThought(
+        id: 'active',
+        text: 'Still active',
+        createdAt: DateTime.utc(2026, 8, 8, 10),
+      ),
+      ParkedThought(
+        id: 'completed',
+        text: 'Still completed',
+        createdAt: DateTime.utc(2026, 8, 8, 9),
+        completedAt: DateTime.utc(2026, 8, 8, 11),
+      ),
+    ]);
+    await _openHistorySheet(
+      tester,
+      store,
+      completeThought: (_) async => throw StateError('complete failed'),
+      reopenThought: (_) async => throw StateError('reopen failed'),
+      removeThoughtById: (_) async => throw StateError('remove failed'),
+    );
+    final completeAction = find.byKey(
+      const ValueKey<String>('complete-parked-thought-active'),
+    );
+    final reopenAction = find.byKey(
+      const ValueKey<String>('reopen-parked-thought-completed'),
+    );
+    final removeAction = find.byKey(
+      const ValueKey<String>('remove-parked-thought-active'),
+    );
+
+    await tester.tap(completeAction);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Thought could not be completed. Please try again.'),
+      findsOneWidget,
+    );
+    expect(store.readActive().single.id, 'active');
+    expect(tester.widget<IconButton>(completeAction).onPressed, isNotNull);
+
+    tester.widget<IconButton>(reopenAction).onPressed!.call();
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'Thought could not be returned to the parking lot. Please try again.',
+      ),
+      findsOneWidget,
+    );
+    expect(store.readCompleted().single.id, 'completed');
+    expect(tester.widget<IconButton>(reopenAction).onPressed, isNotNull);
+
+    tester.widget<IconButton>(removeAction).onPressed!.call();
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Thought could not be removed. Please try again.'),
+      findsOneWidget,
+    );
+    expect(store.thoughts.map((thought) => thought.id), [
+      'active',
+      'completed',
+    ]);
+    expect(tester.widget<IconButton>(removeAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes clear actions per history section', (tester) async {
+    final store = _ThoughtHistoryStore([
+      ParkedThought(
+        id: 'active',
+        text: 'Clear this once',
+        createdAt: DateTime.utc(2026, 8, 8, 10),
+      ),
+    ]);
+    final completion = Completer<void>();
+    var calls = 0;
+    await _openHistorySheet(
+      tester,
+      store,
+      clearThoughts: () async {
+        calls += 1;
+        await completion.future;
+        store.clearActive();
+      },
+    );
+    final action = find.byKey(const ValueKey<String>('clear-parked-thoughts'));
+    final onPressed = tester.widget<TextButton>(action).onPressed!;
+
+    onPressed();
+    onPressed();
+    await tester.pump();
+
+    expect(calls, 1);
+    expect(tester.widget<TextButton>(action).onPressed, isNull);
+    expect(store.readActive().single.id, 'active');
+
+    completion.complete();
+    await tester.pumpAndSettle();
+
+    expect(store.thoughts, isEmpty);
+    expect(
+      find.text('Nothing parked yet. Keep your attention where you want it.'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains clear failures and restores history controls', (
+    tester,
+  ) async {
+    final store = _ThoughtHistoryStore([
+      ParkedThought(
+        id: 'active',
+        text: 'Keep active',
+        createdAt: DateTime.utc(2026, 8, 8, 10),
+      ),
+      ParkedThought(
+        id: 'completed',
+        text: 'Keep completed',
+        createdAt: DateTime.utc(2026, 8, 8, 9),
+        completedAt: DateTime.utc(2026, 8, 8, 11),
+      ),
+    ]);
+    await _openHistorySheet(
+      tester,
+      store,
+      clearThoughts: () async => throw StateError('clear active failed'),
+      clearCompletedThoughts: () async =>
+          throw StateError('clear completed failed'),
+    );
+    final clearActive = find.byKey(
+      const ValueKey<String>('clear-parked-thoughts'),
+    );
+    final clearCompleted = find.byKey(
+      const ValueKey<String>('clear-completed-thoughts'),
+    );
+
+    await tester.ensureVisible(clearActive);
+    await tester.tap(clearActive);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Parked thoughts could not be cleared. Please try again.'),
+      findsOneWidget,
+    );
+    expect(store.readActive().single.id, 'active');
+    expect(tester.widget<TextButton>(clearActive).onPressed, isNotNull);
+
+    await tester.ensureVisible(clearCompleted);
+    await tester.tap(clearCompleted);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Completed thoughts could not be cleared. Please try again.'),
+      findsOneWidget,
+    );
+    expect(store.readCompleted().single.id, 'completed');
+    expect(tester.widget<TextButton>(clearCompleted).onPressed, isNotNull);
     expect(tester.takeException(), isNull);
   });
 }
