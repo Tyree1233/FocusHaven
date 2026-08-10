@@ -285,6 +285,43 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('serializes overlapping completed session transitions', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1,
+      'secondsRemaining': 1,
+      'totalSessionSeconds': 1,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now()
+          .subtract(const Duration(seconds: 2))
+          .millisecondsSinceEpoch,
+    });
+    final timer = TimerService();
+    await timer.initialized;
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+
+    expect(timer.isComplete, isTrue);
+    final takeBreak = find.widgetWithText(FilledButton, 'Take a break');
+    expect(takeBreak, findsOneWidget);
+
+    final transition = tester.widget<FilledButton>(takeBreak).onPressed!;
+    transition();
+    transition();
+    await tester.pump();
+
+    expect(timer.sessionType, SessionType.shortBreak);
+    expect(timer.isComplete, isFalse);
+    expect(find.text('SHORT BREAK'), findsOneWidget);
+    expect(
+      find.widgetWithText(FilledButton, 'Begin short break'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('renders restored dashboard dates in the device local time', (
     tester,
   ) async {

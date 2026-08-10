@@ -135,6 +135,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
     return '${months[localDate.month - 1]} ${localDate.day}';
   }
 
+  void _beginNextSession(TimerService timer) {
+    if (!timer.isComplete) return;
+    timer.beginNextSession();
+  }
+
   Future<void> _chooseCustomDuration(
     BuildContext context,
     TimerService timer,
@@ -847,7 +852,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         )
                       else if (session.isComplete)
                         FilledButton.icon(
-                          onPressed: timer.beginNextSession,
+                          onPressed: () => _beginNextSession(timer),
                           icon: const Icon(Icons.arrow_forward),
                           label: Text(
                             session.sessionType == SessionType.focus
