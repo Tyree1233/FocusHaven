@@ -363,7 +363,9 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   void setCustomMinutes(int minutes) => setCustomDuration(minutes, 0);
 
   void setFocusTask(String task) {
-    _focusTask = _cleanFocusTask(task);
+    final cleaned = _cleanFocusTask(task);
+    if (_focusTask == cleaned) return;
+    _focusTask = cleaned;
     notifyListeners();
     _saveToPrefs();
   }
@@ -462,7 +464,9 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       _parkedThoughts.indexWhere((thought) => thought.id == id);
 
   void setDailyGoalMinutes(int minutes) {
-    _dailyGoalMinutes = minutes.clamp(5, 480).toInt();
+    final clampedMinutes = minutes.clamp(5, 480).toInt();
+    if (_dailyGoalMinutes == clampedMinutes) return;
+    _dailyGoalMinutes = clampedMinutes;
     notifyListeners();
     _saveToPrefs();
   }

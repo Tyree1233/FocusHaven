@@ -96,6 +96,27 @@ void main() {
     expect(notifications, 0);
   });
 
+  test('equivalent timer preferences publish one state change each', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+
+    timer.setFocusTask('  Write   project   outline  ');
+    timer.setFocusTask('Write project outline');
+
+    expect(timer.focusTask, 'Write project outline');
+    expect(notifications, 1);
+
+    timer.setDailyGoalMinutes(1);
+    timer.setDailyGoalMinutes(-20);
+
+    expect(timer.dailyGoalMinutes, 5);
+    expect(notifications, 2);
+  });
+
   test('custom duration accepts minutes and seconds', () async {
     final timer = await createTimer();
     addTearDown(timer.dispose);
