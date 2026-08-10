@@ -481,11 +481,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void clearFocusHistory() {
     final hadHistory = _focusHistory.isNotEmpty || _completedFocusSessions != 0;
+    if (!hadHistory) return;
     _focusHistory = [];
     _completedFocusSessions = 0;
-    if (hadHistory) {
-      _focusHistoryRevision++;
-    }
+    _focusHistoryRevision++;
     notifyListeners();
     _saveToPrefs();
   }

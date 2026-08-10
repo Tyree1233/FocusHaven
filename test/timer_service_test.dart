@@ -576,6 +576,35 @@ void main() {
     expect(timer.weeklyFocusSeconds, 60);
   });
 
+  test('duplicate focus history clears publish one update', () async {
+    SharedPreferences.setMockInitialValues({
+      'completedFocusSessions': 1,
+      'focusHistory': jsonEncode([
+        {
+          'completedAt': '2026-08-09T12:00:00.000',
+          'durationSeconds': 1500,
+          'focusTask': 'Finish the proposal',
+        },
+      ]),
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    final revision = timer.focusHistoryRevision;
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+    final clearHistory = timer.clearFocusHistory;
+
+    clearHistory();
+    clearHistory();
+
+    expect(timer.recentFocusSessions, isEmpty);
+    expect(timer.completedFocusSessions, 0);
+    expect(timer.focusHistoryRevision, revision + 1);
+    expect(notifications, 1);
+  });
+
   test('clearing local data restores the timer defaults', () async {
     SharedPreferences.setMockInitialValues({
       'focusSeconds': 120,
