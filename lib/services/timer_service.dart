@@ -491,6 +491,9 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> clearLocalData() async {
+    await initialized;
+    if (_isDisposed) return;
+
     final hadHistory = _focusHistory.isNotEmpty || _completedFocusSessions != 0;
     _ticker?.cancel();
     _ticker = null;
@@ -533,6 +536,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       prefs.remove('distractions'),
       prefs.remove(_parkedThoughtsKey),
     ]);
+    if (_isDisposed) return;
     notifyListeners();
   }
 

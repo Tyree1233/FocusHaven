@@ -26,6 +26,18 @@ void main() {
     await expectLater(timer.initialized, completes);
   });
 
+  test('clear local data is safe after disposal', () async {
+    SharedPreferences.setMockInitialValues({'focusTask': 'Keep saved task'});
+
+    final timer = TimerService();
+    timer.dispose();
+
+    await timer.initialized;
+    await expectLater(timer.clearLocalData(), completes);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('focusTask'), 'Keep saved task');
+  });
+
   test('starts with a 25-minute focus session', () async {
     final timer = await createTimer();
     addTearDown(timer.dispose);
