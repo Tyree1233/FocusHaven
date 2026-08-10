@@ -261,6 +261,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('reselecting the active session preserves a running timer', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+
+    final beginButton = find.widgetWithText(FilledButton, 'Begin focus');
+    await tester.ensureVisible(beginButton);
+    await tester.tap(beginButton);
+    await tester.pump();
+    final remainingBeforeReselection = timer.secondsRemaining;
+
+    final focusChip = tester.widget<ChoiceChip>(
+      find.widgetWithText(ChoiceChip, 'Focus'),
+    );
+    focusChip.onSelected!.call(false);
+    await tester.pump();
+
+    expect(timer.sessionType, SessionType.focus);
+    expect(timer.isRunning, isTrue);
+    expect(timer.secondsRemaining, remainingBeforeReselection);
+    expect(find.widgetWithText(FilledButton, 'Pause'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('begin and pause controls update the running state', (
     tester,
   ) async {

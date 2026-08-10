@@ -725,7 +725,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               (type) => ChoiceChip(
                                 label: Text(type.label),
                                 selected: session.sessionType == type,
-                                onSelected: (_) => timer.selectSession(type),
+                                onSelected: (selected) {
+                                  if (selected) timer.selectSession(type);
+                                },
                                 selectedColor: sessionColor.withValues(
                                   alpha: 0.32,
                                 ),
