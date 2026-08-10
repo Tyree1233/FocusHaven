@@ -82,6 +82,20 @@ void main() {
     expect(preferences.containsKey('focusProfile'), isFalse);
   });
 
+  test(
+    'removes a focus profile preference with the wrong value type',
+    () async {
+      SharedPreferences.setMockInitialValues({'focusProfile': true});
+
+      final profile = await createProfile();
+      addTearDown(profile.dispose);
+
+      expect(profile.focusType, isNull);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.containsKey('focusProfile'), isFalse);
+    },
+  );
+
   test('initialization and mutations are safe after disposal', () async {
     SharedPreferences.setMockInitialValues({'focusProfile': 'Deep Diver'});
     final profile = FocusProfileService();

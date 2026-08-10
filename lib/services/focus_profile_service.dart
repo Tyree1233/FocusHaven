@@ -51,16 +51,23 @@ class FocusProfileService extends ChangeNotifier {
       final preferences = await SharedPreferences.getInstance();
       if (_isDisposed) return;
 
-      final savedFocusType = preferences.getString(_profileKey);
-      final normalizedFocusType = savedFocusType == null
-          ? null
-          : _normalizeFocusType(savedFocusType);
-      if (normalizedFocusType == null) {
-        if (savedFocusType != null) await preferences.remove(_profileKey);
+      final savedValue = preferences.get(_profileKey);
+      if (savedValue != null && savedValue is! String) {
+        await preferences.remove(_profileKey);
       } else {
-        _focusType = normalizedFocusType;
-        if (normalizedFocusType != savedFocusType) {
-          await preferences.setString(_profileKey, normalizedFocusType);
+        final savedFocusType = savedValue as String?;
+        final normalizedFocusType = savedFocusType == null
+            ? null
+            : _normalizeFocusType(savedFocusType);
+        if (normalizedFocusType == null) {
+          if (savedFocusType != null) {
+            await preferences.remove(_profileKey);
+          }
+        } else {
+          _focusType = normalizedFocusType;
+          if (normalizedFocusType != savedFocusType) {
+            await preferences.setString(_profileKey, normalizedFocusType);
+          }
         }
       }
     } catch (error) {
