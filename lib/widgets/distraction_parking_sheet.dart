@@ -1,12 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../models/parked_thought.dart';
 import 'text_entry_dialog.dart';
 
-typedef ParkedThoughtAdder = void Function(String thought);
+typedef ParkedThoughtAdder = FutureOr<void> Function(String thought);
 typedef ParkedThoughtRecordsReader = List<ParkedThought> Function();
 typedef ParkedThoughtIdAction = void Function(String id);
-typedef ParkedThoughtIdUpdater = void Function(String id, String thought);
+typedef ParkedThoughtIdUpdater =
+    FutureOr<void> Function(String id, String thought);
 
 class DistractionParkingSheet extends StatefulWidget {
   const DistractionParkingSheet.withHistory({
@@ -40,6 +43,15 @@ class DistractionParkingSheet extends StatefulWidget {
 }
 
 class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
+  bool _isEditingThought = false;
+
+  void _showEditorFailure(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeThoughts = widget.readActiveThoughts();
@@ -76,7 +88,8 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
               ),
               const SizedBox(height: 12),
               FilledButton.icon(
-                onPressed: _addThought,
+                key: const ValueKey<String>('add-parked-thought'),
+                onPressed: _isEditingThought ? null : _addThought,
                 icon: const Icon(Icons.add),
                 label: const Text('Add a thought'),
                 style: FilledButton.styleFrom(
@@ -149,9 +162,12 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
         spacing: 0,
         children: [
           IconButton(
+            key: ValueKey<String>('edit-parked-thought-${thought.id}'),
             tooltip: 'Edit thought',
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () => _editHistoryThought(thought),
+            onPressed: _isEditingThought
+                ? null
+                : () => _editHistoryThought(thought),
           ),
           IconButton(
             tooltip: 'Remove thought',
@@ -242,21 +258,35 @@ class _DistractionParkingSheetState extends State<DistractionParkingSheet> {
   }
 
   Future<void> _addThought() async {
-    final thought = await _editParkedThought();
-    if (thought == null) return;
+    if (_isEditingThought) return;
+    setState(() => _isEditingThought = true);
+    try {
+      final thought = await _editParkedThought();
+      if (thought == null) return;
 
-    widget.addThought(thought);
-    if (mounted) setState(() {});
+      await widget.addThought(thought);
+    } catch (_) {
+      _showEditorFailure('Thought could not be added. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isEditingThought = false);
+    }
   }
 
   Future<void> _editHistoryThought(ParkedThought existingThought) async {
-    final thought = await _editParkedThought(
-      existingThought: existingThought.text,
-    );
-    if (thought == null) return;
+    if (_isEditingThought) return;
+    setState(() => _isEditingThought = true);
+    try {
+      final thought = await _editParkedThought(
+        existingThought: existingThought.text,
+      );
+      if (thought == null) return;
 
-    widget.renameThought(existingThought.id, thought);
-    if (mounted) setState(() {});
+      await widget.renameThought(existingThought.id, thought);
+    } catch (_) {
+      _showEditorFailure('Thought could not be updated. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isEditingThought = false);
+    }
   }
 
   Future<String?> _editParkedThought({String? existingThought}) async {

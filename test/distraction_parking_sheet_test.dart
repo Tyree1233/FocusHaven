@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/models/parked_thought.dart';
 import 'package:focushaven/widgets/distraction_parking_sheet.dart';
+import 'package:focushaven/widgets/text_entry_dialog.dart';
 
 class _ThoughtHistoryStore {
   _ThoughtHistoryStore(Iterable<ParkedThought> initialThoughts)
@@ -53,7 +54,11 @@ class _ThoughtHistoryStore {
   }
 }
 
-Widget _historyApp(_ThoughtHistoryStore store) {
+Widget _historyApp(
+  _ThoughtHistoryStore store, {
+  ParkedThoughtAdder? addThought,
+  ParkedThoughtIdUpdater? renameThought,
+}) {
   return MaterialApp(
     theme: ThemeData.dark(),
     home: Builder(
@@ -65,8 +70,8 @@ Widget _historyApp(_ThoughtHistoryStore store) {
             builder: (_) => DistractionParkingSheet.withHistory(
               readActiveThoughts: store.readActive,
               readCompletedThoughts: store.readCompleted,
-              addThought: store.add,
-              renameThought: store.rename,
+              addThought: addThought ?? store.add,
+              renameThought: renameThought ?? store.rename,
               completeThought: store.complete,
               reopenThought: store.reopen,
               removeThoughtById: store.remove,
@@ -83,9 +88,13 @@ Widget _historyApp(_ThoughtHistoryStore store) {
 
 Future<void> _openHistorySheet(
   WidgetTester tester,
-  _ThoughtHistoryStore store,
-) async {
-  await tester.pumpWidget(_historyApp(store));
+  _ThoughtHistoryStore store, {
+  ParkedThoughtAdder? addThought,
+  ParkedThoughtIdUpdater? renameThought,
+}) async {
+  await tester.pumpWidget(
+    _historyApp(store, addThought: addThought, renameThought: renameThought),
+  );
   await tester.tap(find.text('Open thought history'));
   await tester.pumpAndSettle();
 }
@@ -307,5 +316,89 @@ void main() {
     expect(store.thoughts.single.id, 'active');
     expect(find.text('Still parked'), findsOneWidget);
     expect(find.text('Already handled'), findsNothing);
+  });
+
+  testWidgets('blocks duplicate parked-thought editors', (tester) async {
+    final store = _ThoughtHistoryStore([]);
+    await _openHistorySheet(tester, store);
+    final addAction = find.byKey(const ValueKey<String>('add-parked-thought'));
+    final addButton = tester.widget<FilledButton>(addAction);
+
+    addButton.onPressed!.call();
+    addButton.onPressed!.call();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Add a parked thought'), findsOneWidget);
+    expect(find.byType(TextEntryDialog), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<FilledButton>(addAction).onPressed, isNotNull);
+    expect(store.thoughts, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains add failures and restores the pending editor', (
+    tester,
+  ) async {
+    final store = _ThoughtHistoryStore([]);
+    await _openHistorySheet(
+      tester,
+      store,
+      addThought: (_) async => throw StateError('timer storage unavailable'),
+    );
+    final addAction = find.byKey(const ValueKey<String>('add-parked-thought'));
+
+    await tester.tap(addAction);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Reply after focusing');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Thought could not be added. Please try again.'),
+      findsOneWidget,
+    );
+    expect(store.thoughts, isEmpty);
+    expect(tester.widget<FilledButton>(addAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains edit failures and preserves the parked thought', (
+    tester,
+  ) async {
+    final store = _ThoughtHistoryStore([
+      ParkedThought(
+        id: 'thought',
+        text: 'Keep this thought unchanged',
+        createdAt: DateTime.utc(2026, 8, 8, 10),
+      ),
+    ]);
+    await _openHistorySheet(
+      tester,
+      store,
+      renameThought: (_, _) async =>
+          throw StateError('timer storage unavailable'),
+    );
+    final editAction = find.byKey(
+      const ValueKey<String>('edit-parked-thought-thought'),
+    );
+
+    await tester.tap(editAction);
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Changed thought');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Thought could not be updated. Please try again.'),
+      findsOneWidget,
+    );
+    expect(store.thoughts, hasLength(1));
+    expect(store.thoughts.single.id, 'thought');
+    expect(store.thoughts.single.text, 'Keep this thought unchanged');
+    expect(tester.widget<IconButton>(editAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
   });
 }
