@@ -74,6 +74,7 @@ class TextEntryDialog extends StatefulWidget {
 
 class _TextEntryDialogState extends State<TextEntryDialog> {
   late final TextEditingController _controller;
+  bool _isClosing = false;
 
   @override
   void initState() {
@@ -87,7 +88,13 @@ class _TextEntryDialogState extends State<TextEntryDialog> {
     super.dispose();
   }
 
-  void _submit() => Navigator.pop(context, _controller.text);
+  void _close([String? value]) {
+    if (_isClosing) return;
+    setState(() => _isClosing = true);
+    Navigator.pop(context, value);
+  }
+
+  void _submit() => _close(_controller.text);
 
   @override
   Widget build(BuildContext context) {
@@ -96,6 +103,7 @@ class _TextEntryDialogState extends State<TextEntryDialog> {
       content: TextField(
         controller: _controller,
         autofocus: true,
+        enabled: !_isClosing,
         maxLength: widget.maxLength,
         maxLines: widget.maxLines,
         keyboardType: widget.keyboardType,
@@ -108,20 +116,28 @@ class _TextEntryDialogState extends State<TextEntryDialog> {
           helperText: widget.helperText,
           counterText: widget.hideCounter ? '' : null,
         ),
-        onSubmitted: widget.maxLines == 1 ? (_) => _submit() : null,
+        onSubmitted: widget.maxLines == 1 && !_isClosing
+            ? (_) => _submit()
+            : null,
       ),
       actions: [
         if (widget.cancelLabel case final label?)
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            key: const ValueKey<String>('text-entry-cancel'),
+            onPressed: _isClosing ? null : () => _close(),
             child: Text(label),
           ),
         if (widget.clearLabel case final label?)
           TextButton(
-            onPressed: () => Navigator.pop(context, ''),
+            key: const ValueKey<String>('text-entry-clear'),
+            onPressed: _isClosing ? null : () => _close(''),
             child: Text(label),
           ),
-        FilledButton(onPressed: _submit, child: Text(widget.confirmLabel)),
+        FilledButton(
+          key: const ValueKey<String>('text-entry-submit'),
+          onPressed: _isClosing ? null : _submit,
+          child: Text(widget.confirmLabel),
+        ),
       ],
     );
   }

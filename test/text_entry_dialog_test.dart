@@ -2,8 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/widgets/text_entry_dialog.dart';
 
-Widget _launcher(Future<void> Function(BuildContext) onOpen) {
+class _CountingNavigatorObserver extends NavigatorObserver {
+  int popCount = 0;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    popCount += 1;
+    super.didPop(route, previousRoute);
+  }
+}
+
+Widget _launcher(
+  Future<void> Function(BuildContext) onOpen, {
+  NavigatorObserver? observer,
+}) {
   return MaterialApp(
+    navigatorObservers: [?observer],
     home: Builder(
       builder: (context) => Scaffold(
         body: FilledButton(
@@ -128,6 +142,83 @@ void main() {
 
     expect(completed, isTrue);
     expect(result, isNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes overlapping save and clear actions', (tester) async {
+    final observer = _CountingNavigatorObserver();
+    String? result;
+
+    await tester.pumpWidget(
+      _launcher((context) async {
+        result = await TextEntryDialog.show(
+          context,
+          title: 'Edit thought',
+          confirmLabel: 'Save',
+          initialValue: 'Original thought',
+          clearLabel: 'Clear',
+        );
+      }, observer: observer),
+    );
+
+    await tester.tap(find.text('Open dialog'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Updated thought');
+    final submit = tester
+        .widget<FilledButton>(
+          find.byKey(const ValueKey<String>('text-entry-submit')),
+        )
+        .onPressed!;
+    final clear = tester
+        .widget<TextButton>(
+          find.byKey(const ValueKey<String>('text-entry-clear')),
+        )
+        .onPressed!;
+
+    submit();
+    clear();
+    await tester.pumpAndSettle();
+
+    expect(result, 'Updated thought');
+    expect(observer.popCount, 1);
+    expect(find.text('Edit thought'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes overlapping Enter and cancel actions', (
+    tester,
+  ) async {
+    final observer = _CountingNavigatorObserver();
+    String? result;
+
+    await tester.pumpWidget(
+      _launcher((context) async {
+        result = await TextEntryDialog.show(
+          context,
+          title: 'Set intention',
+          confirmLabel: 'Save',
+          initialValue: 'Original intention',
+        );
+      }, observer: observer),
+    );
+
+    await tester.tap(find.text('Open dialog'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'One intention');
+    final submitWithEnter = tester.widget<TextField>(find.byType(TextField));
+    final cancel = tester
+        .widget<TextButton>(
+          find.byKey(const ValueKey<String>('text-entry-cancel')),
+        )
+        .onPressed!;
+
+    submitWithEnter.onSubmitted!.call('One intention');
+    cancel();
+    await tester.pumpAndSettle();
+
+    expect(result, 'One intention');
+    expect(observer.popCount, 1);
+    expect(find.text('Set intention'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
