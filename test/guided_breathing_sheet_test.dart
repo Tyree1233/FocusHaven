@@ -42,6 +42,35 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('serializes overlapping breathing controls', (tester) async {
+    await tester.pumpWidget(_app());
+
+    final begin = tester
+        .widget<FilledButton>(
+          find.widgetWithText(FilledButton, 'Begin breathing'),
+        )
+        .onPressed!;
+    begin();
+    begin();
+    await tester.pump();
+
+    expect(find.text('Pause'), findsOneWidget);
+    expect(find.text('Reset'), findsOneWidget);
+    expect(find.text('1:00'), findsOneWidget);
+
+    final pause = tester
+        .widget<FilledButton>(find.widgetWithText(FilledButton, 'Pause'))
+        .onPressed!;
+    pause();
+    pause();
+    await tester.pump();
+
+    expect(find.text('Begin breathing'), findsOneWidget);
+    expect(find.text('Reset'), findsNothing);
+    expect(find.text('1:00'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('advances phases and remains still while paused', (tester) async {
     await tester.pumpWidget(_app());
 

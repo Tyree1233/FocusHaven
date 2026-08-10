@@ -18,6 +18,7 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
   var _phaseIndex = 0;
   var _phaseRemaining = _phaseDurations.first;
   var _isRunning = false;
+  var _controlLocked = false;
 
   String get _formattedTime {
     final minutes = _totalRemaining ~/ Duration.secondsPerMinute;
@@ -27,10 +28,22 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
 
   bool get _isComplete => _totalRemaining == 0;
 
-  void _toggle() {
+  void _runControl(VoidCallback action) {
+    if (_controlLocked) return;
+    _controlLocked = true;
+    try {
+      action();
+    } finally {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controlLocked = false;
+      });
+    }
+  }
+
+  void _toggleTimer() {
     if (_isComplete) {
-      _reset();
-      _toggle();
+      _resetTimer();
+      _toggleTimer();
       return;
     }
     if (_isRunning) {
@@ -60,7 +73,7 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
     });
   }
 
-  void _reset() {
+  void _resetTimer() {
     _ticker?.cancel();
     setState(() {
       _totalRemaining = 60;
@@ -149,7 +162,7 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
             SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
-                onPressed: _toggle,
+                onPressed: () => _runControl(_toggleTimer),
                 icon: Icon(
                   _isRunning
                       ? Icons.pause
@@ -173,7 +186,7 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
             ),
             if (_isRunning || _isComplete)
               TextButton.icon(
-                onPressed: _reset,
+                onPressed: () => _runControl(_resetTimer),
                 icon: const Icon(Icons.refresh),
                 label: const Text('Reset'),
               ),
