@@ -130,7 +130,12 @@ class IAPService {
 
   static Future<bool> isProUser() async {
     final preferences = await SharedPreferences.getInstance();
-    return preferences.getBool(_proKey) ?? false;
+    final savedEntitlement = preferences.get(_proKey);
+    if (savedEntitlement is bool) return savedEntitlement;
+    if (savedEntitlement != null) {
+      await preferences.remove(_proKey);
+    }
+    return false;
   }
 
   /// Reloads the persisted entitlement and publishes it to active listeners.

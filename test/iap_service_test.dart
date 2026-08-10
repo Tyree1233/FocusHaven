@@ -126,6 +126,21 @@ void main() {
     },
   );
 
+  test('repairs malformed persisted entitlement as inactive', () async {
+    SharedPreferences.setMockInitialValues({'isProUser': 'true'});
+    final backend = _FakeStoreBackend();
+    final service = _createService(backend);
+
+    await service.initialized;
+
+    expect(service.lastKnownIsPro, isFalse);
+    expect(await service.refreshEntitlement(), isFalse);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('isProUser'), isFalse);
+    expect(backend.queryCalls, 0);
+    expect(backend.restoreCalls, 0);
+  });
+
   test('returns only the exact FocusHaven Pro product price', () async {
     final backend = _FakeStoreBackend()
       ..products = [
