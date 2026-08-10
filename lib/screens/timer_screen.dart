@@ -43,6 +43,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
     'Grateful',
   ];
 
+  bool _canOpenOverlay(BuildContext context) =>
+      ModalRoute.of(context)?.isCurrent ?? false;
+
   Color _sessionColor(BuildContext context, SessionType type) => switch (type) {
     SessionType.focus => Theme.of(context).colorScheme.primary,
     SessionType.shortBreak => Theme.of(context).colorScheme.secondary,
@@ -133,6 +136,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final duration = await showModalBottomSheet<Duration>(
       context: context,
       isScrollControlled: true,
@@ -172,6 +176,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     riverpod.WidgetRef ref,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final confirmed = await ConfirmationDialog.show(
       context,
       title: 'Delete cloud backup?',
@@ -200,6 +205,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     riverpod.WidgetRef ref,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final timer = ref.read(timerServiceProvider);
     final journal = ref.read(journalServiceProvider);
     final focusQueue = ref.read(focusQueueServiceProvider);
@@ -230,6 +236,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _showReminderSheet(BuildContext context) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -244,24 +251,26 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     riverpod.WidgetRef ref,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) => AccountSheet(
-        deleteCloudBackup: () => _confirmDeleteCloudBackup(context, ref),
-        deleteLocalData: () => _confirmDeleteLocalData(context, ref),
-        openPro: () => _showProSheet(context),
-        openFocusProfile: () => _showFocusProfileSheet(context),
-        openAppearance: () => _showThemeSheet(context),
-        openPrivacyPolicy: () => _openPrivacyPolicy(context),
+      builder: (sheetContext) => AccountSheet(
+        deleteCloudBackup: () => _confirmDeleteCloudBackup(sheetContext, ref),
+        deleteLocalData: () => _confirmDeleteLocalData(sheetContext, ref),
+        openPro: () => _showProSheet(sheetContext),
+        openFocusProfile: () => _showFocusProfileSheet(sheetContext),
+        openAppearance: () => _showThemeSheet(sheetContext),
+        openPrivacyPolicy: () => _openPrivacyPolicy(sheetContext),
       ),
     );
   }
 
   Future<void> _showThemeSheet(BuildContext context) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -274,6 +283,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _showBreathingPause(BuildContext context) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -286,6 +296,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _showFocusProfileSheet(BuildContext context) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -298,6 +309,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _showProSheet(BuildContext context) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -313,6 +325,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final shouldClear = await ConfirmationDialog.show(
       context,
       title: 'Clear focus history?',
@@ -335,6 +348,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _editFocusTask(BuildContext context, TimerService timer) async {
+    if (!_canOpenOverlay(context)) return;
     final task = await TextEntryDialog.show(
       context,
       title: 'What are you focusing on?',
@@ -355,6 +369,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     TimerService timer,
     riverpod.WidgetRef ref,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -379,6 +394,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     FocusQueueService queue,
     FocusQueueItem item,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final updated = await TextEntryDialog.show(
       context,
       title: 'Edit task',
@@ -394,6 +410,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   }
 
   Future<void> _showCompletedTasksSheet(BuildContext context) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -409,6 +426,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final thought = await TextEntryDialog.show(
       context,
       title: 'Park this thought',
@@ -427,6 +445,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     TimerService timer,
     riverpod.WidgetRef ref,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -455,6 +474,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final milestones = [
       FocusMilestone(
         title: 'First step',
@@ -513,6 +533,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     TimerService timer,
     List<FocusSession> focusHistory,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -537,6 +558,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final value = await TextEntryDialog.show(
       context,
       title: 'Set daily focus goal',
@@ -558,6 +580,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     JournalState journalState,
     JournalService journal,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final draft = await JournalEntryDialog.show(
       context,
       initialMood: _journalMoods.first,
@@ -576,6 +599,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     JournalState journalState,
     JournalService journal,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     final draft = await JournalEntryDialog.show(
       context,
       initialMood: entry.mood,
@@ -596,6 +620,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     riverpod.WidgetRef ref,
   ) async {
+    if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,

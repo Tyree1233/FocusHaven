@@ -8,11 +8,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/timer_service.dart';
+import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 
-Widget _app(TimerService timer) {
+class _CountingNavigatorObserver extends NavigatorObserver {
+  int pushCount = 0;
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    pushCount += 1;
+    super.didPush(route, previousRoute);
+  }
+}
+
+Widget _app(TimerService timer, {NavigatorObserver? observer}) {
   return ProviderScope(
     overrides: [
       timerServiceProvider.overrideWith((ref) => timer),
+      authStateProvider.overrideWithValue((
+        isSignedIn: false,
+        displayName: 'Guest',
+        signInError: null,
+      )),
       authIsSignedInProvider.overrideWithValue(false),
       focusQueueRemainingCountProvider.overrideWithValue(0),
     ],
@@ -25,6 +41,7 @@ Widget _app(TimerService timer) {
           surface: Color(0xFF352260),
         ),
       ),
+      navigatorObservers: [?observer],
       home: const TimerScreen(),
     ),
   );
@@ -59,6 +76,68 @@ void main() {
     expect(find.byTooltip('Reflection journal'), findsOneWidget);
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
     expect(find.byTooltip('Sign in'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes overlapping timer overlay launches', (tester) async {
+    final timer = await _createTimer(tester);
+    final observer = _CountingNavigatorObserver();
+
+    await tester.pumpWidget(_app(timer, observer: observer));
+    await tester.pump();
+
+    final initialPushCount = observer.pushCount;
+    final mindfulPause = tester
+        .widget<IconButton>(
+          find.widgetWithIcon(IconButton, Icons.self_improvement_outlined),
+        )
+        .onPressed!;
+    mindfulPause();
+    mindfulPause();
+    await tester.pumpAndSettle();
+
+    expect(observer.pushCount - initialPushCount, 1);
+    expect(find.byType(GuidedBreathingSheet), findsOneWidget);
+
+    Navigator.of(tester.element(find.byType(GuidedBreathingSheet))).pop();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(GuidedBreathingSheet), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('account settings can open and return from nested sheets', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    final observer = _CountingNavigatorObserver();
+
+    await tester.pumpWidget(_app(timer, observer: observer));
+    await tester.pump();
+    await tester.tap(find.byTooltip('Sign in'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your FocusHaven account'), findsOneWidget);
+    final appearanceAction = find.text('Appearance');
+    await tester.ensureVisible(appearanceAction);
+    await tester.pumpAndSettle();
+    final accountPushCount = observer.pushCount;
+
+    await tester.tap(appearanceAction);
+    await tester.pumpAndSettle();
+
+    expect(observer.pushCount - accountPushCount, 1);
+    expect(find.byTooltip('Back to account settings'), findsOneWidget);
+    expect(
+      find.text('Choose the atmosphere that feels best for your focus.'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byTooltip('Back to account settings'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your FocusHaven account'), findsOneWidget);
+    expect(find.byTooltip('Back to account settings'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
