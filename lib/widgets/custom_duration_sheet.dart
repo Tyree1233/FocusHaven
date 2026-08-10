@@ -28,6 +28,7 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
   late final FixedExtentScrollController _secondsController;
   late int _selectedMinutes;
   late int _selectedSeconds;
+  bool _isClosing = false;
 
   @override
   void initState() {
@@ -54,6 +55,7 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
   }
 
   void _selectFavorite(int minutes) {
+    if (_isClosing) return;
     setState(() {
       _selectedMinutes = minutes;
       _selectedSeconds = 0;
@@ -70,7 +72,19 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
     );
   }
 
+  void _selectMinutes(int minutes) {
+    if (_isClosing) return;
+    setState(() => _selectedMinutes = minutes);
+  }
+
+  void _selectSeconds(int seconds) {
+    if (_isClosing) return;
+    setState(() => _selectedSeconds = seconds);
+  }
+
   void _submit() {
+    if (_isClosing) return;
+    setState(() => _isClosing = true);
     Navigator.pop(
       context,
       Duration(minutes: _selectedMinutes, seconds: _selectedSeconds),
@@ -113,9 +127,14 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
                   .where((minutes) => minutes <= widget.maximumMinutes)
                   .map(
                     (minutes) => ChoiceChip(
+                      key: ValueKey<String>(
+                        'custom-duration-favorite-$minutes',
+                      ),
                       label: Text('$minutes min'),
                       selected: _selectedMinutes == minutes,
-                      onSelected: (_) => _selectFavorite(minutes),
+                      onSelected: _isClosing
+                          ? null
+                          : (_) => _selectFavorite(minutes),
                     ),
                   )
                   .toList(growable: false),
@@ -132,8 +151,7 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
                       selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
                         background: widget.sessionColor.withValues(alpha: 0.15),
                       ),
-                      onSelectedItemChanged: (index) =>
-                          setState(() => _selectedMinutes = index),
+                      onSelectedItemChanged: _isClosing ? null : _selectMinutes,
                       childCount: widget.maximumMinutes + 1,
                       itemBuilder: (context, index) => Center(
                         child: Text(
@@ -150,8 +168,7 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
                       selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
                         background: widget.sessionColor.withValues(alpha: 0.15),
                       ),
-                      onSelectedItemChanged: (index) =>
-                          setState(() => _selectedSeconds = index),
+                      onSelectedItemChanged: _isClosing ? null : _selectSeconds,
                       childCount: 60,
                       itemBuilder: (context, index) => Center(
                         child: Text(
@@ -168,7 +185,8 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: _submit,
+                key: const ValueKey<String>('custom-duration-submit'),
+                onPressed: _isClosing ? null : _submit,
                 style: FilledButton.styleFrom(
                   backgroundColor: widget.sessionColor,
                   foregroundColor: widget.foregroundColor,

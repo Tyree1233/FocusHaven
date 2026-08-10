@@ -1,10 +1,25 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/widgets/custom_duration_sheet.dart';
 
-Widget _launcher({required Future<void> Function(BuildContext) onOpen}) {
+class _CountingNavigatorObserver extends NavigatorObserver {
+  int popCount = 0;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    popCount += 1;
+    super.didPop(route, previousRoute);
+  }
+}
+
+Widget _launcher({
+  required Future<void> Function(BuildContext) onOpen,
+  NavigatorObserver? observer,
+}) {
   return MaterialApp(
     theme: ThemeData.dark(),
+    navigatorObservers: [?observer],
     home: Builder(
       builder: (context) => Scaffold(
         body: FilledButton(
@@ -21,6 +36,7 @@ Future<void> _openSheet(
   required ValueChanged<Duration?> onResult,
   Duration initialDuration = const Duration(minutes: 7, seconds: 5),
   int maximumMinutes = 180,
+  NavigatorObserver? observer,
 }) async {
   await tester.pumpWidget(
     _launcher(
@@ -37,6 +53,7 @@ Future<void> _openSheet(
         );
         onResult(result);
       },
+      observer: observer,
     ),
   );
 
@@ -106,6 +123,47 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(result, const Duration(minutes: 20, seconds: 59));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes submission and locks duration input while closing', (
+    tester,
+  ) async {
+    final observer = _CountingNavigatorObserver();
+    Duration? result;
+    await _openSheet(
+      tester,
+      onResult: (value) => result = value,
+      observer: observer,
+    );
+    final submitFinder = find.byKey(
+      const ValueKey<String>('custom-duration-submit'),
+    );
+    final favoriteFinder = find.byKey(
+      const ValueKey<String>('custom-duration-favorite-25'),
+    );
+    final submit = tester.widget<FilledButton>(submitFinder).onPressed!;
+
+    submit();
+    submit();
+    await tester.pump();
+
+    expect(observer.popCount, 1);
+    expect(tester.widget<FilledButton>(submitFinder).onPressed, isNull);
+    expect(tester.widget<ChoiceChip>(favoriteFinder).onSelected, isNull);
+    final pickers = tester
+        .widgetList<CupertinoPicker>(find.byType(CupertinoPicker))
+        .toList(growable: false);
+    expect(pickers, hasLength(2));
+    expect(
+      pickers.every((picker) => picker.onSelectedItemChanged == null),
+      isTrue,
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(result, const Duration(minutes: 7, seconds: 5));
+    expect(find.text('Focus duration'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }
