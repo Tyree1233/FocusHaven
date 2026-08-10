@@ -36,6 +36,25 @@ void main() {
     expect(timer.isRunning, isFalse);
   });
 
+  test('duplicate pause callbacks publish one state change', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+
+    timer.start();
+    notifications = 0;
+    final pause = timer.pause;
+
+    pause();
+    pause();
+
+    expect(timer.isRunning, isFalse);
+    expect(notifications, 1);
+  });
+
   test('custom duration accepts minutes and seconds', () async {
     final timer = await createTimer();
     addTearDown(timer.dispose);

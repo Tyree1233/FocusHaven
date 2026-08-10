@@ -271,6 +271,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void pause() {
+    if (!_isRunning) return;
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
