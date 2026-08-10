@@ -3,10 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/app_providers.dart';
 
+typedef CompletedTaskRestorer = Future<void> Function(String id);
+
 class CompletedTasksSheet extends ConsumerStatefulWidget {
-  const CompletedTasksSheet({required this.dateLabel, super.key});
+  const CompletedTasksSheet({
+    required this.dateLabel,
+    this.restoreTask,
+    super.key,
+  });
 
   final String Function(DateTime value) dateLabel;
+  final CompletedTaskRestorer? restoreTask;
 
   @override
   ConsumerState<CompletedTasksSheet> createState() =>
@@ -15,6 +22,42 @@ class CompletedTasksSheet extends ConsumerStatefulWidget {
 
 class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
   final ScrollController _scrollController = ScrollController();
+  final Set<String> _restoringTaskIds = <String>{};
+
+  bool _beginRestore(String id) {
+    if (_restoringTaskIds.contains(id)) return false;
+    setState(() => _restoringTaskIds.add(id));
+    return true;
+  }
+
+  void _finishRestore(String id) {
+    if (!mounted) return;
+    setState(() => _restoringTaskIds.remove(id));
+  }
+
+  Future<void> _restoreTask(String id) async {
+    if (!_beginRestore(id)) return;
+    try {
+      final restoreTask = widget.restoreTask;
+      if (restoreTask == null) {
+        await ref.read(focusQueueServiceProvider).toggle(id);
+      } else {
+        await restoreTask(id);
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Task could not be returned to the queue. Please try again.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      _finishRestore(id);
+    }
+  }
 
   @override
   void dispose() {
@@ -25,7 +68,6 @@ class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
   @override
   Widget build(BuildContext context) {
     final queueState = ref.watch(focusQueueStateProvider);
-    final queue = ref.read(focusQueueServiceProvider);
 
     return SafeArea(
       top: false,
@@ -66,7 +108,9 @@ class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
                         const Divider(height: 1, color: Colors.white12),
                     itemBuilder: (context, index) {
                       final item = queueState.completedItems[index];
+                      final isRestoring = _restoringTaskIds.contains(item.id);
                       return ListTile(
+                        key: ValueKey<String>('completed-task-${item.id}'),
                         leading: Icon(
                           Icons.check_circle_outline,
                           color: Theme.of(context).colorScheme.primary,
@@ -78,9 +122,14 @@ class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
                               : 'Completed ${widget.dateLabel(item.completedAt!)}',
                         ),
                         trailing: IconButton(
+                          key: ValueKey<String>(
+                            'completed-task-restore-${item.id}',
+                          ),
                           tooltip: 'Return to queue',
                           icon: const Icon(Icons.undo),
-                          onPressed: () => queue.toggle(item.id),
+                          onPressed: isRestoring
+                              ? null
+                              : () => _restoreTask(item.id),
                         ),
                       );
                     },

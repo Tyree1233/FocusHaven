@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/widgets/completed_tasks_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Widget _app(FocusQueueService service) {
+Widget _app(FocusQueueService service, {CompletedTaskRestorer? restoreTask}) {
   return ProviderScope(
     overrides: [focusQueueServiceProvider.overrideWith((ref) => service)],
     child: MaterialApp(
@@ -16,13 +17,17 @@ Widget _app(FocusQueueService service) {
       home: Scaffold(
         body: CompletedTasksSheet(
           dateLabel: (value) => value.day == 7 ? 'Aug 7' : 'Aug 6',
+          restoreTask: restoreTask,
         ),
       ),
     ),
   );
 }
 
-Future<FocusQueueService> _pumpCompletedTasks(WidgetTester tester) async {
+Future<FocusQueueService> _pumpCompletedTasks(
+  WidgetTester tester, {
+  CompletedTaskRestorer? restoreTask,
+}) async {
   SharedPreferences.setMockInitialValues({
     'focusQueue': jsonEncode([
       {
@@ -42,7 +47,7 @@ Future<FocusQueueService> _pumpCompletedTasks(WidgetTester tester) async {
   final service = FocusQueueService();
   await tester.pump();
 
-  await tester.pumpWidget(_app(service));
+  await tester.pumpWidget(_app(service, restoreTask: restoreTask));
   await tester.pump();
   return service;
 }
@@ -96,6 +101,67 @@ void main() {
     expect(service.completedItems.single.id, 'older-task');
     expect(find.text('Plan tomorrow'), findsNothing);
     expect(find.text('Review notes'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes restores per completed task', (tester) async {
+    final pendingRestore = Completer<void>();
+    final restoredIds = <String>[];
+    final service = await _pumpCompletedTasks(
+      tester,
+      restoreTask: (id) async {
+        restoredIds.add(id);
+        await pendingRestore.future;
+      },
+    );
+    final newerRestore = find.byKey(
+      const ValueKey<String>('completed-task-restore-newer-task'),
+    );
+    final olderRestore = find.byKey(
+      const ValueKey<String>('completed-task-restore-older-task'),
+    );
+    final restoreButton = tester.widget<IconButton>(newerRestore);
+
+    restoreButton.onPressed!.call();
+    restoreButton.onPressed!.call();
+    await tester.pump();
+
+    expect(restoredIds, ['newer-task']);
+    expect(tester.widget<IconButton>(newerRestore).onPressed, isNull);
+    expect(tester.widget<IconButton>(olderRestore).onPressed, isNotNull);
+
+    pendingRestore.complete();
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<IconButton>(newerRestore).onPressed, isNotNull);
+    expect(service.completedItems, hasLength(2));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains restore failures and keeps the task retryable', (
+    tester,
+  ) async {
+    final service = await _pumpCompletedTasks(
+      tester,
+      restoreTask: (_) async => throw StateError('queue storage unavailable'),
+    );
+    final restoreAction = find.byKey(
+      const ValueKey<String>('completed-task-restore-newer-task'),
+    );
+
+    await tester.tap(restoreAction);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Task could not be returned to the queue. Please try again.'),
+      findsOneWidget,
+    );
+    expect(service.completedItems, hasLength(2));
+    expect(
+      service.completedItems.map((item) => item.id),
+      orderedEquals(['newer-task', 'older-task']),
+    );
+    expect(tester.widget<IconButton>(restoreAction).onPressed, isNotNull);
     expect(tester.takeException(), isNull);
   });
 }
