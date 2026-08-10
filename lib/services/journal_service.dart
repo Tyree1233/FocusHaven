@@ -144,8 +144,13 @@ class JournalService extends ChangeNotifier {
       final preferences = await SharedPreferences.getInstance();
       if (_isDisposed) return;
 
-      final saved = preferences.getString(_storageKey);
-      if (saved == null) return;
+      final savedValue = preferences.get(_storageKey);
+      if (savedValue == null) return;
+      if (savedValue is! String) {
+        await preferences.remove(_storageKey);
+        return;
+      }
+      final saved = savedValue;
       final decoded = jsonDecode(saved);
       if (decoded is! List) {
         await preferences.remove(_storageKey);

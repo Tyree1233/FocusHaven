@@ -343,6 +343,17 @@ void main() {
     expect(preferences.containsKey('journalEntries'), isFalse);
   });
 
+  test('removes a journal preference with the wrong value type', () async {
+    SharedPreferences.setMockInitialValues({'journalEntries': true});
+
+    final journal = await createJournal();
+    addTearDown(journal.dispose);
+
+    expect(journal.entries, isEmpty);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('journalEntries'), isFalse);
+  });
+
   test('an unchanged update does not publish another revision', () async {
     final journal = await createJournal();
     addTearDown(journal.dispose);
