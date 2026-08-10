@@ -142,8 +142,14 @@ class FocusQueueService extends ChangeNotifier {
 
   Future<void> _load() async {
     final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString(_storageKey);
-    if (saved == null) return;
+    final savedValue = prefs.get(_storageKey);
+    if (savedValue == null) return;
+    if (savedValue is! String) {
+      _items = [];
+      await prefs.remove(_storageKey);
+      return;
+    }
+    final saved = savedValue;
     try {
       final decoded = jsonDecode(saved);
       if (decoded is! List) {

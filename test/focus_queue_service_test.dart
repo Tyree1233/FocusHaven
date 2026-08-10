@@ -292,6 +292,18 @@ void main() {
     expect(preferences.containsKey('focusQueue'), isFalse);
   });
 
+  test('removes a focus queue preference with the wrong value type', () async {
+    SharedPreferences.setMockInitialValues({'focusQueue': true});
+
+    final queue = await createQueue();
+    addTearDown(queue.dispose);
+
+    expect(queue.items, isEmpty);
+    expect(queue.completedItems, isEmpty);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('focusQueue'), isFalse);
+  });
+
   test('initialization and mutations are safe after disposal', () async {
     SharedPreferences.setMockInitialValues({
       'focusQueue': jsonEncode([
