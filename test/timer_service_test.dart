@@ -158,19 +158,54 @@ void main() {
     expect(timer.secondsRemaining, 24 * 60 * 60);
   });
 
-  test('switching sessions uses the correct saved duration', () async {
+  test('completed sessions use the correct saved next duration', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1,
+      'shortBreakSeconds': 190,
+      'secondsRemaining': 1,
+      'totalSessionSeconds': 1,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now()
+          .subtract(const Duration(seconds: 2))
+          .millisecondsSinceEpoch,
+    });
     final timer = await createTimer();
     addTearDown(timer.dispose);
 
-    timer.selectSession(SessionType.shortBreak);
-    timer.setCustomDuration(3, 10);
-    timer.selectSession(SessionType.focus);
+    expect(timer.isComplete, isTrue);
     timer.beginNextSession();
 
     expect(timer.sessionType, SessionType.shortBreak);
     expect(timer.secondsRemaining, 190);
     expect(timer.isComplete, isFalse);
     expect(timer.isRunning, isFalse);
+  });
+
+  test('stale next-session callbacks publish one transition', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1,
+      'secondsRemaining': 1,
+      'totalSessionSeconds': 1,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now()
+          .subtract(const Duration(seconds: 2))
+          .millisecondsSinceEpoch,
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+    final transition = timer.beginNextSession;
+
+    transition();
+    transition();
+
+    expect(timer.sessionType, SessionType.shortBreak);
+    expect(timer.isComplete, isFalse);
+    expect(timer.isRunning, isFalse);
+    expect(notifications, 1);
   });
 
   test('focus tasks and parked thoughts are cleaned before saving', () async {

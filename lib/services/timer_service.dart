@@ -320,6 +320,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void beginNextSession() {
+    if (!_isComplete) return;
     if (_sessionType == SessionType.focus) {
       final isLongBreak =
           _completedFocusSessions > 0 && _completedFocusSessions % 4 == 0;
