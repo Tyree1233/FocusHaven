@@ -2,8 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/widgets/confirmation_dialog.dart';
 
-Widget _launcher(Future<void> Function(BuildContext) onOpen) {
+class _CountingNavigatorObserver extends NavigatorObserver {
+  int popCount = 0;
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    popCount += 1;
+    super.didPop(route, previousRoute);
+  }
+}
+
+Widget _launcher(
+  Future<void> Function(BuildContext) onOpen, {
+  NavigatorObserver? observer,
+}) {
   return MaterialApp(
+    navigatorObservers: [?observer],
     home: Builder(
       builder: (context) => Scaffold(
         body: FilledButton(
@@ -113,6 +127,94 @@ void main() {
 
     expect(backgroundColor, const Color(0xFFB3261E));
     expect(foregroundColor, Colors.white);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes overlapping cancel and confirm decisions', (
+    tester,
+  ) async {
+    final observer = _CountingNavigatorObserver();
+    bool? result;
+    var completed = false;
+    await tester.pumpWidget(
+      _launcher((context) async {
+        result = await ConfirmationDialog.show(
+          context,
+          title: 'Delete local data?',
+          message: 'This removes data stored on this device.',
+          cancelLabel: 'Keep my data',
+          confirmLabel: 'Delete data',
+          isDestructive: true,
+        );
+        completed = true;
+      }, observer: observer),
+    );
+
+    await tester.tap(find.text('Open dialog'));
+    await tester.pumpAndSettle();
+    final cancel = tester
+        .widget<TextButton>(
+          find.byKey(const ValueKey<String>('confirmation-cancel')),
+        )
+        .onPressed!;
+    final confirm = tester
+        .widget<FilledButton>(
+          find.byKey(const ValueKey<String>('confirmation-confirm')),
+        )
+        .onPressed!;
+
+    cancel();
+    confirm();
+    await tester.pumpAndSettle();
+
+    expect(completed, isTrue);
+    expect(result, isFalse);
+    expect(observer.popCount, 1);
+    expect(find.text('Delete local data?'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes overlapping confirm and cancel decisions', (
+    tester,
+  ) async {
+    final observer = _CountingNavigatorObserver();
+    bool? result;
+    var completed = false;
+    await tester.pumpWidget(
+      _launcher((context) async {
+        result = await ConfirmationDialog.show(
+          context,
+          title: 'Delete cloud backup?',
+          message: 'This cannot be undone.',
+          cancelLabel: 'Cancel',
+          confirmLabel: 'Delete backup',
+          isDestructive: true,
+        );
+        completed = true;
+      }, observer: observer),
+    );
+
+    await tester.tap(find.text('Open dialog'));
+    await tester.pumpAndSettle();
+    final confirm = tester
+        .widget<FilledButton>(
+          find.byKey(const ValueKey<String>('confirmation-confirm')),
+        )
+        .onPressed!;
+    final cancel = tester
+        .widget<TextButton>(
+          find.byKey(const ValueKey<String>('confirmation-cancel')),
+        )
+        .onPressed!;
+
+    confirm();
+    cancel();
+    await tester.pumpAndSettle();
+
+    expect(completed, isTrue);
+    expect(result, isTrue);
+    expect(observer.popCount, 1);
+    expect(find.text('Delete cloud backup?'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

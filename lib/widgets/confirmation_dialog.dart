@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ConfirmationDialog extends StatelessWidget {
+class ConfirmationDialog extends StatefulWidget {
   const ConfirmationDialog({
     required this.title,
     required this.message,
@@ -38,24 +38,39 @@ class ConfirmationDialog extends StatelessWidget {
   }
 
   @override
+  State<ConfirmationDialog> createState() => _ConfirmationDialogState();
+}
+
+class _ConfirmationDialogState extends State<ConfirmationDialog> {
+  bool _isClosing = false;
+
+  void _close(bool result) {
+    if (_isClosing) return;
+    setState(() => _isClosing = true);
+    Navigator.pop(context, result);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(title),
-      content: Text(message),
+      title: Text(widget.title),
+      content: Text(widget.message),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: Text(cancelLabel),
+          key: const ValueKey<String>('confirmation-cancel'),
+          onPressed: _isClosing ? null : () => _close(false),
+          child: Text(widget.cancelLabel),
         ),
         FilledButton(
-          onPressed: () => Navigator.pop(context, true),
-          style: isDestructive
+          key: const ValueKey<String>('confirmation-confirm'),
+          onPressed: _isClosing ? null : () => _close(true),
+          style: widget.isDestructive
               ? FilledButton.styleFrom(
                   backgroundColor: const Color(0xFFB3261E),
                   foregroundColor: Colors.white,
                 )
               : null,
-          child: Text(confirmLabel),
+          child: Text(widget.confirmLabel),
         ),
       ],
     );
