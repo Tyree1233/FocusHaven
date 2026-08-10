@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ConsumerWidget, ProviderScope, WidgetRef;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'firebase_options.dart';
 import 'providers/app_providers.dart';
@@ -24,9 +23,7 @@ Future<void> main() async {
   await notificationService.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  final preferences = await SharedPreferences.getInstance();
-  final showOnboarding =
-      !(preferences.getBool('hasCompletedOnboarding') ?? false);
+  final showOnboarding = await shouldShowOnboarding();
   final authService = AuthService();
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();

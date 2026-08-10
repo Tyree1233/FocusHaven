@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Widget _app(OnboardingCompletionSaver saveCompletion) {
   return MaterialApp(
@@ -16,6 +17,32 @@ Widget _app(OnboardingCompletionSaver saveCompletion) {
 }
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
+  test('uses a valid saved onboarding completion before startup', () async {
+    SharedPreferences.setMockInitialValues({
+      onboardingCompletionPreferenceKey: true,
+    });
+
+    expect(await shouldShowOnboarding(), isFalse);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool(onboardingCompletionPreferenceKey), isTrue);
+  });
+
+  test('repairs malformed onboarding completion before startup', () async {
+    SharedPreferences.setMockInitialValues({
+      onboardingCompletionPreferenceKey: 'true',
+    });
+
+    expect(await shouldShowOnboarding(), isTrue);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey(onboardingCompletionPreferenceKey), isFalse);
+  });
+
   testWidgets('serializes onboarding completion and navigates after saving', (
     tester,
   ) async {

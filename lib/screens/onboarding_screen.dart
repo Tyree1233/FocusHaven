@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const onboardingCompletionPreferenceKey = 'hasCompletedOnboarding';
+
+Future<bool> shouldShowOnboarding() async {
+  final preferences = await SharedPreferences.getInstance();
+  final savedCompletion = preferences.get(onboardingCompletionPreferenceKey);
+  if (savedCompletion is bool) return !savedCompletion;
+  if (savedCompletion != null) {
+    await preferences.remove(onboardingCompletionPreferenceKey);
+  }
+  return true;
+}
+
 typedef OnboardingCompletionSaver = Future<bool> Function();
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,7 +29,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Future<bool> _saveCompletion() async {
     final preferences = await SharedPreferences.getInstance();
-    return preferences.setBool('hasCompletedOnboarding', true);
+    return preferences.setBool(onboardingCompletionPreferenceKey, true);
   }
 
   Future<void> _beginFocus() async {
