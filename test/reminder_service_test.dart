@@ -43,7 +43,7 @@ void main() {
     expect(service.weekdays, {1, 3, 5});
   });
 
-  test('ignores corrupted saved weekdays and keeps safe defaults', () async {
+  test('repairs corrupted saved weekdays with safe defaults', () async {
     SharedPreferences.setMockInitialValues({
       'dailyReminderWeekdays': ['0', '8', 'not-a-weekday'],
     });
@@ -51,9 +51,19 @@ void main() {
     addTearDown(service.dispose);
 
     expect(service.weekdays, {1, 2, 3, 4, 5, 6, 7});
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getStringList('dailyReminderWeekdays'), [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+    ]);
   });
 
-  test('clamps an invalid saved reminder time to a valid time', () async {
+  test('clamps and repairs an invalid saved reminder time', () async {
     SharedPreferences.setMockInitialValues({
       'dailyReminderHour': 42,
       'dailyReminderMinute': -5,
@@ -62,6 +72,33 @@ void main() {
     addTearDown(service.dispose);
 
     expect(service.time, const TimeOfDay(hour: 23, minute: 0));
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getInt('dailyReminderHour'), 23);
+    expect(preferences.getInt('dailyReminderMinute'), 0);
+  });
+
+  test('repairs mistyped reminder preferences without scheduling', () async {
+    SharedPreferences.setMockInitialValues({
+      'dailyReminderEnabled': 'true',
+      'dailyReminderHour': 6,
+      'dailyReminderMinute': '30',
+      'dailyReminderWeekdays': ['6', '2', '2', '9', 'not-a-weekday'],
+    });
+    final notifications = FakeReminderNotifications();
+    final service = await createService(notifications);
+    addTearDown(service.dispose);
+
+    expect(service.isEnabled, isFalse);
+    expect(service.time, const TimeOfDay(hour: 9, minute: 0));
+    expect(service.weekdays, {2, 6});
+    expect(notifications.scheduledTimes, isEmpty);
+    expect(notifications.cancelCalls, 0);
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool('dailyReminderEnabled'), isFalse);
+    expect(preferences.getInt('dailyReminderHour'), 9);
+    expect(preferences.getInt('dailyReminderMinute'), 0);
+    expect(preferences.getStringList('dailyReminderWeekdays'), ['2', '6']);
   });
 
   test('does not enable a reminder when permission is declined', () async {

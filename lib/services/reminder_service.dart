@@ -54,16 +54,7 @@ class ReminderService extends ChangeNotifier {
     _weekdays = selectedWeekdays;
     _isEnabled = true;
     final preferences = await SharedPreferences.getInstance();
-    final orderedWeekdays = selectedWeekdays.toList()..sort();
-    await Future.wait([
-      preferences.setBool(_enabledKey, true),
-      preferences.setInt(_hourKey, time.hour),
-      preferences.setInt(_minuteKey, time.minute),
-      preferences.setStringList(
-        _weekdaysKey,
-        orderedWeekdays.map((day) => day.toString()).toList(),
-      ),
-    ]);
+    await _savePreferences(preferences);
     _notifyListenersSafely();
     return true;
   }
@@ -75,7 +66,7 @@ class ReminderService extends ChangeNotifier {
     await _notificationService.cancelDailyReminder();
     _isEnabled = false;
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool(_enabledKey, false);
+    await _savePreferences(preferences);
     _notifyListenersSafely();
   }
 
@@ -84,25 +75,52 @@ class ReminderService extends ChangeNotifier {
       final preferences = await SharedPreferences.getInstance();
       if (_isDisposed) return;
 
-      _isEnabled = preferences.getBool(_enabledKey) ?? false;
-      final hour = preferences.getInt(_hourKey);
-      final minute = preferences.getInt(_minuteKey);
-      if (hour != null && minute != null) {
-        _time = TimeOfDay(hour: hour.clamp(0, 23), minute: minute.clamp(0, 59));
+      final hasSavedState =
+          preferences.containsKey(_enabledKey) ||
+          preferences.containsKey(_hourKey) ||
+          preferences.containsKey(_minuteKey) ||
+          preferences.containsKey(_weekdaysKey);
+      final savedEnabled = preferences.get(_enabledKey);
+      _isEnabled = savedEnabled is bool && savedEnabled;
+
+      final savedHour = preferences.get(_hourKey);
+      final savedMinute = preferences.get(_minuteKey);
+      if (savedHour is int && savedMinute is int) {
+        _time = TimeOfDay(
+          hour: savedHour.clamp(0, 23),
+          minute: savedMinute.clamp(0, 59),
+        );
       }
-      final savedWeekdays = preferences.getStringList(_weekdaysKey);
-      if (savedWeekdays != null) {
+
+      final savedWeekdays = preferences.get(_weekdaysKey);
+      if (savedWeekdays is List) {
         final parsedWeekdays = savedWeekdays
+            .whereType<String>()
             .map(int.tryParse)
             .whereType<int>()
             .where((day) => day >= DateTime.monday && day <= DateTime.sunday)
             .toSet();
         if (parsedWeekdays.isNotEmpty) _weekdays = parsedWeekdays;
       }
+
+      if (hasSavedState) await _savePreferences(preferences);
     } catch (error) {
       debugPrint('Reminder preferences could not be loaded: $error');
     }
     _notifyListenersSafely();
+  }
+
+  Future<void> _savePreferences(SharedPreferences preferences) async {
+    final orderedWeekdays = _weekdays.toList()..sort();
+    await Future.wait([
+      preferences.setBool(_enabledKey, _isEnabled),
+      preferences.setInt(_hourKey, _time.hour),
+      preferences.setInt(_minuteKey, _time.minute),
+      preferences.setStringList(
+        _weekdaysKey,
+        orderedWeekdays.map((day) => day.toString()).toList(),
+      ),
+    ]);
   }
 
   void _notifyListenersSafely() {
