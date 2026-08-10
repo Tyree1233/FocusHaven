@@ -23,27 +23,46 @@ class AppearanceSheet extends riverpod.ConsumerWidget {
                 ref.read(themeServiceProvider).setTheme(value);
               }
             },
-            child: ListView(
-              children: [
-                Text(
-                  'Appearance',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Choose the atmosphere that feels best for your focus.',
-                  style: TextStyle(color: Colors.white70),
-                ),
-                const SizedBox(height: 14),
-                ...FocusHavenTheme.values.map(
-                  (theme) => RadioListTile<FocusHavenTheme>(
-                    contentPadding: EdgeInsets.zero,
-                    value: theme,
-                    title: Text(theme.label),
-                    secondary: CircleAvatar(backgroundColor: theme.primary),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'Back to account settings',
+                        onPressed: () {
+                          final navigator = Navigator.of(context);
+                          if (navigator.canPop()) {
+                            navigator.pop();
+                          }
+                        },
+                        icon: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Appearance',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Choose the atmosphere that feels best for your focus.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  const SizedBox(height: 14),
+                  ...FocusHavenTheme.values.map(
+                    (theme) => RadioListTile<FocusHavenTheme>(
+                      contentPadding: EdgeInsets.zero,
+                      value: theme,
+                      title: Text(theme.label),
+                      secondary: CircleAvatar(backgroundColor: theme.primary),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

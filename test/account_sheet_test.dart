@@ -128,6 +128,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Your FocusHaven account'), findsOneWidget);
+    expect(find.byTooltip('Close account settings'), findsOneWidget);
     expect(
       find.text('Sign in to protect your focus history and use cloud backup.'),
       findsOneWidget,

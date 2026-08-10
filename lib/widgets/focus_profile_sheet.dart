@@ -125,6 +125,8 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const _BackToAccountButton(),
+            const SizedBox(height: 4),
             Text(
               '${_page + 1} of ${_questions.length}',
               style: const TextStyle(color: Colors.white60),
@@ -177,6 +179,8 @@ class _IntroductionView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const _BackToAccountButton(),
+            const SizedBox(height: 4),
             Icon(
               Icons.psychology_outlined,
               size: 42,
@@ -225,6 +229,8 @@ class _ResultView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const _BackToAccountButton(),
+            const SizedBox(height: 4),
             Icon(
               Icons.auto_awesome,
               size: 44,
@@ -254,6 +260,27 @@ class _ResultView extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _BackToAccountButton extends StatelessWidget {
+  const _BackToAccountButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: IconButton(
+        tooltip: 'Back to account settings',
+        onPressed: () {
+          final navigator = Navigator.of(context);
+          if (navigator.canPop()) {
+            navigator.pop();
+          }
+        },
+        icon: const Icon(Icons.arrow_back),
       ),
     );
   }

@@ -43,6 +43,7 @@ void main() {
     await tester.pumpWidget(_app(service));
     await tester.pump();
 
+    expect(find.byTooltip('Back to account settings'), findsOneWidget);
     for (final theme in FocusHavenTheme.values) {
       expect(find.text(theme.label), findsOneWidget);
     }

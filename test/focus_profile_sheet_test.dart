@@ -33,6 +33,7 @@ void main() {
     await tester.pumpWidget(_app(service));
     await tester.pump();
 
+    expect(find.byTooltip('Back to account settings'), findsOneWidget);
     expect(find.text('Find your focus profile'), findsOneWidget);
     expect(
       find.text(
@@ -57,6 +58,7 @@ void main() {
     await tester.tap(find.text('Start quiz'));
     await tester.pump();
 
+    expect(find.byTooltip('Back to account settings'), findsOneWidget);
     expect(find.text('1 of 4'), findsOneWidget);
     expect(
       find.text('When does focused work feel most natural?'),
@@ -80,6 +82,7 @@ void main() {
     await tester.tap(find.text('A long, uninterrupted block'));
     await tester.pumpAndSettle();
 
+    expect(find.byTooltip('Back to account settings'), findsOneWidget);
     expect(find.text('Your focus profile'), findsOneWidget);
     expect(find.text('Deep Diver'), findsOneWidget);
     expect(
