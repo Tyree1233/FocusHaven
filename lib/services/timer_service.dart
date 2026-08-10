@@ -28,6 +28,22 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static const _timerEndsAtKey = 'timerEndsAt';
   static const _pendingResumeKey = 'hasPendingTimerResume';
   static const _parkedThoughtsKey = 'parkedThoughts';
+  static const _storageKeys = <String>{
+    'focusSeconds',
+    'shortBreakSeconds',
+    'longBreakSeconds',
+    'secondsRemaining',
+    'totalSessionSeconds',
+    'completedFocusSessions',
+    'focusTask',
+    'dailyGoalMinutes',
+    'sessionType',
+    _timerEndsAtKey,
+    _pendingResumeKey,
+    'focusHistory',
+    'distractions',
+    _parkedThoughtsKey,
+  };
   static const _defaultFocusSeconds = 25 * 60;
   static const _defaultShortBreakSeconds = 5 * 60;
   static const _defaultLongBreakSeconds = 15 * 60;
@@ -667,41 +683,41 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> _loadFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     if (_isDisposed) return;
+    final hasSavedState = prefs.getKeys().any(_storageKeys.contains);
 
-    var migratedLegacyThoughts = false;
     _focusSeconds = _clampStoredInt(
-      prefs.getInt('focusSeconds'),
+      _storedInt(prefs, 'focusSeconds'),
       _focusSeconds,
       1,
       _maxSessionSeconds,
     );
     _shortBreakSeconds = _clampStoredInt(
-      prefs.getInt('shortBreakSeconds'),
+      _storedInt(prefs, 'shortBreakSeconds'),
       _shortBreakSeconds,
       1,
       _maxSessionSeconds,
     );
     _longBreakSeconds = _clampStoredInt(
-      prefs.getInt('longBreakSeconds'),
+      _storedInt(prefs, 'longBreakSeconds'),
       _longBreakSeconds,
       1,
       _maxSessionSeconds,
     );
     _completedFocusSessions = _clampStoredInt(
-      prefs.getInt('completedFocusSessions'),
+      _storedInt(prefs, 'completedFocusSessions'),
       0,
       0,
       1 << 31,
     );
-    _focusTask = _cleanFocusTask(prefs.getString('focusTask') ?? '');
+    _focusTask = _cleanFocusTask(_storedString(prefs, 'focusTask') ?? '');
     _dailyGoalMinutes = _clampStoredInt(
-      prefs.getInt('dailyGoalMinutes'),
+      _storedInt(prefs, 'dailyGoalMinutes'),
       _dailyGoalMinutes,
       5,
       480,
     );
-    _hasPendingResume = prefs.getBool(_pendingResumeKey) ?? false;
-    final parkedThoughtsJson = prefs.getString(_parkedThoughtsKey);
+    _hasPendingResume = _storedBool(prefs, _pendingResumeKey) ?? false;
+    final parkedThoughtsJson = _storedString(prefs, _parkedThoughtsKey);
     if (parkedThoughtsJson != null) {
       _parkedThoughts = _decodeParkedThoughts(parkedThoughtsJson);
       final normalizedParkedThoughts = jsonEncode(
@@ -713,7 +729,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       await prefs.remove('distractions');
     } else {
       final legacyThoughts =
-          prefs.getStringList('distractions') ?? const <String>[];
+          _storedStringList(prefs, 'distractions') ?? const <String>[];
       if (legacyThoughts.isNotEmpty) {
         final migrationTime = DateTime.now();
         _parkedThoughts = [
@@ -725,13 +741,12 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
                 createdAt: migrationTime.add(Duration(microseconds: index)),
               ),
         ];
-        migratedLegacyThoughts = true;
       }
     }
     if (_parkedThoughts.isNotEmpty) {
       _parkedThoughtsRevision++;
     }
-    final historyJson = prefs.getString('focusHistory');
+    final historyJson = _storedString(prefs, 'focusHistory');
     if (historyJson != null) {
       _focusHistory = _decodeFocusHistory(historyJson);
       final normalizedHistory = jsonEncode(
@@ -744,20 +759,20 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     if (_focusHistory.isNotEmpty) {
       _focusHistoryRevision++;
     }
-    _sessionType = _sessionTypeFromIndex(prefs.getInt('sessionType'));
+    _sessionType = _sessionTypeFromIndex(_storedInt(prefs, 'sessionType'));
     _totalSessionSeconds = _clampStoredInt(
-      prefs.getInt('totalSessionSeconds'),
+      _storedInt(prefs, 'totalSessionSeconds'),
       _durationFor(_sessionType),
       1,
       _maxSessionSeconds,
     );
     _secondsRemaining = _clampStoredInt(
-      prefs.getInt('secondsRemaining'),
+      _storedInt(prefs, 'secondsRemaining'),
       _totalSessionSeconds,
       0,
       _totalSessionSeconds,
     );
-    final savedEndsAt = prefs.getInt(_timerEndsAtKey);
+    final savedEndsAt = _storedInt(prefs, _timerEndsAtKey);
     if (savedEndsAt != null) {
       _endsAt = DateTime.fromMillisecondsSinceEpoch(savedEndsAt);
       final remaining =
@@ -772,7 +787,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         _saveToPrefs();
       }
     }
-    if (migratedLegacyThoughts) {
+    if (hasSavedState && _timerStorageNeedsRepair(prefs)) {
       await _saveToPrefs();
     }
     if (_isDisposed) return;
@@ -850,6 +865,52 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     } on FormatException {
       return [];
     }
+  }
+
+  bool _timerStorageNeedsRepair(SharedPreferences preferences) {
+    final normalizedHistory = jsonEncode(
+      _focusHistory.map((session) => session.toJson()).toList(),
+    );
+    final normalizedParkedThoughts = jsonEncode(
+      _parkedThoughts.map((thought) => thought.toJson()).toList(),
+    );
+    return preferences.get('focusSeconds') != _focusSeconds ||
+        preferences.get('shortBreakSeconds') != _shortBreakSeconds ||
+        preferences.get('longBreakSeconds') != _longBreakSeconds ||
+        preferences.get('secondsRemaining') != _secondsRemaining ||
+        preferences.get('totalSessionSeconds') != _totalSessionSeconds ||
+        preferences.get('completedFocusSessions') != _completedFocusSessions ||
+        preferences.get('focusTask') != _focusTask ||
+        preferences.get('dailyGoalMinutes') != _dailyGoalMinutes ||
+        preferences.get('sessionType') != _sessionType.index ||
+        preferences.get(_timerEndsAtKey) != _endsAt?.millisecondsSinceEpoch ||
+        preferences.get(_pendingResumeKey) != _hasPendingResume ||
+        preferences.get('focusHistory') != normalizedHistory ||
+        preferences.get(_parkedThoughtsKey) != normalizedParkedThoughts ||
+        preferences.containsKey('distractions');
+  }
+
+  static int? _storedInt(SharedPreferences preferences, String key) {
+    final value = preferences.get(key);
+    return value is int ? value : null;
+  }
+
+  static String? _storedString(SharedPreferences preferences, String key) {
+    final value = preferences.get(key);
+    return value is String ? value : null;
+  }
+
+  static bool? _storedBool(SharedPreferences preferences, String key) {
+    final value = preferences.get(key);
+    return value is bool ? value : null;
+  }
+
+  static List<String>? _storedStringList(
+    SharedPreferences preferences,
+    String key,
+  ) {
+    final value = preferences.get(key);
+    return value is List ? value.whereType<String>().toList() : null;
   }
 
   static int _clampStoredInt(

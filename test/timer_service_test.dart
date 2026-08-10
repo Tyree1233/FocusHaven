@@ -267,6 +267,57 @@ void main() {
     expect(timer.secondsRemaining, 1);
   });
 
+  test('repairs mistyped timer storage without aborting startup', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': '1500',
+      'shortBreakSeconds': 420,
+      'longBreakSeconds': false,
+      'secondsRemaining': '300',
+      'totalSessionSeconds': '420',
+      'completedFocusSessions': '4',
+      'focusTask': 17,
+      'dailyGoalMinutes': '90',
+      'sessionType': '1',
+      'timerEndsAt': 'not-a-deadline',
+      'hasPendingTimerResume': 'true',
+      'focusHistory': false,
+      'parkedThoughts': 42,
+      'distractions': 'not-a-list',
+    });
+
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.sessionType, SessionType.focus);
+    expect(timer.secondsRemaining, 25 * 60);
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(timer.completedFocusSessions, 0);
+    expect(timer.focusTask, isEmpty);
+    expect(timer.dailyGoalMinutes, 60);
+    expect(timer.hasPendingResume, isFalse);
+    expect(timer.recentFocusSessions, isEmpty);
+    expect(timer.parkedThoughts, isEmpty);
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getInt('focusSeconds'), 25 * 60);
+    expect(preferences.getInt('shortBreakSeconds'), 420);
+    expect(preferences.getInt('longBreakSeconds'), 15 * 60);
+    expect(preferences.getInt('secondsRemaining'), 25 * 60);
+    expect(preferences.getInt('totalSessionSeconds'), 25 * 60);
+    expect(preferences.getInt('completedFocusSessions'), 0);
+    expect(preferences.getString('focusTask'), isEmpty);
+    expect(preferences.getInt('dailyGoalMinutes'), 60);
+    expect(preferences.getInt('sessionType'), SessionType.focus.index);
+    expect(preferences.containsKey('timerEndsAt'), isFalse);
+    expect(preferences.getBool('hasPendingTimerResume'), isFalse);
+    expect(preferences.getString('focusHistory'), '[]');
+    expect(preferences.getString('parkedThoughts'), '[]');
+    expect(preferences.containsKey('distractions'), isFalse);
+
+    timer.selectSession(SessionType.shortBreak);
+    expect(timer.secondsRemaining, 420);
+  });
+
   test('preserves valid focus history around damaged saved records', () async {
     SharedPreferences.setMockInitialValues({
       'focusHistory': jsonEncode([
