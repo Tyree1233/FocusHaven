@@ -109,18 +109,23 @@ class ThemeService extends ChangeNotifier {
       final preferences = await SharedPreferences.getInstance();
       if (_isDisposed) return;
 
-      final savedTheme = preferences.getString(_storageKey);
-      FocusHavenTheme? selectedTheme;
-      for (final theme in FocusHavenTheme.values) {
-        if (theme.name == savedTheme) {
-          selectedTheme = theme;
-          break;
-        }
-      }
-      if (selectedTheme != null) {
-        _selectedTheme = selectedTheme;
-      } else if (savedTheme != null) {
+      final savedValue = preferences.get(_storageKey);
+      if (savedValue != null && savedValue is! String) {
         await preferences.remove(_storageKey);
+      } else {
+        final savedTheme = savedValue as String?;
+        FocusHavenTheme? selectedTheme;
+        for (final theme in FocusHavenTheme.values) {
+          if (theme.name == savedTheme) {
+            selectedTheme = theme;
+            break;
+          }
+        }
+        if (selectedTheme != null) {
+          _selectedTheme = selectedTheme;
+        } else if (savedTheme != null) {
+          await preferences.remove(_storageKey);
+        }
       }
     } catch (error) {
       debugPrint('Appearance preference could not be loaded: $error');

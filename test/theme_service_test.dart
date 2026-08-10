@@ -57,6 +57,17 @@ void main() {
     expect(preferences.containsKey('focusHavenTheme'), isFalse);
   });
 
+  test('removes an appearance preference with the wrong value type', () async {
+    SharedPreferences.setMockInitialValues({'focusHavenTheme': true});
+
+    final service = await createThemeService();
+    addTearDown(service.dispose);
+
+    expect(service.selectedTheme, FocusHavenTheme.twilight);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('focusHavenTheme'), isFalse);
+  });
+
   test('does not rebuild for repeated selection of the active theme', () async {
     final service = await createThemeService();
     addTearDown(service.dispose);
