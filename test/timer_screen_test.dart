@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -20,7 +21,11 @@ class _CountingNavigatorObserver extends NavigatorObserver {
   }
 }
 
-Widget _app(TimerService timer, {NavigatorObserver? observer}) {
+Widget _app(
+  TimerService timer, {
+  NavigatorObserver? observer,
+  Future<bool> Function(Uri uri)? openExternalUrl,
+}) {
   return ProviderScope(
     overrides: [
       timerServiceProvider.overrideWith((ref) => timer),
@@ -42,7 +47,7 @@ Widget _app(TimerService timer, {NavigatorObserver? observer}) {
         ),
       ),
       navigatorObservers: [?observer],
-      home: const TimerScreen(),
+      home: TimerScreen(openExternalUrl: openExternalUrl),
     ),
   );
 }
@@ -138,6 +143,95 @@ void main() {
 
     expect(find.text('Your FocusHaven account'), findsOneWidget);
     expect(find.byTooltip('Back to account settings'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reports a refused privacy policy launch', (tester) async {
+    final timer = await _createTimer(tester);
+    Uri? attemptedUri;
+
+    await tester.pumpWidget(
+      _app(
+        timer,
+        openExternalUrl: (uri) async {
+          attemptedUri = uri;
+          return false;
+        },
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.byTooltip('Sign in'));
+    await tester.pumpAndSettle();
+
+    final privacyAction = find.widgetWithText(TextButton, 'Privacy Policy');
+    await tester.ensureVisible(privacyAction);
+    await tester.pumpAndSettle();
+    await tester.tap(privacyAction);
+    await tester.pumpAndSettle();
+
+    expect(
+      attemptedUri,
+      Uri.parse('https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html'),
+    );
+    expect(
+      find.text('Unable to open the privacy policy right now.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'That account action could not be completed. Please try again.',
+      ),
+      findsNothing,
+    );
+    expect(tester.widget<TextButton>(privacyAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains overlapping privacy policy launch failures', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    final pendingLaunch = Completer<bool>();
+    var launchCalls = 0;
+
+    await tester.pumpWidget(
+      _app(
+        timer,
+        openExternalUrl: (uri) {
+          launchCalls += 1;
+          return pendingLaunch.future;
+        },
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.byTooltip('Sign in'));
+    await tester.pumpAndSettle();
+
+    final privacyAction = find.widgetWithText(TextButton, 'Privacy Policy');
+    await tester.ensureVisible(privacyAction);
+    await tester.pumpAndSettle();
+    final initialButton = tester.widget<TextButton>(privacyAction);
+    initialButton.onPressed!.call();
+    initialButton.onPressed!.call();
+    await tester.pump();
+
+    expect(launchCalls, 1);
+    expect(tester.widget<TextButton>(privacyAction).onPressed, isNull);
+
+    pendingLaunch.completeError(StateError('launcher unavailable'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Unable to open the privacy policy right now.'),
+      findsOneWidget,
+    );
+    expect(
+      find.text(
+        'That account action could not be completed. Please try again.',
+      ),
+      findsNothing,
+    );
+    expect(tester.widget<TextButton>(privacyAction).onPressed, isNotNull);
     expect(tester.takeException(), isNull);
   });
 

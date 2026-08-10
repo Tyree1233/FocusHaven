@@ -32,7 +32,10 @@ import '../widgets/text_entry_dialog.dart';
 import '../widgets/timer_countdown.dart';
 
 class TimerScreen extends riverpod.ConsumerWidget {
-  const TimerScreen({super.key});
+  const TimerScreen({this.openExternalUrl, super.key});
+
+  /// Overrides external URL launching in tests and alternate host shells.
+  final Future<bool> Function(Uri uri)? openExternalUrl;
 
   static const _ink = Color(0xFF211442);
   static const _journalMoods = [
@@ -159,10 +162,17 @@ class TimerScreen extends riverpod.ConsumerWidget {
   Future<void> _openPrivacyPolicy(BuildContext context) async {
     const policyUrl =
         'https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html';
-    final opened = await launchUrl(
-      Uri.parse(policyUrl),
-      mode: LaunchMode.externalApplication,
-    );
+    final uri = Uri.parse(policyUrl);
+    var opened = false;
+    try {
+      final launcher = openExternalUrl;
+      opened = launcher == null
+          ? await launchUrl(uri, mode: LaunchMode.externalApplication)
+          : await launcher(uri);
+    } catch (_) {
+      // Platform launch failures use the same retryable message as a
+      // launcher that reports it could not open the URL.
+    }
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
