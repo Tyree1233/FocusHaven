@@ -55,6 +55,27 @@ void main() {
     expect(notifications, 1);
   });
 
+  test('duplicate reset callbacks publish one state change', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+
+    timer.start();
+    notifications = 0;
+    final reset = timer.reset;
+
+    reset();
+    reset();
+
+    expect(timer.isRunning, isFalse);
+    expect(timer.secondsRemaining, 25 * 60);
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(notifications, 1);
+  });
+
   test('custom duration accepts minutes and seconds', () async {
     final timer = await createTimer();
     addTearDown(timer.dispose);

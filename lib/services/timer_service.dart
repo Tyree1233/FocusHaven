@@ -282,13 +282,23 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void reset() {
+    final sessionSeconds = _durationFor(_sessionType);
+    if (_ticker == null &&
+        !_isRunning &&
+        !_isComplete &&
+        !_hasPendingResume &&
+        _endsAt == null &&
+        _secondsRemaining == sessionSeconds &&
+        _totalSessionSeconds == sessionSeconds) {
+      return;
+    }
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
     _isComplete = false;
     _hasPendingResume = false;
     _endsAt = null;
-    _secondsRemaining = _durationFor(_sessionType);
+    _secondsRemaining = sessionSeconds;
     _totalSessionSeconds = _secondsRemaining;
     notifyListeners();
     _saveToPrefs();
@@ -328,7 +338,6 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void discardPendingSession() {
     if (!_hasPendingResume) return;
-    _hasPendingResume = false;
     reset();
   }
 
