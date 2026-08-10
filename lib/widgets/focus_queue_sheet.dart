@@ -6,18 +6,26 @@ import '../services/focus_queue_service.dart';
 
 typedef FocusQueueTaskSelected = void Function(String title);
 typedef FocusQueueTaskEditor = Future<void> Function(FocusQueueItem item);
+typedef FocusQueueTitleAction = Future<void> Function(String title);
+typedef FocusQueueItemAction = Future<void> Function(String id);
 
 class FocusQueueSheet extends ConsumerStatefulWidget {
   const FocusQueueSheet({
     required this.onTaskSelected,
     required this.onEditTask,
     required this.onShowCompleted,
+    this.addTask,
+    this.completeTask,
+    this.removeTask,
     super.key,
   });
 
   final FocusQueueTaskSelected onTaskSelected;
   final FocusQueueTaskEditor onEditTask;
   final VoidCallback onShowCompleted;
+  final FocusQueueTitleAction? addTask;
+  final FocusQueueItemAction? completeTask;
+  final FocusQueueItemAction? removeTask;
 
   @override
   ConsumerState<FocusQueueSheet> createState() => _FocusQueueSheetState();
@@ -28,6 +36,13 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
   final ScrollController _scrollController = ScrollController();
   final Set<String> _busyItemIds = <String>{};
   bool _isAdding = false;
+
+  void _showActionFailure(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
 
   @override
   void dispose() {
@@ -42,8 +57,15 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
 
     setState(() => _isAdding = true);
     try {
-      await ref.read(focusQueueServiceProvider).add(title);
+      final addTask = widget.addTask;
+      if (addTask == null) {
+        await ref.read(focusQueueServiceProvider).add(title);
+      } else {
+        await addTask(title);
+      }
       if (mounted) _textController.clear();
+    } catch (_) {
+      _showActionFailure('Task could not be added. Please try again.');
     } finally {
       if (mounted) setState(() => _isAdding = false);
     }
@@ -63,12 +85,19 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
   Future<void> _completeTask(FocusQueueItem item) async {
     if (!_beginItemAction(item.id)) return;
     try {
-      await ref.read(focusQueueServiceProvider).toggle(item.id);
+      final completeTask = widget.completeTask;
+      if (completeTask == null) {
+        await ref.read(focusQueueServiceProvider).toggle(item.id);
+      } else {
+        await completeTask(item.id);
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('One thing handled. Take a breath.')),
         );
       }
+    } catch (_) {
+      _showActionFailure('Task could not be completed. Please try again.');
     } finally {
       _finishItemAction(item.id);
     }
@@ -77,7 +106,14 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
   Future<void> _removeTask(FocusQueueItem item) async {
     if (!_beginItemAction(item.id)) return;
     try {
-      await ref.read(focusQueueServiceProvider).remove(item.id);
+      final removeTask = widget.removeTask;
+      if (removeTask == null) {
+        await ref.read(focusQueueServiceProvider).remove(item.id);
+      } else {
+        await removeTask(item.id);
+      }
+    } catch (_) {
+      _showActionFailure('Task could not be removed. Please try again.');
     } finally {
       _finishItemAction(item.id);
     }
@@ -87,6 +123,8 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
     if (!_beginItemAction(item.id)) return;
     try {
       await widget.onEditTask(item);
+    } catch (_) {
+      _showActionFailure('Task could not be updated. Please try again.');
     } finally {
       _finishItemAction(item.id);
     }
@@ -163,6 +201,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
                     ),
                     const SizedBox(width: 8),
                     IconButton.filled(
+                      key: const ValueKey<String>('focus-queue-add-task'),
                       onPressed: _isAdding ? null : _addTask,
                       icon: const Icon(Icons.add),
                       tooltip: 'Add task',

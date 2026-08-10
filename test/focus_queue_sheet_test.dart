@@ -8,7 +8,13 @@ import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/widgets/focus_queue_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Widget _app(FocusQueueService service, {FocusQueueTaskEditor? onEditTask}) {
+Widget _app(
+  FocusQueueService service, {
+  FocusQueueTaskEditor? onEditTask,
+  FocusQueueTitleAction? addTask,
+  FocusQueueItemAction? completeTask,
+  FocusQueueItemAction? removeTask,
+}) {
   return ProviderScope(
     overrides: [focusQueueServiceProvider.overrideWith((ref) => service)],
     child: MaterialApp(
@@ -18,6 +24,9 @@ Widget _app(FocusQueueService service, {FocusQueueTaskEditor? onEditTask}) {
           onTaskSelected: (_) {},
           onEditTask: onEditTask ?? (_) async {},
           onShowCompleted: () {},
+          addTask: addTask,
+          completeTask: completeTask,
+          removeTask: removeTask,
         ),
       ),
     ),
@@ -28,12 +37,23 @@ Future<FocusQueueService> _pumpQueue(
   WidgetTester tester, {
   List<Map<String, Object?>> items = const [],
   FocusQueueTaskEditor? onEditTask,
+  FocusQueueTitleAction? addTask,
+  FocusQueueItemAction? completeTask,
+  FocusQueueItemAction? removeTask,
 }) async {
   SharedPreferences.setMockInitialValues({'focusQueue': jsonEncode(items)});
   final service = FocusQueueService();
   await tester.pump();
 
-  await tester.pumpWidget(_app(service, onEditTask: onEditTask));
+  await tester.pumpWidget(
+    _app(
+      service,
+      onEditTask: onEditTask,
+      addTask: addTask,
+      completeTask: completeTask,
+      removeTask: removeTask,
+    ),
+  );
   await tester.pump();
   return service;
 }
@@ -130,6 +150,87 @@ void main() {
     expect(service.completedItems.single.id, 'middle');
     expect(find.text('Top task'), findsOneWidget);
     expect(find.text('Bottom task'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains add failures and preserves the pending title', (
+    tester,
+  ) async {
+    final service = await _pumpQueue(
+      tester,
+      addTask: (_) async => throw StateError('queue storage unavailable'),
+    );
+    final addAction = find.byKey(
+      const ValueKey<String>('focus-queue-add-task'),
+    );
+
+    await tester.enterText(find.byType(TextField), 'Plan tomorrow');
+    await tester.tap(addAction);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Task could not be added. Please try again.'),
+      findsOneWidget,
+    );
+    expect(service.items, isEmpty);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      'Plan tomorrow',
+    );
+    expect(tester.widget<IconButton>(addAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains item action failures and restores controls', (
+    tester,
+  ) async {
+    final service = await _pumpQueue(
+      tester,
+      items: [_item('task', 'Review notes')],
+      onEditTask: (_) async => throw StateError('edit unavailable'),
+      completeTask: (_) async => throw StateError('complete unavailable'),
+      removeTask: (_) async => throw StateError('remove unavailable'),
+    );
+    final checkbox = find.byKey(
+      const ValueKey<String>('focus-queue-checkbox-task'),
+    );
+    final editAction = find.byKey(
+      const ValueKey<String>('focus-queue-edit-task'),
+    );
+    final removeAction = find.byKey(
+      const ValueKey<String>('focus-queue-remove-task'),
+    );
+
+    await tester.tap(checkbox);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Task could not be completed. Please try again.'),
+      findsOneWidget,
+    );
+    expect(tester.widget<Checkbox>(checkbox).onChanged, isNotNull);
+
+    await tester.tap(editAction);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Task could not be updated. Please try again.'),
+      findsOneWidget,
+    );
+    expect(tester.widget<IconButton>(editAction).onPressed, isNotNull);
+
+    await tester.tap(removeAction);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Task could not be removed. Please try again.'),
+      findsOneWidget,
+    );
+    expect(tester.widget<IconButton>(removeAction).onPressed, isNotNull);
+    expect(service.items, hasLength(1));
+    expect(service.items.single.id, 'task');
+    expect(service.items.single.title, 'Review notes');
+    expect(service.completedItems, isEmpty);
     expect(tester.takeException(), isNull);
   });
 }
