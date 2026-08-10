@@ -40,22 +40,37 @@ class _ReflectionJournalSheetState
     super.dispose();
   }
 
-  Future<void> _openEditor(Future<void> Function() editor) async {
+  Future<void> _openEditor(
+    Future<void> Function() editor, {
+    required String failureMessage,
+  }) async {
     if (_isOpeningEditor) return;
     setState(() => _isOpeningEditor = true);
     try {
       await editor();
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(failureMessage)));
+      }
     } finally {
       if (mounted) setState(() => _isOpeningEditor = false);
     }
   }
 
   Future<void> _createEntry() async {
-    await _openEditor(() => widget.onCreateEntry(context));
+    await _openEditor(
+      () => widget.onCreateEntry(context),
+      failureMessage: 'Reflection could not be created. Please try again.',
+    );
   }
 
   Future<void> _editEntry(JournalEntry entry) async {
-    await _openEditor(() => widget.onEditEntry(context, entry));
+    await _openEditor(
+      () => widget.onEditEntry(context, entry),
+      failureMessage: 'Reflection could not be updated. Please try again.',
+    );
   }
 
   @override

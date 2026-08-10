@@ -205,4 +205,77 @@ void main() {
     expect(requestedEntry!.reflection, 'Edit this reflection.');
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('contains create failures and restores the journal controls', (
+    tester,
+  ) async {
+    final service = await _pumpJournal(
+      tester,
+      onCreateEntry: (_) async => throw StateError('editor unavailable'),
+      onEditEntry: (_, _) async {},
+      dateLabel: (_) => 'Today',
+    );
+    final createAction = find.widgetWithText(
+      FilledButton,
+      'Write today’s reflection',
+    );
+
+    await tester.tap(createAction);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Reflection could not be created. Please try again.'),
+      findsOneWidget,
+    );
+    expect(service.entries, isEmpty);
+    expect(tester.widget<FilledButton>(createAction).onPressed, isNotNull);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains edit failures and preserves the reflection', (
+    tester,
+  ) async {
+    final createdAt = DateTime.now();
+    final service = await _pumpJournal(
+      tester,
+      entries: [
+        {
+          'createdAt': createdAt.toIso8601String(),
+          'mood': 'Calm',
+          'reflection': 'Keep this reflection unchanged.',
+        },
+      ],
+      onCreateEntry: (_) async {},
+      onEditEntry: (_, _) async => throw StateError('editor unavailable'),
+      dateLabel: (_) => 'Today',
+    );
+    final editAction = find.widgetWithIcon(IconButton, Icons.edit_outlined);
+    final editButton = tester.widget<IconButton>(editAction);
+
+    expect(editButton.onPressed, isNotNull);
+    editButton.onPressed!.call();
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Reflection could not be updated. Please try again.'),
+      findsOneWidget,
+    );
+    expect(service.entries, hasLength(1));
+    expect(service.entries.single.mood, 'Calm');
+    expect(
+      service.entries.single.reflection,
+      'Keep this reflection unchanged.',
+    );
+    expect(tester.widget<IconButton>(editAction).onPressed, isNotNull);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.widgetWithText(FilledButton, 'Write another reflection'),
+          )
+          .onPressed,
+      isNotNull,
+    );
+    expect(tester.takeException(), isNull);
+  });
 }
