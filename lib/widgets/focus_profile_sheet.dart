@@ -4,8 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/focus_profile_question.dart';
 import '../providers/app_providers.dart';
 
+typedef FocusProfileSaver = Future<void> Function(String focusType);
+
 class FocusProfileSheet extends ConsumerStatefulWidget {
-  const FocusProfileSheet({super.key});
+  const FocusProfileSheet({this.saveFocusType, super.key});
+
+  final FocusProfileSaver? saveFocusType;
 
   @override
   ConsumerState<FocusProfileSheet> createState() => _FocusProfileSheetState();
@@ -52,6 +56,8 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
   late final List<FocusProfileChoice?> _answers;
   int _page = -1;
   String? _result;
+  String? _saveError;
+  bool _answerInProgress = false;
 
   @override
   void initState() {
@@ -60,27 +66,53 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
   }
 
   Future<void> _selectChoice(FocusProfileChoice choice) async {
-    _answers[_page] = choice;
-    if (_page < _questions.length - 1) {
-      setState(() => _page++);
+    if (_answerInProgress || !_questions[_page].choices.contains(choice)) {
       return;
     }
-
-    final scores = <String, int>{};
-    for (final answer in _answers.whereType<FocusProfileChoice>()) {
-      scores.update(answer.focusType, (count) => count + 1, ifAbsent: () => 1);
-    }
-    final winner = scores.entries
-        .reduce((first, next) => first.value >= next.value ? first : next)
-        .key;
-
-    await ref.read(focusProfileServiceProvider).saveFocusType(winner);
-    if (!mounted) return;
-
     setState(() {
-      _result = winner;
-      _page = _questions.length;
+      _answerInProgress = true;
+      _saveError = null;
     });
+
+    try {
+      _answers[_page] = choice;
+      if (_page < _questions.length - 1) {
+        setState(() => _page++);
+        return;
+      }
+
+      final scores = <String, int>{};
+      for (final answer in _answers.whereType<FocusProfileChoice>()) {
+        scores.update(
+          answer.focusType,
+          (count) => count + 1,
+          ifAbsent: () => 1,
+        );
+      }
+      final winner = scores.entries
+          .reduce((first, next) => first.value >= next.value ? first : next)
+          .key;
+
+      final saveFocusType = widget.saveFocusType;
+      if (saveFocusType == null) {
+        await ref.read(focusProfileServiceProvider).saveFocusType(winner);
+      } else {
+        await saveFocusType(winner);
+      }
+      if (!mounted) return;
+
+      setState(() {
+        _result = winner;
+        _page = _questions.length;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _saveError = 'Your focus profile could not be saved. Please try again.';
+      });
+    } finally {
+      if (mounted) setState(() => _answerInProgress = false);
+    }
   }
 
   String _profileTip(String focusType) => switch (focusType) {
@@ -136,12 +168,21 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
               question.prompt,
               style: Theme.of(context).textTheme.titleLarge,
             ),
+            if (_saveError != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                _saveError!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
             const SizedBox(height: 20),
             ...question.choices.map(
               (choice) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: OutlinedButton(
-                  onPressed: () => _selectChoice(choice),
+                  onPressed: _answerInProgress
+                      ? null
+                      : () => _selectChoice(choice),
                   style: OutlinedButton.styleFrom(
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.all(16),
@@ -153,7 +194,9 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
             if (_page > 0) ...[
               const SizedBox(height: 4),
               TextButton.icon(
-                onPressed: () => setState(() => _page--),
+                onPressed: _answerInProgress
+                    ? null
+                    : () => setState(() => _page--),
                 icon: const Icon(Icons.arrow_back),
                 label: const Text('Back to previous question'),
               ),

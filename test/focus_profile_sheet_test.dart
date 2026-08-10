@@ -6,12 +6,12 @@ import 'package:focushaven/services/focus_profile_service.dart';
 import 'package:focushaven/widgets/focus_profile_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Widget _app(FocusProfileService service) {
+Widget _app(FocusProfileService service, {FocusProfileSaver? saveFocusType}) {
   return ProviderScope(
     overrides: [focusProfileServiceProvider.overrideWith((ref) => service)],
     child: MaterialApp(
       theme: ThemeData.dark(),
-      home: const Scaffold(body: FocusProfileSheet()),
+      home: Scaffold(body: FocusProfileSheet(saveFocusType: saveFocusType)),
     ),
   );
 }
@@ -95,6 +95,75 @@ void main() {
 
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString('focusProfile'), 'Deep Diver');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('blocks duplicate answer selections', (tester) async {
+    final service = FocusProfileService();
+    await tester.pump();
+
+    await tester.pumpWidget(_app(service));
+    await tester.pump();
+    await tester.tap(find.text('Start quiz'));
+    await tester.pump();
+
+    final firstChoice = tester.widget<OutlinedButton>(
+      find.widgetWithText(OutlinedButton, 'Early in the day'),
+    );
+    firstChoice.onPressed!.call();
+    firstChoice.onPressed!.call();
+    await tester.pumpAndSettle();
+
+    expect(find.text('2 of 4'), findsOneWidget);
+    expect(find.text('Which environment helps you settle in?'), findsOneWidget);
+    expect(find.text('When you feel stuck, what helps most?'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains save failures and restores the final choices', (
+    tester,
+  ) async {
+    final service = FocusProfileService();
+    await tester.pump();
+    var saveCalls = 0;
+
+    await tester.pumpWidget(
+      _app(
+        service,
+        saveFocusType: (focusType) async {
+          saveCalls += 1;
+          throw StateError('profile storage unavailable');
+        },
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.text('Start quiz'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Early in the day'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Quiet and uninterrupted'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Removing every distraction'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('A long, uninterrupted block'));
+    await tester.pumpAndSettle();
+
+    expect(saveCalls, 1);
+    expect(find.text('4 of 4'), findsOneWidget);
+    expect(
+      find.text('Your focus profile could not be saved. Please try again.'),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<OutlinedButton>(
+            find.widgetWithText(OutlinedButton, 'A long, uninterrupted block'),
+          )
+          .onPressed,
+      isNotNull,
+    );
+    expect(service.focusType, isNull);
     expect(tester.takeException(), isNull);
   });
 }
