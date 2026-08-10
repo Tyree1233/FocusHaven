@@ -305,6 +305,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void selectSession(SessionType type) {
+    if (_sessionType == type) return;
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;

@@ -76,6 +76,26 @@ void main() {
     expect(notifications, 1);
   });
 
+  test('active session reselection is a no-op', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+
+    timer.start();
+    notifications = 0;
+    final remainingBeforeReselection = timer.secondsRemaining;
+
+    timer.selectSession(SessionType.focus);
+
+    expect(timer.sessionType, SessionType.focus);
+    expect(timer.isRunning, isTrue);
+    expect(timer.secondsRemaining, remainingBeforeReselection);
+    expect(notifications, 0);
+  });
+
   test('custom duration accepts minutes and seconds', () async {
     final timer = await createTimer();
     addTearDown(timer.dispose);
