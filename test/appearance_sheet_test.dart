@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -6,12 +8,12 @@ import 'package:focushaven/services/theme_service.dart';
 import 'package:focushaven/widgets/appearance_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Widget _app(ThemeService service) {
+Widget _app(ThemeService service, {AppearanceThemeSetter? setTheme}) {
   return ProviderScope(
     overrides: [themeServiceProvider.overrideWith((ref) => service)],
     child: MaterialApp(
       theme: ThemeData.dark(),
-      home: const Scaffold(body: AppearanceSheet()),
+      home: Scaffold(body: AppearanceSheet(setTheme: setTheme)),
     ),
   );
 }
@@ -71,6 +73,78 @@ void main() {
       preferences.getString('focusHavenTheme'),
       FocusHavenTheme.forest.name,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('serializes overlapping appearance selections', (tester) async {
+    final service = ThemeService();
+    await tester.pump();
+    final pendingSelection = Completer<void>();
+    final selections = <FocusHavenTheme>[];
+
+    await tester.pumpWidget(
+      _app(
+        service,
+        setTheme: (theme) async {
+          selections.add(theme);
+          await pendingSelection.future;
+        },
+      ),
+    );
+    await tester.pump();
+
+    final group = tester.widget<RadioGroup<FocusHavenTheme>>(
+      find.byType(RadioGroup<FocusHavenTheme>),
+    );
+    group.onChanged(FocusHavenTheme.forest);
+    group.onChanged(FocusHavenTheme.sunset);
+    await tester.pump();
+
+    expect(selections, [FocusHavenTheme.forest]);
+    expect(
+      tester
+          .widget<AbsorbPointer>(
+            find.byKey(const Key('appearance-selection-guard')),
+          )
+          .absorbing,
+      isTrue,
+    );
+
+    pendingSelection.complete();
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<AbsorbPointer>(
+            find.byKey(const Key('appearance-selection-guard')),
+          )
+          .absorbing,
+      isFalse,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains appearance failures and restores selection', (
+    tester,
+  ) async {
+    final service = ThemeService();
+    await tester.pump();
+
+    await tester.pumpWidget(
+      _app(
+        service,
+        setTheme: (_) async => throw StateError('theme storage unavailable'),
+      ),
+    );
+    await tester.pump();
+    await tester.tap(find.text('Forest'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Appearance could not be updated. Please try again.'),
+      findsOneWidget,
+    );
+    expect(_selectedTheme(tester), FocusHavenTheme.twilight);
     expect(tester.takeException(), isNull);
   });
 }
