@@ -25,6 +25,7 @@ Widget _app(
   TimerService timer, {
   NavigatorObserver? observer,
   Future<bool> Function(Uri uri)? openExternalUrl,
+  Future<void> Function(String text)? writeClipboard,
 }) {
   return ProviderScope(
     overrides: [
@@ -47,7 +48,10 @@ Widget _app(
         ),
       ),
       navigatorObservers: [?observer],
-      home: TimerScreen(openExternalUrl: openExternalUrl),
+      home: TimerScreen(
+        openExternalUrl: openExternalUrl,
+        writeClipboard: writeClipboard,
+      ),
     ),
   );
 }
@@ -232,6 +236,52 @@ void main() {
       findsNothing,
     );
     expect(tester.widget<TextButton>(privacyAction).onPressed, isNotNull);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('contains focus summary clipboard failures', (tester) async {
+    SharedPreferences.setMockInitialValues({
+      'completedFocusSessions': 1,
+      'focusHistory': jsonEncode([
+        {
+          'completedAt': DateTime.utc(2026, 8, 10).toIso8601String(),
+          'durationSeconds': 60,
+          'focusTask': 'Clipboard integration session',
+        },
+      ]),
+    });
+    final timer = TimerService();
+    await timer.initialized;
+    String? attemptedSummary;
+
+    await tester.pumpWidget(
+      _app(
+        timer,
+        writeClipboard: (text) async {
+          attemptedSummary = text;
+          throw StateError('clipboard unavailable');
+        },
+      ),
+    );
+    await tester.pump();
+
+    final viewAll = find.text('View all');
+    await tester.ensureVisible(viewAll);
+    await tester.pumpAndSettle();
+    await tester.tap(viewAll);
+    await tester.pumpAndSettle();
+
+    final copyAction = find.widgetWithText(TextButton, 'Copy full summary');
+    await tester.tap(copyAction);
+    await tester.pumpAndSettle();
+
+    expect(attemptedSummary, contains('Clipboard integration session'));
+    expect(
+      find.text('Focus summary could not be copied right now.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Focus summary copied.'), findsNothing);
+    expect(tester.widget<TextButton>(copyAction).onPressed, isNotNull);
     expect(tester.takeException(), isNull);
   });
 

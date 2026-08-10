@@ -32,10 +32,13 @@ import '../widgets/text_entry_dialog.dart';
 import '../widgets/timer_countdown.dart';
 
 class TimerScreen extends riverpod.ConsumerWidget {
-  const TimerScreen({this.openExternalUrl, super.key});
+  const TimerScreen({this.openExternalUrl, this.writeClipboard, super.key});
 
   /// Overrides external URL launching in tests and alternate host shells.
   final Future<bool> Function(Uri uri)? openExternalUrl;
+
+  /// Overrides clipboard writes in tests and alternate host shells.
+  final Future<void> Function(String text)? writeClipboard;
 
   static const _ink = Color(0xFF211442);
   static const _journalMoods = [
@@ -65,7 +68,24 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
-    await Clipboard.setData(ClipboardData(text: timer.focusHistoryExport));
+    final summary = timer.focusHistoryExport;
+    try {
+      final writer = writeClipboard;
+      if (writer == null) {
+        await Clipboard.setData(ClipboardData(text: summary));
+      } else {
+        await writer(summary);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Focus summary could not be copied right now.'),
+          ),
+        );
+      }
+      return;
+    }
     if (!context.mounted) {
       return;
     }
