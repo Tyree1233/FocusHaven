@@ -51,6 +51,7 @@ class JournalEntryDialog extends StatefulWidget {
 class _JournalEntryDialogState extends State<JournalEntryDialog> {
   late final TextEditingController _controller;
   late String _selectedMood;
+  bool _isClosing = false;
 
   @override
   void initState() {
@@ -67,9 +68,14 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
     super.dispose();
   }
 
+  void _close([JournalEntryDraft? draft]) {
+    if (_isClosing) return;
+    setState(() => _isClosing = true);
+    Navigator.pop(context, draft);
+  }
+
   void _submit() {
-    Navigator.pop(
-      context,
+    _close(
       JournalEntryDraft(mood: _selectedMood, reflection: _controller.text),
     );
   }
@@ -95,9 +101,11 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
                     ChoiceChip(
                       label: Text(mood),
                       selected: _selectedMood == mood,
-                      onSelected: (_) {
-                        setState(() => _selectedMood = mood);
-                      },
+                      onSelected: _isClosing
+                          ? null
+                          : (_) {
+                              setState(() => _selectedMood = mood);
+                            },
                     ),
                 ],
               ),
@@ -105,6 +113,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
               TextField(
                 controller: _controller,
                 autofocus: true,
+                enabled: !_isClosing,
                 maxLines: 5,
                 maxLength: 800,
                 textCapitalization: TextCapitalization.sentences,
@@ -121,10 +130,15 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          key: const ValueKey<String>('journal-entry-cancel'),
+          onPressed: _isClosing ? null : () => _close(),
           child: const Text('Cancel'),
         ),
-        FilledButton(onPressed: _submit, child: const Text('Save reflection')),
+        FilledButton(
+          key: const ValueKey<String>('journal-entry-submit'),
+          onPressed: _isClosing ? null : _submit,
+          child: const Text('Save reflection'),
+        ),
       ],
     );
   }
