@@ -19,10 +19,26 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Breathe in'), findsOneWidget);
-    expect(find.text('0:60'), findsOneWidget);
+    expect(find.text('1:00'), findsOneWidget);
     expect(find.text('4 seconds'), findsOneWidget);
     expect(find.text('Begin breathing'), findsOneWidget);
     expect(find.text('Reset'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('crosses the minute boundary with valid clock formatting', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_app());
+
+    expect(find.text('1:00'), findsOneWidget);
+    expect(find.text('0:60'), findsNothing);
+
+    await tester.tap(find.text('Begin breathing'));
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('0:59'), findsOneWidget);
+    expect(find.text('0:60'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -59,7 +75,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Breathe in'), findsOneWidget);
-    expect(find.text('0:60'), findsOneWidget);
+    expect(find.text('1:00'), findsOneWidget);
     expect(find.text('Reset'), findsNothing);
     expect(tester.takeException(), isNull);
   });
@@ -81,7 +97,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Breathe in'), findsOneWidget);
-    expect(find.text('0:60'), findsOneWidget);
+    expect(find.text('1:00'), findsOneWidget);
     expect(find.text('Pause'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

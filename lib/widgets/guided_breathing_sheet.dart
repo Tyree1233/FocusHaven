@@ -19,7 +19,12 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
   var _phaseRemaining = _phaseDurations.first;
   var _isRunning = false;
 
-  String get _formattedTime => '0:${_totalRemaining.toString().padLeft(2, '0')}';
+  String get _formattedTime {
+    final minutes = _totalRemaining ~/ Duration.secondsPerMinute;
+    final seconds = _totalRemaining % Duration.secondsPerMinute;
+    return '$minutes:${seconds.toString().padLeft(2, '0')}';
+  }
+
   bool get _isComplete => _totalRemaining == 0;
 
   void _toggle() {
@@ -85,10 +90,16 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
             Container(
               height: 4,
               width: 42,
-              decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(99)),
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(99),
+              ),
             ),
             const SizedBox(height: 20),
-            Text('Mindful pause', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Mindful pause',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
             const Text(
               'Follow a calming 4–4–6 breath for one minute.',
@@ -114,16 +125,24 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
                     child: Text(
                       _isComplete ? 'Complete' : _phaseLabels[_phaseIndex],
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-            Text(_formattedTime, style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold)),
+            Text(
+              _formattedTime,
+              style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
             Text(
-              _isComplete ? 'You made space for yourself.' : '$_phaseRemaining seconds',
+              _isComplete
+                  ? 'You made space for yourself.'
+                  : '$_phaseRemaining seconds',
               style: const TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 22),
@@ -131,8 +150,20 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: _toggle,
-                icon: Icon(_isRunning ? Icons.pause : _isComplete ? Icons.replay : Icons.play_arrow),
-                label: Text(_isRunning ? 'Pause' : _isComplete ? 'Try again' : 'Begin breathing'),
+                icon: Icon(
+                  _isRunning
+                      ? Icons.pause
+                      : _isComplete
+                      ? Icons.replay
+                      : Icons.play_arrow,
+                ),
+                label: Text(
+                  _isRunning
+                      ? 'Pause'
+                      : _isComplete
+                      ? 'Try again'
+                      : 'Begin breathing',
+                ),
                 style: FilledButton.styleFrom(
                   backgroundColor: colors.primary,
                   foregroundColor: colors.surface,
