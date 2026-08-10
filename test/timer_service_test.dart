@@ -164,6 +164,30 @@ void main() {
     expect(timer.distractions, ['Reply to that email']);
   });
 
+  test('equivalent parked thought renames are no-ops', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    timer.captureDistraction('Reply to email');
+    final thought = timer.parkedThoughts.single;
+    final revision = timer.parkedThoughtsRevision;
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+
+    timer.renameParkedThought(thought.id, '  Reply   to   email  ');
+
+    expect(timer.parkedThoughts.single.text, 'Reply to email');
+    expect(timer.parkedThoughtsRevision, revision);
+    expect(notifications, 0);
+
+    timer.renameParkedThought(thought.id, 'Schedule appointment');
+
+    expect(timer.parkedThoughts.single.text, 'Schedule appointment');
+    expect(timer.parkedThoughtsRevision, revision + 1);
+    expect(notifications, 1);
+  });
+
   test('daily goal stays within its supported range', () async {
     final timer = await createTimer();
     addTearDown(timer.dispose);

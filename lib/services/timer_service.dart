@@ -397,6 +397,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     if (cleaned.isEmpty) return;
     final storageIndex = _indexOfParkedThought(id);
     if (storageIndex == -1) return;
+    if (_parkedThoughts[storageIndex].text == cleaned) return;
     _parkedThoughts[storageIndex] = _parkedThoughts[storageIndex].rename(
       cleaned,
     );
