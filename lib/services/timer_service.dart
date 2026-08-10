@@ -346,6 +346,12 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     final totalSeconds = (minutes * 60 + seconds)
         .clamp(1, _maxSessionSeconds)
         .toInt();
+    final currentSessionSeconds = switch (_sessionType) {
+      SessionType.focus => _focusSeconds,
+      SessionType.shortBreak => _shortBreakSeconds,
+      SessionType.longBreak => _longBreakSeconds,
+    };
+    if (currentSessionSeconds == totalSeconds) return;
     switch (_sessionType) {
       case SessionType.focus:
         _focusSeconds = totalSeconds;

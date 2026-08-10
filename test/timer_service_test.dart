@@ -96,6 +96,26 @@ void main() {
     expect(notifications, 0);
   });
 
+  test('equivalent custom duration preserves a running timer', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    var notifications = 0;
+    timer.addListener(() {
+      notifications += 1;
+    });
+
+    timer.start();
+    notifications = 0;
+    final remainingBeforeSubmission = timer.secondsRemaining;
+
+    timer.setCustomDuration(24, 60);
+
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(timer.isRunning, isTrue);
+    expect(timer.secondsRemaining, remainingBeforeSubmission);
+    expect(notifications, 0);
+  });
+
   test('equivalent timer preferences publish one state change each', () async {
     final timer = await createTimer();
     addTearDown(timer.dispose);
