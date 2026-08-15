@@ -124,6 +124,28 @@ class LocalCoachingResponder implements CoachingResponder {
           'support; a focus coach is not a substitute for crisis care.';
     }
     if (_containsAny(normalized, const [
+      'need to vent',
+      'can i vent',
+      'just listen',
+      'listen to me',
+      "don't give me advice",
+      'do not give me advice',
+      'not looking for advice',
+      'no advice',
+    ])) {
+      return _listeningReply(conversation);
+    }
+    if (_containsAny(normalized, const [
+      'hold me accountable',
+      'need accountability',
+      'be direct',
+      'give it to me straight',
+      'push me',
+      'stop making excuses',
+    ])) {
+      return _accountabilityReply(context);
+    }
+    if (_containsAny(normalized, const [
       'still stuck',
       'that did not work',
       "that didn't work",
@@ -265,6 +287,15 @@ class LocalCoachingResponder implements CoachingResponder {
     ])) {
       return _followUpReply(context, conversation);
     }
+    if (_containsAny(normalized, const [
+      "i don't know",
+      'i do not know',
+      "i'm not sure",
+      'i am not sure',
+      'unsure',
+    ])) {
+      return _uncertaintyReply(context, conversation);
+    }
     return _generalReply(context, conversation);
   }
 
@@ -362,6 +393,53 @@ class LocalCoachingResponder implements CoachingResponder {
     final nextQueueTask = context.nextQueueTask?.trim() ?? '';
     if (nextQueueTask.isNotEmpty) return nextQueueTask;
     return 'the task in front of you';
+  }
+
+  static String _listeningReply(List<CoachingMessage> conversation) {
+    final challenge = _recentChallenge(conversation);
+    final recognition = challenge == null
+        ? ''
+        : ' It makes sense that $challenge has been wearing on you.';
+    return 'Absolutely. You do not have to turn this into a plan or perform '
+        'being okay for me.$recognition Say as much or as little as you need. '
+        'I’ll stay with you and listen without trying to fix it.';
+  }
+
+  static String _accountabilityReply(CoachingContext context) {
+    if (context.dailyGoalMinutes > 0 &&
+        context.todayFocusMinutes >= context.dailyGoalMinutes) {
+      return 'Direct answer: you have already met today’s focus goal. The '
+          'accountable choice may be to stop intentionally instead of turning '
+          'rest into something you must earn twice. Close the session and '
+          'protect tomorrow’s attention.';
+    }
+    final task = _currentTask(context);
+    final timerDirection = context.isTimerRunning
+        ? 'Your timer is running, so return to it now.'
+        : 'Start one ten-minute focus round now.';
+    final queueDirection = context.queueRemaining > 1
+        ? 'Ignore the other ${context.queueRemaining - 1} queued items.'
+        : 'Keep everything else out of view.';
+    return 'Direct version, without shame: commit to “$task” for ten minutes. '
+        '$queueDirection $timerDirection Do not negotiate with the whole '
+        'project—do the next visible action, then check back honestly.';
+  }
+
+  static String _uncertaintyReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
+    final task = _currentTask(context);
+    final challenge = _recentChallenge(conversation);
+    if (challenge != null) {
+      return 'Not knowing is allowed. Since $challenge has been the obstacle, '
+          'you do not need a perfect answer. Choose one: a real five-minute '
+          'reset, or one two-minute action on “$task.” Which feels more '
+          'possible right now?';
+    }
+    return 'Not knowing is enough information to make the question smaller. '
+        'For “$task,” which is closest: I need clarity, I need energy, or I’m '
+        'afraid to begin? Pick the nearest answer—not the perfect one.';
   }
 
   static String _overwhelmReply(CoachingContext context) {

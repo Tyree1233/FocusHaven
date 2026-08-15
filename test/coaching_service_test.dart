@@ -459,6 +459,139 @@ void main() {
     expect(response, isNot(contains('Keep working')));
   });
 
+  test('listens without fixing when the user asks to vent', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-overwhelmed-listening',
+        role: CoachingMessageRole.user,
+        text: 'I feel overwhelmed by all of this.',
+        createdAt: DateTime.utc(2026, 8, 15, 17),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'I am overwhelmed, but I need to vent. Please just listen.',
+      context: const CoachingContext(focusTask: 'Finish the presentation'),
+      conversation: conversation,
+    );
+
+    expect(response, contains('do not have to turn this into a plan'));
+    expect(response, contains('overwhelm has been wearing on you'));
+    expect(response, contains('listen without trying to fix it'));
+    expect(response, isNot(contains('Finish the presentation')));
+    expect(response, isNot(contains('two minutes')));
+  });
+
+  test('offers direct accountability without shame', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'Be direct and hold me accountable.',
+      context: const CoachingContext(
+        focusTask: 'Write the release notes',
+        queueRemaining: 3,
+        isTimerRunning: true,
+      ),
+      conversation: const [],
+    );
+
+    expect(response, startsWith('Direct version, without shame'));
+    expect(response, contains('Write the release notes'));
+    expect(response, contains('Ignore the other 2 queued items'));
+    expect(response, contains('Your timer is running'));
+    expect(response, contains('next visible action'));
+  });
+
+  test('direct accountability protects recovery after the goal', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'Push me and give it to me straight.',
+      context: const CoachingContext(
+        focusTask: 'Do even more work',
+        todayFocusMinutes: 75,
+        dailyGoalMinutes: 60,
+      ),
+      conversation: const [],
+    );
+
+    expect(response, startsWith('Direct answer'));
+    expect(response, contains('already met today’s focus goal'));
+    expect(response, contains('stop intentionally'));
+    expect(response, contains('protect tomorrow’s attention'));
+    expect(response, isNot(contains('ten minutes')));
+    expect(response, isNot(contains('Do even more work')));
+  });
+
+  test(
+    'uses recent context when the user does not know what they need',
+    () async {
+      const responder = LocalCoachingResponder();
+      final conversation = [
+        CoachingMessage(
+          id: 'user-distraction-unsure',
+          role: CoachingMessageRole.user,
+          text: 'I keep getting distracted and my mind keeps wandering.',
+          createdAt: DateTime.utc(2026, 8, 15, 18),
+        ),
+        CoachingMessage(
+          id: 'coach-distraction-unsure',
+          role: CoachingMessageRole.coach,
+          text: 'Let the thought stay parked while you return.',
+          createdAt: DateTime.utc(2026, 8, 15, 18, 1),
+        ),
+      ];
+
+      final response = await responder.respond(
+        message: "I don't know.",
+        context: const CoachingContext(focusTask: 'Read the next section'),
+        conversation: conversation,
+      );
+
+      expect(response, contains('Not knowing is allowed'));
+      expect(response, contains('Since distraction has been the obstacle'));
+      expect(response, contains('real five-minute reset'));
+      expect(response, contains('two-minute action'));
+      expect(response, contains('Read the next section'));
+    },
+  );
+
+  test(
+    'makes uncertainty smaller without inventing conversation memory',
+    () async {
+      const responder = LocalCoachingResponder();
+
+      final response = await responder.respond(
+        message: 'I am not sure.',
+        context: const CoachingContext(focusTask: 'Prepare tomorrow’s plan'),
+        conversation: const [],
+      );
+
+      expect(response, contains('make the question smaller'));
+      expect(response, contains('Prepare tomorrow’s plan'));
+      expect(response, contains('I need clarity'));
+      expect(response, contains('I need energy'));
+      expect(response, contains('afraid to begin'));
+      expect(response, contains('not the perfect one'));
+    },
+  );
+
+  test('keeps safety ahead of a request for listening', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'Please just listen. I want to die.',
+      context: const CoachingContext(focusTask: 'Keep working'),
+      conversation: const [],
+    );
+
+    expect(response, contains('Your safety matters'));
+    expect(response, contains('someone you trust'));
+    expect(response, isNot(contains('listen without trying to fix it')));
+    expect(response, isNot(contains('Keep working')));
+  });
+
   test('encourages recovery after the daily focus goal is met', () async {
     const responder = LocalCoachingResponder();
 
