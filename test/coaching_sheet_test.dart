@@ -60,6 +60,7 @@ void main() {
       find.text('You don’t have to figure out the next step alone.'),
       findsOneWidget,
     );
+    expect(find.textContaining('listening without fixing'), findsOneWidget);
     expect(find.text('I’m stuck—help me start'), findsOneWidget);
     expect(find.text('I’m feeling overwhelmed'), findsOneWidget);
     expect(find.text('What should I do next?'), findsOneWidget);
@@ -132,6 +133,69 @@ void main() {
     expect(find.text('I’m feeling overwhelmed'), findsOneWidget);
     expect(find.textContaining('a lot to hold at once'), findsOneWidget);
     expect(find.textContaining('Prepare the presentation'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('offers a one-tap listening mode', (tester) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(
+      _app(
+        coach,
+        coachingContext: const CoachingContext(
+          focusTask: 'Finish the presentation',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+
+    final prompt = find.text('Please just listen');
+    expect(prompt, findsOneWidget);
+    await tester.tap(prompt);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Please just listen'), findsOneWidget);
+    expect(
+      find.textContaining('do not have to turn this into a plan'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('listen without trying to fix it'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Finish the presentation'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('offers one-tap direct accountability', (tester) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(
+      _app(
+        coach,
+        coachingContext: const CoachingContext(
+          focusTask: 'Write the release notes',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -360));
+    await tester.pumpAndSettle();
+
+    final prompt = find.text('Hold me accountable');
+    expect(prompt, findsOneWidget);
+    await tester.tap(prompt);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Hold me accountable'), findsOneWidget);
+    expect(
+      find.textContaining('Direct version, without shame'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Write the release notes'), findsOneWidget);
+    expect(find.textContaining('ten-minute focus round'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

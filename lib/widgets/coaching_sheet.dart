@@ -22,6 +22,8 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     'I’m stuck—help me start',
     'I’m feeling overwhelmed',
     'What should I do next?',
+    'Please just listen',
+    'Hold me accountable',
   ];
 
   final TextEditingController _controller = TextEditingController();
@@ -136,7 +138,9 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     final coachingState = ref.watch(coachingStateProvider);
     if (coachingState.conversationRevision != _lastConversationRevision) {
       _lastConversationRevision = coachingState.conversationRevision;
-      _scheduleScrollToLatest();
+      if (coachingState.messages.isNotEmpty || coachingState.isResponding) {
+        _scheduleScrollToLatest();
+      }
     }
 
     final isBusy =
@@ -341,10 +345,10 @@ class _ConversationBody extends StatelessWidget {
     if (messages.isEmpty && !isResponding) {
       return ListView(
         controller: scrollController,
-        padding: const EdgeInsets.fromLTRB(24, 34, 24, 20),
+        padding: const EdgeInsets.fromLTRB(24, 22, 24, 20),
         children: [
-          Icon(Icons.chat_bubble_outline, color: primaryColor, size: 38),
-          const SizedBox(height: 16),
+          Icon(Icons.chat_bubble_outline, color: primaryColor, size: 34),
+          const SizedBox(height: 12),
           Text(
             'You don’t have to figure out the next step alone.',
             textAlign: TextAlign.center,
@@ -352,11 +356,11 @@ class _ConversationBody extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Talk through resistance, overwhelm, distractions, or what to do next. Your coach uses only the FocusHaven context that helps answer you.',
+            'Choose what you need right now: listening without fixing, a gentle next step, or direct accountability.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white70, height: 1.4),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
           ...starterPrompts.map(
             (prompt) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
