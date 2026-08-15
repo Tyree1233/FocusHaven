@@ -132,7 +132,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'fell behind',
       'failed again',
     ])) {
-      return _setbackReply(context);
+      return _setbackReply(context, conversation);
     }
     if (_containsAny(normalized, const [
       'i am lazy',
@@ -190,7 +190,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'avoiding',
       'unmotivated',
     ])) {
-      return _startingReply(context);
+      return _startingReply(context, conversation);
     }
     if (_containsAny(normalized, const [
       'distracted',
@@ -244,6 +244,91 @@ class LocalCoachingResponder implements CoachingResponder {
   static bool _containsAny(String source, List<String> signals) =>
       signals.any(source.contains);
 
+  static String? _recentChallenge(List<CoachingMessage> conversation) {
+    for (final entry in conversation.reversed) {
+      if (entry.role != CoachingMessageRole.user) continue;
+      final message = entry.text.toLowerCase();
+      if (isSafetyConcern(message)) continue;
+      if (_containsAny(message, const [
+        'i am lazy',
+        "i'm lazy",
+        'i am useless',
+        "i'm useless",
+        'hate myself',
+        'what is wrong with me',
+      ])) {
+        return 'self-criticism';
+      }
+      if (_containsAny(message, const [
+        'perfect',
+        'perfection',
+        'not good enough',
+        'afraid it will be bad',
+        "afraid it'll be bad",
+        'fear of failing',
+      ])) {
+        return 'perfectionism';
+      }
+      if (_containsAny(message, const [
+        "can't decide",
+        'cannot decide',
+        'too many options',
+        'which one',
+        'choose between',
+      ])) {
+        return 'too many choices';
+      }
+      if (_containsAny(message, const [
+        'running out of time',
+        'behind schedule',
+        'not enough time',
+        'deadline',
+        'only have',
+      ])) {
+        return 'deadline pressure';
+      }
+      if (_containsAny(message, const [
+        'overwhelmed',
+        'anxious',
+        'stressed',
+        'too much',
+        "can't handle",
+        'cannot handle',
+      ])) {
+        return 'overwhelm';
+      }
+      if (_containsAny(message, const [
+        'stuck',
+        'procrastinat',
+        "can't start",
+        'cannot start',
+        'avoiding',
+        'unmotivated',
+      ])) {
+        return 'getting started';
+      }
+      if (_containsAny(message, const [
+        'distracted',
+        "can't focus",
+        'cannot focus',
+        'mind keeps',
+        'wandering',
+      ])) {
+        return 'distraction';
+      }
+      if (_containsAny(message, const [
+        'tired',
+        'exhausted',
+        'burned out',
+        'burnt out',
+        'no energy',
+      ])) {
+        return 'low energy';
+      }
+    }
+    return null;
+  }
+
   static String _currentTask(CoachingContext context) {
     final focusTask = context.focusTask.trim();
     if (focusTask.isNotEmpty) return focusTask;
@@ -260,18 +345,42 @@ class LocalCoachingResponder implements CoachingResponder {
         'begin. Want to break it into three tiny steps together?';
   }
 
-  static String _startingReply(CoachingContext context) {
+  static String _startingReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
     final task = _currentTask(context);
+    final alreadySuggestedStartingRound = conversation.any(
+      (entry) =>
+          entry.role == CoachingMessageRole.coach &&
+          (entry.text.contains('next five minutes') ||
+              entry.text.contains('starting is the win')),
+    );
+    if (alreadySuggestedStartingRound) {
+      return 'You’re still here, so let’s change the experiment instead of '
+          'repeating the same advice. For “$task,” spend sixty seconds only '
+          'setting up—open it, put the needed item in front of you, and stop. '
+          'Then choose: continue for two minutes, or tell me what blocked you.';
+    }
     return 'Let’s lower the stakes. For the next five minutes, your only job '
         'is to begin “$task.” You may stop after five minutes if you want; '
         'starting is the win. What is the smallest physical action—open the '
         'file, write one line, or gather one item?';
   }
 
-  static String _setbackReply(CoachingContext context) {
+  static String _setbackReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
     final task = _currentTask(context);
+    final challenge = _recentChallenge(conversation);
+    final memory = challenge == null
+        ? ''
+        : 'We were already working with $challenge, so this calls for a '
+              'different experiment. ';
     return 'That’s frustrating, especially because you already made an effort. '
-        'This is information, not proof that you failed. For “$task,” choose '
+        'This is information, not proof that you failed. $memory'
+        'For “$task,” choose '
         'one reset: make the next step half as small, take a real five-minute '
         'break, or switch approaches. Which reset feels most honest right now?';
   }
@@ -315,10 +424,15 @@ class LocalCoachingResponder implements CoachingResponder {
     final continuity = conversation.any(
       (entry) => entry.role == CoachingMessageRole.coach,
     );
+    final challenge = _recentChallenge(conversation);
     final opening = continuity
         ? 'Absolutely—let’s make the step we were discussing concrete.'
         : 'Absolutely—let’s make this concrete.';
-    return '$opening For “$task”: first, open or gather what you need; second, '
+    final memory = challenge == null
+        ? ''
+        : ' Since $challenge was the sticking point, we’ll keep each step '
+              'deliberately small.';
+    return '$opening$memory For “$task”: first, open or gather what you need; second, '
         'make one deliberately rough pass for five minutes; third, stop and '
         'name the next visible action. Do only the first step right now.';
   }
@@ -381,6 +495,11 @@ class LocalCoachingResponder implements CoachingResponder {
         : profile?.isNotEmpty == true
         ? 'We can shape this for your $profile focus style.'
         : 'We can keep this gentle and practical.';
+    final challenge = _recentChallenge(conversation);
+    if (challenge != null) {
+      return '$personalNote Earlier, you were dealing with $challenge. Is that '
+          'still the main obstacle with “$task,” or has something changed?';
+    }
     final continuity = conversation.length > 2
         ? ' I’m still with the thread we’ve been working through.'
         : '';

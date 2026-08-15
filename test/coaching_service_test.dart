@@ -193,6 +193,154 @@ void main() {
     expect(response, contains('Do only the first step right now'));
   });
 
+  test('recalls a recent obstacle without repeating private wording', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-private',
+        role: CoachingMessageRole.user,
+        text: 'I cannot start because the private client details feel huge.',
+        createdAt: DateTime.utc(2026, 8, 15, 9),
+      ),
+      CoachingMessage(
+        id: 'coach-private',
+        role: CoachingMessageRole.coach,
+        text: 'Let’s lower the stakes and begin gently.',
+        createdAt: DateTime.utc(2026, 8, 15, 9, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'Can you help me keep going?',
+      context: const CoachingContext(focusTask: 'Prepare the client brief'),
+      conversation: conversation,
+    );
+
+    expect(
+      response,
+      contains('Earlier, you were dealing with getting started'),
+    );
+    expect(response, contains('Prepare the client brief'));
+    expect(response, isNot(contains('private client details')));
+  });
+
+  test('changes tactics instead of repeating a starting prompt', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-start',
+        role: CoachingMessageRole.user,
+        text: 'I cannot start.',
+        createdAt: DateTime.utc(2026, 8, 15, 10),
+      ),
+      CoachingMessage(
+        id: 'coach-start',
+        role: CoachingMessageRole.coach,
+        text: 'For the next five minutes, begin. Starting is the win.',
+        createdAt: DateTime.utc(2026, 8, 15, 10, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'I still cannot start.',
+      context: const CoachingContext(focusTask: 'Draft the first paragraph'),
+      conversation: conversation,
+    );
+
+    expect(response, contains('change the experiment'));
+    expect(response, contains('Draft the first paragraph'));
+    expect(response, contains('sixty seconds'));
+    expect(response, contains('continue for two minutes'));
+    expect(response, isNot(contains('next five minutes')));
+  });
+
+  test('uses the remembered obstacle in a requested breakdown', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-overwhelm',
+        role: CoachingMessageRole.user,
+        text: 'I feel overwhelmed by everything involved.',
+        createdAt: DateTime.utc(2026, 8, 15, 11),
+      ),
+      CoachingMessage(
+        id: 'coach-overwhelm',
+        role: CoachingMessageRole.coach,
+        text: 'Want to break it into three tiny steps together?',
+        createdAt: DateTime.utc(2026, 8, 15, 11, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'Yes please, break it down.',
+      context: const CoachingContext(focusTask: 'Organize the workshop'),
+      conversation: conversation,
+    );
+
+    expect(response, contains('Since overwhelm was the sticking point'));
+    expect(response, contains('keep each step deliberately small'));
+    expect(response, contains('Organize the workshop'));
+  });
+
+  test('uses recent context to reframe an unsuccessful attempt', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-choice',
+        role: CoachingMessageRole.user,
+        text: 'I cannot decide because there are too many options.',
+        createdAt: DateTime.utc(2026, 8, 15, 12),
+      ),
+      CoachingMessage(
+        id: 'coach-choice',
+        role: CoachingMessageRole.coach,
+        text: 'Try one reversible choice for a short round.',
+        createdAt: DateTime.utc(2026, 8, 15, 12, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: "I tried, but that didn't work.",
+      context: const CoachingContext(focusTask: 'Choose the launch concept'),
+      conversation: conversation,
+    );
+
+    expect(response, contains('already working with too many choices'));
+    expect(response, contains('different experiment'));
+    expect(response, contains('Choose the launch concept'));
+  });
+
+  test(
+    'does not turn a safety disclosure into ordinary coaching memory',
+    () async {
+      const responder = LocalCoachingResponder();
+      final conversation = [
+        CoachingMessage(
+          id: 'user-safety',
+          role: CoachingMessageRole.user,
+          text: 'I wish I were dead.',
+          createdAt: DateTime.utc(2026, 8, 15, 13),
+        ),
+        CoachingMessage(
+          id: 'coach-safety',
+          role: CoachingMessageRole.coach,
+          text: 'Your safety matters. Please reach out to someone you trust.',
+          createdAt: DateTime.utc(2026, 8, 15, 13, 1),
+        ),
+      ];
+
+      final response = await responder.respond(
+        message: 'Can we talk about tomorrow?',
+        context: const CoachingContext(focusTask: 'Make a gentle plan'),
+        conversation: conversation,
+      );
+
+      expect(response, isNot(contains('Earlier, you were dealing with')));
+      expect(response, isNot(contains('wish I were dead')));
+      expect(response, contains('what feels hardest right now'));
+    },
+  );
+
   test('encourages recovery after the daily focus goal is met', () async {
     const responder = LocalCoachingResponder();
 
