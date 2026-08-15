@@ -87,6 +87,112 @@ void main() {
     expect(response, isNot(contains('Finish the report')));
   });
 
+  test('recognizes broader immediate safety language locally', () async {
+    const responder = LocalCoachingResponder();
+
+    for (final message in const [
+      'I wish I were dead.',
+      'There is no reason to live.',
+      'I am thinking about taking my life.',
+    ]) {
+      final response = await responder.respond(
+        message: message,
+        context: const CoachingContext(focusTask: 'Keep working'),
+        conversation: const [],
+      );
+
+      expect(response, contains('Your safety matters'));
+      expect(response, contains('someone you trust'));
+      expect(response, isNot(contains('Keep working')));
+    }
+  });
+
+  test('responds to setbacks without turning them into identity', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'I tried, but I am still stuck.',
+      context: const CoachingContext(focusTask: 'Outline the proposal'),
+      conversation: const [],
+    );
+
+    expect(response, contains('already made an effort'));
+    expect(response, contains('information, not proof that you failed'));
+    expect(response, contains('Outline the proposal'));
+    expect(response, contains('one reset'));
+  });
+
+  test(
+    'meets self-criticism and perfectionism with specific reframes',
+    () async {
+      const responder = LocalCoachingResponder();
+
+      final selfCriticism = await responder.respond(
+        message: 'I am lazy. What is wrong with me?',
+        context: const CoachingContext(focusTask: 'Write the introduction'),
+        conversation: const [],
+      );
+      final perfectionism = await responder.respond(
+        message: 'I am afraid it will be bad and not good enough.',
+        context: const CoachingContext(focusTask: 'Design the first screen'),
+        conversation: const [],
+      );
+
+      expect(selfCriticism, contains('not your identity'));
+      expect(selfCriticism, contains('clarity, energy, or fear'));
+      expect(perfectionism, contains('rough version'));
+      expect(perfectionism, contains('Design the first screen'));
+      expect(perfectionism, contains('good enough for this session'));
+    },
+  );
+
+  test('turns indecision and deadline pressure into bounded choices', () async {
+    const responder = LocalCoachingResponder();
+
+    final decision = await responder.respond(
+      message: 'I cannot decide. There are too many options.',
+      context: const CoachingContext(
+        focusTask: 'Prepare the launch email',
+        queueRemaining: 4,
+      ),
+      conversation: const [],
+    );
+    final deadline = await responder.respond(
+      message: 'I am running out of time before the deadline.',
+      context: const CoachingContext(focusTask: 'Submit the application'),
+      conversation: const [],
+    );
+
+    expect(decision, contains('4 items waiting'));
+    expect(decision, contains('one short trial round'));
+    expect(deadline, contains('smallest acceptable outcome'));
+    expect(deadline, contains('Submit the application'));
+    expect(deadline, contains('What can safely be left out?'));
+  });
+
+  test('continues a coaching thread with concrete smaller steps', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'coach-1',
+        role: CoachingMessageRole.coach,
+        text: 'Want to break it into smaller steps?',
+        createdAt: DateTime.utc(2026, 8, 15),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'Yes please, break it down.',
+      context: const CoachingContext(focusTask: 'Plan the workshop'),
+      conversation: conversation,
+    );
+
+    expect(response, contains('step we were discussing'));
+    expect(response, contains('Plan the workshop'));
+    expect(response, contains('rough pass for five minutes'));
+    expect(response, contains('Do only the first step right now'));
+  });
+
   test('encourages recovery after the daily focus goal is met', () async {
     const responder = LocalCoachingResponder();
 

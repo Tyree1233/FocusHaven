@@ -95,6 +95,13 @@ class LocalCoachingResponder implements CoachingResponder {
     'self harm',
     'self-harm',
     'suicide',
+    'want to die',
+    'wish i was dead',
+    'wish i were dead',
+    'better off dead',
+    'no reason to live',
+    'take my life',
+    'taking my life',
     "don't want to live",
     'do not want to live',
   ];
@@ -115,6 +122,55 @@ class LocalCoachingResponder implements CoachingResponder {
           'danger, contact local emergency services now and reach out to '
           'someone you trust who can stay with you. You deserve real human '
           'support; a focus coach is not a substitute for crisis care.';
+    }
+    if (_containsAny(normalized, const [
+      'still stuck',
+      'that did not work',
+      "that didn't work",
+      'i tried',
+      'messed up',
+      'fell behind',
+      'failed again',
+    ])) {
+      return _setbackReply(context);
+    }
+    if (_containsAny(normalized, const [
+      'i am lazy',
+      "i'm lazy",
+      'i am useless',
+      "i'm useless",
+      'hate myself',
+      'what is wrong with me',
+    ])) {
+      return _selfCriticismReply(context);
+    }
+    if (_containsAny(normalized, const [
+      'perfect',
+      'perfection',
+      'not good enough',
+      'afraid it will be bad',
+      "afraid it'll be bad",
+      'fear of failing',
+    ])) {
+      return _perfectionismReply(context);
+    }
+    if (_containsAny(normalized, const [
+      "can't decide",
+      'cannot decide',
+      'too many options',
+      'which one',
+      'choose between',
+    ])) {
+      return _decisionReply(context);
+    }
+    if (_containsAny(normalized, const [
+      'running out of time',
+      'behind schedule',
+      'not enough time',
+      'deadline',
+      'only have',
+    ])) {
+      return _timePressureReply(context);
     }
     if (_containsAny(normalized, const [
       'overwhelmed',
@@ -173,6 +229,15 @@ class LocalCoachingResponder implements CoachingResponder {
     ])) {
       return _celebrationReply(context);
     }
+    if (_containsAny(normalized, const [
+      'break it down',
+      'smaller steps',
+      'what are the steps',
+      'yes please',
+      'please do',
+    ])) {
+      return _followUpReply(context, conversation);
+    }
     return _generalReply(context, conversation);
   }
 
@@ -201,6 +266,61 @@ class LocalCoachingResponder implements CoachingResponder {
         'is to begin “$task.” You may stop after five minutes if you want; '
         'starting is the win. What is the smallest physical action—open the '
         'file, write one line, or gather one item?';
+  }
+
+  static String _setbackReply(CoachingContext context) {
+    final task = _currentTask(context);
+    return 'That’s frustrating, especially because you already made an effort. '
+        'This is information, not proof that you failed. For “$task,” choose '
+        'one reset: make the next step half as small, take a real five-minute '
+        'break, or switch approaches. Which reset feels most honest right now?';
+  }
+
+  static String _selfCriticismReply(CoachingContext context) {
+    return 'I hear how hard you’re being on yourself. Struggling with '
+        '“${_currentTask(context)}” is a moment you’re having—not your '
+        'identity. Let’s replace the verdict with one useful fact: what exactly '
+        'is making the next step difficult—clarity, energy, or fear?';
+  }
+
+  static String _perfectionismReply(CoachingContext context) {
+    return 'It sounds like the standard has become so high that starting feels '
+        'unsafe. Give yourself permission to make a rough version of '
+        '“${_currentTask(context)}” for ten minutes—something useful, not '
+        'impressive. What would “good enough for this session” look like?';
+  }
+
+  static String _decisionReply(CoachingContext context) {
+    final queueNote = context.queueRemaining > 1
+        ? 'You have ${context.queueRemaining} items waiting, but only one needs '
+              'your attention now.'
+        : 'You only need to choose the next move, not the whole path.';
+    return 'Too many reasonable options can freeze a decision. $queueNote '
+        'Choose “${_currentTask(context)}” for one short trial round. A '
+        'reversible choice does not need perfect certainty.';
+  }
+
+  static String _timePressureReply(CoachingContext context) {
+    return 'That time pressure is real, and panic can make the remaining time '
+        'harder to use. For “${_currentTask(context)},” name the smallest '
+        'acceptable outcome, remove one nonessential piece, and work only on '
+        'the next ten-minute block. What can safely be left out?';
+  }
+
+  static String _followUpReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
+    final task = _currentTask(context);
+    final continuity = conversation.any(
+      (entry) => entry.role == CoachingMessageRole.coach,
+    );
+    final opening = continuity
+        ? 'Absolutely—let’s make the step we were discussing concrete.'
+        : 'Absolutely—let’s make this concrete.';
+    return '$opening For “$task”: first, open or gather what you need; second, '
+        'make one deliberately rough pass for five minutes; third, stop and '
+        'name the next visible action. Do only the first step right now.';
   }
 
   static String _distractionReply(CoachingContext context) {
