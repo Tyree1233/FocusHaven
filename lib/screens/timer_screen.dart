@@ -8,11 +8,13 @@ import '../models/focus_milestone.dart';
 import '../models/focus_session.dart';
 import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
+import '../services/coaching_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/journal_service.dart';
 import '../services/timer_service.dart';
 import '../widgets/account_sheet.dart';
 import '../widgets/cloud_backup_actions.dart';
+import '../widgets/coaching_sheet.dart';
 import '../widgets/completed_tasks_sheet.dart';
 import '../widgets/confirmation_dialog.dart';
 import '../widgets/focus_queue_sheet.dart';
@@ -243,6 +245,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final timer = ref.read(timerServiceProvider);
     final journal = ref.read(journalServiceProvider);
+    final coach = ref.read(coachingServiceProvider);
     final focusQueue = ref.read(focusQueueServiceProvider);
     final profile = ref.read(focusProfileServiceProvider);
     final themes = ref.read(themeServiceProvider);
@@ -250,7 +253,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       context,
       title: 'Delete local data?',
       message:
-          'This permanently removes your timer history, journal entries, tasks, parked thoughts, goals, profile, and appearance choices from this device. Your cloud backup will not be deleted.',
+          'This permanently removes your timer history, coaching conversation, journal entries, tasks, parked thoughts, goals, profile, and appearance choices from this device. Your cloud backup will not be deleted.',
       cancelLabel: 'Keep my data',
       confirmLabel: 'Delete local data',
       isDestructive: true,
@@ -260,6 +263,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final preferences = await SharedPreferences.getInstance();
     await Future.wait([
       timer.clearLocalData(),
+      coach.clearLocalData(),
       journal.clearLocalData(),
       focusQueue.clearLocalData(),
       profile.clearLocalData(),
@@ -680,6 +684,43 @@ class TimerScreen extends riverpod.ConsumerWidget {
     );
   }
 
+  CoachingContext _buildCoachingContext(riverpod.WidgetRef ref) {
+    final timer = ref.read(timerServiceProvider);
+    final queueState = ref.read(focusQueueStateProvider);
+    final journalState = ref.read(journalStateProvider);
+    final parkedThoughtState = ref.read(parkedThoughtStateProvider);
+    return CoachingContext(
+      focusTask: timer.focusTask,
+      focusProfile: ref.read(focusProfileTypeProvider),
+      todayFocusMinutes: timer.todayFocusMinutes,
+      dailyGoalMinutes: timer.dailyGoalMinutes,
+      queueRemaining: queueState.activeItems.length,
+      nextQueueTask: queueState.activeItems.isEmpty
+          ? null
+          : queueState.activeItems.first.title,
+      recentMood: journalState.mostCommonRecentMood,
+      parkedThoughtCount: parkedThoughtState.activeThoughts.length,
+      isTimerRunning: timer.isRunning,
+    );
+  }
+
+  Future<void> _showCoachingSheet(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    if (!_canOpenOverlay(context)) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) =>
+          CoachingSheet(contextBuilder: () => _buildCoachingContext(ref)),
+    );
+  }
+
   @override
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
     final timer = ref.read(timerServiceProvider);
@@ -699,6 +740,12 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final tertiaryColor = Theme.of(context).colorScheme.tertiary;
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        tooltip: 'Focus Coach',
+        onPressed: () => _showCoachingSheet(context, ref),
+        icon: const Icon(Icons.auto_awesome_outlined),
+        label: const Text('Coach'),
+      ),
       appBar: AppBar(
         title: const Text('FocusHaven'),
         actions: [

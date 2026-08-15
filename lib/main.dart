@@ -8,6 +8,7 @@ import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
 import 'services/auth_service.dart';
+import 'services/coaching_service.dart';
 import 'services/focus_profile_service.dart';
 import 'services/focus_queue_service.dart';
 import 'services/journal_service.dart';
@@ -25,6 +26,7 @@ Future<void> main() async {
 
   final showOnboarding = await shouldShowOnboarding();
   final authService = AuthService();
+  final coachingService = CoachingService();
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();
   final focusProfileService = FocusProfileService();
@@ -35,6 +37,7 @@ Future<void> main() async {
   );
   await Future.wait([
     authService.initialized,
+    coachingService.initialized,
     timerService.initialized,
     themeService.initialized,
     focusProfileService.initialized,
@@ -46,6 +49,7 @@ Future<void> main() async {
   runApp(
     FocusHavenApp(
       authService: authService,
+      coachingService: coachingService,
       notificationService: notificationService,
       timerService: timerService,
       themeService: themeService,
@@ -62,6 +66,7 @@ class FocusHavenApp extends StatelessWidget {
   const FocusHavenApp({
     super.key,
     this.authService,
+    this.coachingService,
     this.notificationService,
     this.timerService,
     this.themeService,
@@ -73,6 +78,7 @@ class FocusHavenApp extends StatelessWidget {
   });
 
   final AuthService? authService;
+  final CoachingService? coachingService;
   final NotificationService? notificationService;
   final TimerService? timerService;
   final ThemeService? themeService;
@@ -85,6 +91,7 @@ class FocusHavenApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeAuthService = authService;
+    final activeCoachingService = coachingService;
     final activeNotificationService =
         notificationService ?? NotificationService();
     final activeTimerService = timerService;
@@ -98,6 +105,8 @@ class FocusHavenApp extends StatelessWidget {
       overrides: [
         if (activeAuthService != null)
           authServiceProvider.overrideWith((ref) => activeAuthService),
+        if (activeCoachingService != null)
+          coachingServiceProvider.overrideWith((ref) => activeCoachingService),
         notificationServiceProvider.overrideWithValue(
           activeNotificationService,
         ),

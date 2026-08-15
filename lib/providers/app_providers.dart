@@ -2,11 +2,13 @@ import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../models/coaching_message.dart';
 import '../models/focus_session.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
+import '../services/coaching_service.dart';
 import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/iap_service.dart';
@@ -65,6 +67,14 @@ typedef JournalState = ({
   Map<String, int> recentMoodCounts,
   String? mostCommonRecentMood,
   String dailyPrompt,
+});
+
+/// Immutable conversation data rendered by the private focus coach.
+typedef CoachingState = ({
+  List<CoachingMessage> messages,
+  bool isResponding,
+  String? errorMessage,
+  int conversationRevision,
 });
 
 /// Immutable parking-lot data separated from the one-second timer state.
@@ -135,6 +145,11 @@ final focusQueueServiceProvider = ChangeNotifierProvider<FocusQueueService>(
 final journalServiceProvider = ChangeNotifierProvider<JournalService>(
   (ref) => JournalService(),
   name: 'journalServiceProvider',
+);
+
+final coachingServiceProvider = ChangeNotifierProvider<CoachingService>(
+  (ref) => CoachingService(),
+  name: 'coachingServiceProvider',
 );
 
 final themeServiceProvider = ChangeNotifierProvider<ThemeService>(
@@ -264,6 +279,17 @@ final journalStateProvider = Provider<JournalState>((ref) {
     dailyPrompt: journal.dailyPrompt,
   );
 }, name: 'journalStateProvider');
+
+/// Conversation snapshot that updates only when coaching state changes.
+final coachingStateProvider = Provider<CoachingState>((ref) {
+  final coach = ref.watch(coachingServiceProvider);
+  return (
+    messages: List<CoachingMessage>.unmodifiable(coach.messages),
+    isResponding: coach.isResponding,
+    errorMessage: coach.errorMessage,
+    conversationRevision: coach.conversationRevision,
+  );
+}, name: 'coachingStateProvider');
 
 /// Immutable authentication snapshot shared by account-related views.
 final authStateProvider = Provider<AuthState>((ref) {

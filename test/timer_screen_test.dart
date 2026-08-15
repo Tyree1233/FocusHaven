@@ -6,9 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
+import 'package:focushaven/services/coaching_service.dart';
 import 'package:focushaven/services/timer_service.dart';
+import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 
 class _CountingNavigatorObserver extends NavigatorObserver {
@@ -24,12 +27,15 @@ class _CountingNavigatorObserver extends NavigatorObserver {
 Widget _app(
   TimerService timer, {
   NavigatorObserver? observer,
+  CoachingService? coachingService,
   Future<bool> Function(Uri uri)? openExternalUrl,
   Future<void> Function(String text)? writeClipboard,
 }) {
   return ProviderScope(
     overrides: [
       timerServiceProvider.overrideWith((ref) => timer),
+      if (coachingService != null)
+        coachingServiceProvider.overrideWith((ref) => coachingService),
       authStateProvider.overrideWithValue((
         isSignedIn: false,
         displayName: 'Guest',
@@ -60,6 +66,22 @@ Future<TimerService> _createTimer(WidgetTester tester) async {
   final timer = TimerService();
   await tester.pump();
   return timer;
+}
+
+class _TimerContextResponder implements CoachingResponder {
+  int calls = 0;
+  CoachingContext? context;
+
+  @override
+  Future<String> respond({
+    required String message,
+    required CoachingContext context,
+    required List<CoachingMessage> conversation,
+  }) async {
+    calls += 1;
+    this.context = context;
+    return 'Use the live timer context.';
+  }
 }
 
 void main() {
@@ -112,6 +134,47 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(GuidedBreathingSheet), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('opens one coach with the current timer context', (tester) async {
+    final timer = await _createTimer(tester);
+    timer.setFocusTask('Prepare the product demo');
+    timer.setDailyGoalMinutes(90);
+    final responder = _TimerContextResponder();
+    final coach = CoachingService(responder: responder);
+    await coach.initialized;
+    final observer = _CountingNavigatorObserver();
+
+    await tester.pumpWidget(
+      _app(timer, observer: observer, coachingService: coach),
+    );
+    await tester.pump();
+
+    final initialPushCount = observer.pushCount;
+    final coachButton = tester.widget<FloatingActionButton>(
+      find.widgetWithText(FloatingActionButton, 'Coach'),
+    );
+    coachButton.onPressed!.call();
+    coachButton.onPressed!.call();
+    await tester.pumpAndSettle();
+
+    expect(observer.pushCount - initialPushCount, 1);
+    expect(find.byType(CoachingSheet), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'What should I do next?',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(responder.calls, 1);
+    expect(responder.context?.focusTask, 'Prepare the product demo');
+    expect(responder.context?.dailyGoalMinutes, 90);
+    expect(responder.context?.isTimerRunning, isFalse);
+    expect(find.text('Use the live timer context.'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
