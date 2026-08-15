@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../config/feature_flags.dart';
 import '../models/coaching_message.dart';
 import '../models/focus_session.dart';
 import '../models/journal_entry.dart';
@@ -151,8 +152,11 @@ final journalServiceProvider = ChangeNotifierProvider<JournalService>(
 );
 
 final coachingServiceProvider = ChangeNotifierProvider<CoachingService>(
-  (ref) =>
-      CoachingService(enhancedResponder: createEnhancedCoachingResponder()),
+  (ref) => CoachingService(
+    enhancedResponder: FeatureFlags.remoteCoachingEnabled
+        ? createEnhancedCoachingResponder()
+        : null,
+  ),
   name: 'coachingServiceProvider',
 );
 

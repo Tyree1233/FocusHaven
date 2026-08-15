@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ConsumerWidget, ProviderScope, WidgetRef;
 
+import 'config/feature_flags.dart';
 import 'firebase_options.dart';
 import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
@@ -28,7 +29,9 @@ Future<void> main() async {
   final showOnboarding = await shouldShowOnboarding();
   final authService = AuthService();
   final coachingService = CoachingService(
-    enhancedResponder: createEnhancedCoachingResponder(),
+    enhancedResponder: FeatureFlags.remoteCoachingEnabled
+        ? createEnhancedCoachingResponder()
+        : null,
   );
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();

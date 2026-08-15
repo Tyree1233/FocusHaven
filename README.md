@@ -23,6 +23,17 @@ firebase functions:secrets:set OPENAI_API_KEY
 firebase deploy --only functions:focusCoach
 ```
 
+Normal builds keep the enhanced-coaching interface hidden so the local coach
+remains accurate when the paid backend has not been deployed. After the
+function and secret are available, enable the interface at build time:
+
+```sh
+flutter build web --release --dart-define=ENABLE_REMOTE_COACHING=true
+flutter build appbundle --release --dart-define=ENABLE_REMOTE_COACHING=true
+```
+
+Never enable this flag in a production build before the function is ready.
+
 The model defaults to `gpt-5.6-terra`. To change that non-secret deployment
 parameter, set `OPENAI_MODEL` when prompted by the Firebase CLI. Provider
 requests use the Responses API with response storage disabled. FocusHaven keeps
