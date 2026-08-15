@@ -211,6 +211,33 @@ class LocalCoachingResponder implements CoachingResponder {
       return _energyReply(context);
     }
     if (_containsAny(normalized, const [
+      "i'm back",
+      'i am back',
+      'back from my break',
+      'back after a break',
+      'ready to continue',
+      'ready to get back',
+      'took a break',
+    ])) {
+      return _returnReply(context, conversation);
+    }
+    if (_containsAny(normalized, const [
+      'i started',
+      "i've started",
+      'i have started',
+      'got started',
+      'made a start',
+      'made progress',
+      'did the first step',
+      'finished the first',
+      'finished one',
+      'completed the first',
+      'completed one',
+      'one part done',
+    ])) {
+      return _progressReply(context, conversation);
+    }
+    if (_containsAny(normalized, const [
       'what should i do',
       'what next',
       'help me plan',
@@ -227,7 +254,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'proud',
       'small win',
     ])) {
-      return _celebrationReply(context);
+      return _celebrationReply(context, conversation);
     }
     if (_containsAny(normalized, const [
       'break it down',
@@ -462,6 +489,41 @@ class LocalCoachingResponder implements CoachingResponder {
         'one ten-minute round and reassess honestly after that.';
   }
 
+  static String _returnReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
+    final task = _currentTask(context);
+    final challenge = _recentChallenge(conversation);
+    final memory = challenge == null
+        ? ''
+        : ' Since $challenge was part of the earlier struggle, re-enter '
+              'gently.';
+    final timerNote = context.isTimerRunning
+        ? ' Your timer is already running, so there is nothing else to set up.'
+        : '';
+    return 'Welcome back. You do not need to recreate all your motivation.'
+        '$memory$timerNote Look at “$task,” recover the last visible action, '
+        'and do only that for two minutes before deciding what comes next.';
+  }
+
+  static String _progressReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
+    final task = _currentTask(context);
+    final challenge = _recentChallenge(conversation);
+    final memory = challenge == null
+        ? ''
+        : ' That matters even more after $challenge was getting in the way.';
+    final pace = context.isTimerRunning
+        ? 'Stay with the current session without speeding up.'
+        : 'Take one breath and let the progress register before continuing.';
+    return 'That is real progress—not a trivial prelude to the “real” work.'
+        '$memory $pace For “$task,” name what you completed, then choose one '
+        'next action no larger than the one you just did.';
+  }
+
   static String _planningReply(CoachingContext context) {
     final task = _currentTask(context);
     final queueNote = context.queueRemaining > 1
@@ -472,13 +534,20 @@ class LocalCoachingResponder implements CoachingResponder {
         'without making another decision.';
   }
 
-  static String _celebrationReply(CoachingContext context) {
+  static String _celebrationReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
     final progress = context.todayFocusMinutes > 0
         ? ' You have protected ${context.todayFocusMinutes} minutes of focus '
               'today.'
         : '';
+    final challenge = _recentChallenge(conversation);
+    final memory = challenge == null
+        ? ''
+        : ' You reached this point while working through $challenge.';
     return 'That counts. Take a second to let the win register instead of '
-        'rushing past it.$progress What helped this time that you want to '
+        'rushing past it.$progress$memory What helped this time that you want to '
         'repeat in your next session?';
   }
 

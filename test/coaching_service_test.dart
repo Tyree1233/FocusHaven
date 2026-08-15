@@ -341,6 +341,124 @@ void main() {
     },
   );
 
+  test(
+    'recognizes partial progress without treating the task as done',
+    () async {
+      const responder = LocalCoachingResponder();
+      final conversation = [
+        CoachingMessage(
+          id: 'user-could-not-start',
+          role: CoachingMessageRole.user,
+          text: 'I cannot start this.',
+          createdAt: DateTime.utc(2026, 8, 15, 14),
+        ),
+        CoachingMessage(
+          id: 'coach-start-small',
+          role: CoachingMessageRole.coach,
+          text: 'Try one small physical action.',
+          createdAt: DateTime.utc(2026, 8, 15, 14, 1),
+        ),
+      ];
+
+      final response = await responder.respond(
+        message: 'I finished the first step.',
+        context: const CoachingContext(
+          focusTask: 'Build the project outline',
+          isTimerRunning: true,
+        ),
+        conversation: conversation,
+      );
+
+      expect(response, contains('That is real progress'));
+      expect(
+        response,
+        contains('after getting started was getting in the way'),
+      );
+      expect(response, contains('Stay with the current session'));
+      expect(response, contains('Build the project outline'));
+      expect(response, contains('next action no larger'));
+      expect(response, isNot(contains('What helped this time')));
+    },
+  );
+
+  test('welcomes a return from a break with a gentle re-entry', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-low-energy',
+        role: CoachingMessageRole.user,
+        text: 'I am exhausted and have no energy.',
+        createdAt: DateTime.utc(2026, 8, 15, 15),
+      ),
+      CoachingMessage(
+        id: 'coach-break',
+        role: CoachingMessageRole.coach,
+        text: 'Take a short break first.',
+        createdAt: DateTime.utc(2026, 8, 15, 15, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: "I'm back after a break.",
+      context: const CoachingContext(focusTask: 'Review the research notes'),
+      conversation: conversation,
+    );
+
+    expect(response, startsWith('Welcome back'));
+    expect(
+      response,
+      contains('Since low energy was part of the earlier struggle'),
+    );
+    expect(response, contains('Review the research notes'));
+    expect(response, contains('last visible action'));
+    expect(response, contains('two minutes'));
+  });
+
+  test('celebrates full completion with remembered effort', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-perfectionism',
+        role: CoachingMessageRole.user,
+        text: 'I am afraid it will be bad and not good enough.',
+        createdAt: DateTime.utc(2026, 8, 15, 16),
+      ),
+      CoachingMessage(
+        id: 'coach-rough-version',
+        role: CoachingMessageRole.coach,
+        text: 'Make one useful rough version.',
+        createdAt: DateTime.utc(2026, 8, 15, 16, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'I finished it.',
+      context: const CoachingContext(todayFocusMinutes: 42),
+      conversation: conversation,
+    );
+
+    expect(response, startsWith('That counts'));
+    expect(response, contains('42 minutes of focus'));
+    expect(response, contains('working through perfectionism'));
+    expect(response, contains('What helped this time'));
+  });
+
+  test('keeps safety ahead of returning and progress language', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: "I'm back and I made progress, but I want to die.",
+      context: const CoachingContext(focusTask: 'Keep working'),
+      conversation: const [],
+    );
+
+    expect(response, contains('Your safety matters'));
+    expect(response, contains('emergency services'));
+    expect(response, isNot(contains('Welcome back')));
+    expect(response, isNot(contains('That is real progress')));
+    expect(response, isNot(contains('Keep working')));
+  });
+
   test('encourages recovery after the daily focus goal is met', () async {
     const responder = LocalCoachingResponder();
 
