@@ -99,6 +99,9 @@ class LocalCoachingResponder implements CoachingResponder {
     'do not want to live',
   ];
 
+  static bool isSafetyConcern(String message) =>
+      _containsAny(message.toLowerCase(), _safetySignals);
+
   @override
   Future<String> respond({
     required String message,
@@ -106,7 +109,7 @@ class LocalCoachingResponder implements CoachingResponder {
     required List<CoachingMessage> conversation,
   }) async {
     final normalized = message.toLowerCase();
-    if (_containsAny(normalized, _safetySignals)) {
+    if (isSafetyConcern(normalized)) {
       return "I'm really glad you told me. Your safety matters more than "
           'productivity. If you might act on this or you are in immediate '
           'danger, contact local emergency services now and reach out to '
@@ -267,19 +270,30 @@ class LocalCoachingResponder implements CoachingResponder {
 }
 
 class CoachingService extends ChangeNotifier {
-  CoachingService({CoachingResponder? responder})
-    : _responder = responder ?? const LocalCoachingResponder() {
+  factory CoachingService({
+    CoachingResponder? responder,
+    CoachingResponder? enhancedResponder,
+  }) => CoachingService._(
+    responder: responder,
+    enhancedResponder: enhancedResponder,
+  );
+
+  CoachingService._({CoachingResponder? responder, this._enhancedResponder})
+    : _localResponder = responder ?? const LocalCoachingResponder() {
     initialized = _load();
   }
 
   static const _storageKey = 'coachingConversation';
+  static const _enhancedCoachingKey = 'enhancedCoachingEnabled';
   static const _maximumMessages = 40;
   static const _maximumMessageLength = 800;
 
-  final CoachingResponder _responder;
+  final CoachingResponder _localResponder;
+  final CoachingResponder? _enhancedResponder;
   List<CoachingMessage> _messages = [];
   int _conversationRevision = 0;
   bool _isResponding = false;
+  bool _enhancedCoachingEnabled = false;
   bool _isDisposed = false;
   String? _errorMessage;
 
@@ -288,6 +302,8 @@ class CoachingService extends ChangeNotifier {
   List<CoachingMessage> get messages => List.unmodifiable(_messages);
   int get conversationRevision => _conversationRevision;
   bool get isResponding => _isResponding;
+  bool get enhancedCoachingAvailable => _enhancedResponder != null;
+  bool get enhancedCoachingEnabled => _enhancedCoachingEnabled;
   String? get errorMessage => _errorMessage;
 
   Future<bool> send(String message, CoachingContext context) async {
@@ -309,7 +325,12 @@ class CoachingService extends ChangeNotifier {
 
     try {
       await _save(_messages);
-      final response = await _responder.respond(
+      final responder = LocalCoachingResponder.isSafetyConcern(cleanedMessage)
+          ? _localResponder
+          : _enhancedCoachingEnabled && _enhancedResponder != null
+          ? _enhancedResponder
+          : _localResponder;
+      final response = await responder.respond(
         message: cleanedMessage,
         context: context,
         conversation: List.unmodifiable(_messages),
@@ -342,24 +363,67 @@ class CoachingService extends ChangeNotifier {
     }
   }
 
-  Future<void> clearLocalData() async {
+  Future<bool> setEnhancedCoachingEnabled(bool enabled) async {
+    await initialized;
+    if (_isDisposed || _isResponding || _enhancedResponder == null) {
+      return false;
+    }
+    if (_enhancedCoachingEnabled == enabled) return false;
+
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_enhancedCoachingKey, enabled);
+    if (_isDisposed) return false;
+
+    _enhancedCoachingEnabled = enabled;
+    notifyListeners();
+    return true;
+  }
+
+  Future<void> clearConversation() =>
+      _clearLocalData(includeEnhancedPreference: false);
+
+  Future<void> clearLocalData() =>
+      _clearLocalData(includeEnhancedPreference: true);
+
+  Future<void> _clearLocalData({
+    required bool includeEnhancedPreference,
+  }) async {
     await initialized;
     if (_isDisposed || _isResponding) return;
 
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(_storageKey);
+    if (includeEnhancedPreference) {
+      await preferences.remove(_enhancedCoachingKey);
+    }
     if (_isDisposed) return;
 
-    if (_messages.isEmpty && _errorMessage == null) return;
+    final conversationChanged = _messages.isNotEmpty || _errorMessage != null;
+    final settingChanged =
+        includeEnhancedPreference && _enhancedCoachingEnabled;
+    if (!conversationChanged && !settingChanged) return;
     _messages = [];
     _errorMessage = null;
-    _notifyConversationChanged();
+    if (includeEnhancedPreference) _enhancedCoachingEnabled = false;
+    if (conversationChanged) {
+      _notifyConversationChanged();
+    } else {
+      notifyListeners();
+    }
   }
 
   Future<void> _load() async {
     try {
       final preferences = await SharedPreferences.getInstance();
       if (_isDisposed) return;
+      final savedEnhancedPreference = preferences.get(_enhancedCoachingKey);
+      if (savedEnhancedPreference is bool) {
+        _enhancedCoachingEnabled =
+            _enhancedResponder != null && savedEnhancedPreference;
+        if (_enhancedCoachingEnabled) notifyListeners();
+      } else if (savedEnhancedPreference != null) {
+        await preferences.remove(_enhancedCoachingKey);
+      }
       final savedValue = preferences.get(_storageKey);
       if (savedValue == null) return;
       if (savedValue is! String) {

@@ -3,6 +3,35 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+## Focus Coach server
+
+The optional remote Focus Coach runs through an authenticated Firebase callable
+function. The OpenAI API key belongs only in Google Secret Manager and must
+never be added to this repository or a Flutter build.
+
+From the project root, install and test the server dependencies:
+
+```sh
+npm install --prefix functions
+npm test --prefix functions
+```
+
+Configure the production secret interactively, then deploy the function:
+
+```sh
+firebase functions:secrets:set OPENAI_API_KEY
+firebase deploy --only functions:focusCoach
+```
+
+The model defaults to `gpt-5.6-terra`. To change that non-secret deployment
+parameter, set `OPENAI_MODEL` when prompted by the Firebase CLI. Provider
+requests use the Responses API with response storage disabled. FocusHaven keeps
+its local coaching responder available when the function, network, or provider
+is unavailable. Enhanced coaching is off by default and requires an explicit
+in-app disclosure and opt-in. Disabling response storage does not disable the
+OpenAI API's default abuse-monitoring retention; keep the privacy policy aligned
+with OpenAI's current [API data controls](https://developers.openai.com/api/docs/guides/your-data).
+
 ## Features
 
 - Focus, short-break, long-break, and custom-duration sessions

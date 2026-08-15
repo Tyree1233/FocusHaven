@@ -29,8 +29,14 @@ Widget _app(CoachingService coach, {CoachingContext? coachingContext}) {
   );
 }
 
-Future<CoachingService> _createCoach({CoachingResponder? responder}) async {
-  final coach = CoachingService(responder: responder);
+Future<CoachingService> _createCoach({
+  CoachingResponder? responder,
+  CoachingResponder? enhancedResponder,
+}) async {
+  final coach = CoachingService(
+    responder: responder,
+    enhancedResponder: enhancedResponder,
+  );
   await coach.initialized;
   return coach;
 }
@@ -126,6 +132,64 @@ void main() {
     expect(find.text('I’m feeling overwhelmed'), findsOneWidget);
     expect(find.textContaining('a lot to hold at once'), findsOneWidget);
     expect(find.textContaining('Prepare the presentation'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('enables enhanced coaching only after informed confirmation', (
+    tester,
+  ) async {
+    final coach = await _createCoach(
+      enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+    );
+
+    await tester.pumpWidget(_app(coach));
+    await tester.pumpAndSettle();
+
+    final toggle = find.byKey(const ValueKey('coach-enhanced-ai-toggle'));
+    expect(toggle, findsOneWidget);
+    expect(tester.widget<SwitchListTile>(toggle).value, isFalse);
+    expect(find.text('Off · coaching stays on this device.'), findsOneWidget);
+
+    await tester.tap(toggle);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Use enhanced AI coaching?'), findsOneWidget);
+    expect(
+      find.textContaining('up to 12 recent coaching messages'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('sent securely through Firebase'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('up to 30 days by default'), findsOneWidget);
+    expect(coach.enhancedCoachingEnabled, isFalse);
+
+    await tester.tap(find.byKey(const ValueKey<String>('confirmation-cancel')));
+    await tester.pumpAndSettle();
+
+    expect(coach.enhancedCoachingEnabled, isFalse);
+    await tester.tap(toggle);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.tap(
+      find.byKey(const ValueKey<String>('confirmation-confirm')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(coach.enhancedCoachingEnabled, isTrue);
+    expect(tester.widget<SwitchListTile>(toggle).value, isTrue);
+    expect(
+      find.text('Enhanced AI · conversation saved on this device'),
+      findsOneWidget,
+    );
+
+    await tester.tap(toggle);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Use enhanced AI coaching?'), findsNothing);
+    expect(coach.enhancedCoachingEnabled, isFalse);
     expect(tester.takeException(), isNull);
   });
 

@@ -14,6 +14,7 @@ import '../services/focus_queue_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/notification_service.dart';
+import '../services/remote_coaching_responder.dart';
 import '../services/reminder_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
@@ -73,6 +74,8 @@ typedef JournalState = ({
 typedef CoachingState = ({
   List<CoachingMessage> messages,
   bool isResponding,
+  bool enhancedCoachingAvailable,
+  bool enhancedCoachingEnabled,
   String? errorMessage,
   int conversationRevision,
 });
@@ -148,7 +151,8 @@ final journalServiceProvider = ChangeNotifierProvider<JournalService>(
 );
 
 final coachingServiceProvider = ChangeNotifierProvider<CoachingService>(
-  (ref) => CoachingService(),
+  (ref) =>
+      CoachingService(enhancedResponder: createEnhancedCoachingResponder()),
   name: 'coachingServiceProvider',
 );
 
@@ -286,6 +290,8 @@ final coachingStateProvider = Provider<CoachingState>((ref) {
   return (
     messages: List<CoachingMessage>.unmodifiable(coach.messages),
     isResponding: coach.isResponding,
+    enhancedCoachingAvailable: coach.enhancedCoachingAvailable,
+    enhancedCoachingEnabled: coach.enhancedCoachingEnabled,
     errorMessage: coach.errorMessage,
     conversationRevision: coach.conversationRevision,
   );

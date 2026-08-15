@@ -1,0 +1,78 @@
+"use strict";
+
+const { defineSecret, defineString } = require("firebase-functions/params");
+const { HttpsError, onCall } = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
+const OpenAI = require("openai");
+
+const {
+  SYSTEM_INSTRUCTIONS,
+  buildModelInput,
+  normalizeCoachingRequest,
+} = require("./coaching");
+
+const openAiApiKey = defineSecret("OPENAI_API_KEY");
+const openAiModel = defineString("OPENAI_MODEL", {
+  default: "gpt-5.6-terra",
+  description: "OpenAI model used by the FocusHaven coaching responder.",
+});
+
+exports.focusCoach = onCall(
+  {
+    region: "us-central1",
+    secrets: [openAiApiKey],
+    timeoutSeconds: 30,
+    memory: "256MiB",
+    minInstances: 0,
+    maxInstances: 10,
+    concurrency: 20,
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError(
+        "unauthenticated",
+        "Sign in to use the remote Focus Coach.",
+      );
+    }
+
+    let coachingRequest;
+    try {
+      coachingRequest = normalizeCoachingRequest(request.data);
+    } catch (error) {
+      throw new HttpsError(
+        "invalid-argument",
+        error instanceof Error ? error.message : "Invalid coaching request.",
+      );
+    }
+
+    try {
+      const client = new OpenAI({
+        apiKey: openAiApiKey.value(),
+        timeout: 25000,
+        maxRetries: 1,
+      });
+      const response = await client.responses.create({
+        model: openAiModel.value(),
+        instructions: SYSTEM_INSTRUCTIONS,
+        input: buildModelInput(coachingRequest),
+        reasoning: { effort: "low" },
+        max_output_tokens: 400,
+        store: false,
+      });
+      const text = response.output_text?.trim();
+      if (!text) throw new Error("OpenAI returned an empty response.");
+      return { text };
+    } catch (error) {
+      const status = Number.isInteger(error?.status) ? error.status : null;
+      logger.error("Focus Coach provider request failed.", {
+        authenticated: true,
+        providerStatus: status,
+        providerRequestId: error?.request_id ?? null,
+      });
+      throw new HttpsError(
+        status === 429 ? "resource-exhausted" : "unavailable",
+        "Focus Coach is temporarily unavailable.",
+      );
+    }
+  },
+);

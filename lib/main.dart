@@ -13,6 +13,7 @@ import 'services/focus_profile_service.dart';
 import 'services/focus_queue_service.dart';
 import 'services/journal_service.dart';
 import 'services/notification_service.dart';
+import 'services/remote_coaching_responder.dart';
 import 'services/reminder_service.dart';
 import 'services/theme_service.dart';
 import 'services/timer_service.dart';
@@ -26,7 +27,9 @@ Future<void> main() async {
 
   final showOnboarding = await shouldShowOnboarding();
   final authService = AuthService();
-  final coachingService = CoachingService();
+  final coachingService = CoachingService(
+    enhancedResponder: createEnhancedCoachingResponder(),
+  );
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();
   final focusProfileService = FocusProfileService();

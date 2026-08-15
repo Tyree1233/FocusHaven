@@ -14,8 +14,14 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  Future<CoachingService> createCoach({CoachingResponder? responder}) async {
-    final coach = CoachingService(responder: responder);
+  Future<CoachingService> createCoach({
+    CoachingResponder? responder,
+    CoachingResponder? enhancedResponder,
+  }) async {
+    final coach = CoachingService(
+      responder: responder,
+      enhancedResponder: enhancedResponder,
+    );
     await coach.initialized;
     return coach;
   }
@@ -124,6 +130,93 @@ void main() {
     expect(emptyResponse, contains('Start with'));
     expect(emptyResponse, contains('Draft release notes'));
   });
+
+  test('enhanced coaching requires opt-in and persists the choice', () async {
+    final localResponder = _RecordingResponder('Local guidance.');
+    final enhancedResponder = _RecordingResponder('Enhanced guidance.');
+    final coach = await createCoach(
+      responder: localResponder,
+      enhancedResponder: enhancedResponder,
+    );
+
+    expect(coach.enhancedCoachingAvailable, isTrue);
+    expect(coach.enhancedCoachingEnabled, isFalse);
+    expect(await coach.send('Help me begin.', const CoachingContext()), isTrue);
+    expect(localResponder.calls, 1);
+    expect(enhancedResponder.calls, 0);
+
+    expect(await coach.setEnhancedCoachingEnabled(true), isTrue);
+    expect(coach.enhancedCoachingEnabled, isTrue);
+    expect(
+      await coach.send('Help me continue.', const CoachingContext()),
+      isTrue,
+    );
+    expect(localResponder.calls, 1);
+    expect(enhancedResponder.calls, 1);
+    coach.dispose();
+
+    final restoredEnhancedResponder = _RecordingResponder(
+      'Restored enhanced guidance.',
+    );
+    final restoredCoach = await createCoach(
+      enhancedResponder: restoredEnhancedResponder,
+    );
+    addTearDown(restoredCoach.dispose);
+
+    expect(restoredCoach.enhancedCoachingEnabled, isTrue);
+    expect(
+      await restoredCoach.send('Help me finish.', const CoachingContext()),
+      isTrue,
+    );
+    expect(restoredEnhancedResponder.calls, 1);
+  });
+
+  test('keeps immediate safety concerns on the local responder', () async {
+    final enhancedResponder = _RecordingResponder(
+      'This remote response must not be used.',
+    );
+    final coach = await createCoach(enhancedResponder: enhancedResponder);
+    addTearDown(coach.dispose);
+    await coach.setEnhancedCoachingEnabled(true);
+
+    expect(
+      await coach.send(
+        'I want to kill myself.',
+        const CoachingContext(focusTask: 'Finish the report'),
+      ),
+      isTrue,
+    );
+
+    expect(enhancedResponder.calls, 0);
+    expect(coach.messages.last.text, contains('Your safety matters'));
+    expect(coach.messages.last.text, contains('emergency services'));
+    expect(coach.messages.last.text, isNot(contains('Finish the report')));
+  });
+
+  test(
+    'conversation clearing preserves consent until all local data clears',
+    () async {
+      final coach = await createCoach(
+        enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+      );
+      addTearDown(coach.dispose);
+      await coach.setEnhancedCoachingEnabled(true);
+      await coach.send('Help me start.', const CoachingContext());
+
+      await coach.clearConversation();
+
+      expect(coach.messages, isEmpty);
+      expect(coach.enhancedCoachingEnabled, isTrue);
+      var preferences = await SharedPreferences.getInstance();
+      expect(preferences.getBool('enhancedCoachingEnabled'), isTrue);
+
+      await coach.clearLocalData();
+
+      expect(coach.enhancedCoachingEnabled, isFalse);
+      preferences = await SharedPreferences.getInstance();
+      expect(preferences.containsKey('enhancedCoachingEnabled'), isFalse);
+    },
+  );
 
   test('serializes overlapping coaching requests', () async {
     final responder = _PendingResponder();
@@ -262,6 +355,23 @@ class _CallbackResponder implements CoachingResponder {
     required CoachingContext context,
     required List<CoachingMessage> conversation,
   }) => callback(message);
+}
+
+class _RecordingResponder implements CoachingResponder {
+  _RecordingResponder(this.response);
+
+  final String response;
+  int calls = 0;
+
+  @override
+  Future<String> respond({
+    required String message,
+    required CoachingContext context,
+    required List<CoachingMessage> conversation,
+  }) async {
+    calls += 1;
+    return response;
+  }
 }
 
 class _PendingResponder implements CoachingResponder {

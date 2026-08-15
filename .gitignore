@@ -74,6 +74,10 @@ unlinked_spec.ds
 **/service-account*.json
 **/*-service-account*.json
 **/client_secret_*.json
+functions/node_modules/
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

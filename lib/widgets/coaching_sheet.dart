@@ -102,7 +102,30 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         isDestructive: true,
       );
       if (!confirmed || !mounted) return;
-      await ref.read(coachingServiceProvider).clearLocalData();
+      await ref.read(coachingServiceProvider).clearConversation();
+    } finally {
+      if (mounted) setState(() => _isManagingHistory = false);
+    }
+  }
+
+  Future<void> _setEnhancedCoachingEnabled(bool enabled) async {
+    if (_isManagingHistory || _isSubmitting) return;
+    setState(() => _isManagingHistory = true);
+    try {
+      if (enabled) {
+        final confirmed = await ConfirmationDialog.show(
+          context,
+          title: 'Use enhanced AI coaching?',
+          message:
+              'When enabled, your message, up to 12 recent coaching messages, and relevant FocusHaven context are sent securely through Firebase to OpenAI to generate a response. OpenAI does not use API data for training unless the API account opts in, but may retain content for abuse monitoring for up to 30 days by default. Your conversation remains saved on this device. You can turn this off anytime.',
+          cancelLabel: 'Keep coaching local',
+          confirmLabel: 'Enable AI coaching',
+        );
+        if (!confirmed || !mounted) return;
+      }
+      await ref
+          .read(coachingServiceProvider)
+          .setEnhancedCoachingEnabled(enabled);
     } finally {
       if (mounted) setState(() => _isManagingHistory = false);
     }
@@ -160,9 +183,11 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                             'Focus Coach',
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
-                          const Text(
-                            'Private guidance saved on this device',
-                            style: TextStyle(color: Colors.white60),
+                          Text(
+                            coachingState.enhancedCoachingEnabled
+                                ? 'Enhanced AI · conversation saved on this device'
+                                : 'Private guidance saved on this device',
+                            style: const TextStyle(color: Colors.white60),
                           ),
                         ],
                       ),
@@ -189,6 +214,21 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                 ),
               ),
               const Divider(height: 1),
+              if (coachingState.enhancedCoachingAvailable) ...[
+                SwitchListTile.adaptive(
+                  key: const ValueKey<String>('coach-enhanced-ai-toggle'),
+                  value: coachingState.enhancedCoachingEnabled,
+                  onChanged: isBusy ? null : _setEnhancedCoachingEnabled,
+                  secondary: const Icon(Icons.cloud_outlined),
+                  title: const Text('Enhanced AI coaching'),
+                  subtitle: Text(
+                    coachingState.enhancedCoachingEnabled
+                        ? 'Messages use secure cloud AI with an automatic local fallback.'
+                        : 'Off · coaching stays on this device.',
+                  ),
+                ),
+                const Divider(height: 1),
+              ],
               Expanded(
                 child: _ConversationBody(
                   messages: coachingState.messages,

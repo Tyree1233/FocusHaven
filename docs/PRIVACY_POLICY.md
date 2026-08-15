@@ -1,6 +1,6 @@
 # FocusHaven Privacy Policy
 
-**Effective date: August 5, 2026**
+**Effective date: August 15, 2026**
 
 FocusHaven is a focus timer and wellbeing companion created by Tyree Jones. This policy explains what information FocusHaven uses and why.
 
@@ -10,10 +10,27 @@ FocusHaven stores the following information locally on your device so its featur
 
 - timer settings, session history, daily goals, intentions, and parked thoughts;
 - focus queue items, journal reflections, and mood selections;
-- appearance and onboarding preferences; and
+- appearance and onboarding preferences;
+- your Focus Coach conversation and whether you enabled enhanced AI coaching; and
 - whether a FocusHaven Pro purchase has been recognized on the device.
 
-This information remains on your device unless you choose to sign in and use cloud backup.
+Unless a section below says otherwise, this information remains on your device. Optional cloud backup sends only the supported focus data described in that section.
+
+## Focus Coach and optional enhanced AI coaching
+
+Focus Coach uses a local coaching responder by default. Your coaching conversation is saved on your device and is not included in cloud backup.
+
+Enhanced AI coaching is optional and remains off until you explicitly enable it. When you enable it and send a coaching request, FocusHaven sends the following information through an authenticated Google Firebase function to OpenAI to generate a response:
+
+- your current coaching message;
+- up to 12 recent messages from the same coaching conversation; and
+- relevant FocusHaven context, which can include your current focus task, focus profile, focus minutes and daily goal, remaining queue count and next task, recent mood summary, parked-thought count, and whether the timer is running.
+
+FocusHaven does not send full journal reflections or your full focus history with a coaching request. The OpenAI API key is stored only on the server and is never included in the app. The function does not deliberately log coaching-message text, and FocusHaven does not maintain a server-side copy of the coaching conversation. If the function, network, or AI provider is unavailable, FocusHaven falls back to its local coach.
+
+Enhanced requests use the OpenAI Responses API with response storage disabled (`store: false`). OpenAI states that API data is not used to train or improve its models unless the API account owner explicitly opts in. OpenAI may retain prompts, responses, and related metadata in abuse-monitoring logs for up to 30 days by default, unless a longer period is required by law or needed to protect its services or others from harm.
+
+Messages that FocusHaven recognizes as an immediate self-harm or suicide concern are handled by the local responder and are not sent to enhanced AI coaching. Focus Coach supports wellbeing and productivity, but it is not professional healthcare or crisis care. You can turn enhanced AI coaching off at any time.
 
 ## Optional sign-in and cloud backup
 
@@ -31,15 +48,17 @@ FocusHaven may offer optional in-app purchases. Purchases are processed by Googl
 
 ## How information is used
 
-FocusHaven uses your information only to provide and improve the app’s features, including restoring backups you request, recognizing purchases, and sending the notifications you enable. FocusHaven does not sell personal information and does not use your journal entries, focus history, or parked thoughts for advertising.
+FocusHaven uses your information only to provide and improve the app’s features, including generating coaching responses you request, restoring backups you request, recognizing purchases, and sending the notifications you enable. FocusHaven does not sell personal information and does not use your coaching messages, journal entries, focus history, or parked thoughts for advertising.
 
 ## Service providers
 
-FocusHaven uses Google Firebase for authentication and optional cloud backup. Google’s handling of information is described in the [Google Privacy Policy](https://policies.google.com/privacy).
+FocusHaven uses Google Firebase for authentication, optional cloud backup, and the authenticated enhanced-coaching function. Google’s handling of information is described in the [Google Privacy Policy](https://policies.google.com/privacy). Enhanced AI coaching uses the OpenAI API; OpenAI describes its practices in its [Privacy Policy](https://openai.com/policies/privacy-policy/) and [API data controls](https://developers.openai.com/api/docs/guides/your-data).
 
 ## Data retention and deletion
 
-Local data can be removed by clearing the app’s data or uninstalling the app. If you used cloud backup and want your cloud-backed FocusHaven data deleted, contact us at the email below from the account used to sign in. We may need to verify the request before deleting associated backup data.
+You can delete your local coaching conversation from Focus Coach. Clearing all local app data or uninstalling the app also removes the locally saved conversation and enhanced-coaching preference. Turning enhanced coaching off prevents future coaching requests from being sent to OpenAI but does not alter any provider abuse-monitoring logs that may already be subject to OpenAI’s retention period.
+
+If you used cloud backup and want your cloud-backed FocusHaven data deleted, contact us at the email below from the account used to sign in. We may need to verify the request before deleting associated backup data.
 
 ## Children’s privacy
 
