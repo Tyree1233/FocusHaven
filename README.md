@@ -25,8 +25,12 @@ versioned map again in Kotlin, rejects unknown fields and impossible timer
 states, and stores only that text-free snapshot in app-private preferences.
 The Flutter lifecycle host starts synchronization only on Android, preserves a
 running session by its authoritative deadline, and skips equivalent one-second
-writes. No launcher widget or exported Android component is added in this
-phase; Apple and every unsupported platform remain dormant.
+writes. Android home screens can now add a responsive, read-only FocusHaven
+widget that shows the session kind, calm timer state, progress, and a live
+system countdown. It reads only the validated private snapshot, performs no
+periodic background work, and uses one immutable tap target to open the app;
+it cannot mutate the timer or expose task, reflection, mood, history, coach, or
+account data. Apple and every unsupported platform remain dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the

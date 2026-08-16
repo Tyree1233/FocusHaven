@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="focus_haven_widget_background">#FF211B2C</color>
+    <color name="focus_haven_widget_border">#FF4A3B5D</color>
+    <color name="focus_haven_widget_foreground">#FFF9F4FC</color>
+    <color name="focus_haven_widget_muted">#FFD5C9DB</color>
+    <color name="focus_haven_widget_accent">#FFF2A6D2</color>
+    <color name="focus_haven_widget_progress_track">#FF41354E</color>
+</resources>

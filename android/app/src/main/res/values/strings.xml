@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="focus_haven_widget_name">FocusHaven</string>
+    <string name="focus_haven_widget_picker_description">A private view of your current FocusHaven timer.</string>
+    <string name="focus_haven_widget_focus">Focus</string>
+    <string name="focus_haven_widget_short_break">Short break</string>
+    <string name="focus_haven_widget_long_break">Long break</string>
+    <string name="focus_haven_widget_ready">Ready when you are</string>
+    <string name="focus_haven_widget_running">In progress</string>
+    <string name="focus_haven_widget_paused">Paused</string>
+    <string name="focus_haven_widget_completed">Session complete</string>
+    <string name="focus_haven_widget_pending_resume">Ready to return</string>
+    <string name="focus_haven_widget_open_to_begin">Open FocusHaven to begin</string>
+    <string name="focus_haven_widget_description_template">%1$s, %2$s, %3$s remaining</string>
+    <string name="focus_haven_widget_accessibility">%1$s. Double tap to open FocusHaven.</string>
+</resources>

@@ -76,6 +76,7 @@ internal object SystemFocusSnapshotStore {
             .edit()
             .putString(SNAPSHOT_KEY, encoded.toString())
             .apply()
+        FocusHavenWidgetProvider.refresh(context)
     }
 
     fun load(context: Context): Map<String, Any?>? {
