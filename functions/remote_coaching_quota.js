@@ -3,6 +3,7 @@
 const { createHash } = require("node:crypto");
 
 const DEFAULT_MONTHLY_REMOTE_COACHING_LIMIT = 120;
+const DEFAULT_GLOBAL_MONTHLY_REMOTE_COACHING_LIMIT = 1000;
 const REMOTE_COACHING_USAGE_COLLECTION = "remoteCoachingUsage";
 
 function utcMonthKey(date) {
@@ -22,6 +23,10 @@ function quotaDocumentId(uid, period) {
   return `${userHash}-${period}`;
 }
 
+function globalQuotaDocumentId(period) {
+  return `global-${period}`;
+}
+
 function readUsedCount(snapshot) {
   if (!snapshot.exists) return 0;
   const used = snapshot.data()?.used;
@@ -36,6 +41,7 @@ async function consumeRemoteCoachingQuota({
   uid,
   now = new Date(),
   limit = DEFAULT_MONTHLY_REMOTE_COACHING_LIMIT,
+  globalLimit,
 }) {
   if (!firestore || typeof firestore.runTransaction !== "function") {
     throw new TypeError("A Firestore quota store is required.");
@@ -43,17 +49,57 @@ async function consumeRemoteCoachingQuota({
   if (!Number.isInteger(limit) || limit <= 0) {
     throw new TypeError("A positive integer quota limit is required.");
   }
+  if (
+    globalLimit !== undefined &&
+    (!Number.isInteger(globalLimit) || globalLimit <= 0)
+  ) {
+    throw new TypeError("A positive integer global quota limit is required.");
+  }
   const period = utcMonthKey(now);
   const documentId = quotaDocumentId(uid, period);
   const reference = firestore
     .collection(REMOTE_COACHING_USAGE_COLLECTION)
     .doc(documentId);
+  const globalReference = globalLimit === undefined
+    ? null
+    : firestore
+      .collection(REMOTE_COACHING_USAGE_COLLECTION)
+      .doc(globalQuotaDocumentId(period));
 
   return firestore.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(reference);
     const used = readUsedCount(snapshot);
+    const globalSnapshot = globalReference === null
+      ? null
+      : await transaction.get(globalReference);
+    const globalUsed = globalSnapshot === null
+      ? null
+      : readUsedCount(globalSnapshot);
+
+    if (globalUsed !== null && globalUsed >= globalLimit) {
+      return {
+        allowed: false,
+        reason: "global-limit",
+        limit,
+        period,
+        remaining: Math.max(limit - used, 0),
+        globalLimit,
+        globalRemaining: 0,
+      };
+    }
     if (used >= limit) {
-      return { allowed: false, limit, period, remaining: 0 };
+      if (globalUsed === null) {
+        return { allowed: false, limit, period, remaining: 0 };
+      }
+      return {
+        allowed: false,
+        reason: "user-limit",
+        limit,
+        period,
+        remaining: 0,
+        globalLimit,
+        globalRemaining: globalLimit - globalUsed,
+      };
     }
 
     const nextUsed = used + 1;
@@ -62,19 +108,35 @@ async function consumeRemoteCoachingQuota({
       updatedAt: now.toISOString(),
       used: nextUsed,
     });
-    return {
+    const result = {
       allowed: true,
       limit,
       period,
       remaining: limit - nextUsed,
     };
+    if (globalReference === null || globalUsed === null) return result;
+
+    const nextGlobalUsed = globalUsed + 1;
+    transaction.set(globalReference, {
+      period,
+      scope: "global",
+      updatedAt: now.toISOString(),
+      used: nextGlobalUsed,
+    });
+    return {
+      ...result,
+      globalLimit,
+      globalRemaining: globalLimit - nextGlobalUsed,
+    };
   });
 }
 
 module.exports = {
+  DEFAULT_GLOBAL_MONTHLY_REMOTE_COACHING_LIMIT,
   DEFAULT_MONTHLY_REMOTE_COACHING_LIMIT,
   REMOTE_COACHING_USAGE_COLLECTION,
   consumeRemoteCoachingQuota,
+  globalQuotaDocumentId,
   quotaDocumentId,
   utcMonthKey,
 };

@@ -43,6 +43,12 @@ per UTC calendar month. The usage collection is outside client-readable paths,
 uses hashed user identifiers, rejects malformed counters, and fails closed when
 Firestore cannot verify the allowance. Provider failures may still consume a
 reservation so concurrent retries cannot overspend the configured budget.
+The same transaction also enforces a server-wide ceiling, which defaults to
+1,000 enhanced replies per UTC month through the
+`REMOTE_COACHING_GLOBAL_MONTHLY_LIMIT` parameter. This aggregate circuit
+breaker applies across every account. A request rejected by it does not consume
+the user's personal allowance and falls back locally without describing the
+server's private budget state.
 When the allowance is exhausted or the remote service cannot be used, the
 client keeps the submitted message, answers through the private local coach,
 and explains the handoff without exposing backend error details. Only the

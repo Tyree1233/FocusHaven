@@ -4,6 +4,7 @@ const { getApps, initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const {
   defineBoolean,
+  defineInt,
   defineSecret,
   defineString,
 } = require("firebase-functions/params");
@@ -31,6 +32,14 @@ const remoteCoachingEnabled = defineBoolean("REMOTE_COACHING_ENABLED", {
   default: false,
   description: "Emergency server-side switch for remote Focus Coach calls.",
 });
+const remoteCoachingGlobalMonthlyLimit = defineInt(
+  "REMOTE_COACHING_GLOBAL_MONTHLY_LIMIT",
+  {
+    default: 1000,
+    description:
+      "Hard server-wide limit for enhanced coaching replies per UTC month.",
+  },
+);
 
 exports.focusCoach = onCall(
   {
@@ -73,6 +82,7 @@ exports.focusCoach = onCall(
       quota = await consumeRemoteCoachingQuota({
         firestore,
         uid: request.auth.uid,
+        globalLimit: remoteCoachingGlobalMonthlyLimit.value(),
       });
     } catch (error) {
       logger.error("Focus Coach quota reservation failed.", {
@@ -85,6 +95,19 @@ exports.focusCoach = onCall(
       );
     }
     if (!quota.allowed) {
+      if (quota.reason === "global-limit") {
+        logger.warn("Focus Coach global monthly limit reached.", {
+          period: quota.period,
+        });
+        throw new HttpsError(
+          "resource-exhausted",
+          "Enhanced Focus Coach is temporarily unavailable.",
+          {
+            reason: "global-budget-exhausted",
+            period: quota.period,
+          },
+        );
+      }
       throw new HttpsError(
         "resource-exhausted",
         "Your enhanced coaching allowance will renew next month.",
