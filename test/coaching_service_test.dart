@@ -761,6 +761,46 @@ void main() {
     },
   );
 
+  test('respects requests for space without productivity pressure', () async {
+    const responder = LocalCoachingResponder();
+
+    for (final message in const [
+      'Stop coaching me.',
+      'Not right now.',
+      'Please leave me alone.',
+      'I need some space.',
+      'No more advice.',
+    ]) {
+      final response = await responder.respond(
+        message: message,
+        context: const CoachingContext(focusTask: 'Finish the launch plan'),
+        conversation: const [],
+      );
+
+      expect(response, startsWith('Okay. I’ll stop here'));
+      expect(response, contains('No next step'));
+      expect(response, contains('nothing to prove'));
+      expect(response, contains('come back whenever you choose'));
+      expect(response, isNot(contains('Finish the launch plan')));
+      expect(response, isNot(contains('focus round')));
+    }
+  });
+
+  test('keeps safety ahead of a request to stop coaching', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'Stop coaching me. I want to die.',
+      context: const CoachingContext(focusTask: 'Keep working'),
+      conversation: const [],
+    );
+
+    expect(response, contains('Your safety matters'));
+    expect(response, contains('someone you trust'));
+    expect(response, isNot(contains('I’ll stop here')));
+    expect(response, isNot(contains('Keep working')));
+  });
+
   test('keeps safety ahead of a request for listening', () async {
     const responder = LocalCoachingResponder();
 
@@ -879,6 +919,28 @@ void main() {
     expect(enhancedResponder.calls, 0);
     expect(coach.messages.last.text, contains('Your safety matters'));
     expect(coach.messages.last.text, contains('emergency services'));
+    expect(coach.messages.last.text, isNot(contains('Finish the report')));
+  });
+
+  test('keeps coaching boundary requests on the local responder', () async {
+    final enhancedResponder = _RecordingResponder(
+      'This remote response must not be used.',
+    );
+    final coach = await createCoach(enhancedResponder: enhancedResponder);
+    addTearDown(coach.dispose);
+    await coach.setEnhancedCoachingEnabled(true);
+
+    expect(
+      await coach.send(
+        'Please stop coaching and give me space.',
+        const CoachingContext(focusTask: 'Finish the report'),
+      ),
+      isTrue,
+    );
+
+    expect(enhancedResponder.calls, 0);
+    expect(coach.messages.last.text, contains('I’ll stop here'));
+    expect(coach.messages.last.text, contains('nothing to prove'));
     expect(coach.messages.last.text, isNot(contains('Finish the report')));
   });
 

@@ -46,7 +46,8 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
       }
     }
     if (latestUserMessage == null ||
-        LocalCoachingResponder.isSafetyConcern(latestUserMessage.text)) {
+        LocalCoachingResponder.isSafetyConcern(latestUserMessage.text) ||
+        LocalCoachingResponder.isBoundaryRequest(latestUserMessage.text)) {
       return const [];
     }
 

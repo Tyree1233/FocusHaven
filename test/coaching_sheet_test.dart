@@ -245,6 +245,51 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('gives space without prompts until the user returns', (
+    tester,
+  ) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(
+      _app(
+        coach,
+        coachingContext: const CoachingContext(
+          focusTask: 'Finish the launch plan',
+          isTimerRunning: true,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'I need space.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('I’ll stop here'), findsOneWidget);
+    expect(find.textContaining('nothing to prove'), findsOneWidget);
+    expect(find.textContaining('Finish the launch plan'), findsNothing);
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'I’m back.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('I’m back.'), findsOneWidget);
+    expect(find.textContaining('Welcome back'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-I did the first step')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('offers one-tap gentle support with matching follow-ups', (
     tester,
   ) async {

@@ -107,6 +107,19 @@ class LocalCoachingResponder implements CoachingResponder {
     "don't want to live",
     'do not want to live',
   ];
+  static const _boundarySignals = <String>[
+    'stop coaching',
+    'pause coaching',
+    'not right now',
+    'not now',
+    'leave me alone',
+    'give me space',
+    'i need space',
+    'need some space',
+    "don't push me",
+    'do not push me',
+    'no more advice',
+  ];
   static const _listeningSignals = <String>[
     'need to vent',
     'can i vent',
@@ -136,6 +149,8 @@ class LocalCoachingResponder implements CoachingResponder {
 
   static bool isSafetyConcern(String message) =>
       _containsAny(message.toLowerCase(), _safetySignals);
+  static bool isBoundaryRequest(String message) =>
+      _containsAny(message.toLowerCase(), _boundarySignals);
 
   @override
   Future<String> respond({
@@ -150,6 +165,9 @@ class LocalCoachingResponder implements CoachingResponder {
           'danger, contact local emergency services now and reach out to '
           'someone you trust who can stay with you. You deserve real human '
           'support; a focus coach is not a substitute for crisis care.';
+    }
+    if (isBoundaryRequest(normalized)) {
+      return _boundaryReply();
     }
     final rememberedSupportMode = _rememberedSupportMode(conversation);
     if (_containsAny(normalized, _listeningSignals)) {
@@ -258,6 +276,7 @@ class LocalCoachingResponder implements CoachingResponder {
     }
     if (_containsAny(normalized, const [
       "i'm back",
+      'i’m back',
       'i am back',
       'back from my break',
       'back after a break',
@@ -445,6 +464,12 @@ class LocalCoachingResponder implements CoachingResponder {
     final nextQueueTask = context.nextQueueTask?.trim() ?? '';
     if (nextQueueTask.isNotEmpty) return nextQueueTask;
     return 'the task in front of you';
+  }
+
+  static String _boundaryReply() {
+    return 'Okay. I’ll stop here and give you space. No next step, no '
+        'check-in, and nothing to prove. You can close Focus Coach now or '
+        'come back whenever you choose.';
   }
 
   static String _listeningReply(List<CoachingMessage> conversation) {
@@ -822,7 +847,10 @@ class CoachingService extends ChangeNotifier {
 
     try {
       await _save(_messages);
-      final responder = LocalCoachingResponder.isSafetyConcern(cleanedMessage)
+      final requiresLocalResponse =
+          LocalCoachingResponder.isSafetyConcern(cleanedMessage) ||
+          LocalCoachingResponder.isBoundaryRequest(cleanedMessage);
+      final responder = requiresLocalResponse
           ? _localResponder
           : _enhancedCoachingEnabled && _enhancedResponder != null
           ? _enhancedResponder
