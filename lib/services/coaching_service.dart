@@ -52,6 +52,8 @@ abstract interface class CoachingResponder {
   });
 }
 
+enum _CoachingSupportMode { gentle, listening, direct }
+
 class ResilientCoachingResponder implements CoachingResponder {
   const ResilientCoachingResponder({
     required this.primary,
@@ -105,6 +107,32 @@ class LocalCoachingResponder implements CoachingResponder {
     "don't want to live",
     'do not want to live',
   ];
+  static const _listeningSignals = <String>[
+    'need to vent',
+    'can i vent',
+    'just listen',
+    'listen to me',
+    "don't give me advice",
+    'do not give me advice',
+    'not looking for advice',
+    'no advice',
+  ];
+  static const _directSignals = <String>[
+    'hold me accountable',
+    'need accountability',
+    'be direct',
+    'give it to me straight',
+    'push me',
+    'stop making excuses',
+  ];
+  static const _gentleSignals = <String>[
+    'be gentle',
+    'gentle with me',
+    'go easy on me',
+    'need encouragement',
+    'need reassurance',
+    'encourage me',
+  ];
 
   static bool isSafetyConcern(String message) =>
       _containsAny(message.toLowerCase(), _safetySignals);
@@ -123,27 +151,15 @@ class LocalCoachingResponder implements CoachingResponder {
           'someone you trust who can stay with you. You deserve real human '
           'support; a focus coach is not a substitute for crisis care.';
     }
-    if (_containsAny(normalized, const [
-      'need to vent',
-      'can i vent',
-      'just listen',
-      'listen to me',
-      "don't give me advice",
-      'do not give me advice',
-      'not looking for advice',
-      'no advice',
-    ])) {
+    final rememberedSupportMode = _rememberedSupportMode(conversation);
+    if (_containsAny(normalized, _listeningSignals)) {
       return _listeningReply(conversation);
     }
-    if (_containsAny(normalized, const [
-      'hold me accountable',
-      'need accountability',
-      'be direct',
-      'give it to me straight',
-      'push me',
-      'stop making excuses',
-    ])) {
+    if (_containsAny(normalized, _directSignals)) {
       return _accountabilityReply(context);
+    }
+    if (_containsAny(normalized, _gentleSignals)) {
+      return _gentleReply(context, conversation);
     }
     if (_containsAny(normalized, const [
       'still stuck',
@@ -302,13 +318,41 @@ class LocalCoachingResponder implements CoachingResponder {
       'i am not sure',
       'unsure',
     ])) {
-      return _uncertaintyReply(context, conversation);
+      return _uncertaintyReply(
+        context,
+        conversation,
+        supportMode: rememberedSupportMode,
+      );
     }
-    return _generalReply(context, conversation);
+    return _generalReply(
+      context,
+      conversation,
+      supportMode: rememberedSupportMode,
+    );
   }
 
   static bool _containsAny(String source, List<String> signals) =>
       signals.any(source.contains);
+
+  static _CoachingSupportMode? _rememberedSupportMode(
+    List<CoachingMessage> conversation,
+  ) {
+    for (final entry in conversation.reversed) {
+      if (entry.role != CoachingMessageRole.user) continue;
+      final message = entry.text.toLowerCase();
+      if (isSafetyConcern(message)) continue;
+      if (_containsAny(message, _listeningSignals)) {
+        return _CoachingSupportMode.listening;
+      }
+      if (_containsAny(message, _directSignals)) {
+        return _CoachingSupportMode.direct;
+      }
+      if (_containsAny(message, _gentleSignals)) {
+        return _CoachingSupportMode.gentle;
+      }
+    }
+    return null;
+  }
 
   static String? _recentChallenge(List<CoachingMessage> conversation) {
     for (final entry in conversation.reversed) {
@@ -413,6 +457,20 @@ class LocalCoachingResponder implements CoachingResponder {
         'I’ll stay with you and listen without trying to fix it.';
   }
 
+  static String _gentleReply(
+    CoachingContext context,
+    List<CoachingMessage> conversation,
+  ) {
+    final challenge = _recentChallenge(conversation);
+    final recognition = challenge == null
+        ? ''
+        : ' I remember that $challenge has been making this harder.';
+    return 'Absolutely. I’ll keep this gentle.$recognition You do not have to '
+        'prove anything or solve “${_currentTask(context)}” all at once. What '
+        'would feel supportive right now: encouragement, a very small next '
+        'step, or a moment to breathe?';
+  }
+
   static String _accountabilityReply(CoachingContext context) {
     if (context.dailyGoalMinutes > 0 &&
         context.todayFocusMinutes >= context.dailyGoalMinutes) {
@@ -435,17 +493,31 @@ class LocalCoachingResponder implements CoachingResponder {
 
   static String _uncertaintyReply(
     CoachingContext context,
-    List<CoachingMessage> conversation,
-  ) {
+    List<CoachingMessage> conversation, {
+    _CoachingSupportMode? supportMode,
+  }) {
     final task = _currentTask(context);
     final challenge = _recentChallenge(conversation);
+    if (supportMode == _CoachingSupportMode.listening) {
+      return 'You do not need to find the answer yet. I remember that you '
+          'wanted listening without advice, so we can stay with the uncertainty. '
+          'What feels most present when you say “I don’t know”?';
+    }
+    if (supportMode == _CoachingSupportMode.direct) {
+      return 'You asked me to stay direct: do not solve the whole uncertainty. '
+          'Choose one two-minute action on “$task,” do it now, and use what '
+          'happens as the next piece of information.';
+    }
+    final gentleOpening = supportMode == _CoachingSupportMode.gentle
+        ? 'We can approach this gently. '
+        : '';
     if (challenge != null) {
-      return 'Not knowing is allowed. Since $challenge has been the obstacle, '
+      return '${gentleOpening}Not knowing is allowed. Since $challenge has been the obstacle, '
           'you do not need a perfect answer. Choose one: a real five-minute '
           'reset, or one two-minute action on “$task.” Which feels more '
           'possible right now?';
     }
-    return 'Not knowing is enough information to make the question smaller. '
+    return '${gentleOpening}Not knowing is enough information to make the question smaller. '
         'For “$task,” which is closest: I need clarity, I need energy, or I’m '
         'afraid to begin? Pick the nearest answer—not the perfect one.';
   }
@@ -655,9 +727,24 @@ class LocalCoachingResponder implements CoachingResponder {
 
   static String _generalReply(
     CoachingContext context,
-    List<CoachingMessage> conversation,
-  ) {
+    List<CoachingMessage> conversation, {
+    _CoachingSupportMode? supportMode,
+  }) {
     final task = _currentTask(context);
+    if (supportMode == _CoachingSupportMode.listening) {
+      return _listeningReply(conversation);
+    }
+    if (supportMode == _CoachingSupportMode.direct) {
+      final timerDirection = context.isTimerRunning
+          ? 'Return to the running timer now.'
+          : 'Start one ten-minute focus round now.';
+      return 'You asked me to stay direct: put everything except “$task” out '
+          'of view. $timerDirection Do the next visible action, then report '
+          'what actually happened.';
+    }
+    final gentleOpening = supportMode == _CoachingSupportMode.gentle
+        ? 'I remember that you wanted a gentler approach. '
+        : '';
     final mood = context.recentMood?.trim();
     final profile = context.focusProfile?.trim();
     final personalNote = mood?.isNotEmpty == true
@@ -668,13 +755,13 @@ class LocalCoachingResponder implements CoachingResponder {
         : 'We can keep this gentle and practical.';
     final challenge = _recentChallenge(conversation);
     if (challenge != null) {
-      return '$personalNote Earlier, you were dealing with $challenge. Is that '
+      return '$gentleOpening$personalNote Earlier, you were dealing with $challenge. Is that '
           'still the main obstacle with “$task,” or has something changed?';
     }
     final continuity = conversation.length > 2
         ? ' I’m still with the thread we’ve been working through.'
         : '';
-    return '$personalNote$continuity For “$task,” what feels hardest right '
+    return '$gentleOpening$personalNote$continuity For “$task,” what feels hardest right '
         'now: knowing what to do, getting started, or staying with it?';
   }
 }

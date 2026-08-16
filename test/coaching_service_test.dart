@@ -614,6 +614,153 @@ void main() {
     },
   );
 
+  test('offers an explicitly gentle coaching response', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'Please be gentle with me.',
+      context: const CoachingContext(focusTask: 'Write the difficult email'),
+      conversation: const [],
+    );
+
+    expect(response, contains('I’ll keep this gentle'));
+    expect(response, contains('Write the difficult email'));
+    expect(response, contains('encouragement'));
+    expect(response, contains('a very small next step'));
+  });
+
+  test('remembers a request for listening on an ambiguous follow-up', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-listening-preference',
+        role: CoachingMessageRole.user,
+        text: 'Please just listen. I do not want advice right now.',
+        createdAt: DateTime.utc(2026, 8, 15, 19),
+      ),
+      CoachingMessage(
+        id: 'coach-listening-preference',
+        role: CoachingMessageRole.coach,
+        text: 'I’ll stay with you and listen without trying to fix it.',
+        createdAt: DateTime.utc(2026, 8, 15, 19, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'There is more I need to say.',
+      context: const CoachingContext(focusTask: 'Finish the proposal'),
+      conversation: conversation,
+    );
+
+    expect(response, contains('do not have to turn this into a plan'));
+    expect(response, contains('listen without trying to fix it'));
+    expect(response, isNot(contains('Finish the proposal')));
+  });
+
+  test('remembers direct support when uncertainty follows', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-direct-preference',
+        role: CoachingMessageRole.user,
+        text: 'Be direct and hold me accountable.',
+        createdAt: DateTime.utc(2026, 8, 15, 20),
+      ),
+      CoachingMessage(
+        id: 'coach-direct-preference',
+        role: CoachingMessageRole.coach,
+        text: 'Direct version, without shame: start one focus round.',
+        createdAt: DateTime.utc(2026, 8, 15, 20, 1),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'I am not sure.',
+      context: const CoachingContext(focusTask: 'Outline the presentation'),
+      conversation: conversation,
+    );
+
+    expect(response, startsWith('You asked me to stay direct'));
+    expect(response, contains('two-minute action'));
+    expect(response, contains('Outline the presentation'));
+    expect(response, isNot(contains('Pick the nearest answer')));
+  });
+
+  test('the latest support preference replaces the earlier one', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'user-old-direct-preference',
+        role: CoachingMessageRole.user,
+        text: 'Push me and be direct.',
+        createdAt: DateTime.utc(2026, 8, 15, 21),
+      ),
+      CoachingMessage(
+        id: 'coach-old-direct-preference',
+        role: CoachingMessageRole.coach,
+        text: 'Direct version, without shame.',
+        createdAt: DateTime.utc(2026, 8, 15, 21, 1),
+      ),
+      CoachingMessage(
+        id: 'user-new-gentle-preference',
+        role: CoachingMessageRole.user,
+        text: 'Please go easy on me and be gentle.',
+        createdAt: DateTime.utc(2026, 8, 15, 21, 2),
+      ),
+      CoachingMessage(
+        id: 'coach-new-gentle-preference',
+        role: CoachingMessageRole.coach,
+        text: 'Absolutely. I’ll keep this gentle.',
+        createdAt: DateTime.utc(2026, 8, 15, 21, 3),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: 'Can you help me with this?',
+      context: const CoachingContext(focusTask: 'Review the budget'),
+      conversation: conversation,
+    );
+
+    expect(
+      response,
+      startsWith('I remember that you wanted a gentler approach'),
+    );
+    expect(response, contains('Review the budget'));
+    expect(response, isNot(contains('You asked me to stay direct')));
+  });
+
+  test(
+    'does not infer a support preference from a safety disclosure',
+    () async {
+      const responder = LocalCoachingResponder();
+      final conversation = [
+        CoachingMessage(
+          id: 'user-safety-not-preference',
+          role: CoachingMessageRole.user,
+          text: 'I want to die.',
+          createdAt: DateTime.utc(2026, 8, 15, 22),
+        ),
+        CoachingMessage(
+          id: 'coach-safety-not-preference',
+          role: CoachingMessageRole.coach,
+          text: 'Your safety matters. Reach out to someone you trust.',
+          createdAt: DateTime.utc(2026, 8, 15, 22, 1),
+        ),
+      ];
+
+      final response = await responder.respond(
+        message: 'Can you stay with me for a moment?',
+        context: const CoachingContext(focusTask: 'Make a gentle plan'),
+        conversation: conversation,
+      );
+
+      expect(response, contains('We can keep this gentle and practical'));
+      expect(response, contains('Make a gentle plan'));
+      expect(response, isNot(contains('Your safety matters')));
+      expect(response, isNot(contains('I remember that you wanted')));
+    },
+  );
+
   test('keeps safety ahead of a request for listening', () async {
     const responder = LocalCoachingResponder();
 
@@ -759,6 +906,32 @@ void main() {
       expect(preferences.containsKey('enhancedCoachingEnabled'), isFalse);
     },
   );
+
+  test('clearing the conversation forgets its support preference', () async {
+    final coach = await createCoach();
+    addTearDown(coach.dispose);
+    const context = CoachingContext(focusTask: 'Prepare the demo');
+
+    expect(
+      await coach.send('Be direct and hold me accountable.', context),
+      isTrue,
+    );
+    expect(await coach.send('Can you help me with this?', context), isTrue);
+    expect(coach.messages.last.text, startsWith('You asked me to stay direct'));
+
+    await coach.clearConversation();
+
+    expect(coach.messages, isEmpty);
+    expect(await coach.send('Can you help me with this?', context), isTrue);
+    expect(
+      coach.messages.last.text,
+      contains('We can keep this gentle and practical'),
+    );
+    expect(
+      coach.messages.last.text,
+      isNot(contains('You asked me to stay direct')),
+    );
+  });
 
   test('serializes overlapping coaching requests', () async {
     final responder = _PendingResponder();
