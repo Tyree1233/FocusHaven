@@ -22,6 +22,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     'I’m stuck—help me start',
     'I’m feeling overwhelmed',
     'What should I do next?',
+    'Be gentle with me',
     'Please just listen',
     'Hold me accountable',
   ];
@@ -55,14 +56,27 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
       return const ['I’m back after a break'];
     }
     if (coachReply.contains('listen without trying to fix')) {
-      return const ['What should I do next?', 'Hold me accountable'];
+      return const [
+        'What should I do next?',
+        'Be gentle with me',
+        'Hold me accountable',
+      ];
     }
-    if (coachReply.startsWith('direct version')) {
+    if (coachReply.startsWith('direct version') ||
+        coachReply.startsWith('you asked me to stay direct')) {
       return const [
         'I did the first step',
         'I’m still stuck',
         'I need a break',
+        'Be gentle with me',
       ];
+    }
+    if (coachReply.contains('i’ll keep this gentle') ||
+        coachReply.startsWith(
+          'i remember that you wanted a gentler approach',
+        ) ||
+        coachReply.startsWith('we can approach this gently')) {
+      return const ['Break it down', 'Please just listen', 'I need a break'];
     }
     if (coachReply.startsWith('welcome back')) {
       return const ['I did the first step', 'I’m still stuck'];

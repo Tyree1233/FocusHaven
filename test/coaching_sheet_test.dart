@@ -64,6 +64,14 @@ void main() {
     expect(find.text('I’m stuck—help me start'), findsOneWidget);
     expect(find.text('I’m feeling overwhelmed'), findsOneWidget);
     expect(find.text('What should I do next?'), findsOneWidget);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -220));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('coach-prompt-Be gentle with me')),
+      findsOneWidget,
+    );
     expect(find.byKey(const ValueKey('coach-message-input')), findsOneWidget);
     expect(
       tester
@@ -237,6 +245,46 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('offers one-tap gentle support with matching follow-ups', (
+    tester,
+  ) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(
+      _app(
+        coach,
+        coachingContext: const CoachingContext(
+          focusTask: 'Send the difficult message',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -260));
+    await tester.pumpAndSettle();
+
+    final prompt = find.byKey(const ValueKey('coach-prompt-Be gentle with me'));
+    expect(prompt, findsOneWidget);
+    await tester.tap(prompt);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Be gentle with me'), findsOneWidget);
+    expect(find.textContaining('I’ll keep this gentle'), findsOneWidget);
+    expect(find.textContaining('Send the difficult message'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Break it down')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Please just listen')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-I need a break')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('offers a one-tap listening mode', (tester) async {
     final coach = await _createCoach();
 
@@ -264,6 +312,10 @@ void main() {
     );
     expect(
       find.textContaining('listen without trying to fix it'),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Be gentle with me')),
       findsOneWidget,
     );
     expect(find.textContaining('Finish the presentation'), findsNothing);
@@ -297,6 +349,24 @@ void main() {
     );
     expect(find.textContaining('Write the release notes'), findsOneWidget);
     expect(find.textContaining('ten-minute focus round'), findsOneWidget);
+
+    final gentleReply = find.byKey(
+      const ValueKey('coach-quick-reply-Be gentle with me'),
+    );
+    expect(gentleReply, findsOneWidget);
+    tester.widget<ActionChip>(gentleReply).onPressed!.call();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Be gentle with me'), findsOneWidget);
+    expect(find.textContaining('I’ll keep this gentle'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Break it down')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Hold me accountable')),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 
