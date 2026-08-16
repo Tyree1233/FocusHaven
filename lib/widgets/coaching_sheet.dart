@@ -51,6 +51,14 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
       return const [];
     }
 
+    if (LocalCoachingResponder.isRepairRequest(latestUserMessage.text)) {
+      return const [
+        'Please just listen',
+        'Be gentle with me',
+        'Hold me accountable',
+      ];
+    }
+
     final coachReply = messages.last.text.toLowerCase();
     if (coachReply.contains('take a real five-minute break') ||
         coachReply.contains('let recovery count')) {

@@ -290,6 +290,61 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('repairs a mismatch with one-tap recalibration choices', (
+    tester,
+  ) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(
+      _app(
+        coach,
+        coachingContext: const CoachingContext(
+          focusTask: 'Finish the launch plan',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'That’s not what I meant.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('I misunderstood'), findsOneWidget);
+    expect(find.textContaining('I’m sorry'), findsOneWidget);
+    expect(
+      find.textContaining('without making you repeat everything'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Finish the launch plan'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Please just listen')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Be gentle with me')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Hold me accountable')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('coach-quick-reply-Please just listen')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Please just listen'), findsOneWidget);
+    expect(
+      find.textContaining('listen without trying to fix it'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('offers one-tap gentle support with matching follow-ups', (
     tester,
   ) async {

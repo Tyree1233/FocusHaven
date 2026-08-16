@@ -120,6 +120,23 @@ class LocalCoachingResponder implements CoachingResponder {
     'do not push me',
     'no more advice',
   ];
+  static const _repairSignals = <String>[
+    "that's not what i meant",
+    'that’s not what i meant',
+    'that is not what i meant',
+    'you misunderstood',
+    'you misunderstood me',
+    'you got me wrong',
+    "that's not what i need",
+    'that’s not what i need',
+    'that is not what i need',
+    "that doesn't help",
+    'that doesn’t help',
+    'that does not help',
+    'you are not listening',
+    "you aren't listening",
+    'you aren’t listening',
+  ];
   static const _listeningSignals = <String>[
     'need to vent',
     'can i vent',
@@ -151,6 +168,8 @@ class LocalCoachingResponder implements CoachingResponder {
       _containsAny(message.toLowerCase(), _safetySignals);
   static bool isBoundaryRequest(String message) =>
       _containsAny(message.toLowerCase(), _boundarySignals);
+  static bool isRepairRequest(String message) =>
+      _containsAny(message.toLowerCase(), _repairSignals);
 
   @override
   Future<String> respond({
@@ -168,6 +187,9 @@ class LocalCoachingResponder implements CoachingResponder {
     }
     if (isBoundaryRequest(normalized)) {
       return _boundaryReply();
+    }
+    if (isRepairRequest(normalized)) {
+      return _repairReply();
     }
     final rememberedSupportMode = _rememberedSupportMode(conversation);
     if (_containsAny(normalized, _listeningSignals)) {
@@ -470,6 +492,13 @@ class LocalCoachingResponder implements CoachingResponder {
     return 'Okay. I’ll stop here and give you space. No next step, no '
         'check-in, and nothing to prove. You can close Focus Coach now or '
         'come back whenever you choose.';
+  }
+
+  static String _repairReply() {
+    return 'Thank you for correcting me. I misunderstood what you needed, '
+        'and I’m sorry. Let’s reset without making you repeat everything. '
+        'What would fit better right now: listening without advice, gentle '
+        'support, or a direct next step?';
   }
 
   static String _listeningReply(List<CoachingMessage> conversation) {
@@ -849,7 +878,8 @@ class CoachingService extends ChangeNotifier {
       await _save(_messages);
       final requiresLocalResponse =
           LocalCoachingResponder.isSafetyConcern(cleanedMessage) ||
-          LocalCoachingResponder.isBoundaryRequest(cleanedMessage);
+          LocalCoachingResponder.isBoundaryRequest(cleanedMessage) ||
+          LocalCoachingResponder.isRepairRequest(cleanedMessage);
       final responder = requiresLocalResponse
           ? _localResponder
           : _enhancedCoachingEnabled && _enhancedResponder != null
