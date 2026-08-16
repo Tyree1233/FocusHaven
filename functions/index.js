@@ -1,5 +1,7 @@
 "use strict";
 
+const { getApps, initializeApp } = require("firebase-admin/app");
+const { getFirestore } = require("firebase-admin/firestore");
 const {
   defineBoolean,
   defineSecret,
@@ -15,6 +17,10 @@ const {
   normalizeCoachingRequest,
 } = require("./coaching");
 const { evaluateRemoteCoachingAccess } = require("./remote_coaching_policy");
+const { consumeRemoteCoachingQuota } = require("./remote_coaching_quota");
+
+if (getApps().length === 0) initializeApp();
+const firestore = getFirestore();
 
 const openAiApiKey = defineSecret("OPENAI_API_KEY");
 const openAiModel = defineString("OPENAI_MODEL", {
@@ -62,6 +68,29 @@ exports.focusCoach = onCall(
       );
     }
 
+    let quota;
+    try {
+      quota = await consumeRemoteCoachingQuota({
+        firestore,
+        uid: request.auth.uid,
+      });
+    } catch (error) {
+      logger.error("Focus Coach quota reservation failed.", {
+        authenticated: true,
+        errorType: error?.constructor?.name ?? "UnknownError",
+      });
+      throw new HttpsError(
+        "unavailable",
+        "Focus Coach usage could not be verified right now.",
+      );
+    }
+    if (!quota.allowed) {
+      throw new HttpsError(
+        "resource-exhausted",
+        "Your enhanced coaching allowance will renew next month.",
+      );
+    }
+
     try {
       const client = new OpenAI({
         apiKey: openAiApiKey.value(),
@@ -78,7 +107,14 @@ exports.focusCoach = onCall(
       });
       const text = response.output_text?.trim();
       if (!text) throw new Error("OpenAI returned an empty response.");
-      return { text };
+      return {
+        text,
+        usage: {
+          limit: quota.limit,
+          period: quota.period,
+          remaining: quota.remaining,
+        },
+      };
     } catch (error) {
       const status = Number.isInteger(error?.status) ? error.status : null;
       logger.error("Focus Coach provider request failed.", {

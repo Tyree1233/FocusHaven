@@ -37,6 +37,13 @@ unexpired monthly or annual subscription. Client storage and purchase events
 cannot mint these claims. Until trusted store receipt validation can issue and
 revoke them, every remote coaching request remains denied.
 
+The function also reserves usage through a Firestore transaction before each
+provider call. Monthly and annual plans currently receive 120 enhanced replies
+per UTC calendar month. The usage collection is outside client-readable paths,
+uses hashed user identifiers, rejects malformed counters, and fails closed when
+Firestore cannot verify the allowance. Provider failures may still consume a
+reservation so concurrent retries cannot overspend the configured budget.
+
 Normal builds keep the enhanced-coaching interface hidden so the local coach
 remains accurate when the paid backend has not been deployed. Before producing
 an enabled build, register the Android, Apple, and web apps under Firebase
