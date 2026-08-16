@@ -94,6 +94,7 @@ with OpenAI's current [API data controls](https://developers.openai.com/api/docs
 - Focus queue with editing, completion history, and task restoration
 - Daily goals, streaks, session history, challenges, and milestones
 - Privacy-safe focus events for future recovery and rhythm recommendations
+- Transparent local Haven Plans shaped by available time and energy
 - Distraction parking for thoughts that can wait until after a session
 - Reflection journal with daily prompts and mood history
 - Guided breathing, configurable reminders, and appearance themes

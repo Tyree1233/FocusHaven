@@ -6,6 +6,7 @@ import '../config/feature_flags.dart';
 import '../models/coaching_message.dart';
 import '../models/focus_event.dart';
 import '../models/focus_session.dart';
+import '../models/haven_plan.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
 import '../models/pro_entitlement.dart';
@@ -14,6 +15,7 @@ import '../services/cloud_sync_service.dart';
 import '../services/coaching_service.dart';
 import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
+import '../services/haven_plan_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/notification_service.dart';
@@ -63,6 +65,8 @@ typedef FocusQueueState = ({
   List<FocusQueueItem> completedItems,
   int completedToday,
 });
+
+typedef HavenPlanRequest = ({HavenEnergy energy, int availableMinutes});
 
 /// Immutable journal data used by the Reflection Journal sheet.
 typedef JournalState = ({
@@ -147,6 +151,11 @@ final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(
 final focusQueueServiceProvider = ChangeNotifierProvider<FocusQueueService>(
   (ref) => FocusQueueService(),
   name: 'focusQueueServiceProvider',
+);
+
+final havenPlanServiceProvider = Provider<HavenPlanService>(
+  (ref) => const HavenPlanService(),
+  name: 'havenPlanServiceProvider',
 );
 
 final journalServiceProvider = ChangeNotifierProvider<JournalService>(
@@ -288,6 +297,27 @@ final focusQueueStateProvider = Provider<FocusQueueState>((ref) {
     completedToday: queue.completedToday,
   );
 }, name: 'focusQueueStateProvider');
+
+/// Creates an ephemeral, local-only plan from the current queue, the user's
+/// explicit energy check-in, available time, and text-free focus events.
+final havenPlanProvider = Provider.family<HavenPlan, HavenPlanRequest>((
+  ref,
+  request,
+) {
+  final queue = ref.watch(focusQueueStateProvider).activeItems;
+  final events = ref.watch(timerFocusEventsProvider);
+  return ref
+      .watch(havenPlanServiceProvider)
+      .createPlan(
+        queue: [
+          for (final item in queue)
+            HavenTaskCandidate(id: item.id, title: item.title),
+        ],
+        recentEvents: events,
+        energy: request.energy,
+        availableMinutes: request.availableMinutes,
+      );
+}, name: 'havenPlanProvider');
 
 /// Immutable journal snapshot that changes only when entries are loaded,
 /// added, updated, replaced, or cleared.
