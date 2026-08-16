@@ -44,6 +44,7 @@ typedef TimerSessionState = ({
   String focusTask,
   int parkedThoughtCount,
   String completionMessage,
+  FocusSessionFit? completedFocusSessionFit,
 });
 
 /// Aggregated progress shown by the timer screen's summary cards.
@@ -241,6 +242,7 @@ final timerSessionStateProvider = Provider<TimerSessionState>((ref) {
     focusTask: timer.focusTask,
     parkedThoughtCount: timer.distractions.length,
     completionMessage: timer.completionMessage,
+    completedFocusSessionFit: timer.completedFocusSessionFit,
   );
 }, name: 'timerSessionStateProvider');
 

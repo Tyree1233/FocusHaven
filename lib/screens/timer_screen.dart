@@ -26,6 +26,7 @@ import '../widgets/appearance_sheet.dart';
 import '../widgets/distraction_parking_sheet.dart';
 import '../widgets/focus_milestones_sheet.dart';
 import '../widgets/focus_profile_sheet.dart';
+import '../widgets/focus_session_reflection_card.dart';
 import '../widgets/guided_breathing_sheet.dart';
 import '../widgets/haven_plan_sheet.dart';
 import '../widgets/journal_entry_dialog.dart';
@@ -1012,19 +1013,30 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           ),
                         )
                       else if (session.isComplete)
-                        FilledButton.icon(
-                          onPressed: () => _beginNextSession(timer),
-                          icon: const Icon(Icons.arrow_forward),
-                          label: Text(
-                            session.sessionType == SessionType.focus
-                                ? 'Take a break'
-                                : 'Begin focus',
-                          ),
-                          style: FilledButton.styleFrom(
-                            backgroundColor: sessionColor,
-                            foregroundColor: _ink,
-                            minimumSize: const Size(210, 54),
-                          ),
+                        Column(
+                          children: [
+                            if (session.sessionType == SessionType.focus) ...[
+                              FocusSessionReflectionCard(
+                                selected: session.completedFocusSessionFit,
+                                onSelected: timer.reflectOnCompletedFocus,
+                              ),
+                              const SizedBox(height: 14),
+                            ],
+                            FilledButton.icon(
+                              onPressed: () => _beginNextSession(timer),
+                              icon: const Icon(Icons.arrow_forward),
+                              label: Text(
+                                session.sessionType == SessionType.focus
+                                    ? 'Take a break'
+                                    : 'Begin focus',
+                              ),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: sessionColor,
+                                foregroundColor: _ink,
+                                minimumSize: const Size(210, 54),
+                              ),
+                            ),
+                          ],
                         )
                       else
                         Row(

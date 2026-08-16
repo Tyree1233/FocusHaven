@@ -14,6 +14,7 @@ import 'package:focushaven/services/coaching_service.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
+import 'package:focushaven/widgets/focus_session_reflection_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
 import 'package:focushaven/widgets/smart_reset_sheet.dart';
@@ -637,6 +638,51 @@ void main() {
       find.widgetWithText(FilledButton, 'Begin short break'),
       findsOneWidget,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('records an optional private reflection before the break', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1,
+      'secondsRemaining': 1,
+      'totalSessionSeconds': 1,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now()
+          .subtract(const Duration(seconds: 2))
+          .millisecondsSinceEpoch,
+    });
+    final timer = TimerService();
+    await timer.initialized;
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+
+    expect(find.byType(FocusSessionReflectionCard), findsOneWidget);
+    final aboutRight = find.byKey(
+      const ValueKey('focus-session-fit-aboutRight'),
+    );
+    await tester.ensureVisible(aboutRight);
+    await tester.pumpAndSettle();
+    await tester.tap(aboutRight);
+    await tester.pump();
+
+    expect(timer.completedFocusSessionFit, FocusSessionFit.aboutRight);
+    expect(
+      timer.recentFocusEvents.single.sessionFit,
+      FocusSessionFit.aboutRight,
+    );
+    expect(find.textContaining('Saved privately'), findsOneWidget);
+
+    final takeBreak = find.widgetWithText(FilledButton, 'Take a break');
+    await tester.ensureVisible(takeBreak);
+    await tester.pumpAndSettle();
+    await tester.tap(takeBreak);
+    await tester.pump();
+
+    expect(timer.sessionType, SessionType.shortBreak);
+    expect(find.byType(FocusSessionReflectionCard), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

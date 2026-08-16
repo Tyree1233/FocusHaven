@@ -831,6 +831,59 @@ void main() {
   );
 
   test(
+    'completion reflections update only the active completed focus event',
+    () async {
+      final startedAt = DateTime.now().toUtc().subtract(
+        const Duration(minutes: 1),
+      );
+      SharedPreferences.setMockInitialValues({
+        'focusSeconds': 60,
+        'secondsRemaining': 1,
+        'totalSessionSeconds': 60,
+        'sessionType': SessionType.focus.index,
+        'timerEndsAt': DateTime.now()
+            .subtract(const Duration(seconds: 2))
+            .millisecondsSinceEpoch,
+        'activeFocusAttempt': jsonEncode({
+          'startedAt': startedAt.toIso8601String(),
+          'plannedDurationSeconds': 60,
+          'pauseCount': 0,
+          'didResume': false,
+        }),
+      });
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+      final initialRevision = timer.focusEventsRevision;
+
+      timer.reflectOnCompletedFocus(FocusSessionFit.tooMuch);
+
+      expect(timer.completedFocusSessionFit, FocusSessionFit.tooMuch);
+      expect(
+        timer.recentFocusEvents.single.sessionFit,
+        FocusSessionFit.tooMuch,
+      );
+      expect(timer.focusEventsRevision, initialRevision + 1);
+
+      timer.reflectOnCompletedFocus(FocusSessionFit.tooMuch);
+      expect(timer.focusEventsRevision, initialRevision + 1);
+
+      await Future<void>.delayed(Duration.zero);
+      final preferences = await SharedPreferences.getInstance();
+      final saved = jsonDecode(preferences.getString('focusEvents')!) as List;
+      expect((saved.single as Map)['sessionFit'], 'tooMuch');
+
+      timer.beginNextSession();
+      timer.reflectOnCompletedFocus(FocusSessionFit.couldDoMore);
+      expect(
+        timer.recentFocusEvents.single.sessionFit,
+        FocusSessionFit.tooMuch,
+      );
+      expect(timer.completedFocusSessionFit, isNull);
+      expect(timer.focusEventsRevision, initialRevision + 1);
+    },
+  );
+
+  test(
     'repairs damaged saved focus events without losing valid signals',
     () async {
       final valid = FocusEvent(

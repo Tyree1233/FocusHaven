@@ -56,6 +56,48 @@ void main() {
     expect(event(FocusEventOutcome.changedSession).canSupportRecovery, isFalse);
   });
 
+  test(
+    'completed events preserve an optional text-free session reflection',
+    () {
+      final event = FocusEvent(
+        startedAt: DateTime.utc(2026, 8, 16, 12),
+        endedAt: DateTime.utc(2026, 8, 16, 12, 25),
+        plannedDurationSeconds: 25 * 60,
+        focusedDurationSeconds: 25 * 60,
+        pauseCount: 0,
+        didResume: false,
+        outcome: FocusEventOutcome.completed,
+      ).withSessionFit(FocusSessionFit.aboutRight);
+
+      final json = event.toJson();
+      final restored = FocusEvent.fromJson(json);
+
+      expect(json['sessionFit'], 'aboutRight');
+      expect(json.toString(), isNot(contains('task')));
+      expect(json.toString(), isNot(contains('journal')));
+      expect(restored.sessionFit, FocusSessionFit.aboutRight);
+      expect(restored.hasSessionReflection, isTrue);
+    },
+  );
+
+  test('non-completions cannot receive a session reflection', () {
+    final event = FocusEvent(
+      startedAt: DateTime.utc(2026, 8, 16, 12),
+      endedAt: DateTime.utc(2026, 8, 16, 12, 5),
+      plannedDurationSeconds: 25 * 60,
+      focusedDurationSeconds: 5 * 60,
+      pauseCount: 0,
+      didResume: false,
+      outcome: FocusEventOutcome.reset,
+    );
+
+    final unchanged = event.withSessionFit(FocusSessionFit.tooMuch);
+
+    expect(identical(unchanged, event), isTrue);
+    expect(unchanged.sessionFit, isNull);
+    expect(unchanged.toJson(), isNot(contains('sessionFit')));
+  });
+
   test('damaged or impossible focus events are rejected', () {
     final valid = FocusEvent(
       startedAt: DateTime.utc(2026, 8, 16, 12),
@@ -76,6 +118,8 @@ void main() {
       {...valid, 'pauseCount': -1},
       {...valid, 'didResume': 'yes'},
       {...valid, 'outcome': 'punished'},
+      {...valid, 'sessionFit': 'judged'},
+      {...valid, 'outcome': 'reset', 'sessionFit': 'aboutRight'},
     ];
 
     for (final json in invalidEvents) {

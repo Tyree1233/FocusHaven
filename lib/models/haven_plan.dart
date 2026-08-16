@@ -1,6 +1,12 @@
 enum HavenEnergy { low, steady, strong }
 
-enum HavenPlanBasis { freshStart, gentleStart, recentRecovery, personalRhythm }
+enum HavenPlanBasis {
+  freshStart,
+  gentleStart,
+  recentRecovery,
+  sessionReflection,
+  personalRhythm,
+}
 
 /// A sanitized queue candidate provided to the local Haven planning engine.
 class HavenTaskCandidate {
@@ -37,6 +43,9 @@ class HavenPlan {
   final bool wasEnergyBound;
 
   int get totalPlannedMinutes => focusMinutes + breakMinutes;
-  bool get usesPersonalHistory => basis == HavenPlanBasis.personalRhythm;
+  bool get usesPersonalHistory =>
+      basis == HavenPlanBasis.sessionReflection ||
+      basis == HavenPlanBasis.personalRhythm;
+  bool get usesSessionReflection => basis == HavenPlanBasis.sessionReflection;
   bool get supportsRecovery => basis == HavenPlanBasis.recentRecovery;
 }

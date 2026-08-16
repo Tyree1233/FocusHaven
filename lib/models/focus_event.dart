@@ -1,5 +1,7 @@
 enum FocusEventOutcome { completed, reset, changedSession, discardedResume }
 
+enum FocusSessionFit { tooMuch, aboutRight, couldDoMore }
+
 /// A bounded, text-free record of how one focus attempt ended.
 ///
 /// Focus events intentionally exclude task names, journal text, mood labels,
@@ -15,6 +17,7 @@ class FocusEvent {
     required this.pauseCount,
     required this.didResume,
     required this.outcome,
+    this.sessionFit,
   });
 
   static const schemaVersion = 1;
@@ -26,11 +29,28 @@ class FocusEvent {
   final int pauseCount;
   final bool didResume;
   final FocusEventOutcome outcome;
+  final FocusSessionFit? sessionFit;
 
   bool get wasCompleted => outcome == FocusEventOutcome.completed;
   bool get canSupportRecovery =>
       outcome == FocusEventOutcome.reset ||
       outcome == FocusEventOutcome.discardedResume;
+
+  bool get hasSessionReflection => sessionFit != null;
+
+  FocusEvent withSessionFit(FocusSessionFit value) {
+    if (!wasCompleted) return this;
+    return FocusEvent(
+      startedAt: startedAt,
+      endedAt: endedAt,
+      plannedDurationSeconds: plannedDurationSeconds,
+      focusedDurationSeconds: focusedDurationSeconds,
+      pauseCount: pauseCount,
+      didResume: didResume,
+      outcome: outcome,
+      sessionFit: value,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'schemaVersion': schemaVersion,
@@ -41,6 +61,7 @@ class FocusEvent {
     'pauseCount': pauseCount,
     'didResume': didResume,
     'outcome': outcome.name,
+    if (sessionFit != null) 'sessionFit': sessionFit!.name,
   };
 
   factory FocusEvent.fromJson(Map<String, dynamic> json) {
@@ -55,6 +76,7 @@ class FocusEvent {
     final pauseCount = json['pauseCount'];
     final didResume = json['didResume'];
     final outcomeValue = json['outcome'];
+    final sessionFitValue = json['sessionFit'];
 
     if (startedAtValue is! String ||
         endedAtValue is! String ||
@@ -62,7 +84,8 @@ class FocusEvent {
         focusedDurationSeconds is! int ||
         pauseCount is! int ||
         didResume is! bool ||
-        outcomeValue is! String) {
+        outcomeValue is! String ||
+        (sessionFitValue != null && sessionFitValue is! String)) {
       throw const FormatException('Invalid focus event shape.');
     }
 
@@ -75,6 +98,15 @@ class FocusEvent {
         break;
       }
     }
+    FocusSessionFit? sessionFit;
+    if (sessionFitValue != null) {
+      for (final value in FocusSessionFit.values) {
+        if (value.name == sessionFitValue) {
+          sessionFit = value;
+          break;
+        }
+      }
+    }
     if (startedAt == null ||
         endedAt == null ||
         endedAt.isBefore(startedAt) ||
@@ -82,7 +114,9 @@ class FocusEvent {
         focusedDurationSeconds < 0 ||
         focusedDurationSeconds > plannedDurationSeconds ||
         pauseCount < 0 ||
-        outcome == null) {
+        outcome == null ||
+        (sessionFitValue != null && sessionFit == null) ||
+        (sessionFit != null && outcome != FocusEventOutcome.completed)) {
       throw const FormatException('Invalid focus event values.');
     }
 
@@ -94,6 +128,7 @@ class FocusEvent {
       pauseCount: pauseCount,
       didResume: didResume,
       outcome: outcome,
+      sessionFit: sessionFit,
     );
   }
 }

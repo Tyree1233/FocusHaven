@@ -43,9 +43,12 @@ class HavenPlanService {
         .toList(growable: false);
 
     final hasRecoveryPattern = _hasRecentRecoveryPattern(recent);
+    final reflectedCompletion = _latestReflectedCompletion(recent);
     final hasPersonalRhythm = completedDurations.length >= _historyThreshold;
     final basis = hasRecoveryPattern
         ? HavenPlanBasis.recentRecovery
+        : reflectedCompletion != null
+        ? HavenPlanBasis.sessionReflection
         : hasPersonalRhythm
         ? HavenPlanBasis.personalRhythm
         : energy == HavenEnergy.low
@@ -54,6 +57,9 @@ class HavenPlanService {
 
     final uncappedTargetMinutes = switch (basis) {
       HavenPlanBasis.recentRecovery => 10,
+      HavenPlanBasis.sessionReflection => _reflectedTarget(
+        reflectedCompletion!,
+      ),
       HavenPlanBasis.personalRhythm => _median(completedDurations),
       HavenPlanBasis.gentleStart => 10,
       HavenPlanBasis.freshStart => switch (energy) {
@@ -87,6 +93,7 @@ class HavenPlanService {
       explanation: _explanation(
         basis: basis,
         energy: energy,
+        sessionFit: reflectedCompletion?.sessionFit,
         wasTimeBound: wasTimeBound,
         wasEnergyBound: wasEnergyBound,
       ),
@@ -100,6 +107,37 @@ class HavenPlanService {
         .where((event) => event.outcome != FocusEventOutcome.changedSession)
         .take(3);
     return meaningful.where((event) => event.canSupportRecovery).length >= 2;
+  }
+
+  static FocusEvent? _latestReflectedCompletion(List<FocusEvent> events) {
+    for (final event in events) {
+      if (event.wasCompleted && event.sessionFit != null) return event;
+    }
+    return null;
+  }
+
+  static int _reflectedTarget(FocusEvent event) {
+    final completedMinutes = (event.focusedDurationSeconds ~/ 60).clamp(1, 90);
+    final focusOptions = _sessionOptions
+        .map((option) => option.focusMinutes)
+        .toList(growable: false);
+    return switch (event.sessionFit!) {
+      FocusSessionFit.tooMuch => focusOptions.lastWhere(
+        (minutes) => minutes < completedMinutes,
+        orElse: () => focusOptions.first,
+      ),
+      FocusSessionFit.aboutRight => focusOptions.reduce(
+        (best, candidate) =>
+            (candidate - completedMinutes).abs() <
+                (best - completedMinutes).abs()
+            ? candidate
+            : best,
+      ),
+      FocusSessionFit.couldDoMore => focusOptions.firstWhere(
+        (minutes) => minutes > completedMinutes,
+        orElse: () => focusOptions.last,
+      ),
+    };
   }
 
   static int _median(List<int> values) {
@@ -156,12 +194,21 @@ class HavenPlanService {
   static String _explanation({
     required HavenPlanBasis basis,
     required HavenEnergy energy,
+    required FocusSessionFit? sessionFit,
     required bool wasTimeBound,
     required bool wasEnergyBound,
   }) {
     final base = switch (basis) {
       HavenPlanBasis.recentRecovery =>
         'A shorter return can lower the pressure after recent interruptions.',
+      HavenPlanBasis.sessionReflection => switch (sessionFit!) {
+        FocusSessionFit.tooMuch =>
+          'You said your last reflected session felt like too much, so this plan steps down gently.',
+        FocusSessionFit.aboutRight =>
+          'You said your last reflected session felt about right, so this plan stays close to that pace.',
+        FocusSessionFit.couldDoMore =>
+          'You said you could have done more, so this plan offers one small step up.',
+      },
       HavenPlanBasis.personalRhythm =>
         'Your recent completed sessions suggest this has been a workable rhythm.',
       HavenPlanBasis.gentleStart =>

@@ -19,6 +19,7 @@ void main() {
     int focusedMinutes = 10,
     int plannedMinutes = 25,
     int ageMinutes = 0,
+    FocusSessionFit? sessionFit,
   }) {
     final endedAt = DateTime.utc(
       2026,
@@ -34,6 +35,7 @@ void main() {
       pauseCount: 0,
       didResume: false,
       outcome: outcome,
+      sessionFit: sessionFit,
     );
   }
 
@@ -158,6 +160,87 @@ void main() {
     expect(plan.usesPersonalHistory, isTrue);
     expect(plan.explanation, contains('recent completed sessions'));
   });
+
+  test('a too-much reflection gently steps the next plan down', () {
+    final plan = service.createPlan(
+      queue: const [firstTask],
+      recentEvents: [
+        event(
+          outcome: FocusEventOutcome.completed,
+          focusedMinutes: 25,
+          plannedMinutes: 25,
+          sessionFit: FocusSessionFit.tooMuch,
+        ),
+      ],
+      energy: HavenEnergy.steady,
+      availableMinutes: 60,
+    );
+
+    expect(plan.focusMinutes, 15);
+    expect(plan.basis, HavenPlanBasis.sessionReflection);
+    expect(plan.usesPersonalHistory, isTrue);
+    expect(plan.usesSessionReflection, isTrue);
+    expect(plan.explanation, contains('steps down gently'));
+  });
+
+  test('about-right and could-do-more reflections adjust one bounded step', () {
+    HavenPlan planFor(FocusSessionFit sessionFit) => service.createPlan(
+      queue: const [firstTask],
+      recentEvents: [
+        event(
+          outcome: FocusEventOutcome.completed,
+          focusedMinutes: 25,
+          plannedMinutes: 25,
+          sessionFit: sessionFit,
+        ),
+      ],
+      energy: HavenEnergy.strong,
+      availableMinutes: 60,
+    );
+
+    final aboutRight = planFor(FocusSessionFit.aboutRight);
+    final couldDoMore = planFor(FocusSessionFit.couldDoMore);
+
+    expect(aboutRight.focusMinutes, 25);
+    expect(aboutRight.explanation, contains('stays close'));
+    expect(couldDoMore.focusMinutes, 45);
+    expect(couldDoMore.explanation, contains('one small step up'));
+  });
+
+  test(
+    'recovery and current energy remain stronger than ambition feedback',
+    () {
+      final reflected = event(
+        outcome: FocusEventOutcome.completed,
+        focusedMinutes: 25,
+        plannedMinutes: 25,
+        ageMinutes: 30,
+        sessionFit: FocusSessionFit.couldDoMore,
+      );
+      final recoveryPlan = service.createPlan(
+        queue: const [firstTask],
+        recentEvents: [
+          event(outcome: FocusEventOutcome.reset),
+          event(outcome: FocusEventOutcome.discardedResume, ageMinutes: 10),
+          reflected,
+        ],
+        energy: HavenEnergy.strong,
+        availableMinutes: 60,
+      );
+      final lowEnergyPlan = service.createPlan(
+        queue: const [firstTask],
+        recentEvents: [reflected],
+        energy: HavenEnergy.low,
+        availableMinutes: 60,
+      );
+
+      expect(recoveryPlan.basis, HavenPlanBasis.recentRecovery);
+      expect(recoveryPlan.focusMinutes, 10);
+      expect(lowEnergyPlan.basis, HavenPlanBasis.sessionReflection);
+      expect(lowEnergyPlan.focusMinutes, 15);
+      expect(lowEnergyPlan.wasEnergyBound, isTrue);
+    },
+  );
 
   test('insufficient history never claims a learned rhythm', () {
     final plan = service.createPlan(

@@ -13,6 +13,13 @@ restart suggestion. The running timer pauses while the user decides, cancelling
 restores the prior session, and accepting the suggestion changes only that one
 attempt rather than overwriting the user's normal focus duration.
 
+After a completed focus session, an optional one-tap reflection lets the user
+mark the session as too much, about right, or capable of a little more. The
+signal is text-free, stored with private focus events, and can gently adjust a
+future Haven Plan. Recovery patterns plus the user's current energy and
+available time always take priority, and skipping the reflection never blocks
+the next break.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
