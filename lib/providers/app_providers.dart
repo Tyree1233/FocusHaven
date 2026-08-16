@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../config/feature_flags.dart';
 import '../models/coaching_message.dart';
+import '../models/focus_event.dart';
 import '../models/focus_session.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
@@ -252,6 +253,14 @@ final timerFocusHistoryProvider = Provider<List<FocusSession>>((ref) {
 
   return ref.read(timerServiceProvider).recentFocusSessions;
 }, name: 'timerFocusHistoryProvider');
+
+/// Text-free focus attempt signals used by future local recovery and rhythm
+/// features. This snapshot changes only when an attempt ends or history clears.
+final timerFocusEventsProvider = Provider<List<FocusEvent>>((ref) {
+  ref.watch(timerServiceProvider.select((timer) => timer.focusEventsRevision));
+
+  return ref.read(timerServiceProvider).recentFocusEvents;
+}, name: 'timerFocusEventsProvider');
 
 /// Parking-lot snapshot that changes only when a thought is captured, edited,
 /// completed, reopened, removed, migrated, or cleared.

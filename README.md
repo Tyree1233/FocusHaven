@@ -93,6 +93,7 @@ with OpenAI's current [API data controls](https://developers.openai.com/api/docs
 - Pause, resume, reset, add-time, and persisted timer recovery
 - Focus queue with editing, completion history, and task restoration
 - Daily goals, streaks, session history, challenges, and milestones
+- Privacy-safe focus events for future recovery and rhythm recommendations
 - Distraction parking for thoughts that can wait until after a session
 - Reflection journal with daily prompts and mood history
 - Guided breathing, configurable reminders, and appearance themes
@@ -190,5 +191,8 @@ store-transition testing; restoring an existing purchase remains available.
 
 FocusHaven can be used without Google sign-in. Optional cloud data can be
 deleted from the account controls, and local data can be removed from the app.
+Focus-event history is bounded and excludes task names, journal text, mood
+labels, and other user-authored content. It stays on the device unless the user
+explicitly includes local FocusHaven data in an optional cloud backup.
 See the [FocusHaven Privacy Policy](https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html)
 for details.

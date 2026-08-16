@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/services/timer_service.dart';
 
 void main() {
@@ -770,4 +771,141 @@ void main() {
     expect(preferences.getString('parkedThoughts'), isNotNull);
     expect(preferences.getStringList('distractions'), isNull);
   });
+
+  test('reset records a text-free focus attempt and its return', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    timer.setCustomDuration(1, 0);
+    timer.setFocusTask('Private presentation details');
+
+    timer.start();
+    timer.pause();
+    timer.start();
+    timer.reset();
+
+    final event = timer.recentFocusEvents.single;
+    expect(event.outcome, FocusEventOutcome.reset);
+    expect(event.plannedDurationSeconds, 60);
+    expect(event.focusedDurationSeconds, 0);
+    expect(event.pauseCount, 1);
+    expect(event.didResume, isTrue);
+    final backupEvents = timer.cloudBackup['focusEvents'] as List;
+    expect(backupEvents, hasLength(1));
+    expect(backupEvents.single.toString(), isNot(contains('presentation')));
+    expect(backupEvents.single.toString(), isNot(contains('task')));
+  });
+
+  test(
+    'completed focus restores and closes an active private attempt',
+    () async {
+      final startedAt = DateTime.now().toUtc().subtract(
+        const Duration(minutes: 1),
+      );
+      SharedPreferences.setMockInitialValues({
+        'focusSeconds': 60,
+        'secondsRemaining': 1,
+        'totalSessionSeconds': 60,
+        'sessionType': SessionType.focus.index,
+        'timerEndsAt': DateTime.now()
+            .subtract(const Duration(seconds: 2))
+            .millisecondsSinceEpoch,
+        'activeFocusAttempt': jsonEncode({
+          'startedAt': startedAt.toIso8601String(),
+          'plannedDurationSeconds': 60,
+          'pauseCount': 1,
+          'didResume': true,
+        }),
+      });
+
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+
+      final event = timer.recentFocusEvents.single;
+      expect(event.outcome, FocusEventOutcome.completed);
+      expect(event.focusedDurationSeconds, 60);
+      expect(event.pauseCount, 1);
+      expect(event.didResume, isTrue);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.getString('activeFocusAttempt'), isNull);
+    },
+  );
+
+  test(
+    'repairs damaged saved focus events without losing valid signals',
+    () async {
+      final valid = FocusEvent(
+        startedAt: DateTime.utc(2026, 8, 16, 12),
+        endedAt: DateTime.utc(2026, 8, 16, 12, 10),
+        plannedDurationSeconds: 15 * 60,
+        focusedDurationSeconds: 10 * 60,
+        pauseCount: 0,
+        didResume: false,
+        outcome: FocusEventOutcome.reset,
+      ).toJson();
+      SharedPreferences.setMockInitialValues({
+        'focusEvents': jsonEncode([
+          {...valid, 'privateTask': 'Do not retain this'},
+          {...valid, 'outcome': 'unknown'},
+          'not an event',
+        ]),
+      });
+
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+
+      expect(timer.recentFocusEvents, hasLength(1));
+      final preferences = await SharedPreferences.getInstance();
+      final repaired =
+          jsonDecode(preferences.getString('focusEvents')!) as List;
+      expect(repaired, hasLength(1));
+      expect(repaired.single.toString(), isNot(contains('privateTask')));
+      expect(repaired.single.toString(), isNot(contains('retain')));
+    },
+  );
+
+  test('older cloud backups remain valid without focus events', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    final restored = timer.restoreCloudBackup({
+      'focusSeconds': 25 * 60,
+      'shortBreakSeconds': 5 * 60,
+      'longBreakSeconds': 15 * 60,
+      'completedFocusSessions': 0,
+      'focusTask': '',
+      'dailyGoalMinutes': 60,
+      'focusHistory': <Object?>[],
+    });
+
+    expect(restored, isTrue);
+    expect(timer.recentFocusEvents, isEmpty);
+  });
+
+  test(
+    'malformed cloud focus events fail without changing local data',
+    () async {
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+      timer.setCustomDuration(30, 0);
+      final revision = timer.focusEventsRevision;
+
+      final restored = timer.restoreCloudBackup({
+        'focusSeconds': 25 * 60,
+        'shortBreakSeconds': 5 * 60,
+        'longBreakSeconds': 15 * 60,
+        'completedFocusSessions': 0,
+        'focusTask': '',
+        'dailyGoalMinutes': 60,
+        'focusHistory': <Object?>[],
+        'focusEvents': [
+          {'schemaVersion': 1, 'outcome': 'completed'},
+        ],
+      });
+
+      expect(restored, isFalse);
+      expect(timer.totalSessionSeconds, 30 * 60);
+      expect(timer.recentFocusEvents, isEmpty);
+      expect(timer.focusEventsRevision, revision);
+    },
+  );
 }

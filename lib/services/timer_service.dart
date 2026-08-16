@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/focus_event.dart';
 import '../models/focus_session.dart';
 import '../models/parked_thought.dart';
 import 'notification_service.dart';
@@ -28,6 +29,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static const _timerEndsAtKey = 'timerEndsAt';
   static const _pendingResumeKey = 'hasPendingTimerResume';
   static const _parkedThoughtsKey = 'parkedThoughts';
+  static const _focusEventsKey = 'focusEvents';
+  static const _activeFocusAttemptKey = 'activeFocusAttempt';
   static const _storageKeys = <String>{
     'focusSeconds',
     'shortBreakSeconds',
@@ -41,6 +44,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _timerEndsAtKey,
     _pendingResumeKey,
     'focusHistory',
+    _focusEventsKey,
+    _activeFocusAttemptKey,
     'distractions',
     _parkedThoughtsKey,
   };
@@ -50,6 +55,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static const _defaultDailyGoalMinutes = 60;
   static const _dailyChallengeTarget = 3;
   static const _maxSessionSeconds = 24 * 60 * 60;
+  static const _maxFocusEvents = 500;
+  static const _maxPauseCount = 10000;
 
   Timer? _ticker;
   int _focusSeconds = _defaultFocusSeconds;
@@ -59,8 +66,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   int _totalSessionSeconds = _defaultFocusSeconds;
   int _completedFocusSessions = 0;
   int _focusHistoryRevision = 0;
+  int _focusEventsRevision = 0;
   int _parkedThoughtsRevision = 0;
   List<FocusSession> _focusHistory = [];
+  List<FocusEvent> _focusEvents = [];
   List<ParkedThought> _parkedThoughts = [];
   String _focusTask = '';
   int _dailyGoalMinutes = _defaultDailyGoalMinutes;
@@ -70,6 +79,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   bool _hasLoaded = false;
   bool _isDisposed = false;
   DateTime? _endsAt;
+  DateTime? _activeFocusStartedAt;
+  int? _activeFocusPlannedSeconds;
+  int _activeFocusPauseCount = 0;
+  bool _activeFocusDidResume = false;
   SessionType _sessionType = SessionType.focus;
   final NotificationService? _notificationService;
   late final Future<void> _initialization;
@@ -78,6 +91,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   int get totalSessionSeconds => _totalSessionSeconds;
   int get completedFocusSessions => _completedFocusSessions;
   int get focusHistoryRevision => _focusHistoryRevision;
+  int get focusEventsRevision => _focusEventsRevision;
   int get parkedThoughtsRevision => _parkedThoughtsRevision;
   String get focusTask => _focusTask;
   int get dailyGoalMinutes => _dailyGoalMinutes;
@@ -89,9 +103,12 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     'focusTask': _focusTask,
     'dailyGoalMinutes': _dailyGoalMinutes,
     'focusHistory': _focusHistory.map((session) => session.toJson()).toList(),
+    _focusEventsKey: _focusEvents.map((event) => event.toJson()).toList(),
   };
   List<FocusSession> get recentFocusSessions =>
       List.unmodifiable(_focusHistory.reversed);
+  List<FocusEvent> get recentFocusEvents =>
+      List.unmodifiable(_focusEvents.reversed);
   List<ParkedThought> get parkedThoughts => List.unmodifiable(
     _parkedThoughts.where((thought) => !thought.isCompleted).toList().reversed,
   );
@@ -216,6 +233,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void start() {
     if (_isRunning || _isComplete || _secondsRemaining == 0) return;
+    _beginOrResumeFocusAttempt();
     _hasPendingResume = false;
     _isRunning = true;
     _endsAt = DateTime.now().add(Duration(seconds: _secondsRemaining));
@@ -272,6 +290,11 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void pause() {
     if (!_isRunning) return;
+    if (_sessionType == SessionType.focus &&
+        _activeFocusStartedAt != null &&
+        _activeFocusPauseCount < _maxPauseCount) {
+      _activeFocusPauseCount++;
+    }
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
@@ -281,17 +304,21 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _saveToPrefs();
   }
 
-  void reset() {
+  void reset() => _reset(FocusEventOutcome.reset);
+
+  void _reset(FocusEventOutcome outcome) {
     final sessionSeconds = _durationFor(_sessionType);
     if (_ticker == null &&
         !_isRunning &&
         !_isComplete &&
         !_hasPendingResume &&
         _endsAt == null &&
+        _activeFocusStartedAt == null &&
         _secondsRemaining == sessionSeconds &&
         _totalSessionSeconds == sessionSeconds) {
       return;
     }
+    _recordFocusEvent(outcome);
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
@@ -306,6 +333,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void selectSession(SessionType type) {
     if (_sessionType == type) return;
+    _recordFocusEvent(FocusEventOutcome.changedSession);
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
@@ -340,7 +368,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   void discardPendingSession() {
     if (!_hasPendingResume) return;
-    reset();
+    _reset(FocusEventOutcome.discardedResume);
   }
 
   void setCustomDuration(int minutes, int seconds) {
@@ -480,11 +508,16 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void clearFocusHistory() {
-    final hadHistory = _focusHistory.isNotEmpty || _completedFocusSessions != 0;
+    final hadHistory =
+        _focusHistory.isNotEmpty ||
+        _focusEvents.isNotEmpty ||
+        _completedFocusSessions != 0;
     if (!hadHistory) return;
     _focusHistory = [];
+    _focusEvents = [];
     _completedFocusSessions = 0;
     _focusHistoryRevision++;
+    _focusEventsRevision++;
     notifyListeners();
     _saveToPrefs();
   }
@@ -493,7 +526,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     await initialized;
     if (_isDisposed) return;
 
-    final hadHistory = _focusHistory.isNotEmpty || _completedFocusSessions != 0;
+    final hadHistory =
+        _focusHistory.isNotEmpty ||
+        _focusEvents.isNotEmpty ||
+        _completedFocusSessions != 0;
     _ticker?.cancel();
     _ticker = null;
     _focusSeconds = _defaultFocusSeconds;
@@ -503,8 +539,10 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _totalSessionSeconds = _defaultFocusSeconds;
     _completedFocusSessions = 0;
     _focusHistory = [];
+    _focusEvents = [];
     if (hadHistory) {
       _focusHistoryRevision++;
+      _focusEventsRevision++;
     }
     if (_parkedThoughts.isNotEmpty) {
       _parkedThoughts = [];
@@ -516,6 +554,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _isComplete = false;
     _hasPendingResume = false;
     _endsAt = null;
+    _clearActiveFocusAttempt();
     _sessionType = SessionType.focus;
 
     final prefs = await SharedPreferences.getInstance();
@@ -532,6 +571,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       prefs.remove(_timerEndsAtKey),
       prefs.remove(_pendingResumeKey),
       prefs.remove('focusHistory'),
+      prefs.remove(_focusEventsKey),
+      prefs.remove(_activeFocusAttemptKey),
       prefs.remove('distractions'),
       prefs.remove(_parkedThoughtsKey),
     ]);
@@ -546,6 +587,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       final longBreakSeconds = backup['longBreakSeconds'];
       final completedFocusSessions = backup['completedFocusSessions'];
       final history = backup['focusHistory'];
+      final events = backup[_focusEventsKey];
       final focusTask = backup['focusTask'];
       final dailyGoalMinutes = backup['dailyGoalMinutes'];
 
@@ -571,6 +613,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
       final restoredHistory = _parseCloudFocusHistory(history);
       if (restoredHistory == null) return false;
+      final restoredEvents = _parseCloudFocusEvents(events);
+      if (restoredEvents == null) return false;
 
       _ticker?.cancel();
       _ticker = null;
@@ -578,12 +622,15 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       _isComplete = false;
       _hasPendingResume = false;
       _endsAt = null;
+      _clearActiveFocusAttempt();
       _focusSeconds = focusSeconds;
       _shortBreakSeconds = shortBreakSeconds;
       _longBreakSeconds = longBreakSeconds;
       _completedFocusSessions = completedFocusSessions;
       _focusHistory = restoredHistory;
       _focusHistoryRevision++;
+      _focusEvents = restoredEvents;
+      _focusEventsRevision++;
       _focusTask = _cleanFocusTask(focusTask ?? '');
       if (dailyGoalMinutes != null) {
         _dailyGoalMinutes = dailyGoalMinutes;
@@ -634,7 +681,82 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     return sessions;
   }
 
+  List<FocusEvent>? _parseCloudFocusEvents(Object? value) {
+    if (value == null) return [];
+    if (value is! List || value.length > _maxFocusEvents) return null;
+
+    final events = <FocusEvent>[];
+    for (final record in value) {
+      if (record is! Map) return null;
+      try {
+        final event = FocusEvent.fromJson(Map<String, dynamic>.from(record));
+        if (event.plannedDurationSeconds > _maxSessionSeconds ||
+            event.pauseCount > _maxPauseCount) {
+          return null;
+        }
+        events.add(event);
+      } on FormatException {
+        return null;
+      } on TypeError {
+        return null;
+      }
+    }
+    return events;
+  }
+
+  void _beginOrResumeFocusAttempt() {
+    if (_sessionType != SessionType.focus) return;
+    if (_activeFocusStartedAt == null) {
+      _activeFocusStartedAt = DateTime.now().toUtc();
+      _activeFocusPlannedSeconds = _totalSessionSeconds;
+      _activeFocusPauseCount = 0;
+      _activeFocusDidResume = false;
+      return;
+    }
+    _activeFocusDidResume = true;
+  }
+
+  void _recordFocusEvent(FocusEventOutcome outcome, {DateTime? endedAt}) {
+    if (_sessionType != SessionType.focus) return;
+    final completedAt = (endedAt ?? DateTime.now()).toUtc();
+    var startedAt = _activeFocusStartedAt;
+    var plannedSeconds = _activeFocusPlannedSeconds;
+    if (startedAt == null || plannedSeconds == null) {
+      if (outcome != FocusEventOutcome.completed) return;
+      plannedSeconds = _totalSessionSeconds;
+      startedAt = completedAt.subtract(Duration(seconds: plannedSeconds));
+    }
+
+    final focusedSeconds = outcome == FocusEventOutcome.completed
+        ? plannedSeconds
+        : (plannedSeconds - _secondsRemaining).clamp(0, plannedSeconds).toInt();
+    if (_focusEvents.length >= _maxFocusEvents) {
+      _focusEvents.removeAt(0);
+    }
+    _focusEvents.add(
+      FocusEvent(
+        startedAt: startedAt,
+        endedAt: completedAt.isBefore(startedAt) ? startedAt : completedAt,
+        plannedDurationSeconds: plannedSeconds,
+        focusedDurationSeconds: focusedSeconds,
+        pauseCount: _activeFocusPauseCount,
+        didResume: _activeFocusDidResume,
+        outcome: outcome,
+      ),
+    );
+    _focusEventsRevision++;
+    _clearActiveFocusAttempt();
+  }
+
+  void _clearActiveFocusAttempt() {
+    _activeFocusStartedAt = null;
+    _activeFocusPlannedSeconds = null;
+    _activeFocusPauseCount = 0;
+    _activeFocusDidResume = false;
+  }
+
   void _finishSession() {
+    final completedAt = DateTime.now();
     _ticker?.cancel();
     _ticker = null;
     _isRunning = false;
@@ -649,10 +771,11 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
           Future<void>.value(),
     );
     if (_sessionType == SessionType.focus) {
+      _recordFocusEvent(FocusEventOutcome.completed, endedAt: completedAt);
       _completedFocusSessions++;
       _focusHistory.add(
         FocusSession(
-          completedAt: DateTime.now(),
+          completedAt: completedAt,
           durationSeconds: _totalSessionSeconds,
           focusTask: _focusTask.isEmpty ? null : _focusTask,
         ),
@@ -698,6 +821,13 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         'focusHistory',
         jsonEncode(_focusHistory.map((session) => session.toJson()).toList()),
       ),
+      prefs.setString(
+        _focusEventsKey,
+        jsonEncode(_focusEvents.map((event) => event.toJson()).toList()),
+      ),
+      _activeFocusAttemptJson == null
+          ? prefs.remove(_activeFocusAttemptKey)
+          : prefs.setString(_activeFocusAttemptKey, _activeFocusAttemptJson!),
       prefs.setString(
         _parkedThoughtsKey,
         jsonEncode(_parkedThoughts.map((thought) => thought.toJson()).toList()),
@@ -785,7 +915,24 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     if (_focusHistory.isNotEmpty) {
       _focusHistoryRevision++;
     }
+    final eventsJson = _storedString(prefs, _focusEventsKey);
+    if (eventsJson != null) {
+      _focusEvents = _decodeFocusEvents(eventsJson);
+      final normalizedEvents = jsonEncode(
+        _focusEvents.map((event) => event.toJson()).toList(),
+      );
+      if (normalizedEvents != eventsJson) {
+        await prefs.setString(_focusEventsKey, normalizedEvents);
+      }
+    }
+    if (_focusEvents.isNotEmpty) {
+      _focusEventsRevision++;
+    }
+    _loadActiveFocusAttempt(_storedString(prefs, _activeFocusAttemptKey));
     _sessionType = _sessionTypeFromIndex(_storedInt(prefs, 'sessionType'));
+    if (_sessionType != SessionType.focus) {
+      _clearActiveFocusAttempt();
+    }
     _totalSessionSeconds = _clampStoredInt(
       _storedInt(prefs, 'totalSessionSeconds'),
       _durationFor(_sessionType),
@@ -893,12 +1040,89 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
+  static List<FocusEvent> _decodeFocusEvents(String source) {
+    try {
+      final decoded = jsonDecode(source);
+      if (decoded is! List) return [];
+
+      final events = <FocusEvent>[];
+      for (final value in decoded.whereType<Map>()) {
+        try {
+          final event = FocusEvent.fromJson(Map<String, dynamic>.from(value));
+          if (event.plannedDurationSeconds <= _maxSessionSeconds &&
+              event.pauseCount <= _maxPauseCount) {
+            events.add(event);
+          }
+        } on FormatException {
+          // Ignore one damaged record without discarding valid local signals.
+        } on TypeError {
+          // Ignore values with an unexpected persisted shape.
+        }
+      }
+      return events.length <= _maxFocusEvents
+          ? events
+          : events.sublist(events.length - _maxFocusEvents);
+    } on FormatException {
+      return [];
+    }
+  }
+
+  void _loadActiveFocusAttempt(String? source) {
+    if (source == null) return;
+    try {
+      final decoded = jsonDecode(source);
+      if (decoded is! Map) return;
+      final json = Map<String, dynamic>.from(decoded);
+      final startedAtValue = json['startedAt'];
+      final plannedDurationSeconds = json['plannedDurationSeconds'];
+      final pauseCount = json['pauseCount'];
+      final didResume = json['didResume'];
+      if (startedAtValue is! String ||
+          plannedDurationSeconds is! int ||
+          pauseCount is! int ||
+          didResume is! bool) {
+        return;
+      }
+      final startedAt = DateTime.tryParse(startedAtValue);
+      if (startedAt == null ||
+          plannedDurationSeconds < 1 ||
+          plannedDurationSeconds > _maxSessionSeconds ||
+          pauseCount < 0 ||
+          pauseCount > _maxPauseCount) {
+        return;
+      }
+      _activeFocusStartedAt = startedAt.toUtc();
+      _activeFocusPlannedSeconds = plannedDurationSeconds;
+      _activeFocusPauseCount = pauseCount;
+      _activeFocusDidResume = didResume;
+    } on FormatException {
+      // A damaged active attempt is discarded without affecting history.
+    } on TypeError {
+      // Ignore values with an unexpected persisted shape.
+    }
+  }
+
+  String? get _activeFocusAttemptJson {
+    final startedAt = _activeFocusStartedAt;
+    final plannedDurationSeconds = _activeFocusPlannedSeconds;
+    if (startedAt == null || plannedDurationSeconds == null) return null;
+    return jsonEncode({
+      'startedAt': startedAt.toUtc().toIso8601String(),
+      'plannedDurationSeconds': plannedDurationSeconds,
+      'pauseCount': _activeFocusPauseCount,
+      'didResume': _activeFocusDidResume,
+    });
+  }
+
   bool _timerStorageNeedsRepair(SharedPreferences preferences) {
     final normalizedHistory = jsonEncode(
       _focusHistory.map((session) => session.toJson()).toList(),
     );
     final normalizedParkedThoughts = jsonEncode(
       _parkedThoughts.map((thought) => thought.toJson()).toList(),
+    );
+    final normalizedEvents = jsonEncode(
+      _focusEvents.map((event) => event.toJson()).toList(),
     );
     return preferences.get('focusSeconds') != _focusSeconds ||
         preferences.get('shortBreakSeconds') != _shortBreakSeconds ||
@@ -912,6 +1136,8 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         preferences.get(_timerEndsAtKey) != _endsAt?.millisecondsSinceEpoch ||
         preferences.get(_pendingResumeKey) != _hasPendingResume ||
         preferences.get('focusHistory') != normalizedHistory ||
+        preferences.get(_focusEventsKey) != normalizedEvents ||
+        preferences.get(_activeFocusAttemptKey) != _activeFocusAttemptJson ||
         preferences.get(_parkedThoughtsKey) != normalizedParkedThoughts ||
         preferences.containsKey('distractions');
   }
