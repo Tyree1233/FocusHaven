@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/models/coaching_message.dart';
+import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/coaching_service.dart';
@@ -15,6 +16,7 @@ import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
+import 'package:focushaven/widgets/smart_reset_sheet.dart';
 
 class _CountingNavigatorObserver extends NavigatorObserver {
   int pushCount = 0;
@@ -196,6 +198,93 @@ void main() {
 
     expect(timer.canStartHavenPlan, isFalse);
     expect(find.byKey(const ValueKey('open-haven-plan')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Smart Reset starts a smaller one-time recovery session', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    timer.setFocusTask('Keep the recovery task');
+    timer.start();
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+    final reset = find.byTooltip('Reset timer');
+    await tester.ensureVisible(reset);
+    await tester.pumpAndSettle();
+    await tester.tap(reset);
+    await tester.pumpAndSettle();
+
+    expect(timer.isRunning, isFalse);
+    expect(find.byType(SmartResetSheet), findsOneWidget);
+    expect(find.text('This session isn’t a failure'), findsOneWidget);
+
+    final restart = find.byKey(const ValueKey('smart-reset-restart'));
+    await tester.ensureVisible(restart);
+    await tester.pumpAndSettle();
+    await tester.tap(restart);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SmartResetSheet), findsNothing);
+    expect(timer.isRunning, isTrue);
+    expect(timer.totalSessionSeconds, 10 * 60);
+    expect(timer.focusTask, 'Keep the recovery task');
+    expect(timer.recentFocusEvents.single.outcome, FocusEventOutcome.reset);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keeping a running session resumes it after Smart Reset', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    timer.start();
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+    final reset = find.byTooltip('Reset timer');
+    await tester.ensureVisible(reset);
+    await tester.pumpAndSettle();
+    await tester.tap(reset);
+    await tester.pumpAndSettle();
+
+    expect(timer.isRunning, isFalse);
+    final keep = find.byKey(const ValueKey('smart-reset-keep'));
+    await tester.ensureVisible(keep);
+    await tester.pumpAndSettle();
+    await tester.tap(keep);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SmartResetSheet), findsNothing);
+    expect(timer.isRunning, isTrue);
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(timer.recentFocusEvents, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('plain reset remains available from the recovery sheet', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    timer.start();
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+    final reset = find.byTooltip('Reset timer');
+    await tester.ensureVisible(reset);
+    await tester.pumpAndSettle();
+    await tester.tap(reset);
+    await tester.pumpAndSettle();
+    final plainReset = find.byKey(const ValueKey('smart-reset-plain-reset'));
+    await tester.ensureVisible(plainReset);
+    await tester.pumpAndSettle();
+    await tester.tap(plainReset);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SmartResetSheet), findsNothing);
+    expect(timer.isRunning, isFalse);
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(timer.recentFocusEvents.single.outcome, FocusEventOutcome.reset);
     expect(tester.takeException(), isNull);
   });
 

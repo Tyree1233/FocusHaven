@@ -215,6 +215,18 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   bool get isRunning => _isRunning;
   bool get isComplete => _isComplete;
   bool get hasPendingResume => _hasPendingResume;
+  bool get canOfferSmartReset =>
+      _sessionType == SessionType.focus &&
+      !_isComplete &&
+      !_hasPendingResume &&
+      _activeFocusStartedAt != null &&
+      (_activeFocusPlannedSeconds ?? 0) > 1;
+  int get activeFocusPlannedSeconds =>
+      _activeFocusPlannedSeconds ?? _totalSessionSeconds;
+  int get activeFocusFocusedSeconds =>
+      (activeFocusPlannedSeconds - _secondsRemaining)
+          .clamp(0, activeFocusPlannedSeconds)
+          .toInt();
   bool get canStartHavenPlan =>
       _sessionType == SessionType.focus &&
       !_isRunning &&
@@ -311,6 +323,23 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void reset() => _reset(FocusEventOutcome.reset);
+
+  void startSmartReset(int restartDurationSeconds) {
+    if (!canOfferSmartReset) return;
+    final boundedDuration = restartDurationSeconds
+        .clamp(1, activeFocusPlannedSeconds - 1)
+        .toInt();
+    _recordFocusEvent(FocusEventOutcome.reset);
+    _ticker?.cancel();
+    _ticker = null;
+    _isRunning = false;
+    _isComplete = false;
+    _hasPendingResume = false;
+    _endsAt = null;
+    _secondsRemaining = boundedDuration;
+    _totalSessionSeconds = boundedDuration;
+    start();
+  }
 
   void _reset(FocusEventOutcome outcome) {
     final sessionSeconds = _durationFor(_sessionType);

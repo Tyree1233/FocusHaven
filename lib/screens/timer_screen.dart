@@ -31,6 +31,7 @@ import '../widgets/haven_plan_sheet.dart';
 import '../widgets/journal_entry_dialog.dart';
 import '../widgets/pro_sheet.dart';
 import '../widgets/reflection_journal_sheet.dart';
+import '../widgets/smart_reset_sheet.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/text_entry_dialog.dart';
 import '../widgets/timer_countdown.dart';
@@ -185,6 +186,53 @@ class TimerScreen extends riverpod.ConsumerWidget {
     );
     if (duration != null && duration.inSeconds > 0) {
       timer.setCustomDuration(duration.inMinutes, duration.inSeconds % 60);
+    }
+  }
+
+  Future<void> _resetTimer(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+    TimerService timer,
+  ) async {
+    if (!timer.canOfferSmartReset) {
+      timer.reset();
+      return;
+    }
+    if (!_canOpenOverlay(context)) return;
+
+    final wasRunning = timer.isRunning;
+    if (wasRunning) timer.pause();
+    if (!timer.canOfferSmartReset) return;
+
+    final plan = ref
+        .read(smartResetServiceProvider)
+        .createPlan(
+          plannedDurationSeconds: timer.activeFocusPlannedSeconds,
+          focusedDurationSeconds: timer.activeFocusFocusedSeconds,
+          recentEvents: ref.read(timerFocusEventsProvider),
+        );
+    final choice = await showModalBottomSheet<SmartResetChoice>(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) => SmartResetSheet(plan: plan),
+    );
+    if (!context.mounted || !timer.canOfferSmartReset) return;
+
+    switch (choice) {
+      case SmartResetChoice.restart:
+        timer.startSmartReset(plan.restartDurationSeconds);
+        break;
+      case SmartResetChoice.reset:
+        timer.reset();
+        break;
+      case SmartResetChoice.keep:
+      case null:
+        if (wasRunning) timer.start();
+        break;
     }
   }
 
@@ -983,7 +1031,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             IconButton.outlined(
-                              onPressed: timer.reset,
+                              onPressed: () => _resetTimer(context, ref, timer),
                               tooltip: 'Reset timer',
                               icon: const Icon(Icons.replay),
                             ),

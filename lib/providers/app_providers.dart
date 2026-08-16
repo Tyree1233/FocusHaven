@@ -21,6 +21,7 @@ import '../services/journal_service.dart';
 import '../services/notification_service.dart';
 import '../services/remote_coaching_responder.dart';
 import '../services/reminder_service.dart';
+import '../services/smart_reset_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
 
@@ -156,6 +157,11 @@ final focusQueueServiceProvider = ChangeNotifierProvider<FocusQueueService>(
 final havenPlanServiceProvider = Provider<HavenPlanService>(
   (ref) => const HavenPlanService(),
   name: 'havenPlanServiceProvider',
+);
+
+final smartResetServiceProvider = Provider<SmartResetService>(
+  (ref) => const SmartResetService(),
+  name: 'smartResetServiceProvider',
 );
 
 final journalServiceProvider = ChangeNotifierProvider<JournalService>(

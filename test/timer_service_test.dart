@@ -930,4 +930,46 @@ void main() {
     timer.reset();
     expect(timer.canStartHavenPlan, isTrue);
   });
+
+  test(
+    'Smart Reset records the attempt and starts one shorter session',
+    () async {
+      final timer = await createTimer();
+      addTearDown(timer.dispose);
+      timer.setFocusTask('Preserve this private intention');
+      timer.start();
+      timer.pause();
+
+      expect(timer.canOfferSmartReset, isTrue);
+      expect(timer.activeFocusPlannedSeconds, 25 * 60);
+
+      timer.startSmartReset(10 * 60);
+
+      expect(timer.isRunning, isTrue);
+      expect(timer.totalSessionSeconds, 10 * 60);
+      expect(timer.focusTask, 'Preserve this private intention');
+      expect(timer.recentFocusEvents, hasLength(1));
+      expect(timer.recentFocusEvents.single.outcome, FocusEventOutcome.reset);
+
+      timer.reset();
+      expect(timer.isRunning, isFalse);
+      expect(timer.totalSessionSeconds, 25 * 60);
+    },
+  );
+
+  test('Smart Reset cannot lengthen or replace an inactive session', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    timer.startSmartReset(60 * 60);
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(timer.recentFocusEvents, isEmpty);
+
+    timer.start();
+    timer.pause();
+    timer.startSmartReset(60 * 60);
+
+    expect(timer.totalSessionSeconds, 25 * 60 - 1);
+    expect(timer.isRunning, isTrue);
+  });
 }

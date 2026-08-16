@@ -8,6 +8,11 @@ time, focus queue, and text-free local focus events into a transparent session
 preview. Plans are created on-device, are never persisted by themselves, and
 cannot start a timer until the user explicitly accepts the recommendation.
 
+Smart Reset responds to an interrupted focus attempt with a smaller, private
+restart suggestion. The running timer pauses while the user decides, cancelling
+restores the prior session, and accepting the suggestion changes only that one
+attempt rather than overwriting the user's normal focus duration.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
