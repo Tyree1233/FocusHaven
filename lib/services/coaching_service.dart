@@ -233,6 +233,14 @@ class LocalCoachingResponder implements CoachingResponder {
       return _energyReply(context);
     }
     if (_containsAny(normalized, const [
+      'need a break',
+      'take a break',
+      'pause for a bit',
+      'pause for a while',
+    ])) {
+      return _breakReply(context);
+    }
+    if (_containsAny(normalized, const [
       "i'm back",
       'i am back',
       'back from my break',
@@ -565,6 +573,22 @@ class LocalCoachingResponder implements CoachingResponder {
     return 'Low energy deserves a smaller plan, not harsher self-talk. Try a '
         'short break first. When you return, give “${_currentTask(context)}” '
         'one ten-minute round and reassess honestly after that.';
+  }
+
+  static String _breakReply(CoachingContext context) {
+    if (context.dailyGoalMinutes > 0 &&
+        context.todayFocusMinutes >= context.dailyGoalMinutes) {
+      return 'Yes—take the break. You have already met today’s focus goal, so '
+          'you do not need to promise another round before you rest. End the '
+          'session intentionally and let recovery count.';
+    }
+    final timerNote = context.isTimerRunning
+        ? ' Pause the timer so the break feels real.'
+        : '';
+    return 'Yes—take a real five-minute break.$timerNote Leave “${_currentTask(context)}” '
+        'open to the exact place you stopped, move your body, and get water if '
+        'you need it. When you return, say “I’m back,” and we’ll choose only '
+        'the next visible action.';
   }
 
   static String _returnReply(

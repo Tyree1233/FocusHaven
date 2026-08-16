@@ -33,6 +33,47 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   bool _isManagingHistory = false;
   int _lastConversationRevision = -1;
 
+  static List<String> _quickRepliesFor(List<CoachingMessage> messages) {
+    if (messages.isEmpty || messages.last.role != CoachingMessageRole.coach) {
+      return const [];
+    }
+    CoachingMessage? latestUserMessage;
+    for (final message in messages.reversed) {
+      if (message.role == CoachingMessageRole.user) {
+        latestUserMessage = message;
+        break;
+      }
+    }
+    if (latestUserMessage == null ||
+        LocalCoachingResponder.isSafetyConcern(latestUserMessage.text)) {
+      return const [];
+    }
+
+    final coachReply = messages.last.text.toLowerCase();
+    if (coachReply.contains('take a real five-minute break') ||
+        coachReply.contains('let recovery count')) {
+      return const ['I’m back after a break'];
+    }
+    if (coachReply.contains('listen without trying to fix')) {
+      return const ['What should I do next?', 'Hold me accountable'];
+    }
+    if (coachReply.startsWith('direct version')) {
+      return const [
+        'I did the first step',
+        'I’m still stuck',
+        'I need a break',
+      ];
+    }
+    if (coachReply.startsWith('welcome back')) {
+      return const ['I did the first step', 'I’m still stuck'];
+    }
+    if (coachReply.startsWith('that counts') ||
+        coachReply.startsWith('that is real progress')) {
+      return const ['What should I do next?', 'I need a break'];
+    }
+    return const ['Break it down', 'I’m still stuck', 'Please just listen'];
+  }
+
   @override
   void initState() {
     super.initState();
@@ -146,6 +187,9 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     final isBusy =
         coachingState.isResponding || _isSubmitting || _isManagingHistory;
     final canSend = !isBusy && _controller.text.trim().isNotEmpty;
+    final quickReplies = !isBusy && coachingState.errorMessage == null
+        ? _quickRepliesFor(coachingState.messages)
+        : const <String>[];
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return SafeArea(
@@ -240,6 +284,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                   starterPrompts: _starterPrompts,
                   primaryColor: primaryColor,
                   scrollController: _scrollController,
+                  quickReplies: quickReplies,
                   promptsEnabled: !isBusy,
                   onPromptSelected: _send,
                 ),
@@ -328,6 +373,7 @@ class _ConversationBody extends StatelessWidget {
     required this.starterPrompts,
     required this.primaryColor,
     required this.scrollController,
+    required this.quickReplies,
     required this.promptsEnabled,
     required this.onPromptSelected,
   });
@@ -337,6 +383,7 @@ class _ConversationBody extends StatelessWidget {
   final List<String> starterPrompts;
   final Color primaryColor;
   final ScrollController scrollController;
+  final List<String> quickReplies;
   final bool promptsEnabled;
   final ValueChanged<String> onPromptSelected;
 
@@ -378,7 +425,9 @@ class _ConversationBody extends StatelessWidget {
       );
     }
 
-    final itemCount = messages.length + (isResponding ? 1 : 0);
+    final hasQuickReplies = !isResponding && quickReplies.isNotEmpty;
+    final hasTrailingItem = isResponding || hasQuickReplies;
+    final itemCount = messages.length + (hasTrailingItem ? 1 : 0);
     return ListView.separated(
       key: const ValueKey<String>('coach-conversation-list'),
       controller: scrollController,
@@ -387,13 +436,57 @@ class _ConversationBody extends StatelessWidget {
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         if (index == messages.length) {
-          return _ThinkingBubble(primaryColor: primaryColor);
+          if (isResponding) {
+            return _ThinkingBubble(primaryColor: primaryColor);
+          }
+          return _QuickReplyBar(
+            replies: quickReplies,
+            enabled: promptsEnabled,
+            onSelected: onPromptSelected,
+          );
         }
         return _MessageBubble(
           message: messages[index],
           primaryColor: primaryColor,
         );
       },
+    );
+  }
+}
+
+class _QuickReplyBar extends StatelessWidget {
+  const _QuickReplyBar({
+    required this.replies,
+    required this.enabled,
+    required this.onSelected,
+  });
+
+  final List<String> replies;
+  final bool enabled;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      label: 'Suggested follow-up replies',
+      child: SingleChildScrollView(
+        key: const ValueKey<String>('coach-quick-replies'),
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final reply in replies)
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: ActionChip(
+                  key: ValueKey<String>('coach-quick-reply-$reply'),
+                  label: Text(reply),
+                  onPressed: enabled ? () => onSelected(reply) : null,
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

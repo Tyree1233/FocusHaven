@@ -136,6 +136,107 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('contextual quick replies continue through the send path', (
+    tester,
+  ) async {
+    final responder = _RecordingResponder('Choose one clear next action.');
+    final coach = await _createCoach(responder: responder);
+
+    await tester.pumpWidget(_app(coach));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'Help me make a plan.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Break it down')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-I’m still stuck')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-Please just listen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('coach-quick-reply-Break it down')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(responder.calls, 2);
+    expect(responder.lastMessage, 'Break it down');
+    expect(responder.lastConversation, hasLength(3));
+    expect(coach.messages[2].text, 'Break it down');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('break coaching offers a one-tap gentle return', (tester) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(
+      _app(
+        coach,
+        coachingContext: const CoachingContext(
+          focusTask: 'Review the launch notes',
+          isTimerRunning: true,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'I need a break.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('real five-minute break'), findsOneWidget);
+    final returnReply = find.byKey(
+      const ValueKey('coach-quick-reply-I’m back after a break'),
+    );
+    expect(returnReply, findsOneWidget);
+
+    await tester.tap(returnReply);
+    await tester.pumpAndSettle();
+
+    expect(find.text('I’m back after a break'), findsOneWidget);
+    expect(find.textContaining('Welcome back'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('coach-quick-reply-I did the first step')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('safety coaching never offers routine quick replies', (
+    tester,
+  ) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(_app(coach));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'I want to kill myself.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Your safety matters'), findsOneWidget);
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('offers a one-tap listening mode', (tester) async {
     final coach = await _createCoach();
 
@@ -279,6 +380,7 @@ void main() {
 
     expect(responder.calls, 1);
     expect(find.text('Thinking…'), findsOneWidget);
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
     expect(
       tester
           .widget<TextField>(find.byKey(const ValueKey('coach-message-input')))
@@ -300,6 +402,7 @@ void main() {
       find.text('Choose one action that takes two minutes.'),
       findsOneWidget,
     );
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -324,6 +427,7 @@ void main() {
       findsOneWidget,
     );
     expect(coach.messages, hasLength(1));
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

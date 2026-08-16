@@ -414,6 +414,43 @@ void main() {
     expect(response, contains('two minutes'));
   });
 
+  test('offers a real break with a clear path back', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'I need a break.',
+      context: const CoachingContext(
+        focusTask: 'Draft the project brief',
+        isTimerRunning: true,
+      ),
+      conversation: const [],
+    );
+
+    expect(response, contains('real five-minute break'));
+    expect(response, contains('Pause the timer'));
+    expect(response, contains('Draft the project brief'));
+    expect(response, contains('say “I’m back'));
+  });
+
+  test('protects recovery when a break follows the daily goal', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'I need to take a break.',
+      context: const CoachingContext(
+        focusTask: 'Keep polishing the report',
+        todayFocusMinutes: 60,
+        dailyGoalMinutes: 60,
+      ),
+      conversation: const [],
+    );
+
+    expect(response, startsWith('Yes—take the break'));
+    expect(response, contains('met today’s focus goal'));
+    expect(response, contains('let recovery count'));
+    expect(response, isNot(contains('Keep polishing the report')));
+  });
+
   test('celebrates full completion with remembered effort', () async {
     const responder = LocalCoachingResponder();
     final conversation = [
