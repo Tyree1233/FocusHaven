@@ -10,6 +10,11 @@ the commands valid for that state. It excludes task names, reflections,
 journal and coaching content, focus history, moods, and account identifiers by
 construction. The snapshot is derived locally, is not persisted by itself,
 and cannot mutate the timer or invoke platform code.
+Commands arriving from those future surfaces use a separate text-free envelope
+with a bounded request ID and the exact UTC snapshot time the person acted on.
+FocusHaven accepts an action only when the snapshot still advertises it, rejects
+stale and replayed requests, contains callback failures, and keeps platform
+transport separate from timer mutation.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the

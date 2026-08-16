@@ -27,6 +27,7 @@ import '../services/notification_service.dart';
 import '../services/remote_coaching_responder.dart';
 import '../services/reminder_service.dart';
 import '../services/smart_reset_service.dart';
+import '../services/system_focus_command_router.dart';
 import '../services/system_focus_surface_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
@@ -184,6 +185,11 @@ final smartResetServiceProvider = Provider<SmartResetService>(
 final systemFocusSurfaceServiceProvider = Provider<SystemFocusSurfaceService>(
   (ref) => const SystemFocusSurfaceService(),
   name: 'systemFocusSurfaceServiceProvider',
+);
+
+final systemFocusCommandRouterProvider = Provider<SystemFocusCommandRouter>(
+  (ref) => SystemFocusCommandRouter(),
+  name: 'systemFocusCommandRouterProvider',
 );
 
 final journalServiceProvider = ChangeNotifierProvider<JournalService>(
