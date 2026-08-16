@@ -6,4 +6,8 @@ void main() {
   test('remote coaching stays hidden in ordinary builds', () {
     expect(FeatureFlags.remoteCoachingEnabled, isFalse);
   });
+
+  test('legacy lifetime checkout stays hidden in ordinary builds', () {
+    expect(FeatureFlags.legacyLifetimePurchasesEnabled, isFalse);
+  });
 }

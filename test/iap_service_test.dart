@@ -99,8 +99,14 @@ PurchaseDetails _purchase({
   return purchase;
 }
 
-IAPService _createService(_FakeStoreBackend backend) {
-  final service = IAPService(storeBackend: backend);
+IAPService _createService(
+  _FakeStoreBackend backend, {
+  bool legacyLifetimePurchasesEnabled = true,
+}) {
+  final service = IAPService(
+    storeBackend: backend,
+    legacyLifetimePurchasesEnabled: legacyLifetimePurchasesEnabled,
+  );
   addTearDown(() async {
     service.dispose();
     await backend.dispose();
@@ -247,6 +253,31 @@ void main() {
     expect(backend.buyCalls, 1);
   });
 
+  test('disabled legacy checkout avoids store queries and purchases', () async {
+    final backend = _FakeStoreBackend()
+      ..products = [_product(IAPService.proProductId)];
+    final service = _createService(
+      backend,
+      legacyLifetimePurchasesEnabled: false,
+    );
+    await service.initialized;
+
+    expect(await service.proPrice(), isNull);
+    await expectLater(
+      service.buyPro(),
+      throwsA(
+        isA<StateError>().having(
+          (error) => error.message,
+          'message',
+          'New lifetime purchases are no longer available.',
+        ),
+      ),
+    );
+
+    expect(backend.queryCalls, 0);
+    expect(backend.buyCalls, 0);
+  });
+
   test('grants and completes the exact purchased Pro product', () async {
     final backend = _FakeStoreBackend();
     final service = _createService(backend);
@@ -275,6 +306,33 @@ void main() {
       isFalse,
     );
     expect(await IAPService.isProUser(), isTrue);
+  });
+
+  test('disabled legacy checkout still restores lifetime owners', () async {
+    final backend = _FakeStoreBackend();
+    final service = _createService(
+      backend,
+      legacyLifetimePurchasesEnabled: false,
+    );
+    await service.initialized;
+    final purchase = _purchase(
+      productId: IAPService.proProductId,
+      status: PurchaseStatus.restored,
+      pendingCompletePurchase: true,
+    );
+    final entitlement = service.entitlementChanges.firstWhere((isPro) => isPro);
+    final completed = backend.completedPurchases.firstWhere(
+      (candidate) => identical(candidate, purchase),
+    );
+
+    backend.emit([purchase]);
+
+    expect(await entitlement, isTrue);
+    expect(await completed, same(purchase));
+    expect(
+      service.lastKnownEntitlement,
+      const ProEntitlement.grandfatheredLifetime(),
+    );
   });
 
   test('does not grant Pro for a different purchased product', () async {

@@ -4,6 +4,11 @@ abstract final class FeatureFlags {
     defaultValue: false,
   );
 
+  static const legacyLifetimePurchasesEnabled = bool.fromEnvironment(
+    'ENABLE_LEGACY_LIFETIME_PURCHASES',
+    defaultValue: false,
+  );
+
   static const firebaseAppCheckWebSiteKey = String.fromEnvironment(
     'FIREBASE_APP_CHECK_WEB_SITE_KEY',
     defaultValue: '',

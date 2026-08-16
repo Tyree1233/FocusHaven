@@ -158,6 +158,9 @@ Apple and Google rather than hard-coded in the client.
 Subscription checkout is not active yet. Monthly and annual purchase events
 require trusted server verification and cannot create a local paid entitlement.
 The legacy identifier remains available for existing lifetime-owner restoration.
+Ordinary builds also disable new legacy lifetime purchases. The temporary
+`ENABLE_LEGACY_LIFETIME_PURCHASES` compile-time flag exists only for controlled
+store-transition testing; restoring an existing purchase remains available.
 
 ## Privacy
 

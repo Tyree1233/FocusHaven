@@ -172,7 +172,9 @@ final cloudSyncServiceProvider = Provider<CloudSyncService>(
 );
 
 final iapServiceProvider = Provider<IAPService>((ref) {
-  final service = IAPService();
+  final service = IAPService(
+    legacyLifetimePurchasesEnabled: FeatureFlags.legacyLifetimePurchasesEnabled,
+  );
   ref.onDispose(service.dispose);
   return service;
 }, name: 'iapServiceProvider');

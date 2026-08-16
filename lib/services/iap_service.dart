@@ -56,16 +56,20 @@ class IAPService {
   final IAPStoreBackend _store;
   final StreamController<ProEntitlement> _entitlementController =
       StreamController<ProEntitlement>.broadcast();
+  final bool legacyLifetimePurchasesEnabled;
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   ProEntitlement? _lastKnownEntitlement;
   bool _isDisposed = false;
 
-  IAPService({InAppPurchase? inAppPurchase, IAPStoreBackend? storeBackend})
-    : assert(
-        inAppPurchase == null || storeBackend == null,
-        'Provide either inAppPurchase or storeBackend, not both.',
-      ),
-      _store = storeBackend ?? PluginIAPStoreBackend(inAppPurchase) {
+  IAPService({
+    InAppPurchase? inAppPurchase,
+    IAPStoreBackend? storeBackend,
+    this.legacyLifetimePurchasesEnabled = true,
+  }) : assert(
+         inAppPurchase == null || storeBackend == null,
+         'Provide either inAppPurchase or storeBackend, not both.',
+       ),
+       _store = storeBackend ?? PluginIAPStoreBackend(inAppPurchase) {
     _subscription = _store.purchaseStream.listen(
       _handlePurchaseUpdates,
       onError: _handlePurchaseError,
@@ -209,7 +213,7 @@ class IAPService {
   }
 
   Future<String?> proPrice() async {
-    if (_isDisposed) return null;
+    if (_isDisposed || !legacyLifetimePurchasesEnabled) return null;
     final product = await _loadProProduct();
     return product?.price;
   }
@@ -217,6 +221,9 @@ class IAPService {
   Future<void> buyPro() async {
     if (_isDisposed) {
       throw StateError('FocusHaven Pro purchasing is no longer available.');
+    }
+    if (!legacyLifetimePurchasesEnabled) {
+      throw StateError('New lifetime purchases are no longer available.');
     }
 
     final product = await _loadProProduct();
