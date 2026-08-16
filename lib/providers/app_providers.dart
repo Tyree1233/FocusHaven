@@ -79,6 +79,7 @@ typedef CoachingState = ({
   bool enhancedCoachingAvailable,
   bool enhancedCoachingEnabled,
   String? errorMessage,
+  String? noticeMessage,
   int conversationRevision,
 });
 
@@ -314,6 +315,7 @@ final coachingStateProvider = Provider<CoachingState>((ref) {
     enhancedCoachingAvailable: coach.enhancedCoachingAvailable,
     enhancedCoachingEnabled: coach.enhancedCoachingEnabled,
     errorMessage: coach.errorMessage,
+    noticeMessage: coach.noticeMessage,
     conversationRevision: coach.conversationRevision,
   );
 }, name: 'coachingStateProvider');

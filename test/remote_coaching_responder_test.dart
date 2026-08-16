@@ -91,6 +91,81 @@ void main() {
       );
     }
   });
+
+  test('recognizes only the explicit monthly allowance failure', () async {
+    final quotaResponder = RemoteCoachingResponder(
+      backend: const _FailingBackend(
+        CoachingFunctionException(
+          code: 'resource-exhausted',
+          details: {'reason': 'monthly-quota-exhausted'},
+        ),
+      ),
+    );
+    final providerResponder = RemoteCoachingResponder(
+      backend: const _FailingBackend(
+        CoachingFunctionException(
+          code: 'resource-exhausted',
+          details: {'reason': 'provider-unavailable'},
+        ),
+      ),
+    );
+
+    await expectLater(
+      quotaResponder.respond(
+        message: 'Help me start.',
+        context: const CoachingContext(),
+        conversation: const [],
+      ),
+      throwsA(
+        isA<CoachingFallbackException>().having(
+          (error) => error.reason,
+          'reason',
+          CoachingFallbackReason.allowanceReached,
+        ),
+      ),
+    );
+    await expectLater(
+      providerResponder.respond(
+        message: 'Help me start.',
+        context: const CoachingContext(),
+        conversation: const [],
+      ),
+      throwsA(
+        isA<CoachingFallbackException>().having(
+          (error) => error.reason,
+          'reason',
+          CoachingFallbackReason.serviceUnavailable,
+        ),
+      ),
+    );
+  });
+
+  test('contains remote access failures behind one safe reason', () async {
+    for (final code in <String>[
+      'unauthenticated',
+      'permission-denied',
+      'failed-precondition',
+    ]) {
+      final responder = RemoteCoachingResponder(
+        backend: _FailingBackend(CoachingFunctionException(code: code)),
+      );
+
+      await expectLater(
+        responder.respond(
+          message: 'Help me start.',
+          context: const CoachingContext(),
+          conversation: const [],
+        ),
+        throwsA(
+          isA<CoachingFallbackException>().having(
+            (error) => error.reason,
+            'reason',
+            CoachingFallbackReason.accessUnavailable,
+          ),
+        ),
+      );
+    }
+  });
 }
 
 class _RecordingBackend implements CoachingFunctionBackend {
@@ -106,4 +181,13 @@ class _RecordingBackend implements CoachingFunctionBackend {
     lastPayload = payload;
     return response;
   }
+}
+
+class _FailingBackend implements CoachingFunctionBackend {
+  const _FailingBackend(this.error);
+
+  final Object error;
+
+  @override
+  Future<Object?> request(Map<String, Object?> payload) => Future.error(error);
 }

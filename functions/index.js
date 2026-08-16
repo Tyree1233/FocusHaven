@@ -88,6 +88,10 @@ exports.focusCoach = onCall(
       throw new HttpsError(
         "resource-exhausted",
         "Your enhanced coaching allowance will renew next month.",
+        {
+          reason: "monthly-quota-exhausted",
+          period: quota.period,
+        },
       );
     }
 
@@ -125,6 +129,7 @@ exports.focusCoach = onCall(
       throw new HttpsError(
         status === 429 ? "resource-exhausted" : "unavailable",
         "Focus Coach is temporarily unavailable.",
+        { reason: "provider-unavailable" },
       );
     }
   },

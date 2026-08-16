@@ -580,6 +580,48 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('explains an enhanced allowance handoff to local coaching', (
+    tester,
+  ) async {
+    final localResponder = _RecordingResponder('Private local guidance.');
+    final coach = await _createCoach(
+      responder: localResponder,
+      enhancedResponder: ResilientCoachingResponder(
+        primary: const _FallbackResponder(
+          CoachingFallbackReason.allowanceReached,
+        ),
+        fallback: localResponder,
+      ),
+    );
+    await coach.setEnhancedCoachingEnabled(true);
+
+    await tester.pumpWidget(_app(coach));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'Help me plan today.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(coach.messages.map((message) => message.text), [
+      'Help me plan today.',
+      'Private local guidance.',
+    ]);
+    expect(find.byKey(const ValueKey('coach-fallback-notice')), findsOneWidget);
+    expect(
+      find.text(
+        'Your enhanced AI allowance has been reached for this month. '
+        'Your private local coach answered instead.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.textContaining('could not respond right now'), findsNothing);
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('serializes overlapping prompt submissions while thinking', (
     tester,
   ) async {
@@ -732,4 +774,17 @@ class _FailingResponder implements CoachingResponder {
     required CoachingContext context,
     required List<CoachingMessage> conversation,
   }) => Future.error(StateError('coach unavailable'));
+}
+
+class _FallbackResponder implements CoachingResponder {
+  const _FallbackResponder(this.reason);
+
+  final CoachingFallbackReason reason;
+
+  @override
+  Future<String> respond({
+    required String message,
+    required CoachingContext context,
+    required List<CoachingMessage> conversation,
+  }) => Future.error(CoachingFallbackException(reason));
 }

@@ -7,6 +7,13 @@ abstract interface class CoachingFunctionBackend {
   Future<Object?> request(Map<String, Object?> payload);
 }
 
+final class CoachingFunctionException implements Exception {
+  const CoachingFunctionException({required this.code, this.details});
+
+  final String code;
+  final Object? details;
+}
+
 final class FirebaseCoachingFunctionBackend implements CoachingFunctionBackend {
   FirebaseCoachingFunctionBackend({
     FirebaseFunctions? functions,
@@ -28,8 +35,12 @@ final class FirebaseCoachingFunctionBackend implements CoachingFunctionBackend {
         limitedUseAppCheckToken: true,
       ),
     );
-    final result = await callable.call(payload);
-    return result.data;
+    try {
+      final result = await callable.call(payload);
+      return result.data;
+    } on FirebaseFunctionsException catch (error) {
+      throw CoachingFunctionException(code: error.code, details: error.details);
+    }
   }
 }
 
@@ -59,11 +70,16 @@ final class RemoteCoachingResponder implements CoachingResponder {
           },
         )
         .toList(growable: false);
-    final response = await _backend.request({
-      'message': message,
-      'context': context.toPromptData(),
-      'conversation': sharedConversation,
-    });
+    final Object? response;
+    try {
+      response = await _backend.request({
+        'message': message,
+        'context': context.toPromptData(),
+        'conversation': sharedConversation,
+      });
+    } on CoachingFunctionException catch (error) {
+      throw CoachingFallbackException(_fallbackReasonFor(error));
+    }
     if (response is! Map) {
       throw const FormatException('Invalid Focus Coach response.');
     }
@@ -72,6 +88,23 @@ final class RemoteCoachingResponder implements CoachingResponder {
       throw const FormatException('Invalid Focus Coach response.');
     }
     return text.trim();
+  }
+
+  static CoachingFallbackReason _fallbackReasonFor(
+    CoachingFunctionException error,
+  ) {
+    final details = error.details;
+    if (error.code == 'resource-exhausted' &&
+        details is Map &&
+        details['reason'] == 'monthly-quota-exhausted') {
+      return CoachingFallbackReason.allowanceReached;
+    }
+    if (error.code == 'unauthenticated' ||
+        error.code == 'permission-denied' ||
+        error.code == 'failed-precondition') {
+      return CoachingFallbackReason.accessUnavailable;
+    }
+    return CoachingFallbackReason.serviceUnavailable;
   }
 }
 

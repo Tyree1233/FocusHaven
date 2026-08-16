@@ -339,6 +339,31 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                     ),
                   ),
                 ),
+              if (coachingState.noticeMessage != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                  child: DecoratedBox(
+                    key: const ValueKey<String>('coach-fallback-notice'),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.shield_outlined,
+                            size: 18,
+                            color: primaryColor,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(child: Text(coachingState.noticeMessage!)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Row(

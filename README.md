@@ -43,6 +43,11 @@ per UTC calendar month. The usage collection is outside client-readable paths,
 uses hashed user identifiers, rejects malformed counters, and fails closed when
 Firestore cannot verify the allowance. Provider failures may still consume a
 reservation so concurrent retries cannot overspend the configured budget.
+When the allowance is exhausted or the remote service cannot be used, the
+client keeps the submitted message, answers through the private local coach,
+and explains the handoff without exposing backend error details. Only the
+server's explicit monthly-quota reason is shown as allowance exhaustion;
+provider capacity failures remain temporary-service notices.
 
 Normal builds keep the enhanced-coaching interface hidden so the local coach
 remains accurate when the paid backend has not been deployed. Before producing

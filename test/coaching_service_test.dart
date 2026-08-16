@@ -1048,6 +1048,52 @@ void main() {
     expect(emptyResponse, contains('Draft release notes'));
   });
 
+  test(
+    'reports a successful private fallback without losing messages',
+    () async {
+      final localResponder = _RecordingResponder('Private local guidance.');
+      final enhancedResponder = ResilientCoachingResponder(
+        primary: _CallbackResponder(
+          (_) => throw const CoachingFallbackException(
+            CoachingFallbackReason.allowanceReached,
+          ),
+        ),
+        fallback: localResponder,
+      );
+      final coach = await createCoach(
+        responder: localResponder,
+        enhancedResponder: enhancedResponder,
+      );
+      addTearDown(coach.dispose);
+
+      expect(await coach.setEnhancedCoachingEnabled(true), isTrue);
+      expect(
+        await coach.send('Help me begin.', const CoachingContext()),
+        isTrue,
+      );
+
+      expect(coach.messages.map((message) => message.text), [
+        'Help me begin.',
+        'Private local guidance.',
+      ]);
+      expect(coach.errorMessage, isNull);
+      expect(
+        coach.noticeMessage,
+        'Your enhanced AI allowance has been reached for this month. '
+        'Your private local coach answered instead.',
+      );
+
+      expect(await coach.setEnhancedCoachingEnabled(false), isTrue);
+      expect(coach.noticeMessage, isNull);
+      expect(
+        await coach.send('Help me continue.', const CoachingContext()),
+        isTrue,
+      );
+      expect(coach.noticeMessage, isNull);
+      expect(coach.messages, hasLength(4));
+    },
+  );
+
   test('enhanced coaching requires opt-in and persists the choice', () async {
     final localResponder = _RecordingResponder('Local guidance.');
     final enhancedResponder = _RecordingResponder('Enhanced guidance.');

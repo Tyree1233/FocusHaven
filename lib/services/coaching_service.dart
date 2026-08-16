@@ -52,16 +52,52 @@ abstract interface class CoachingResponder {
   });
 }
 
+enum CoachingFallbackReason {
+  allowanceReached,
+  accessUnavailable,
+  serviceUnavailable,
+}
+
+extension CoachingFallbackReasonMessage on CoachingFallbackReason {
+  String get userMessage => switch (this) {
+    CoachingFallbackReason.allowanceReached =>
+      'Your enhanced AI allowance has been reached for this month. '
+          'Your private local coach answered instead.',
+    CoachingFallbackReason.accessUnavailable =>
+      'Enhanced AI is not available for this account right now. '
+          'Your private local coach answered instead.',
+    CoachingFallbackReason.serviceUnavailable =>
+      'Enhanced AI is temporarily unavailable. '
+          'Your private local coach answered instead.',
+  };
+}
+
+final class CoachingFallbackException implements Exception {
+  const CoachingFallbackException(this.reason);
+
+  final CoachingFallbackReason reason;
+}
+
+abstract interface class CoachingFallbackNoticeSource {
+  CoachingFallbackReason? takeFallbackReason();
+}
+
 enum _CoachingSupportMode { gentle, listening, direct, reflective }
 
-class ResilientCoachingResponder implements CoachingResponder {
-  const ResilientCoachingResponder({
-    required this.primary,
-    required this.fallback,
-  });
+class ResilientCoachingResponder
+    implements CoachingResponder, CoachingFallbackNoticeSource {
+  ResilientCoachingResponder({required this.primary, required this.fallback});
 
   final CoachingResponder primary;
   final CoachingResponder fallback;
+  CoachingFallbackReason? _fallbackReason;
+
+  @override
+  CoachingFallbackReason? takeFallbackReason() {
+    final reason = _fallbackReason;
+    _fallbackReason = null;
+    return reason;
+  }
 
   @override
   Future<String> respond({
@@ -69,6 +105,7 @@ class ResilientCoachingResponder implements CoachingResponder {
     required CoachingContext context,
     required List<CoachingMessage> conversation,
   }) async {
+    _fallbackReason = null;
     try {
       final response = await primary.respond(
         message: message,
@@ -76,7 +113,11 @@ class ResilientCoachingResponder implements CoachingResponder {
         conversation: conversation,
       );
       if (response.trim().isNotEmpty) return response;
+      _fallbackReason = CoachingFallbackReason.serviceUnavailable;
+    } on CoachingFallbackException catch (error) {
+      _fallbackReason = error.reason;
     } catch (_) {
+      _fallbackReason = CoachingFallbackReason.serviceUnavailable;
       // The private local coach remains available when a remote provider fails.
     }
     return fallback.respond(
@@ -930,6 +971,7 @@ class CoachingService extends ChangeNotifier {
   bool _enhancedCoachingEnabled = false;
   bool _isDisposed = false;
   String? _errorMessage;
+  String? _noticeMessage;
 
   late final Future<void> initialized;
 
@@ -939,6 +981,7 @@ class CoachingService extends ChangeNotifier {
   bool get enhancedCoachingAvailable => _enhancedResponder != null;
   bool get enhancedCoachingEnabled => _enhancedCoachingEnabled;
   String? get errorMessage => _errorMessage;
+  String? get noticeMessage => _noticeMessage;
 
   Future<bool> send(String message, CoachingContext context) async {
     final cleanedMessage = _cleanText(message);
@@ -948,6 +991,7 @@ class CoachingService extends ChangeNotifier {
 
     _isResponding = true;
     _errorMessage = null;
+    _noticeMessage = null;
     final userMessage = CoachingMessage(
       id: _nextMessageId(),
       role: CoachingMessageRole.user,
@@ -989,6 +1033,10 @@ class CoachingService extends ChangeNotifier {
       if (_isDisposed) return false;
 
       _messages = updatedMessages;
+      final fallbackReason = responder is CoachingFallbackNoticeSource
+          ? (responder as CoachingFallbackNoticeSource).takeFallbackReason()
+          : null;
+      _noticeMessage = fallbackReason?.userMessage;
       _isResponding = false;
       _notifyConversationChanged();
       return true;
@@ -1014,6 +1062,7 @@ class CoachingService extends ChangeNotifier {
     if (_isDisposed) return false;
 
     _enhancedCoachingEnabled = enabled;
+    _noticeMessage = null;
     notifyListeners();
     return true;
   }
@@ -1037,12 +1086,14 @@ class CoachingService extends ChangeNotifier {
     }
     if (_isDisposed) return;
 
-    final conversationChanged = _messages.isNotEmpty || _errorMessage != null;
+    final conversationChanged =
+        _messages.isNotEmpty || _errorMessage != null || _noticeMessage != null;
     final settingChanged =
         includeEnhancedPreference && _enhancedCoachingEnabled;
     if (!conversationChanged && !settingChanged) return;
     _messages = [];
     _errorMessage = null;
+    _noticeMessage = null;
     if (includeEnhancedPreference) _enhancedCoachingEnabled = false;
     if (conversationChanged) {
       _notifyConversationChanged();
