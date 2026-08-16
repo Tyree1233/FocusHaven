@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/models/pro_entitlement.dart';
+import 'package:focushaven/models/pro_product_catalog.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/iap_service.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -297,6 +298,27 @@ void main() {
     backend.emit([unrelatedPurchase, processingBarrier]);
     await completed;
 
+    expect(service.lastKnownIsPro, isFalse);
+    expect(await IAPService.isProUser(), isFalse);
+  });
+
+  test('subscription purchases wait for trusted server verification', () async {
+    final backend = _FakeStoreBackend();
+    final service = _createService(backend);
+    await service.initialized;
+    final purchase = _purchase(
+      productId: ProProductCatalog.monthlyProductId,
+      status: PurchaseStatus.purchased,
+      pendingCompletePurchase: true,
+    );
+    final completed = backend.completedPurchases.firstWhere(
+      (candidate) => identical(candidate, purchase),
+    );
+
+    backend.emit([purchase]);
+    await completed;
+
+    expect(service.lastKnownEntitlement, const ProEntitlement.free());
     expect(service.lastKnownIsPro, isFalse);
     expect(await IAPService.isProUser(), isFalse);
   });

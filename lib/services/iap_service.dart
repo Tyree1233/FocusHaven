@@ -5,6 +5,7 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/pro_entitlement.dart';
+import '../models/pro_product_catalog.dart';
 
 abstract interface class IAPStoreBackend {
   Stream<List<PurchaseDetails>> get purchaseStream;
@@ -50,7 +51,7 @@ final class PluginIAPStoreBackend implements IAPStoreBackend {
 class IAPService {
   static const _legacyProKey = 'isProUser';
   static const _entitlementKey = 'proEntitlementV1';
-  static const proProductId = 'focushaven_pro';
+  static const proProductId = ProProductCatalog.legacyLifetimeProductId;
 
   final IAPStoreBackend _store;
   final StreamController<ProEntitlement> _entitlementController =
@@ -112,7 +113,7 @@ class IAPService {
         if (_isDisposed) return;
 
         final grantsPro =
-            purchase.productID == proProductId &&
+            ProProductCatalog.grantsLocalLifetimeAccess(purchase.productID) &&
             (purchase.status == PurchaseStatus.purchased ||
                 purchase.status == PurchaseStatus.restored);
         if (grantsPro) {

@@ -75,7 +75,7 @@ with OpenAI's current [API data controls](https://developers.openai.com/api/docs
 - Focus profile questionnaire with saved results
 - Guest access with optional Google sign-in and Firebase cloud backup
 - User-controlled deletion of local data and cloud backups
-- FocusHaven Pro lifetime purchase and purchase restoration
+- Subscription-aware FocusHaven Pro foundation with legacy purchase restoration
 
 ## Architecture
 
@@ -150,9 +150,14 @@ supported clients can connect to the FocusHaven Firebase project. Firebase
 administrator credentials, service-account keys, signing keystores, passwords,
 and other private server credentials must never be committed.
 
-The non-consumable product identifier is `focushaven_pro`. The matching product
-must be configured and approved in each supported store before real purchases
-can be completed.
+The grandfathered non-consumable product identifier is `focushaven_pro`.
+Planned subscription identifiers are `focushaven_pro_monthly` and
+`focushaven_pro_annual`. Store prices and introductory offers remain managed by
+Apple and Google rather than hard-coded in the client.
+
+Subscription checkout is not active yet. Monthly and annual purchase events
+require trusted server verification and cannot create a local paid entitlement.
+The legacy identifier remains available for existing lifetime-owner restoration.
 
 ## Privacy
 
