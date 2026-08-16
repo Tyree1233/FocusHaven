@@ -3,6 +3,14 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+The Living Lantern foundation turns only the current timer state and bounded,
+text-free focus events into one ephemeral companion state. The lantern can be
+ready, steadily focusing, resting, celebrating, or offering a gentle return.
+It never loses health, breaks, dies, or removes progress after an interrupted
+attempt. Its state is derived locally, is never persisted by itself, and cannot
+start, pause, reset, or otherwise control the timer. A future visual surface can
+observe this foundation without turning the lantern into a productivity score.
+
 The optional Haven Plan check-in turns the user's current energy, available
 time, focus queue, and text-free local focus events into a transparent session
 preview. Plans are created on-device, are never persisted by themselves, and

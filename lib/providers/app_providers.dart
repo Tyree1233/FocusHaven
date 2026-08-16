@@ -8,6 +8,7 @@ import '../models/focus_event.dart';
 import '../models/focus_session.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_rhythm_insight.dart';
+import '../models/living_lantern_state.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
 import '../models/pro_entitlement.dart';
@@ -20,6 +21,7 @@ import '../services/haven_plan_service.dart';
 import '../services/haven_rhythm_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
+import '../services/living_lantern_service.dart';
 import '../services/notification_service.dart';
 import '../services/remote_coaching_responder.dart';
 import '../services/reminder_service.dart';
@@ -167,6 +169,11 @@ final havenRhythmServiceProvider = Provider<HavenRhythmService>(
   name: 'havenRhythmServiceProvider',
 );
 
+final livingLanternServiceProvider = Provider<LivingLanternService>(
+  (ref) => const LivingLanternService(),
+  name: 'livingLanternServiceProvider',
+);
+
 final smartResetServiceProvider = Provider<SmartResetService>(
   (ref) => const SmartResetService(),
   name: 'smartResetServiceProvider',
@@ -294,6 +301,22 @@ final havenRhythmInsightProvider = Provider<HavenRhythmInsight>((ref) {
       .watch(havenRhythmServiceProvider)
       .createInsight(recentEvents: events);
 }, name: 'havenRhythmInsightProvider');
+
+/// Rebuilds the lantern from current timer controls and private text-free
+/// events. The result is local, ephemeral, informational, and non-punitive.
+final livingLanternStateProvider = Provider<LivingLanternState>((ref) {
+  final session = ref.watch(timerSessionStateProvider);
+  final events = ref.watch(timerFocusEventsProvider);
+  return ref
+      .watch(livingLanternServiceProvider)
+      .createState(
+        sessionType: session.sessionType,
+        isRunning: session.isRunning,
+        isComplete: session.isComplete,
+        hasPendingResume: session.hasPendingResume,
+        recentEvents: events,
+      );
+}, name: 'livingLanternStateProvider');
 
 /// Parking-lot snapshot that changes only when a thought is captured, edited,
 /// completed, reopened, removed, migrated, or cleared.
