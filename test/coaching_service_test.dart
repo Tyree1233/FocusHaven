@@ -886,6 +886,124 @@ void main() {
     expect(coach.messages.last.text, isNot(contains('Finish the report')));
   });
 
+  test('slows down for reflective coaching requests', () async {
+    const responder = LocalCoachingResponder();
+
+    for (final message in const [
+      'Help me think this through.',
+      'Can we think this through?',
+      'I need to process this.',
+      'Talk this through with me.',
+      'Help me sort this out.',
+    ]) {
+      final response = await responder.respond(
+        message: message,
+        context: const CoachingContext(focusTask: 'Finish the launch plan'),
+        conversation: const [],
+      );
+
+      expect(response, startsWith('Let’s slow this down'));
+      expect(response, contains('do not need to turn it into a decision'));
+      expect(response, contains('most important to understand'));
+      expect('?'.allMatches(response), hasLength(1));
+      expect(response, isNot(contains('Finish the launch plan')));
+      expect(response, isNot(contains('next step')));
+    }
+  });
+
+  test('reflects emotional conflict with one thoughtful question', () async {
+    const responder = LocalCoachingResponder();
+
+    final response = await responder.respond(
+      message: 'I feel torn. Part of me wants to go and part wants to stay.',
+      context: const CoachingContext(focusTask: 'Make the decision'),
+      conversation: const [],
+    );
+
+    expect(response, contains('two honest needs'));
+    expect(response, contains('pulling in different directions'));
+    expect(response, contains('Neither one has to be argued away'));
+    expect(response, contains('harder to disappoint'));
+    expect('?'.allMatches(response), hasLength(1));
+    expect(response, isNot(contains('Make the decision')));
+  });
+
+  test('continues reflection without rushing into task advice', () async {
+    const responder = LocalCoachingResponder();
+    final conversation = [
+      CoachingMessage(
+        id: 'reflection-user',
+        role: CoachingMessageRole.user,
+        text: 'Help me think this through.',
+        createdAt: DateTime.utc(2026, 8, 15),
+      ),
+      CoachingMessage(
+        id: 'reflection-coach',
+        role: CoachingMessageRole.coach,
+        text: 'What part feels most important to understand first?',
+        createdAt: DateTime.utc(2026, 8, 15, 0, 1),
+      ),
+      CoachingMessage(
+        id: 'reflection-follow-up',
+        role: CoachingMessageRole.user,
+        text: 'I am afraid I will disappoint everyone.',
+        createdAt: DateTime.utc(2026, 8, 15, 0, 2),
+      ),
+    ];
+
+    final response = await responder.respond(
+      message: conversation.last.text,
+      context: const CoachingContext(focusTask: 'Choose a direction'),
+      conversation: conversation,
+    );
+
+    expect(response, contains('fear sounds like it is carrying'));
+    expect(response, contains('trying to protect you from'));
+    expect('?'.allMatches(response), hasLength(1));
+    expect(response, isNot(contains('Choose a direction')));
+    expect(response, isNot(contains('focus round')));
+  });
+
+  test(
+    'keeps reflective threads local with safety and boundaries first',
+    () async {
+      final enhancedResponder = _RecordingResponder(
+        'This remote response must not be used.',
+      );
+      final coach = await createCoach(enhancedResponder: enhancedResponder);
+      addTearDown(coach.dispose);
+      await coach.setEnhancedCoachingEnabled(true);
+      const context = CoachingContext(focusTask: 'Choose a direction');
+
+      expect(await coach.send('Help me think this through.', context), isTrue);
+      expect(enhancedResponder.calls, 0);
+      expect(coach.messages.last.text, startsWith('Let’s slow this down'));
+
+      expect(
+        await coach.send('I am afraid I will disappoint everyone.', context),
+        isTrue,
+      );
+      expect(enhancedResponder.calls, 0);
+      expect(coach.messages.last.text, contains('trying to protect you from'));
+
+      expect(
+        await coach.send('I want to die. Help me think this through.', context),
+        isTrue,
+      );
+      expect(enhancedResponder.calls, 0);
+      expect(coach.messages.last.text, contains('Your safety matters'));
+      expect(coach.messages.last.text, isNot(contains('Let’s slow this down')));
+
+      expect(
+        await coach.send('I need space. Help me think this through.', context),
+        isTrue,
+      );
+      expect(enhancedResponder.calls, 0);
+      expect(coach.messages.last.text, startsWith('Okay. I’ll stop here'));
+      expect(coach.messages.last.text, isNot(contains('Let’s slow this down')));
+    },
+  );
+
   test('encourages recovery after the daily focus goal is met', () async {
     const responder = LocalCoachingResponder();
 

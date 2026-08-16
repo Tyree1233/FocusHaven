@@ -22,6 +22,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     'I’m stuck—help me start',
     'I’m feeling overwhelmed',
     'What should I do next?',
+    'Help me think this through',
     'Be gentle with me',
     'Please just listen',
     'Hold me accountable',
@@ -57,6 +58,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         'Be gentle with me',
         'Hold me accountable',
       ];
+    }
+
+    if (LocalCoachingResponder.isReflectiveConversation(messages)) {
+      return const [];
     }
 
     final coachReply = messages.last.text.toLowerCase();

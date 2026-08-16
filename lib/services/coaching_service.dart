@@ -52,7 +52,7 @@ abstract interface class CoachingResponder {
   });
 }
 
-enum _CoachingSupportMode { gentle, listening, direct }
+enum _CoachingSupportMode { gentle, listening, direct, reflective }
 
 class ResilientCoachingResponder implements CoachingResponder {
   const ResilientCoachingResponder({
@@ -137,6 +137,17 @@ class LocalCoachingResponder implements CoachingResponder {
     "you aren't listening",
     'you aren’t listening',
   ];
+  static const _reflectionSignals = <String>[
+    'help me think this through',
+    'think this through with me',
+    'can we think this through',
+    'help me process this',
+    'i need to process this',
+    'talk this through with me',
+    'help me sort this out',
+    'i feel conflicted',
+    'i feel torn',
+  ];
   static const _listeningSignals = <String>[
     'need to vent',
     'can i vent',
@@ -170,6 +181,10 @@ class LocalCoachingResponder implements CoachingResponder {
       _containsAny(message.toLowerCase(), _boundarySignals);
   static bool isRepairRequest(String message) =>
       _containsAny(message.toLowerCase(), _repairSignals);
+  static bool isReflectionRequest(String message) =>
+      _containsAny(message.toLowerCase(), _reflectionSignals);
+  static bool isReflectiveConversation(List<CoachingMessage> conversation) =>
+      _rememberedSupportMode(conversation) == _CoachingSupportMode.reflective;
 
   @override
   Future<String> respond({
@@ -190,6 +205,9 @@ class LocalCoachingResponder implements CoachingResponder {
     }
     if (isRepairRequest(normalized)) {
       return _repairReply();
+    }
+    if (isReflectionRequest(normalized)) {
+      return _reflectionReply(normalized);
     }
     final rememberedSupportMode = _rememberedSupportMode(conversation);
     if (_containsAny(normalized, _listeningSignals)) {
@@ -359,11 +377,17 @@ class LocalCoachingResponder implements CoachingResponder {
       'i am not sure',
       'unsure',
     ])) {
+      if (rememberedSupportMode == _CoachingSupportMode.reflective) {
+        return _reflectiveUncertaintyReply();
+      }
       return _uncertaintyReply(
         context,
         conversation,
         supportMode: rememberedSupportMode,
       );
+    }
+    if (rememberedSupportMode == _CoachingSupportMode.reflective) {
+      return _reflectionFollowUpReply(conversation);
     }
     return _generalReply(
       context,
@@ -382,6 +406,9 @@ class LocalCoachingResponder implements CoachingResponder {
       if (entry.role != CoachingMessageRole.user) continue;
       final message = entry.text.toLowerCase();
       if (isSafetyConcern(message)) continue;
+      if (isReflectionRequest(message)) {
+        return _CoachingSupportMode.reflective;
+      }
       if (_containsAny(message, _listeningSignals)) {
         return _CoachingSupportMode.listening;
       }
@@ -499,6 +526,62 @@ class LocalCoachingResponder implements CoachingResponder {
         'and I’m sorry. Let’s reset without making you repeat everything. '
         'What would fit better right now: listening without advice, gentle '
         'support, or a direct next step?';
+  }
+
+  static String _reflectionReply(String message) {
+    if (_containsAny(message, const [
+      'conflicted',
+      'torn',
+      'part of me',
+      'on one hand',
+      'mixed feelings',
+    ])) {
+      return 'It sounds like two honest needs are pulling in different '
+          'directions. Neither one has to be argued away yet. Which side '
+          'feels harder to disappoint?';
+    }
+    return 'Let’s slow this down. You do not need to turn it into a decision '
+        'or an action plan yet. What part of this feels most important to '
+        'understand first?';
+  }
+
+  static String _reflectionFollowUpReply(List<CoachingMessage> conversation) {
+    var latestUserMessage = '';
+    for (final entry in conversation.reversed) {
+      if (entry.role != CoachingMessageRole.user) continue;
+      latestUserMessage = entry.text.toLowerCase();
+      break;
+    }
+    if (_containsAny(latestUserMessage, const [
+      'afraid',
+      'fear',
+      'scared',
+      'worried',
+    ])) {
+      return 'That fear sounds like it is carrying a lot of weight, even if '
+          'another part of you knows what it wants. What is the fear trying '
+          'to protect you from?';
+    }
+    if (_containsAny(latestUserMessage, const [
+      'guilty',
+      'guilt',
+      'disappoint',
+      'let them down',
+      'let everyone down',
+    ])) {
+      return 'You seem to be holding your own needs alongside concern for '
+          'someone else. What would honoring yourself without dismissing '
+          'them look like?';
+    }
+    return 'There is something important in that, and we do not have to '
+        'force it into a plan. Which part feels most true now that you have '
+        'said it out loud?';
+  }
+
+  static String _reflectiveUncertaintyReply() {
+    return 'Not knowing can be part of understanding this, rather than a '
+        'problem to solve immediately. What feels uncertain underneath the '
+        'decision itself?';
   }
 
   static String _listeningReply(List<CoachingMessage> conversation) {
@@ -879,7 +962,8 @@ class CoachingService extends ChangeNotifier {
       final requiresLocalResponse =
           LocalCoachingResponder.isSafetyConcern(cleanedMessage) ||
           LocalCoachingResponder.isBoundaryRequest(cleanedMessage) ||
-          LocalCoachingResponder.isRepairRequest(cleanedMessage);
+          LocalCoachingResponder.isRepairRequest(cleanedMessage) ||
+          LocalCoachingResponder.isReflectiveConversation(_messages);
       final responder = requiresLocalResponse
           ? _localResponder
           : _enhancedCoachingEnabled && _enhancedResponder != null

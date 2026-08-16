@@ -345,6 +345,58 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('offers a quiet one-question reflection mode', (tester) async {
+    final coach = await _createCoach();
+
+    await tester.pumpWidget(
+      _app(
+        coach,
+        coachingContext: const CoachingContext(
+          focusTask: 'Choose the next project',
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(ListView), const Offset(0, -300));
+    await tester.pumpAndSettle();
+
+    final prompt = find.byKey(
+      const ValueKey('coach-prompt-Help me think this through'),
+    );
+    expect(prompt, findsOneWidget);
+    await tester.tap(prompt);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Help me think this through'), findsOneWidget);
+    expect(find.textContaining('Let’s slow this down'), findsOneWidget);
+    expect(
+      find.textContaining('most important to understand first'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Choose the next project'), findsNothing);
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'I am afraid I will disappoint everyone.',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('I am afraid I will disappoint everyone.'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('fear sounds like it is carrying'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('trying to protect you from'), findsOneWidget);
+    expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('offers one-tap gentle support with matching follow-ups', (
     tester,
   ) async {
