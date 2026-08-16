@@ -20,6 +20,12 @@ future Haven Plan. Recovery patterns plus the user's current energy and
 available time always take priority, and skipping the reflection never blocks
 the next break.
 
+The local Haven Rhythm engine turns repeated text-free focus events into one
+plain-language observation at a time. It requires multiple signals before
+describing a pattern, explains the evidence behind each observation, and says
+when feedback is mixed or still incomplete. Insights are ephemeral and never
+become a productivity score, diagnosis, or remote profile.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

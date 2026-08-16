@@ -7,6 +7,7 @@ import '../models/coaching_message.dart';
 import '../models/focus_event.dart';
 import '../models/focus_session.dart';
 import '../models/haven_plan.dart';
+import '../models/haven_rhythm_insight.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
 import '../models/pro_entitlement.dart';
@@ -16,6 +17,7 @@ import '../services/coaching_service.dart';
 import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/haven_plan_service.dart';
+import '../services/haven_rhythm_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/notification_service.dart';
@@ -160,6 +162,11 @@ final havenPlanServiceProvider = Provider<HavenPlanService>(
   name: 'havenPlanServiceProvider',
 );
 
+final havenRhythmServiceProvider = Provider<HavenRhythmService>(
+  (ref) => const HavenRhythmService(),
+  name: 'havenRhythmServiceProvider',
+);
+
 final smartResetServiceProvider = Provider<SmartResetService>(
   (ref) => const SmartResetService(),
   name: 'smartResetServiceProvider',
@@ -278,6 +285,15 @@ final timerFocusEventsProvider = Provider<List<FocusEvent>>((ref) {
 
   return ref.read(timerServiceProvider).recentFocusEvents;
 }, name: 'timerFocusEventsProvider');
+
+/// Rebuilds one transparent, ephemeral rhythm insight from private text-free
+/// focus events. The insight is local and is never persisted by itself.
+final havenRhythmInsightProvider = Provider<HavenRhythmInsight>((ref) {
+  final events = ref.watch(timerFocusEventsProvider);
+  return ref
+      .watch(havenRhythmServiceProvider)
+      .createInsight(recentEvents: events);
+}, name: 'havenRhythmInsightProvider');
 
 /// Parking-lot snapshot that changes only when a thought is captured, edited,
 /// completed, reopened, removed, migrated, or cleared.
