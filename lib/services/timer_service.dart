@@ -89,6 +89,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   int get secondsRemaining => _secondsRemaining;
   int get totalSessionSeconds => _totalSessionSeconds;
+  DateTime? get endsAt => _endsAt?.toUtc();
   int get completedFocusSessions => _completedFocusSessions;
   int get focusHistoryRevision => _focusHistoryRevision;
   int get focusEventsRevision => _focusEventsRevision;

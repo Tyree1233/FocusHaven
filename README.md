@@ -20,6 +20,13 @@ snapshot publications, rejects malformed native payloads, and disables command
 handling when its initial publication cannot reach a native adapter. Android,
 Apple, web, and desktop builds do not start this bridge until an intentionally
 supported native surface is installed and tested.
+Android now installs the first strict native adapter. It validates the complete
+versioned map again in Kotlin, rejects unknown fields and impossible timer
+states, and stores only that text-free snapshot in app-private preferences.
+The Flutter lifecycle host starts synchronization only on Android, preserves a
+running session by its authoritative deadline, and skips equivalent one-second
+writes. No launcher widget or exported Android component is added in this
+phase; Apple and every unsupported platform remain dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the

@@ -130,6 +130,12 @@ final timerServiceProvider = ChangeNotifierProvider<TimerService>(
   name: 'timerServiceProvider',
 );
 
+/// Stable running deadline shared with system surfaces without widening the
+/// high-frequency countdown read model.
+final timerEndsAtProvider = Provider<DateTime?>((ref) {
+  return ref.watch(timerServiceProvider.select((timer) => timer.endsAt));
+}, name: 'timerEndsAtProvider');
+
 final reminderServiceProvider = ChangeNotifierProvider<ReminderService>(
   (ref) => ReminderService(
     notificationService: ref.watch(notificationServiceProvider),
@@ -365,6 +371,7 @@ final livingLanternStateProvider = Provider<LivingLanternState>((ref) {
 final systemFocusSnapshotProvider = Provider<SystemFocusSnapshot>((ref) {
   final countdown = ref.watch(timerCountdownStateProvider);
   final session = ref.watch(timerSessionStateProvider);
+  final endsAt = ref.watch(timerEndsAtProvider);
   return ref
       .watch(systemFocusSurfaceServiceProvider)
       .createSnapshot(
@@ -375,6 +382,7 @@ final systemFocusSnapshotProvider = Provider<SystemFocusSnapshot>((ref) {
         secondsRemaining: countdown.secondsRemaining,
         totalSessionSeconds: countdown.totalSessionSeconds,
         generatedAt: DateTime.now(),
+        endsAt: endsAt,
       );
 }, name: 'systemFocusSnapshotProvider');
 

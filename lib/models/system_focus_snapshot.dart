@@ -92,6 +92,23 @@ class SystemFocusSnapshot {
     },
   };
 
+  /// Whether two snapshots describe the same native surface state.
+  ///
+  /// A running surface uses its authoritative deadline, so one-second Dart
+  /// countdown updates do not cause storage writes or invalidate a command
+  /// created from the last published snapshot.
+  bool isEquivalentForSystemSurface(SystemFocusSnapshot other) {
+    if (session != other.session ||
+        activity != other.activity ||
+        totalSessionSeconds != other.totalSessionSeconds) {
+      return false;
+    }
+    if (activity == SystemFocusActivity.running) {
+      return endsAt == other.endsAt;
+    }
+    return secondsRemaining == other.secondsRemaining;
+  }
+
   Map<String, Object?> toJson() => {
     'schemaVersion': schemaVersion,
     'session': session.name,

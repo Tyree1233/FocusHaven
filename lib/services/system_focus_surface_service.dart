@@ -16,6 +16,7 @@ class SystemFocusSurfaceService {
     required int secondsRemaining,
     required int totalSessionSeconds,
     required DateTime generatedAt,
+    DateTime? endsAt,
   }) {
     if (isRunning && (isComplete || hasPendingResume)) {
       throw ArgumentError('The system surface requires a valid timer state.');
@@ -49,7 +50,8 @@ class SystemFocusSurfaceService {
       totalSessionSeconds: totalSessionSeconds,
       generatedAt: utcGeneratedAt,
       endsAt: activity == SystemFocusActivity.running
-          ? utcGeneratedAt.add(Duration(seconds: secondsRemaining))
+          ? (endsAt ?? utcGeneratedAt.add(Duration(seconds: secondsRemaining)))
+                .toUtc()
           : null,
     );
   }

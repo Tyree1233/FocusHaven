@@ -87,6 +87,7 @@ class SystemFocusPlatformBridge {
   Future<void> _publishTail = Future<void>.value();
   bool _isStarted = false;
   bool _isDisposed = false;
+  SystemFocusSnapshot? _publishedSnapshot;
 
   bool get isStarted => _isStarted;
 
@@ -120,8 +121,14 @@ class SystemFocusPlatformBridge {
     if (_isDisposed || !_isStarted) return Future<bool>.value(false);
     final operation = _publishTail.then((_) async {
       if (_isDisposed || !_isStarted) return false;
+      final published = _publishedSnapshot;
+      if (published != null &&
+          snapshot.isEquivalentForSystemSurface(published)) {
+        return true;
+      }
       try {
         await _backend.publishSnapshot(snapshot.toJson());
+        _publishedSnapshot = snapshot;
         return true;
       } catch (_) {
         return false;
@@ -136,9 +143,15 @@ class SystemFocusPlatformBridge {
     try {
       final command = SystemFocusCommand.fromJson(json);
       final currentSnapshot = _readSnapshot();
+      final publishedSnapshot = _publishedSnapshot;
+      if (publishedSnapshot == null ||
+          !currentSnapshot.isEquivalentForSystemSurface(publishedSnapshot)) {
+        await publish(currentSnapshot);
+        return false;
+      }
       final accepted = _router.execute(
         command: command,
-        currentSnapshot: currentSnapshot,
+        currentSnapshot: publishedSnapshot,
         target: _target,
       );
       if (!accepted) return false;

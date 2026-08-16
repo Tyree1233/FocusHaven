@@ -18,6 +18,7 @@ import 'services/remote_coaching_responder.dart';
 import 'services/reminder_service.dart';
 import 'services/theme_service.dart';
 import 'services/timer_service.dart';
+import 'widgets/system_focus_platform_host.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -140,7 +141,9 @@ class FocusHavenApp extends StatelessWidget {
         if (activeReminderService != null)
           reminderServiceProvider.overrideWith((ref) => activeReminderService),
       ],
-      child: _FocusHavenMaterialApp(showOnboarding: showOnboarding),
+      child: SystemFocusPlatformHost(
+        child: _FocusHavenMaterialApp(showOnboarding: showOnboarding),
+      ),
     );
   }
 }

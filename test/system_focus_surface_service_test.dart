@@ -129,6 +129,29 @@ void main() {
     expect(restored.endsAt, original.endsAt);
   });
 
+  test('running equivalence follows the deadline instead of each tick', () {
+    final original = snapshot(isRunning: true, secondsRemaining: 300);
+    final refreshed = SystemFocusSnapshot(
+      session: original.session,
+      activity: original.activity,
+      secondsRemaining: 290,
+      totalSessionSeconds: original.totalSessionSeconds,
+      generatedAt: generatedAt.add(const Duration(seconds: 10)),
+      endsAt: original.endsAt,
+    );
+    final differentDeadline = SystemFocusSnapshot(
+      session: original.session,
+      activity: original.activity,
+      secondsRemaining: 290,
+      totalSessionSeconds: original.totalSessionSeconds,
+      generatedAt: generatedAt.add(const Duration(seconds: 10)),
+      endsAt: original.endsAt!.add(const Duration(seconds: 1)),
+    );
+
+    expect(original.isEquivalentForSystemSurface(refreshed), isTrue);
+    expect(original.isEquivalentForSystemSurface(differentDeadline), isFalse);
+  });
+
   test('unknown fields and schema versions fail closed', () {
     final unknownField = snapshot().toJson()..['task'] = 'private task';
     final futureSchema = snapshot().toJson()..['schemaVersion'] = 2;
@@ -191,6 +214,9 @@ void main() {
       overrides: [
         timerSessionStateProvider.overrideWithValue(session),
         timerCountdownStateProvider.overrideWithValue(countdown),
+        timerEndsAtProvider.overrideWithValue(
+          DateTime.now().add(const Duration(seconds: 90)),
+        ),
       ],
     );
     addTearDown(container.dispose);

@@ -15,11 +15,13 @@ void main() {
   SystemFocusSnapshot snapshot({
     SystemFocusActivity activity = SystemFocusActivity.ready,
     DateTime? at,
+    int? remaining,
+    DateTime? deadline,
   }) {
     final snapshotTime = at ?? generatedAt;
     final secondsRemaining = activity == SystemFocusActivity.completed
         ? 0
-        : 300;
+        : remaining ?? 300;
     return SystemFocusSnapshot(
       session: SystemFocusSession.focus,
       activity: activity,
@@ -27,7 +29,7 @@ void main() {
       totalSessionSeconds: 300,
       generatedAt: snapshotTime,
       endsAt: activity == SystemFocusActivity.running
-          ? snapshotTime.add(Duration(seconds: secondsRemaining))
+          ? deadline ?? snapshotTime.add(Duration(seconds: secondsRemaining))
           : null,
     );
   }
@@ -143,6 +145,54 @@ void main() {
     },
   );
 
+  test(
+    'one running deadline skips ticks while its published command stays valid',
+    () async {
+      final backend = _RecordingPlatformBackend();
+      var current = snapshot(activity: SystemFocusActivity.running);
+      final publishedAt = current.generatedAt;
+      final deadline = current.endsAt!;
+      final calls = <String>[];
+      final bridge = SystemFocusPlatformBridge(
+        backend: backend,
+        router: SystemFocusCommandRouter(),
+        readSnapshot: () => current,
+        target: _target(
+          calls,
+          pause: () {
+            current = snapshot(
+              activity: SystemFocusActivity.paused,
+              at: generatedAt.add(const Duration(seconds: 11)),
+              remaining: 290,
+            );
+          },
+        ),
+      );
+      expect(await bridge.start(), isTrue);
+      current = snapshot(
+        activity: SystemFocusActivity.running,
+        at: generatedAt.add(const Duration(seconds: 10)),
+        remaining: 290,
+        deadline: deadline,
+      );
+
+      expect(await bridge.publishCurrent(), isTrue);
+      expect(backend.published, hasLength(1));
+
+      final accepted = await backend.handler!(
+        command(
+          action: SystemFocusAction.pause,
+          snapshotGeneratedAt: publishedAt,
+        ).toJson(),
+      );
+
+      expect(accepted, isTrue);
+      expect(calls, ['pause']);
+      expect(backend.published, hasLength(2));
+      expect(backend.published.last['activity'], 'paused');
+    },
+  );
+
   test('malformed stale and unavailable commands remain contained', () async {
     final backend = _RecordingPlatformBackend();
     final calls = <String>[];
@@ -234,12 +284,16 @@ SystemFocusPlatformBridge _bridge({
 SystemFocusCommandTarget _target(
   List<String> calls, {
   void Function()? start,
+  void Function()? pause,
 }) => (
   start: () {
     calls.add('start');
     start?.call();
   },
-  pause: () => calls.add('pause'),
+  pause: () {
+    calls.add('pause');
+    pause?.call();
+  },
   resumePending: () => calls.add('resumePending'),
   reset: () => calls.add('reset'),
   beginNextSession: () => calls.add('beginNextSession'),
