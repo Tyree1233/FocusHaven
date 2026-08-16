@@ -19,6 +19,7 @@ import 'package:focushaven/widgets/focus_session_reflection_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
 import 'package:focushaven/widgets/haven_rhythm_card.dart';
+import 'package:focushaven/widgets/living_lantern_card.dart';
 import 'package:focushaven/widgets/smart_reset_sheet.dart';
 
 class _CountingNavigatorObserver extends NavigatorObserver {
@@ -120,6 +121,8 @@ void main() {
     expect(find.text('Begin focus'), findsOneWidget);
     expect(find.text('Open focus queue'), findsOneWidget);
     expect(find.text('Plan my next session'), findsOneWidget);
+    expect(find.byType(LivingLanternCard), findsOneWidget);
+    expect(find.text('LIVING LANTERN · READY'), findsOneWidget);
     expect(find.byType(HavenRhythmCard), findsOneWidget);
     expect(find.byTooltip('Mindful pause'), findsOneWidget);
     expect(find.byTooltip('Reflection journal'), findsOneWidget);

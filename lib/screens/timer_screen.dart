@@ -31,6 +31,7 @@ import '../widgets/guided_breathing_sheet.dart';
 import '../widgets/haven_plan_sheet.dart';
 import '../widgets/haven_rhythm_card.dart';
 import '../widgets/journal_entry_dialog.dart';
+import '../widgets/living_lantern_card.dart';
 import '../widgets/pro_sheet.dart';
 import '../widgets/reflection_journal_sheet.dart';
 import '../widgets/smart_reset_sheet.dart';
@@ -811,6 +812,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final focusHistory = ref.watch(timerFocusHistoryProvider);
     final summary = ref.watch(timerSummaryStateProvider);
     final havenRhythm = ref.watch(havenRhythmInsightProvider);
+    final livingLantern = ref.watch(livingLanternStateProvider);
     final isSignedIn = ref.watch(authIsSignedInProvider);
     final queueRemaining = ref.watch(focusQueueRemainingCountProvider);
     final parkedThoughtState = ref.watch(parkedThoughtStateProvider);
@@ -905,6 +907,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.white70),
                       ),
+                      const SizedBox(height: 18),
+                      LivingLanternCard(state: livingLantern),
                       if (session.sessionType == SessionType.focus) ...[
                         const SizedBox(height: 12),
                         TextButton.icon(
