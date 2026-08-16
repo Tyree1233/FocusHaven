@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ConsumerWidget, ProviderScope, WidgetRef;
 
-import 'config/feature_flags.dart';
 import 'firebase_options.dart';
 import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
+import 'services/app_check_service.dart';
 import 'services/auth_service.dart';
 import 'services/coaching_service.dart';
 import 'services/focus_profile_service.dart';
@@ -26,10 +26,17 @@ Future<void> main() async {
   await notificationService.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  var remoteCoachingReady = false;
+  try {
+    remoteCoachingReady = await initializeRemoteCoachingAppCheck();
+  } catch (error) {
+    debugPrint('Remote coaching App Check setup failed: $error');
+  }
+
   final showOnboarding = await shouldShowOnboarding();
   final authService = AuthService();
   final coachingService = CoachingService(
-    enhancedResponder: FeatureFlags.remoteCoachingEnabled
+    enhancedResponder: remoteCoachingReady
         ? createEnhancedCoachingResponder()
         : null,
   );

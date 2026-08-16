@@ -4,5 +4,10 @@ abstract final class FeatureFlags {
     defaultValue: false,
   );
 
+  static const firebaseAppCheckWebSiteKey = String.fromEnvironment(
+    'FIREBASE_APP_CHECK_WEB_SITE_KEY',
+    defaultValue: '',
+  );
+
   const FeatureFlags._();
 }

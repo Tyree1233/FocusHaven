@@ -32,16 +32,27 @@ tokens to reduce replay attempts. The server switch is an emergency kill
 switch; the Flutter build flag below does not replace it.
 
 Normal builds keep the enhanced-coaching interface hidden so the local coach
-remains accurate when the paid backend has not been deployed. After the
-function and secret are available, enable the interface at build time:
+remains accurate when the paid backend has not been deployed. Before producing
+an enabled build, register the Android, Apple, and web apps under Firebase
+App Check. FocusHaven uses Play Integrity in Android releases, App Attest with
+DeviceCheck fallback in Apple releases, and reCAPTCHA v3 on web. Debug builds
+use Firebase debug providers; register their generated tokens only for trusted
+development devices and never distribute a debug build.
+
+After the function, secret, App Check registrations, entitlement verification,
+and quotas are available, enable the interface at build time:
 
 ```sh
-flutter build web --release --dart-define=ENABLE_REMOTE_COACHING=true
+flutter build web --release \
+  --dart-define=ENABLE_REMOTE_COACHING=true \
+  --dart-define=FIREBASE_APP_CHECK_WEB_SITE_KEY=your-recaptcha-v3-site-key
 flutter build appbundle --release --dart-define=ENABLE_REMOTE_COACHING=true
 ```
 
 Never enable this flag in a production build before the function is ready and
-the independent server-side switch has been reviewed.
+the independent server-side switch has been reviewed. If App Check cannot be
+initialized, FocusHaven keeps the local coach available and does not construct
+the remote responder.
 
 The model defaults to `gpt-5.6-terra`. To change that non-secret deployment
 parameter, set `OPENAI_MODEL` when prompted by the Firebase CLI. Provider
