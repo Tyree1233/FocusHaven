@@ -15,6 +15,11 @@ with a bounded request ID and the exact UTC snapshot time the person acted on.
 FocusHaven accepts an action only when the snapshot still advertises it, rejects
 stale and replayed requests, contains callback failures, and keeps platform
 transport separate from timer mutation.
+The dormant platform bridge uses one dedicated method channel, serializes
+snapshot publications, rejects malformed native payloads, and disables command
+handling when its initial publication cannot reach a native adapter. Android,
+Apple, web, and desktop builds do not start this bridge until an intentionally
+supported native surface is installed and tested.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the
