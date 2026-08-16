@@ -23,6 +23,14 @@ firebase functions:secrets:set OPENAI_API_KEY
 firebase deploy --only functions:focusCoach
 ```
 
+The deployed callable fails closed unless the server-side
+`REMOTE_COACHING_ENABLED` parameter is explicitly set to `true`. Leave it
+`false` until App Check is configured for every supported production client,
+server-enforced Pro entitlement verification and usage quotas are deployed,
+and billing alerts are active. The callable requires App Check and consumes
+tokens to reduce replay attempts. The server switch is an emergency kill
+switch; the Flutter build flag below does not replace it.
+
 Normal builds keep the enhanced-coaching interface hidden so the local coach
 remains accurate when the paid backend has not been deployed. After the
 function and secret are available, enable the interface at build time:
@@ -32,7 +40,8 @@ flutter build web --release --dart-define=ENABLE_REMOTE_COACHING=true
 flutter build appbundle --release --dart-define=ENABLE_REMOTE_COACHING=true
 ```
 
-Never enable this flag in a production build before the function is ready.
+Never enable this flag in a production build before the function is ready and
+the independent server-side switch has been reviewed.
 
 The model defaults to `gpt-5.6-terra`. To change that non-secret deployment
 parameter, set `OPENAI_MODEL` when prompted by the Firebase CLI. Provider

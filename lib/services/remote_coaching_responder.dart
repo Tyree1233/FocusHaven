@@ -23,7 +23,10 @@ final class FirebaseCoachingFunctionBackend implements CoachingFunctionBackend {
   Future<Object?> request(Map<String, Object?> payload) async {
     final callable = _functions.httpsCallable(
       functionName,
-      options: HttpsCallableOptions(timeout: timeout),
+      options: HttpsCallableOptions(
+        timeout: timeout,
+        limitedUseAppCheckToken: true,
+      ),
     );
     final result = await callable.call(payload);
     return result.data;

@@ -1,6 +1,10 @@
 "use strict";
 
-const { defineSecret, defineString } = require("firebase-functions/params");
+const {
+  defineBoolean,
+  defineSecret,
+  defineString,
+} = require("firebase-functions/params");
 const { HttpsError, onCall } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 const OpenAI = require("openai");
@@ -10,11 +14,16 @@ const {
   buildModelInput,
   normalizeCoachingRequest,
 } = require("./coaching");
+const { evaluateRemoteCoachingAccess } = require("./remote_coaching_policy");
 
 const openAiApiKey = defineSecret("OPENAI_API_KEY");
 const openAiModel = defineString("OPENAI_MODEL", {
   default: "gpt-5.6-terra",
   description: "OpenAI model used by the FocusHaven coaching responder.",
+});
+const remoteCoachingEnabled = defineBoolean("REMOTE_COACHING_ENABLED", {
+  default: false,
+  description: "Emergency server-side switch for remote Focus Coach calls.",
 });
 
 exports.focusCoach = onCall(
@@ -26,12 +35,18 @@ exports.focusCoach = onCall(
     minInstances: 0,
     maxInstances: 10,
     concurrency: 20,
+    enforceAppCheck: true,
+    consumeAppCheckToken: true,
   },
   async (request) => {
-    if (!request.auth) {
+    const accessFailure = evaluateRemoteCoachingAccess({
+      authenticated: Boolean(request.auth),
+      enabled: remoteCoachingEnabled.value(),
+    });
+    if (accessFailure) {
       throw new HttpsError(
-        "unauthenticated",
-        "Sign in to use the remote Focus Coach.",
+        accessFailure.code,
+        accessFailure.message,
       );
     }
 
