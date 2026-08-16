@@ -26,6 +26,11 @@ describing a pattern, explains the evidence behind each observation, and says
 when feedback is mixed or still incomplete. Insights are ephemeral and never
 become a productivity score, diagnosis, or remote profile.
 
+The dashboard surfaces that observation in a compact Haven Rhythm card. Its
+headline stays visible without interrupting the timer; the explanation,
+evidence, possible pace, and privacy note appear only when the user expands the
+card. The card is informational and cannot start, schedule, or alter a session.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

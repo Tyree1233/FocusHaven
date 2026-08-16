@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/models/focus_event.dart';
+import 'package:focushaven/models/haven_rhythm_insight.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/coaching_service.dart';
@@ -17,6 +18,7 @@ import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
+import 'package:focushaven/widgets/haven_rhythm_card.dart';
 import 'package:focushaven/widgets/smart_reset_sheet.dart';
 
 class _CountingNavigatorObserver extends NavigatorObserver {
@@ -36,6 +38,7 @@ Widget _app(
   Future<bool> Function(Uri uri)? openExternalUrl,
   Future<void> Function(String text)? writeClipboard,
   List<FocusQueueItem> havenQueue = const [],
+  HavenRhythmInsight? rhythmInsight,
 }) {
   return ProviderScope(
     overrides: [
@@ -54,6 +57,8 @@ Widget _app(
         completedItems: const [],
         completedToday: 0,
       )),
+      if (rhythmInsight != null)
+        havenRhythmInsightProvider.overrideWithValue(rhythmInsight),
     ],
     child: MaterialApp(
       theme: ThemeData.dark().copyWith(
@@ -115,10 +120,42 @@ void main() {
     expect(find.text('Begin focus'), findsOneWidget);
     expect(find.text('Open focus queue'), findsOneWidget);
     expect(find.text('Plan my next session'), findsOneWidget);
+    expect(find.byType(HavenRhythmCard), findsOneWidget);
     expect(find.byTooltip('Mindful pause'), findsOneWidget);
     expect(find.byTooltip('Reflection journal'), findsOneWidget);
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
     expect(find.byTooltip('Sign in'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('expanding Haven Rhythm evidence leaves the timer untouched', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    const insight = HavenRhythmInsight(
+      kind: HavenRhythmKind.sustainablePace,
+      headline: '25 minutes has felt sustainable',
+      detail: 'Recent reflected sessions cluster near this pace.',
+      evidence: '3 of 4 recent reflections said About right.',
+      signalCount: 4,
+      usesSessionReflections: true,
+      suggestedFocusMinutes: 25,
+    );
+
+    await tester.pumpWidget(_app(timer, rhythmInsight: insight));
+    await tester.pump();
+    final secondsBefore = timer.secondsRemaining;
+    final toggle = find.byKey(const ValueKey('toggle-haven-rhythm'));
+    await tester.ensureVisible(toggle);
+    await tester.pumpAndSettle();
+    await tester.tap(toggle);
+    await tester.pump();
+
+    expect(find.text(insight.evidence), findsOneWidget);
+    expect(find.text('Possible pace · 25 min'), findsOneWidget);
+    expect(timer.secondsRemaining, secondsBefore);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
