@@ -36,7 +36,16 @@ class _SystemFocusPlatformHostState
   void initState() {
     super.initState();
     if (!_isEnabled) return;
+    unawaited(_activateAfterTimerRestoration());
+  }
 
+  Future<void> _activateAfterTimerRestoration() async {
+    try {
+      await ref.read(timerInitializationProvider);
+    } catch (_) {
+      return;
+    }
+    if (!mounted) return;
     final bridge = ref.read(systemFocusPlatformBridgeProvider);
     _bridge = bridge;
     _snapshotSubscription = ref.listenManual<SystemFocusSnapshot>(
@@ -45,7 +54,7 @@ class _SystemFocusPlatformHostState
         if (bridge.isStarted) unawaited(bridge.publish(snapshot));
       },
     );
-    unawaited(bridge.start());
+    await bridge.start();
   }
 
   @override

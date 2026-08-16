@@ -15,7 +15,7 @@ import java.time.Duration
 import java.time.Instant
 import java.util.Locale
 
-/** Read-only home-screen view of the private, text-free timer snapshot. */
+/** Private, text-free timer surface with narrowly authorized controls. */
 class FocusHavenWidgetProvider : AppWidgetProvider() {
     override fun onReceive(
         context: Context,
@@ -103,6 +103,7 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
                 )
                 showStaticTime(views, 0)
                 views.setProgressBar(R.id.focus_haven_widget_progress, 1, 0, false)
+                hideControls(views)
                 setDescription(
                     context,
                     views,
@@ -121,6 +122,7 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
                 content.completedSeconds,
                 false,
             )
+            configureControls(context, views, content)
             if (content.isRunning) {
                 val deadline = checkNotNull(content.endsAt)
                 val remainingMillis =
@@ -148,6 +150,75 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
                 ),
             )
             return views
+        }
+
+        private fun configureControls(
+            context: Context,
+            views: RemoteViews,
+            content: SystemFocusWidgetContent,
+        ) {
+            val primaryAction =
+                when {
+                    SystemFocusWidgetAction.START in content.availableActions ->
+                        SystemFocusWidgetAction.START
+                    SystemFocusWidgetAction.PAUSE in content.availableActions ->
+                        SystemFocusWidgetAction.PAUSE
+                    SystemFocusWidgetAction.RESUME in content.availableActions ->
+                        SystemFocusWidgetAction.RESUME
+                    SystemFocusWidgetAction.BEGIN_NEXT_SESSION in content.availableActions ->
+                        SystemFocusWidgetAction.BEGIN_NEXT_SESSION
+                    else -> null
+                }
+            if (primaryAction == null) {
+                hideControls(views)
+                return
+            }
+            views.setViewVisibility(R.id.focus_haven_widget_controls, View.VISIBLE)
+            views.setViewVisibility(R.id.focus_haven_widget_primary_action, View.VISIBLE)
+            views.setTextViewText(
+                R.id.focus_haven_widget_primary_action,
+                context.getString(primaryAction.labelResource),
+            )
+            views.setOnClickPendingIntent(
+                R.id.focus_haven_widget_primary_action,
+                commandPendingIntent(context, content, primaryAction),
+            )
+            if (SystemFocusWidgetAction.RESET in content.availableActions) {
+                views.setViewVisibility(R.id.focus_haven_widget_reset_action, View.VISIBLE)
+                views.setOnClickPendingIntent(
+                    R.id.focus_haven_widget_reset_action,
+                    commandPendingIntent(context, content, SystemFocusWidgetAction.RESET),
+                )
+            } else {
+                views.setViewVisibility(R.id.focus_haven_widget_reset_action, View.GONE)
+            }
+        }
+
+        private fun commandPendingIntent(
+            context: Context,
+            content: SystemFocusWidgetContent,
+            action: SystemFocusWidgetAction,
+        ): PendingIntent {
+            val intent =
+                Intent(context, FocusHavenWidgetCommandActivity::class.java).apply {
+                    putExtra(FocusHavenWidgetCommandActivity.EXTRA_ACTION, action.wireName)
+                    putExtra(
+                        FocusHavenWidgetCommandActivity.EXTRA_SNAPSHOT_GENERATED_AT,
+                        content.snapshotGeneratedAt.toString(),
+                    )
+                }
+            return PendingIntent.getActivity(
+                context,
+                4200 + action.ordinal,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+        }
+
+        private fun hideControls(views: RemoteViews) {
+            views.setViewVisibility(R.id.focus_haven_widget_controls, View.GONE)
+            views.setViewVisibility(R.id.focus_haven_widget_primary_action, View.GONE)
+            views.setViewVisibility(R.id.focus_haven_widget_reset_action, View.GONE)
         }
 
         private fun scheduleDeadlineRefresh(
@@ -222,6 +293,19 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
                     SystemFocusWidgetActivity.COMPLETED -> R.string.focus_haven_widget_completed
                     SystemFocusWidgetActivity.PENDING_RESUME ->
                         R.string.focus_haven_widget_pending_resume
+                }
+
+        private val SystemFocusWidgetAction.labelResource: Int
+            get() =
+                when (this) {
+                    SystemFocusWidgetAction.START -> R.string.focus_haven_widget_start
+                    SystemFocusWidgetAction.PAUSE -> R.string.focus_haven_widget_pause
+                    SystemFocusWidgetAction.RESUME -> R.string.focus_haven_widget_resume
+                    SystemFocusWidgetAction.RESET -> R.string.focus_haven_widget_reset
+                    SystemFocusWidgetAction.BEGIN_NEXT_SESSION ->
+                        R.string.focus_haven_widget_next
+                    SystemFocusWidgetAction.DISCARD_PENDING ->
+                        R.string.focus_haven_widget_discard
                 }
     }
 }

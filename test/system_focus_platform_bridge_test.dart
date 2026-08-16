@@ -70,6 +70,27 @@ void main() {
   );
 
   test(
+    'method channel backend claims only a string-keyed command map',
+    () async {
+      const channel = MethodChannel('com/focushaven/test_pending_focus');
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      final pending = command().toJson();
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        expect(
+          call.method,
+          MethodChannelSystemFocusBackend.takePendingCommandMethod,
+        );
+        return pending;
+      });
+      addTearDown(() => messenger.setMockMethodCallHandler(channel, null));
+      final backend = MethodChannelSystemFocusBackend(channel: channel);
+
+      expect(await backend.takePendingCommand(), pending);
+    },
+  );
+
+  test(
     'bridge stays dormant until a native host explicitly starts it',
     () async {
       final backend = _RecordingPlatformBackend();
@@ -142,6 +163,83 @@ void main() {
         backend.published.last['generatedAt'],
         current.generatedAt.toIso8601String(),
       );
+    },
+  );
+
+  test(
+    'startup consumes one restored native command after initial publication',
+    () async {
+      var current = snapshot(at: generatedAt.add(const Duration(seconds: 5)));
+      final calls = <String>[];
+      final backend = _RecordingPlatformBackend(
+        pendingCommand: command().toJson(),
+      );
+      final bridge = SystemFocusPlatformBridge(
+        backend: backend,
+        router: SystemFocusCommandRouter(),
+        readSnapshot: () => current,
+        target: _target(
+          calls,
+          start: () {
+            current = snapshot(
+              activity: SystemFocusActivity.running,
+              at: generatedAt.add(const Duration(seconds: 6)),
+            );
+          },
+        ),
+      );
+
+      expect(await bridge.start(), isTrue);
+
+      expect(backend.pendingTakeCount, 1);
+      expect(backend.pendingCommand, isNull);
+      expect(calls, ['start']);
+      expect(backend.published.map((item) => item['activity']), [
+        'ready',
+        'running',
+      ]);
+    },
+  );
+
+  test(
+    'malformed restored commands stay contained without disabling sync',
+    () async {
+      final backend = _RecordingPlatformBackend(
+        pendingCommand: {'schemaVersion': 1, 'requestId': 'incomplete'},
+      );
+      final bridge = _bridge(backend: backend, readSnapshot: snapshot);
+
+      expect(await bridge.start(), isTrue);
+
+      expect(bridge.isStarted, isTrue);
+      expect(backend.pendingTakeCount, 1);
+      expect(backend.published, hasLength(1));
+    },
+  );
+
+  test(
+    'restored commands still require the current advertised action',
+    () async {
+      final calls = <String>[];
+      final backend = _RecordingPlatformBackend(
+        pendingCommand: command().toJson(),
+      );
+      final bridge = SystemFocusPlatformBridge(
+        backend: backend,
+        router: SystemFocusCommandRouter(),
+        readSnapshot: () => snapshot(
+          activity: SystemFocusActivity.paused,
+          at: generatedAt.add(const Duration(seconds: 5)),
+          remaining: 290,
+        ),
+        target: _target(calls),
+      );
+
+      expect(await bridge.start(), isTrue);
+
+      expect(calls, isEmpty);
+      expect(backend.published, hasLength(1));
+      expect(backend.published.single['activity'], 'paused');
     },
   );
 
@@ -300,10 +398,13 @@ SystemFocusCommandTarget _target(
   discardPending: () => calls.add('discardPending'),
 );
 
-final class _RecordingPlatformBackend implements SystemFocusPlatformBackend {
-  _RecordingPlatformBackend({this.publishError});
+final class _RecordingPlatformBackend
+    implements SystemFocusPlatformBackend, SystemFocusPendingCommandBackend {
+  _RecordingPlatformBackend({this.publishError, this.pendingCommand});
 
   final Object? publishError;
+  Map<String, Object?>? pendingCommand;
+  int pendingTakeCount = 0;
   SystemFocusPlatformCommandHandler? handler;
   Future<void>? publishGate;
   final List<Map<String, Object?>> published = [];
@@ -313,6 +414,14 @@ final class _RecordingPlatformBackend implements SystemFocusPlatformBackend {
   @override
   void setCommandHandler(SystemFocusPlatformCommandHandler? handler) {
     this.handler = handler;
+  }
+
+  @override
+  Future<Map<String, Object?>?> takePendingCommand() async {
+    pendingTakeCount += 1;
+    final command = pendingCommand;
+    pendingCommand = null;
+    return command;
   }
 
   @override

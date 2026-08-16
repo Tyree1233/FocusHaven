@@ -13,4 +13,10 @@
     <string name="focus_haven_widget_open_to_begin">Open FocusHaven to begin</string>
     <string name="focus_haven_widget_description_template">%1$s, %2$s, %3$s remaining</string>
     <string name="focus_haven_widget_accessibility">%1$s. Double tap to open FocusHaven.</string>
+    <string name="focus_haven_widget_start">Start</string>
+    <string name="focus_haven_widget_pause">Pause</string>
+    <string name="focus_haven_widget_resume">Resume</string>
+    <string name="focus_haven_widget_reset">Reset</string>
+    <string name="focus_haven_widget_next">Next session</string>
+    <string name="focus_haven_widget_discard">Discard</string>
 </resources>

@@ -130,6 +130,11 @@ final timerServiceProvider = ChangeNotifierProvider<TimerService>(
   name: 'timerServiceProvider',
 );
 
+/// Completion boundary required before trusted system surfaces publish or act.
+final timerInitializationProvider = Provider<Future<void>>((ref) {
+  return ref.watch(timerServiceProvider).initialized;
+}, name: 'timerInitializationProvider');
+
 /// Stable running deadline shared with system surfaces without widening the
 /// high-frequency countdown read model.
 final timerEndsAtProvider = Provider<DateTime?>((ref) {

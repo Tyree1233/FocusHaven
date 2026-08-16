@@ -74,4 +74,39 @@
         android:progress="0"
         android:progressBackgroundTint="@color/focus_haven_widget_progress_track"
         android:progressTint="@color/focus_haven_widget_accent" />
+
+    <LinearLayout
+        android:id="@+id/focus_haven_widget_controls"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:gravity="end|center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/focus_haven_widget_reset_action"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginEnd="8dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:text="@string/focus_haven_widget_reset"
+            android:textAllCaps="false"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/focus_haven_widget_primary_action"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
+            android:text="@string/focus_haven_widget_start"
+            android:textAllCaps="false"
+            android:textSize="13sp" />
+    </LinearLayout>
 </LinearLayout>

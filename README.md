@@ -28,9 +28,14 @@ running session by its authoritative deadline, and skips equivalent one-second
 writes. Android home screens can now add a responsive, read-only FocusHaven
 widget that shows the session kind, calm timer state, progress, and a live
 system countdown. It reads only the validated private snapshot, performs no
-periodic background work, and uses one immutable tap target to open the app;
-it cannot mutate the timer or expose task, reflection, mood, history, coach, or
-account data. Apple and every unsupported platform remain dormant.
+periodic background work, and uses immutable start, pause, resume, reset, and
+next-session controls. Each control enters through a non-exported Android
+trampoline, is rechecked against the exact app-private snapshot, and queues one
+text-free command. Flutter waits for timer restoration, claims a cold-start
+command once, and still applies the stale, replay, and advertised-action gates
+before any mutation. No widget code can directly change the timer or expose
+task, reflection, mood, history, coach, or account data. Apple and every
+unsupported platform remain dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the

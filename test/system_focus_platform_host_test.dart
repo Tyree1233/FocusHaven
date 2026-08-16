@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -66,6 +68,37 @@ void main() {
     expect(backend.published.last['endsAt'], isNotNull);
   });
 
+  testWidgets('native sync waits for restored timer initialization', (
+    tester,
+  ) async {
+    final backend = _RecordingHostBackend();
+    final restoration = Completer<void>();
+    final timer = TimerService();
+    await timer.initialized;
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          timerServiceProvider.overrideWith((ref) => timer),
+          timerInitializationProvider.overrideWithValue(restoration.future),
+          systemFocusPlatformBackendProvider.overrideWithValue(backend),
+        ],
+        child: const SystemFocusPlatformHost(enabled: true, child: SizedBox()),
+      ),
+    );
+    await tester.pump();
+
+    expect(backend.handler, isNull);
+    expect(backend.published, isEmpty);
+
+    restoration.complete();
+    await tester.pump();
+    await tester.pump();
+
+    expect(backend.handler, isNotNull);
+    expect(backend.published, hasLength(1));
+  });
+
   testWidgets('host disposal removes the native command handler', (
     tester,
   ) async {
@@ -79,6 +112,7 @@ void main() {
         child: const SystemFocusPlatformHost(enabled: true, child: SizedBox()),
       ),
     );
+    await tester.pump();
     await tester.pump();
     expect(backend.handler, isNotNull);
 

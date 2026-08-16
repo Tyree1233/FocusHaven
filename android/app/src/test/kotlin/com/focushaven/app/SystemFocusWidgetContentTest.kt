@@ -35,6 +35,7 @@ class SystemFocusWidgetContentTest {
             assertEquals(activityEnum(activity), content.activity)
             assertEquals(900, content.secondsRemaining)
             assertEquals(600, content.completedSeconds)
+            assertEquals(now, content.snapshotGeneratedAt)
             assertFalse(content.isRunning)
             assertNull(content.endsAt)
         }
@@ -58,6 +59,10 @@ class SystemFocusWidgetContentTest {
         assertEquals(83, content.secondsRemaining)
         assertEquals(deadline, content.endsAt)
         assertTrue(content.isRunning)
+        assertEquals(
+            setOf(SystemFocusWidgetAction.PAUSE, SystemFocusWidgetAction.RESET),
+            content.availableActions,
+        )
     }
 
     @Test
@@ -76,6 +81,7 @@ class SystemFocusWidgetContentTest {
         assertEquals(0, content.secondsRemaining)
         assertFalse(content.isRunning)
         assertNull(content.endsAt)
+        assertTrue(content.availableActions.isEmpty())
     }
 
     @Test
