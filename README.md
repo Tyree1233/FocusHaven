@@ -31,6 +31,12 @@ and billing alerts are active. The callable requires App Check and consumes
 tokens to reduce replay attempts. The server switch is an emergency kill
 switch; the Flutter build flag below does not replace it.
 
+Even when that switch is enabled, the callable requires server-issued
+`focusHavenProPlan` and `focusHavenProExpiresAt` Firebase Auth claims for an
+unexpired monthly or annual subscription. Client storage and purchase events
+cannot mint these claims. Until trusted store receipt validation can issue and
+revoke them, every remote coaching request remains denied.
+
 Normal builds keep the enhanced-coaching interface hidden so the local coach
 remains accurate when the paid backend has not been deployed. Before producing
 an enabled build, register the Android, Apple, and web apps under Firebase

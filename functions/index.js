@@ -41,7 +41,9 @@ exports.focusCoach = onCall(
   async (request) => {
     const accessFailure = evaluateRemoteCoachingAccess({
       authenticated: Boolean(request.auth),
+      claims: request.auth?.token ?? null,
       enabled: remoteCoachingEnabled.value(),
+      nowSeconds: Math.floor(Date.now() / 1000),
     });
     if (accessFailure) {
       throw new HttpsError(
