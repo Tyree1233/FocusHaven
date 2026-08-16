@@ -137,6 +137,42 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('previews subscriptions while checkout remains disabled', (
+    tester,
+  ) async {
+    final platform = _FakeIapPlatform(product: _product());
+    InAppPurchasePlatform.instance = platform;
+    final service = IAPService(
+      inAppPurchase: inAppPurchase,
+      legacyLifetimePurchasesEnabled: false,
+    );
+    addTearDown(() async {
+      service.dispose();
+      await platform.dispose();
+    });
+
+    await tester.pumpWidget(_app(service, isPro: false));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Enhanced AI coaching allowance'), findsOneWidget);
+    expect(find.text('Monthly plan for flexible access'), findsOneWidget);
+    expect(
+      find.text('Annual plan with early-supporter savings'),
+      findsOneWidget,
+    );
+    expect(find.text('One-time lifetime unlock'), findsNothing);
+    expect(find.text(r'Unlock Pro for $4.99'), findsNothing);
+    final preview = find.widgetWithText(
+      FilledButton,
+      'Monthly and annual plans coming soon',
+    );
+    expect(preview, findsOneWidget);
+    expect(tester.widget<FilledButton>(preview).onPressed, isNull);
+    expect(find.text('Restore purchases'), findsOneWidget);
+    expect(platform.buyCalls, 0);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('starts the lifetime purchase when pricing is available', (
     tester,
   ) async {

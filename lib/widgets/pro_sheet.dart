@@ -76,6 +76,9 @@ class _ProSheetState extends ConsumerState<ProSheet> {
   @override
   Widget build(BuildContext context) {
     final entitlement = ref.watch(proEntitlementProvider);
+    final legacyLifetimePurchasesEnabled = ref
+        .read(iapServiceProvider)
+        .legacyLifetimePurchasesEnabled;
     final isPro = entitlement.value;
     final entitlementFailed = entitlement.hasError;
 
@@ -127,10 +130,12 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Protect your focus progress with secure cloud backup and restore it on your other devices.',
+                Text(
+                  legacyLifetimePurchasesEnabled
+                      ? 'Protect your focus progress with secure cloud backup and restore it on your other devices.'
+                      : 'Core focus tools and private local coaching stay free. Pro subscriptions will add enhanced coaching and secure continuity across devices.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70),
+                  style: const TextStyle(color: Colors.white70),
                 ),
                 const SizedBox(height: 18),
                 const ProBenefit(
@@ -141,10 +146,25 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                   icon: Icons.devices_outlined,
                   label: 'Restore on another device',
                 ),
-                const ProBenefit(
-                  icon: Icons.all_inclusive,
-                  label: 'One-time lifetime unlock',
-                ),
+                if (legacyLifetimePurchasesEnabled)
+                  const ProBenefit(
+                    icon: Icons.all_inclusive,
+                    label: 'One-time lifetime unlock',
+                  )
+                else ...[
+                  const ProBenefit(
+                    icon: Icons.auto_awesome_outlined,
+                    label: 'Enhanced AI coaching allowance',
+                  ),
+                  const ProBenefit(
+                    icon: Icons.calendar_view_month_outlined,
+                    label: 'Monthly plan for flexible access',
+                  ),
+                  const ProBenefit(
+                    icon: Icons.savings_outlined,
+                    label: 'Annual plan with early-supporter savings',
+                  ),
+                ],
                 const SizedBox(height: 22),
                 FutureBuilder<String?>(
                   future: _priceFuture,
@@ -152,7 +172,8 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                     final price = snapshot.data;
                     return FilledButton(
                       onPressed:
-                          isPro == false &&
+                          legacyLifetimePurchasesEnabled &&
+                              isPro == false &&
                               price != null &&
                               !_storeActionInProgress
                           ? _buyPro
@@ -169,6 +190,8 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                             ? entitlementFailed
                                   ? 'Pro status is unavailable'
                                   : 'Checking Pro status'
+                            : !legacyLifetimePurchasesEnabled
+                            ? 'Monthly and annual plans coming soon'
                             : price == null
                             ? 'Pro is not available yet'
                             : 'Unlock Pro for $price',
