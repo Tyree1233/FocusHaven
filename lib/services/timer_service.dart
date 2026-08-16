@@ -215,6 +215,12 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   bool get isRunning => _isRunning;
   bool get isComplete => _isComplete;
   bool get hasPendingResume => _hasPendingResume;
+  bool get canStartHavenPlan =>
+      _sessionType == SessionType.focus &&
+      !_isRunning &&
+      !_isComplete &&
+      !_hasPendingResume &&
+      _activeFocusStartedAt == null;
   Future<void> get initialized => _initialization;
   SessionType get sessionType => _sessionType;
   String get completionMessage => _completionMessage;

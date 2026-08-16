@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/focus_milestone.dart';
 import '../models/focus_session.dart';
+import '../models/haven_plan.dart';
 import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
 import '../services/coaching_service.dart';
@@ -26,6 +27,7 @@ import '../widgets/distraction_parking_sheet.dart';
 import '../widgets/focus_milestones_sheet.dart';
 import '../widgets/focus_profile_sheet.dart';
 import '../widgets/guided_breathing_sheet.dart';
+import '../widgets/haven_plan_sheet.dart';
 import '../widgets/journal_entry_dialog.dart';
 import '../widgets/pro_sheet.dart';
 import '../widgets/reflection_journal_sheet.dart';
@@ -424,6 +426,37 @@ class TimerScreen extends riverpod.ConsumerWidget {
           item,
         ),
         onShowCompleted: () => _showCompletedTasksSheet(sheetContext),
+      ),
+    );
+  }
+
+  Future<void> _showHavenPlanSheet(
+    BuildContext context,
+    TimerService timer,
+  ) async {
+    if (!_canOpenOverlay(context) || !timer.canStartHavenPlan) {
+      return;
+    }
+    final plan = await showModalBottomSheet<HavenPlan>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) => const HavenPlanSheet(),
+    );
+    if (plan == null || !context.mounted) return;
+    if (!timer.canStartHavenPlan) return;
+
+    if (plan.queueItemId != null) timer.setFocusTask(plan.taskTitle);
+    timer.setCustomMinutes(plan.focusMinutes);
+    timer.start();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Haven Plan started: ${plan.focusMinutes} minutes of focus.',
+        ),
       ),
     );
   }
@@ -846,6 +879,17 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                 : 'Focus queue • $queueRemaining',
                           ),
                         ),
+                        if (timer.canStartHavenPlan)
+                          TextButton.icon(
+                            key: const ValueKey('open-haven-plan'),
+                            onPressed: () =>
+                                _showHavenPlanSheet(context, timer),
+                            icon: const Icon(
+                              Icons.auto_awesome_outlined,
+                              size: 18,
+                            ),
+                            label: const Text('Plan my next session'),
+                          ),
                         if (session.isRunning || hasParkedThoughts)
                           TextButton.icon(
                             onPressed: () => session.isRunning

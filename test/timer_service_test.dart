@@ -908,4 +908,26 @@ void main() {
       expect(timer.focusEventsRevision, revision);
     },
   );
+
+  test('Haven Plans are available only before a fresh focus attempt', () async {
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.canStartHavenPlan, isTrue);
+
+    timer.selectSession(SessionType.shortBreak);
+    expect(timer.canStartHavenPlan, isFalse);
+
+    timer.selectSession(SessionType.focus);
+    expect(timer.canStartHavenPlan, isTrue);
+
+    timer.start();
+    expect(timer.canStartHavenPlan, isFalse);
+
+    timer.pause();
+    expect(timer.canStartHavenPlan, isFalse);
+
+    timer.reset();
+    expect(timer.canStartHavenPlan, isTrue);
+  });
 }

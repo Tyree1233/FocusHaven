@@ -10,9 +10,11 @@ import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/coaching_service.dart';
+import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
+import 'package:focushaven/widgets/haven_plan_sheet.dart';
 
 class _CountingNavigatorObserver extends NavigatorObserver {
   int pushCount = 0;
@@ -30,6 +32,7 @@ Widget _app(
   CoachingService? coachingService,
   Future<bool> Function(Uri uri)? openExternalUrl,
   Future<void> Function(String text)? writeClipboard,
+  List<FocusQueueItem> havenQueue = const [],
 }) {
   return ProviderScope(
     overrides: [
@@ -42,7 +45,12 @@ Widget _app(
         signInError: null,
       )),
       authIsSignedInProvider.overrideWithValue(false),
-      focusQueueRemainingCountProvider.overrideWithValue(0),
+      focusQueueRemainingCountProvider.overrideWithValue(havenQueue.length),
+      focusQueueStateProvider.overrideWithValue((
+        activeItems: havenQueue,
+        completedItems: const [],
+        completedToday: 0,
+      )),
     ],
     child: MaterialApp(
       theme: ThemeData.dark().copyWith(
@@ -103,10 +111,91 @@ void main() {
     expect(find.text('25 MINUTES'), findsOneWidget);
     expect(find.text('Begin focus'), findsOneWidget);
     expect(find.text('Open focus queue'), findsOneWidget);
+    expect(find.text('Plan my next session'), findsOneWidget);
     expect(find.byTooltip('Mindful pause'), findsOneWidget);
     expect(find.byTooltip('Reflection journal'), findsOneWidget);
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
     expect(find.byTooltip('Sign in'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('starts an accepted Haven Plan with its queued task', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+
+    await tester.pumpWidget(
+      _app(
+        timer,
+        havenQueue: const [
+          FocusQueueItem(id: 'plan-task', title: 'Prepare the project brief'),
+        ],
+      ),
+    );
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('open-haven-plan')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(HavenPlanSheet), findsOneWidget);
+    expect(find.text('Prepare the project brief'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ChoiceChip, 'Low'));
+    await tester.pump();
+    final start = find.byKey(const ValueKey('haven-plan-start'));
+    await tester.ensureVisible(start);
+    await tester.pumpAndSettle();
+    await tester.tap(start);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(HavenPlanSheet), findsNothing);
+    expect(timer.isRunning, isTrue);
+    expect(timer.totalSessionSeconds, 10 * 60);
+    expect(timer.focusTask, 'Prepare the project brief');
+    expect(
+      find.text('Haven Plan started: 10 minutes of focus.'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('open-haven-plan')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('dismissing a Haven Plan leaves the timer untouched', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    timer.setFocusTask('Keep the current intention');
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('open-haven-plan')));
+    await tester.pumpAndSettle();
+
+    final dismiss = find.text('Not right now');
+    await tester.ensureVisible(dismiss);
+    await tester.tap(dismiss);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(HavenPlanSheet), findsNothing);
+    expect(timer.isRunning, isFalse);
+    expect(timer.totalSessionSeconds, 25 * 60);
+    expect(timer.focusTask, 'Keep the current intention');
+    expect(find.byKey(const ValueKey('open-haven-plan')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a paused focus attempt cannot be replaced by a Haven Plan', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    timer.start();
+    timer.pause();
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+
+    expect(timer.canStartHavenPlan, isFalse);
+    expect(find.byKey(const ValueKey('open-haven-plan')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

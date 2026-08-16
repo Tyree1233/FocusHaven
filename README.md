@@ -3,6 +3,11 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+The optional Haven Plan check-in turns the user's current energy, available
+time, focus queue, and text-free local focus events into a transparent session
+preview. Plans are created on-device, are never persisted by themselves, and
+cannot start a timer until the user explicitly accepts the recommendation.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
