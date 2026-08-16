@@ -12,6 +12,7 @@ import '../models/living_lantern_state.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
 import '../models/pro_entitlement.dart';
+import '../models/system_focus_snapshot.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/coaching_service.dart';
@@ -26,6 +27,7 @@ import '../services/notification_service.dart';
 import '../services/remote_coaching_responder.dart';
 import '../services/reminder_service.dart';
 import '../services/smart_reset_service.dart';
+import '../services/system_focus_surface_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
 
@@ -179,6 +181,11 @@ final smartResetServiceProvider = Provider<SmartResetService>(
   name: 'smartResetServiceProvider',
 );
 
+final systemFocusSurfaceServiceProvider = Provider<SystemFocusSurfaceService>(
+  (ref) => const SystemFocusSurfaceService(),
+  name: 'systemFocusSurfaceServiceProvider',
+);
+
 final journalServiceProvider = ChangeNotifierProvider<JournalService>(
   (ref) => JournalService(),
   name: 'journalServiceProvider',
@@ -317,6 +324,24 @@ final livingLanternStateProvider = Provider<LivingLanternState>((ref) {
         recentEvents: events,
       );
 }, name: 'livingLanternStateProvider');
+
+/// Creates the bounded, text-free state contract used by trusted system
+/// surfaces. No task, journal, coach, history, mood, or account data enters it.
+final systemFocusSnapshotProvider = Provider<SystemFocusSnapshot>((ref) {
+  final countdown = ref.watch(timerCountdownStateProvider);
+  final session = ref.watch(timerSessionStateProvider);
+  return ref
+      .watch(systemFocusSurfaceServiceProvider)
+      .createSnapshot(
+        sessionType: session.sessionType,
+        isRunning: session.isRunning,
+        isComplete: session.isComplete,
+        hasPendingResume: session.hasPendingResume,
+        secondsRemaining: countdown.secondsRemaining,
+        totalSessionSeconds: countdown.totalSessionSeconds,
+        generatedAt: DateTime.now(),
+      );
+}, name: 'systemFocusSnapshotProvider');
 
 /// Parking-lot snapshot that changes only when a thought is captured, edited,
 /// completed, reopened, removed, migrated, or cleared.

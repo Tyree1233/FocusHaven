@@ -3,6 +3,14 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+Future home-screen widgets, lock-screen experiences, notifications, and watch
+companions share one versioned system-focus snapshot. The contract contains
+only the session kind, timer activity, bounded duration, UTC timestamps, and
+the commands valid for that state. It excludes task names, reflections,
+journal and coaching content, focus history, moods, and account identifiers by
+construction. The snapshot is derived locally, is not persisted by itself,
+and cannot mutate the timer or invoke platform code.
+
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the
 same whole lantern while it is ready, steadily focusing, resting, celebrating,
