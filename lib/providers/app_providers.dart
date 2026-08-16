@@ -7,6 +7,7 @@ import '../models/coaching_message.dart';
 import '../models/focus_session.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
+import '../models/pro_entitlement.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/coaching_service.dart';
@@ -176,13 +177,27 @@ final iapServiceProvider = Provider<IAPService>((ref) {
   return service;
 }, name: 'iapServiceProvider');
 
-/// Loads the persisted Pro entitlement, then follows purchase and restore
+/// Loads the complete local Pro entitlement, then follows purchase and restore
 /// updates without coupling views to the store service implementation.
+final proEntitlementDetailsProvider = StreamProvider<ProEntitlement>((
+  ref,
+) async* {
+  final service = ref.watch(iapServiceProvider);
+
+  await service.initialized;
+  yield service.lastKnownEntitlement ?? await service.refreshProEntitlement();
+  yield* service.proEntitlementChanges;
+}, name: 'proEntitlementDetailsProvider');
+
+/// Compatibility view used by existing Pro surfaces while subscription-aware
+/// presentation and server verification are introduced incrementally.
 final proEntitlementProvider = StreamProvider<bool>((ref) async* {
   final service = ref.watch(iapServiceProvider);
 
   await service.initialized;
-  yield service.lastKnownIsPro ?? await service.refreshEntitlement();
+  final initial =
+      service.lastKnownEntitlement ?? await service.refreshProEntitlement();
+  yield initial.isActiveAt(DateTime.now());
   yield* service.entitlementChanges;
 }, name: 'proEntitlementProvider');
 

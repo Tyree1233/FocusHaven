@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/pro_entitlement.dart';
 
 abstract interface class IAPStoreBackend {
   Stream<List<PurchaseDetails>> get purchaseStream;
@@ -45,14 +48,15 @@ final class PluginIAPStoreBackend implements IAPStoreBackend {
 }
 
 class IAPService {
-  static const _proKey = 'isProUser';
+  static const _legacyProKey = 'isProUser';
+  static const _entitlementKey = 'proEntitlementV1';
   static const proProductId = 'focushaven_pro';
 
   final IAPStoreBackend _store;
-  final StreamController<bool> _entitlementController =
-      StreamController<bool>.broadcast();
+  final StreamController<ProEntitlement> _entitlementController =
+      StreamController<ProEntitlement>.broadcast();
   StreamSubscription<List<PurchaseDetails>>? _subscription;
-  bool? _lastKnownIsPro;
+  ProEntitlement? _lastKnownEntitlement;
   bool _isDisposed = false;
 
   IAPService({InAppPurchase? inAppPurchase, IAPStoreBackend? storeBackend})
@@ -75,10 +79,19 @@ class IAPService {
   ///
   /// The stream is intentionally separate from store availability and pricing
   /// so views that only care about access do not rebuild for store operations.
-  Stream<bool> get entitlementChanges => _entitlementController.stream;
+  Stream<ProEntitlement> get proEntitlementChanges =>
+      _entitlementController.stream;
+
+  /// Compatibility stream for existing views that only need active access.
+  Stream<bool> get entitlementChanges => proEntitlementChanges.map(
+    (entitlement) => entitlement.isActiveAt(DateTime.now()),
+  );
 
   /// The most recently loaded entitlement, or `null` until storage is read.
-  bool? get lastKnownIsPro => _lastKnownIsPro;
+  ProEntitlement? get lastKnownEntitlement => _lastKnownEntitlement;
+
+  /// Compatibility value for existing views that only need active access.
+  bool? get lastKnownIsPro => _lastKnownEntitlement?.isActiveAt(DateTime.now());
 
   Future<void> _loadInitialEntitlement() async {
     try {
@@ -103,9 +116,9 @@ class IAPService {
             (purchase.status == PurchaseStatus.purchased ||
                 purchase.status == PurchaseStatus.restored);
         if (grantsPro) {
-          final preferences = await SharedPreferences.getInstance();
-          await preferences.setBool(_proKey, true);
-          _publishEntitlement(true);
+          const entitlement = ProEntitlement.grandfatheredLifetime();
+          await _persistEntitlement(entitlement);
+          _publishEntitlement(entitlement);
         }
         if (purchase.pendingCompletePurchase && !_isDisposed) {
           await _store.completePurchase(purchase);
@@ -122,27 +135,76 @@ class IAPService {
     }
   }
 
-  void _publishEntitlement(bool isPro) {
-    if (_isDisposed || _lastKnownIsPro == isPro) return;
-    _lastKnownIsPro = isPro;
-    _entitlementController.add(isPro);
+  void _publishEntitlement(ProEntitlement entitlement) {
+    if (_isDisposed || _lastKnownEntitlement == entitlement) return;
+    _lastKnownEntitlement = entitlement;
+    _entitlementController.add(entitlement);
+  }
+
+  /// Loads the local access record.
+  ///
+  /// Shared preferences are not trusted to prove a paid server entitlement.
+  /// Only free and grandfathered lifetime access can be restored here. Future
+  /// subscription verification must arrive from a trusted server response.
+  static Future<ProEntitlement> loadEntitlement() async {
+    final preferences = await SharedPreferences.getInstance();
+    final saved = preferences.get(_entitlementKey);
+    if (saved is String) {
+      try {
+        final decoded = jsonDecode(saved);
+        if (decoded is! Map<String, dynamic>) {
+          throw const FormatException('Invalid Pro entitlement record.');
+        }
+        final entitlement = ProEntitlement.fromJson(decoded);
+        if (entitlement.verification == ProVerification.server) {
+          throw const FormatException(
+            'Server grants cannot be restored from local storage.',
+          );
+        }
+        await preferences.remove(_legacyProKey);
+        return entitlement;
+      } on FormatException {
+        await preferences.remove(_entitlementKey);
+      }
+    } else if (saved != null) {
+      await preferences.remove(_entitlementKey);
+    }
+
+    final legacy = preferences.get(_legacyProKey);
+    await preferences.remove(_legacyProKey);
+    if (legacy == true) {
+      const entitlement = ProEntitlement.grandfatheredLifetime();
+      await _persistEntitlement(entitlement, preferences: preferences);
+      return entitlement;
+    }
+    return const ProEntitlement.free();
   }
 
   static Future<bool> isProUser() async {
-    final preferences = await SharedPreferences.getInstance();
-    final savedEntitlement = preferences.get(_proKey);
-    if (savedEntitlement is bool) return savedEntitlement;
-    if (savedEntitlement != null) {
-      await preferences.remove(_proKey);
-    }
-    return false;
+    final entitlement = await loadEntitlement();
+    return entitlement.isActiveAt(DateTime.now());
+  }
+
+  static Future<void> _persistEntitlement(
+    ProEntitlement entitlement, {
+    SharedPreferences? preferences,
+  }) async {
+    final storage = preferences ?? await SharedPreferences.getInstance();
+    await storage.setString(_entitlementKey, jsonEncode(entitlement.toJson()));
+    await storage.remove(_legacyProKey);
+  }
+
+  /// Reloads and publishes the complete local entitlement record.
+  Future<ProEntitlement> refreshProEntitlement() async {
+    final entitlement = await loadEntitlement();
+    _publishEntitlement(entitlement);
+    return entitlement;
   }
 
   /// Reloads the persisted entitlement and publishes it to active listeners.
   Future<bool> refreshEntitlement() async {
-    final isPro = await isProUser();
-    _publishEntitlement(isPro);
-    return isPro;
+    final entitlement = await refreshProEntitlement();
+    return entitlement.isActiveAt(DateTime.now());
   }
 
   Future<String?> proPrice() async {

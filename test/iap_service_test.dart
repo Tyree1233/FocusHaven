@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/models/pro_entitlement.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/iap_service.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
@@ -122,7 +124,20 @@ void main() {
       await service.initialized;
 
       expect(service.lastKnownIsPro, isTrue);
+      expect(
+        service.lastKnownEntitlement,
+        const ProEntitlement.grandfatheredLifetime(),
+      );
       expect(await IAPService.isProUser(), isTrue);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.containsKey('isProUser'), isFalse);
+      expect(
+        ProEntitlement.fromJson(
+          jsonDecode(preferences.getString('proEntitlementV1')!)
+              as Map<String, dynamic>,
+        ),
+        const ProEntitlement.grandfatheredLifetime(),
+      );
     },
   );
 
@@ -139,6 +154,32 @@ void main() {
     expect(preferences.containsKey('isProUser'), isFalse);
     expect(backend.queryCalls, 0);
     expect(backend.restoreCalls, 0);
+  });
+
+  test('rejects a forged server entitlement from local storage', () async {
+    final forged = ProEntitlement.serverVerified(
+      plan: ProPlan.annual,
+      verifiedAt: DateTime.utc(2026, 1, 1),
+      expiresAt: DateTime.utc(2027, 1, 1),
+    );
+    SharedPreferences.setMockInitialValues({
+      'proEntitlementV1': jsonEncode(forged.toJson()),
+    });
+    final backend = _FakeStoreBackend();
+    final service = _createService(backend);
+
+    await service.initialized;
+
+    expect(service.lastKnownEntitlement, const ProEntitlement.free());
+    expect(service.lastKnownIsPro, isFalse);
+    expect(
+      service.lastKnownEntitlement!.allowsPaidServicesAt(
+        DateTime.utc(2026, 6, 1),
+      ),
+      isFalse,
+    );
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('proEntitlementV1'), isFalse);
   });
 
   test('returns only the exact FocusHaven Pro product price', () async {
@@ -224,6 +265,14 @@ void main() {
     expect(await entitlement, isTrue);
     expect(await completed, same(purchase));
     expect(service.lastKnownIsPro, isTrue);
+    expect(
+      service.lastKnownEntitlement,
+      const ProEntitlement.grandfatheredLifetime(),
+    );
+    expect(
+      service.lastKnownEntitlement!.allowsPaidServicesAt(DateTime.now()),
+      isFalse,
+    );
     expect(await IAPService.isProUser(), isTrue);
   });
 
@@ -320,4 +369,34 @@ void main() {
       expect(container.read(proEntitlementProvider).value, isTrue);
     },
   );
+
+  test('Riverpod exposes complete subscription-aware entitlement', () async {
+    SharedPreferences.setMockInitialValues({'isProUser': true});
+    final backend = _FakeStoreBackend();
+    final service = _createService(backend);
+    final container = ProviderContainer(
+      overrides: [iapServiceProvider.overrideWithValue(service)],
+    );
+    addTearDown(container.dispose);
+    final firstEntitlement = Completer<ProEntitlement>();
+    final subscription = container.listen(proEntitlementDetailsProvider, (
+      previous,
+      next,
+    ) {
+      next.whenData((entitlement) {
+        if (!firstEntitlement.isCompleted) {
+          firstEntitlement.complete(entitlement);
+        }
+      });
+    }, fireImmediately: true);
+    addTearDown(subscription.close);
+
+    final entitlement = await firstEntitlement.future.timeout(
+      const Duration(seconds: 1),
+    );
+
+    expect(entitlement, const ProEntitlement.grandfatheredLifetime());
+    expect(entitlement.isActiveAt(DateTime.now()), isTrue);
+    expect(entitlement.allowsPaidServicesAt(DateTime.now()), isFalse);
+  });
 }
