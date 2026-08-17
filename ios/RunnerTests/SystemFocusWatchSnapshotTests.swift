@@ -150,6 +150,209 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     )
   }
 
+  func testCommandUsesOneExactBoundedTextFreeContract() throws {
+    let snapshot = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(applicationSnapshot())
+    )
+    let command = try XCTUnwrap(
+      SystemFocusWatchCommand.create(
+        action: .start,
+        snapshot: snapshot,
+        now: generatedAt.addingTimeInterval(10),
+        requestId: "watch-request-123"
+      )
+    )
+
+    XCTAssertEqual(
+      Set(command.wireDictionary.keys),
+      [
+        "schemaVersion",
+        "requestId",
+        "action",
+        "snapshotGeneratedAtMilliseconds",
+        "createdAtMilliseconds",
+      ]
+    )
+    XCTAssertNil(command.wireDictionary["task"])
+    XCTAssertNil(command.wireDictionary["accountId"])
+    XCTAssertEqual(
+      SystemFocusWatchCommand.fromWireDictionary(command.wireDictionary),
+      command
+    )
+  }
+
+  func testMalformedExpandedAndUnboundedCommandsFailClosed() throws {
+    let command = try validCommand()
+    var expanded = command.wireDictionary
+    expanded["reflection"] = "private"
+    var floatingVersion = command.wireDictionary
+    floatingVersion["schemaVersion"] = 1.0
+    var booleanTime = command.wireDictionary
+    booleanTime["createdAtMilliseconds"] = true
+    var unknownAction = command.wireDictionary
+    unknownAction["action"] = "extend"
+    var shortRequest = command.wireDictionary
+    shortRequest["requestId"] = "short"
+
+    for value in [expanded, floatingVersion, booleanTime, unknownAction, shortRequest] {
+      XCTAssertNil(SystemFocusWatchCommand.fromWireDictionary(value))
+    }
+  }
+
+  func testCommandFreshnessUsesOneBoundedWindow() throws {
+    let command = try validCommand(now: generatedAt)
+
+    XCTAssertTrue(command.isFresh(at: generatedAt))
+    XCTAssertTrue(
+      command.isFresh(
+        at: generatedAt.addingTimeInterval(SystemFocusWatchCommand.maximumAge)
+      )
+    )
+    XCTAssertFalse(
+      command.isFresh(
+        at: generatedAt.addingTimeInterval(SystemFocusWatchCommand.maximumAge + 0.001)
+      )
+    )
+    XCTAssertFalse(command.isFresh(at: generatedAt.addingTimeInterval(-1)))
+  }
+
+  func testEveryActivityAdvertisesOnlyItsSafeCommands() throws {
+    let expectations: [(String, Set<SystemFocusWatchAction>)] = [
+      ("ready", [.start]),
+      ("running", [.pause, .reset]),
+      ("paused", [.resume, .reset]),
+      ("completed", [.beginNextSession]),
+      ("pendingResume", [.resume, .discardPending]),
+    ]
+
+    for (activity, expected) in expectations {
+      let remaining = activity == "completed" ? 0 : 300
+      let endsAt: Any = activity == "running"
+        ? isoDate(generatedAt.addingTimeInterval(300))
+        : NSNull()
+      let snapshot = try XCTUnwrap(
+        SystemFocusWatchSnapshot.fromApplicationSnapshot(
+          applicationSnapshot(
+            activity: activity,
+            secondsRemaining: remaining,
+            endsAt: endsAt
+          )
+        )
+      )
+      XCTAssertEqual(snapshot.availableActions, expected)
+    }
+  }
+
+  func testBridgeAuthorizesOneFreshCommandForTheExactSnapshot() throws {
+    let bridge = SystemFocusWatchConnectivityBridge(session: nil)
+    let snapshot = applicationSnapshot()
+    bridge.publish(snapshot: snapshot)
+    let command = try validCommand(now: generatedAt.addingTimeInterval(10))
+    var delivered: [String: Any]?
+    bridge.setCommandHandler { value, completion in
+      delivered = value
+      completion(true)
+    }
+
+    let result = receive(
+      command,
+      through: bridge,
+      now: generatedAt.addingTimeInterval(20)
+    )
+
+    XCTAssertEqual(result?.accepted, true)
+    XCTAssertEqual(delivered?["action"] as? String, "start")
+    XCTAssertEqual(delivered?["requestId"] as? String, command.requestId)
+    XCTAssertEqual(
+      delivered.map { Set($0.keys) },
+      ["schemaVersion", "requestId", "action", "snapshotGeneratedAt"]
+    )
+  }
+
+  func testBridgeRejectsStaleUnavailableAndMismatchedCommands() throws {
+    let bridge = SystemFocusWatchConnectivityBridge(session: nil)
+    bridge.publish(snapshot: applicationSnapshot())
+    var deliveries = 0
+    bridge.setCommandHandler { _, completion in
+      deliveries += 1
+      completion(true)
+    }
+    let valid = try validCommand(now: generatedAt)
+    var wrongAction = valid.wireDictionary
+    wrongAction["action"] = "pause"
+    var wrongSnapshot = valid.wireDictionary
+    wrongSnapshot["requestId"] = "wrong-snapshot-123"
+    wrongSnapshot["snapshotGeneratedAtMilliseconds"] =
+      valid.snapshotGeneratedAtMilliseconds + 1
+
+    XCTAssertEqual(
+      receive(
+        SystemFocusWatchCommand.fromWireDictionary(wrongAction)!,
+        through: bridge,
+        now: generatedAt
+      )?.accepted,
+      false
+    )
+    XCTAssertEqual(
+      receive(
+        SystemFocusWatchCommand.fromWireDictionary(wrongSnapshot)!,
+        through: bridge,
+        now: generatedAt
+      )?.accepted,
+      false
+    )
+    XCTAssertEqual(
+      receive(
+        valid,
+        through: bridge,
+        now: generatedAt.addingTimeInterval(61)
+      )?.accepted,
+      false
+    )
+    XCTAssertEqual(deliveries, 0)
+  }
+
+  func testBridgeConsumesBothTheRequestAndRenderedSnapshot() throws {
+    let bridge = SystemFocusWatchConnectivityBridge(session: nil)
+    bridge.publish(snapshot: applicationSnapshot())
+    var deliveries = 0
+    bridge.setCommandHandler { _, completion in
+      deliveries += 1
+      completion(false)
+    }
+    let first = try validCommand(
+      now: generatedAt,
+      requestId: "first-watch-request"
+    )
+    let second = try validCommand(
+      now: generatedAt,
+      requestId: "second-watch-request"
+    )
+
+    XCTAssertEqual(receive(first, through: bridge, now: generatedAt)?.accepted, false)
+    XCTAssertEqual(receive(first, through: bridge, now: generatedAt)?.accepted, false)
+    XCTAssertEqual(receive(second, through: bridge, now: generatedAt)?.accepted, false)
+    XCTAssertEqual(deliveries, 1)
+  }
+
+  func testCommandResultRequiresTheExactBooleanEnvelope() {
+    let valid = SystemFocusWatchCommandResult(
+      requestId: "watch-request-123",
+      accepted: true
+    )
+    XCTAssertEqual(
+      SystemFocusWatchCommandResult.fromWireDictionary(valid.wireDictionary),
+      valid
+    )
+
+    var numericBoolean = valid.wireDictionary
+    numericBoolean["accepted"] = 1
+    var expanded = valid.wireDictionary
+    expanded["message"] = "private"
+    XCTAssertNil(SystemFocusWatchCommandResult.fromWireDictionary(numericBoolean))
+    XCTAssertNil(SystemFocusWatchCommandResult.fromWireDictionary(expanded))
+  }
+
   private func applicationSnapshot(
     session: String = "focus",
     activity: String = "ready",
@@ -169,6 +372,35 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
 
   private func validWireDictionary() -> [String: Any] {
     SystemFocusWatchSnapshot.fromApplicationSnapshot(applicationSnapshot())!.wireDictionary
+  }
+
+  private func validCommand(
+    now: Date? = nil,
+    requestId: String = "watch-request-123"
+  ) throws -> SystemFocusWatchCommand {
+    let snapshot = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(applicationSnapshot())
+    )
+    return try XCTUnwrap(
+      SystemFocusWatchCommand.create(
+        action: .start,
+        snapshot: snapshot,
+        now: now ?? generatedAt,
+        requestId: requestId
+      )
+    )
+  }
+
+  private func receive(
+    _ command: SystemFocusWatchCommand,
+    through bridge: SystemFocusWatchConnectivityBridge,
+    now: Date
+  ) -> SystemFocusWatchCommandResult? {
+    var result: SystemFocusWatchCommandResult?
+    bridge.receiveCommand(command.wireDictionary, reply: { value in
+      result = SystemFocusWatchCommandResult.fromWireDictionary(value)
+    }, now: now)
+    return result
   }
 
   private func isoDate(_ date: Date) -> String {

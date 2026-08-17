@@ -13,6 +13,7 @@ struct FocusHavenWatchApp: App {
 
 struct FocusHavenWatchView: View {
   @ObservedObject var model: SystemFocusWatchModel
+  @State private var pendingDestructiveAction: SystemFocusWatchAction?
 
   var body: some View {
     TimelineView(.periodic(from: .now, by: 1)) { context in
@@ -21,6 +22,24 @@ struct FocusHavenWatchView: View {
       } else {
         waitingView
       }
+    }
+    .confirmationDialog(
+      "Change this session?",
+      isPresented: Binding(
+        get: { pendingDestructiveAction != nil },
+        set: { if !$0 { pendingDestructiveAction = nil } }
+      ),
+      presenting: pendingDestructiveAction
+    ) { action in
+      Button(action.title, role: .destructive) {
+        model.send(action)
+        pendingDestructiveAction = nil
+      }
+      Button("Cancel", role: .cancel) {
+        pendingDestructiveAction = nil
+      }
+    } message: { action in
+      Text("Confirm \(action.title.lowercased()) for the current timer.")
     }
   }
 
@@ -46,30 +65,105 @@ struct FocusHavenWatchView: View {
   ) -> some View {
     let activity = snapshot.activity(at: date)
     let remaining = snapshot.remainingSeconds(at: date)
-    return VStack(spacing: 6) {
-      HStack(spacing: 5) {
-        Image(systemName: snapshot.session == .focus ? "moon.stars.fill" : "cup.and.saucer.fill")
-          .foregroundStyle(snapshot.session == .focus ? .indigo : .teal)
-        Text(snapshot.session.title)
-          .font(.headline)
+    let actions = activity == snapshot.activity ? snapshot.availableActions : []
+    return ScrollView {
+      VStack(spacing: 8) {
+        VStack(spacing: 6) {
+          HStack(spacing: 5) {
+            Image(
+              systemName: snapshot.session == .focus
+                ? "moon.stars.fill"
+                : "cup.and.saucer.fill"
+            )
+            .foregroundStyle(snapshot.session == .focus ? .indigo : .teal)
+            Text(snapshot.session.title)
+              .font(.headline)
+          }
+          Text(activity.title)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+          Text(Self.durationText(remaining))
+            .font(.system(.title, design: .rounded, weight: .semibold))
+            .monospacedDigit()
+          ProgressView(value: snapshot.progress(at: date))
+            .tint(snapshot.session == .focus ? .indigo : .teal)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+          "\(snapshot.session.title), \(activity.title), \(Self.accessibleDuration(remaining)) remaining"
+        )
+
+        controls(actions)
+
+        if let message = model.commandState.message {
+          Text(message)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+        } else {
+          Text("Private timer only")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+        }
       }
-      Text(activity.title)
-        .font(.caption)
-        .foregroundStyle(.secondary)
-      Text(Self.durationText(remaining))
-        .font(.system(.title, design: .rounded, weight: .semibold))
-        .monospacedDigit()
-      ProgressView(value: snapshot.progress(at: date))
-        .tint(snapshot.session == .focus ? .indigo : .teal)
-      Text("Private timer only")
-        .font(.caption2)
-        .foregroundStyle(.secondary)
+      .padding(.horizontal, 8)
     }
-    .padding(.horizontal, 8)
-    .accessibilityElement(children: .combine)
-    .accessibilityLabel(
-      "\(snapshot.session.title), \(activity.title), \(Self.accessibleDuration(remaining)) remaining"
-    )
+  }
+
+  @ViewBuilder
+  private func controls(_ actions: Set<SystemFocusWatchAction>) -> some View {
+    if let primary = primaryAction(actions) {
+      HStack(spacing: 6) {
+        commandButton(primary, prominent: true)
+        if let secondary = secondaryAction(actions) {
+          commandButton(secondary, prominent: false)
+        }
+      }
+    }
+  }
+
+  private func commandButton(
+    _ action: SystemFocusWatchAction,
+    prominent: Bool
+  ) -> some View {
+    Button {
+      if action == .reset || action == .discardPending {
+        pendingDestructiveAction = action
+      } else {
+        model.send(action)
+      }
+    } label: {
+      Text(action.title)
+        .font(.caption.weight(.semibold))
+        .lineLimit(1)
+        .frame(maxWidth: .infinity)
+    }
+    .buttonStyle(.borderedProminent)
+    .tint(prominent ? .indigo : .gray)
+    .disabled(!model.canSend(action))
+    .accessibilityLabel("\(action.title) FocusHaven timer")
+  }
+
+  private func primaryAction(
+    _ actions: Set<SystemFocusWatchAction>
+  ) -> SystemFocusWatchAction? {
+    for action in [
+      SystemFocusWatchAction.start,
+      .pause,
+      .resume,
+      .beginNextSession,
+    ] where actions.contains(action) {
+      return action
+    }
+    return nil
+  }
+
+  private func secondaryAction(
+    _ actions: Set<SystemFocusWatchAction>
+  ) -> SystemFocusWatchAction? {
+    if actions.contains(.reset) { return .reset }
+    if actions.contains(.discardPending) { return .discardPending }
+    return nil
   }
 
   private static func durationText(_ seconds: Int) -> String {

@@ -25,6 +25,17 @@ final class SystemFocusPlatformAdapter {
       binaryMessenger: binaryMessenger
     )
     self.channel = channel
+    watchPublisher.setCommandHandler { [weak self] command, completion in
+      DispatchQueue.main.async {
+        guard let channel = self?.channel else {
+          completion(false)
+          return
+        }
+        channel.invokeMethod("executeCommand", arguments: command) { result in
+          completion(result as? Bool ?? false)
+        }
+      }
+    }
     channel.setMethodCallHandler { [weak self] call, result in
       guard let self else {
         result(
@@ -62,6 +73,7 @@ final class SystemFocusPlatformAdapter {
   }
 
   func dispose() {
+    watchPublisher.setCommandHandler(nil)
     channel?.setMethodCallHandler(nil)
     channel = nil
   }

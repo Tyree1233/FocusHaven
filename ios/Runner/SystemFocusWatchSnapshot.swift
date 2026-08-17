@@ -32,6 +32,26 @@ enum SystemFocusWatchActivity: String, CaseIterable {
   }
 }
 
+enum SystemFocusWatchAction: String, CaseIterable {
+  case start
+  case pause
+  case resume
+  case reset
+  case beginNextSession
+  case discardPending
+
+  var title: String {
+    switch self {
+    case .start: return "Start"
+    case .pause: return "Pause"
+    case .resume: return "Resume"
+    case .reset: return "Reset"
+    case .beginNextSession: return "Next session"
+    case .discardPending: return "Start fresh"
+    }
+  }
+}
+
 /// The complete property-list-safe contract sent from the iPhone to its watch.
 ///
 /// It is intentionally unable to represent tasks, reflections, moods, history,
@@ -65,6 +85,20 @@ struct SystemFocusWatchSnapshot: Equatable {
   let totalSessionSeconds: Int
   let generatedAt: Date
   let endsAt: Date?
+
+  var generatedAtMilliseconds: Int {
+    Self.milliseconds(generatedAt)
+  }
+
+  var availableActions: Set<SystemFocusWatchAction> {
+    switch activity {
+    case .ready: return [.start]
+    case .running: return [.pause, .reset]
+    case .paused: return [.resume, .reset]
+    case .completed: return [.beginNextSession]
+    case .pendingResume: return [.resume, .discardPending]
+    }
+  }
 
   var wireDictionary: [String: Any] {
     [
@@ -199,7 +233,7 @@ struct SystemFocusWatchSnapshot: Equatable {
     )
   }
 
-  private static func integer(_ value: Any?) -> Int? {
+  fileprivate static func integer(_ value: Any?) -> Int? {
     guard let number = value as? NSNumber,
       CFGetTypeID(number) != CFBooleanGetTypeID(),
       !CFNumberIsFloatType(number),
@@ -226,5 +260,145 @@ struct SystemFocusWatchSnapshot: Equatable {
     if let parsed = formatter.date(from: value) { return parsed }
     formatter.formatOptions = [.withInternetDateTime]
     return formatter.date(from: value)
+  }
+}
+
+/// One bounded, text-free command created by the watch for the exact snapshot
+/// its wearer acted on. Both the watch and iPhone parse this same contract.
+struct SystemFocusWatchCommand: Equatable {
+  static let schemaVersion = 1
+  static let maximumAge: TimeInterval = 60
+
+  private static let wireKeys: Set<String> = [
+    "schemaVersion",
+    "requestId",
+    "action",
+    "snapshotGeneratedAtMilliseconds",
+    "createdAtMilliseconds",
+  ]
+  private static let requestIdPattern = try! NSRegularExpression(
+    pattern: "^[A-Za-z0-9_-]{8,64}$"
+  )
+
+  let requestId: String
+  let action: SystemFocusWatchAction
+  let snapshotGeneratedAtMilliseconds: Int
+  let createdAtMilliseconds: Int
+
+  var wireDictionary: [String: Any] {
+    [
+      "schemaVersion": Self.schemaVersion,
+      "requestId": requestId,
+      "action": action.rawValue,
+      "snapshotGeneratedAtMilliseconds": snapshotGeneratedAtMilliseconds,
+      "createdAtMilliseconds": createdAtMilliseconds,
+    ]
+  }
+
+  var applicationEnvelope: [String: Any] {
+    [
+      "schemaVersion": Self.schemaVersion,
+      "requestId": requestId,
+      "action": action.rawValue,
+      "snapshotGeneratedAt": Self.utcString(
+        Self.date(milliseconds: snapshotGeneratedAtMilliseconds)
+      ),
+    ]
+  }
+
+  func isFresh(at date: Date) -> Bool {
+    let age = date.timeIntervalSince(Self.date(milliseconds: createdAtMilliseconds))
+    return age >= 0 && age <= Self.maximumAge
+  }
+
+  static func create(
+    action: SystemFocusWatchAction,
+    snapshot: SystemFocusWatchSnapshot,
+    now: Date = Date(),
+    requestId: String = UUID().uuidString
+  ) -> Self? {
+    fromWireDictionary([
+      "schemaVersion": schemaVersion,
+      "requestId": requestId,
+      "action": action.rawValue,
+      "snapshotGeneratedAtMilliseconds": snapshot.generatedAtMilliseconds,
+      "createdAtMilliseconds": milliseconds(now),
+    ])
+  }
+
+  static func fromWireDictionary(_ value: [String: Any]?) -> Self? {
+    guard let value, Set(value.keys) == wireKeys,
+      SystemFocusWatchSnapshot.integer(value["schemaVersion"]) == schemaVersion,
+      let requestId = value["requestId"] as? String,
+      matchesRequestId(requestId),
+      let actionText = value["action"] as? String,
+      let action = SystemFocusWatchAction(rawValue: actionText),
+      let snapshotGeneratedAtMilliseconds = SystemFocusWatchSnapshot.integer(
+        value["snapshotGeneratedAtMilliseconds"]
+      ),
+      let createdAtMilliseconds = SystemFocusWatchSnapshot.integer(
+        value["createdAtMilliseconds"]
+      ),
+      snapshotGeneratedAtMilliseconds > 0,
+      createdAtMilliseconds > 0
+    else {
+      return nil
+    }
+    return Self(
+      requestId: requestId,
+      action: action,
+      snapshotGeneratedAtMilliseconds: snapshotGeneratedAtMilliseconds,
+      createdAtMilliseconds: createdAtMilliseconds
+    )
+  }
+
+  fileprivate static func matchesRequestId(_ value: String) -> Bool {
+    let range = NSRange(value.startIndex..<value.endIndex, in: value)
+    return requestIdPattern.firstMatch(in: value, range: range) != nil
+  }
+
+  private static func milliseconds(_ date: Date) -> Int {
+    Int((date.timeIntervalSince1970 * 1_000).rounded())
+  }
+
+  private static func date(milliseconds: Int) -> Date {
+    Date(timeIntervalSince1970: Double(milliseconds) / 1_000)
+  }
+
+  private static func utcString(_ date: Date) -> String {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    return formatter.string(from: date)
+  }
+}
+
+struct SystemFocusWatchCommandResult: Equatable {
+  private static let wireKeys: Set<String> = [
+    "schemaVersion", "requestId", "accepted",
+  ]
+
+  let requestId: String
+  let accepted: Bool
+
+  var wireDictionary: [String: Any] {
+    [
+      "schemaVersion": SystemFocusWatchCommand.schemaVersion,
+      "requestId": requestId,
+      "accepted": accepted,
+    ]
+  }
+
+  static func fromWireDictionary(_ value: [String: Any]?) -> Self? {
+    guard let value, Set(value.keys) == wireKeys,
+      SystemFocusWatchSnapshot.integer(value["schemaVersion"])
+        == SystemFocusWatchCommand.schemaVersion,
+      let requestId = value["requestId"] as? String,
+      SystemFocusWatchCommand.matchesRequestId(requestId),
+      let acceptedNumber = value["accepted"] as? NSNumber,
+      CFGetTypeID(acceptedNumber) == CFBooleanGetTypeID()
+    else {
+      return nil
+    }
+    return Self(requestId: requestId, accepted: acceptedNumber.boolValue)
   }
 }

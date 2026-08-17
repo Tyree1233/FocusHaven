@@ -46,14 +46,18 @@ start, pause, resume, reset, discard, and next-session controls only when the
 exact rendered state permits them. Each link carries a rotating private
 capability, enters one app-group command inbox, and is rechecked against the
 current snapshot before Flutter applies its stale, replay, and advertised-action
-gates. Synchronization waits for timer restoration; Lock Screen, Live Activity,
-and watch commands remain disabled until their separately authorized transports
-exist. A paired Apple Watch can now receive only the latest bounded, text-free
-timer snapshot through WatchConnectivity. Its first read-only companion shows
-the current focus or break, calm state, progress, and a live local countdown;
-it stores no task, reflection, mood, history, coach, or account data and cannot
-mutate the phone timer. macOS, web, and every unsupported platform remain
-dormant.
+gates. Synchronization waits for timer restoration; Lock Screen and Live
+Activity commands remain disabled until their separately authorized transports
+exist. A paired Apple Watch receives only the latest bounded, text-free timer
+snapshot through WatchConnectivity. Its companion shows the current focus or
+break, calm state, progress, and a live local countdown. It offers only the
+start, pause, resume, reset, discard, or next-session actions advertised by the
+exact displayed state. Every request is bounded, expires after one minute, and
+is consumed once on the iPhone before Flutter independently applies its stale,
+replay, and advertised-action gates. Destructive watch actions require an extra
+confirmation. The watch stores no task, reflection, mood, history, coach, or
+account data and cannot bypass phone-side timer authorization. macOS, web, and
+every unsupported platform remain dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the
@@ -222,6 +226,11 @@ Install the exact dependency versions recorded in `pubspec.lock`:
 ```bash
 flutter pub get --enforce-lockfile
 ```
+
+The iOS project uses Flutter's generated Swift Package Manager package for
+plugins. Do not run `pod install`; CocoaPods is intentionally not part of the
+iOS workspace and would duplicate Firebase modules already supplied by Swift
+Package Manager.
 
 List available devices and launch the appropriate target:
 
