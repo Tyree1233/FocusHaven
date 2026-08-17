@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FocusHaven</string>
+    <string name="open_phone_to_sync">Open FocusHaven on your phone to sync.</string>
+    <string name="session_focus">Focus</string>
+    <string name="session_short_break">Short break</string>
+    <string name="session_long_break">Long break</string>
+    <string name="activity_ready">Ready when you are</string>
+    <string name="activity_running">Steady focus</string>
+    <string name="activity_paused">Paused without pressure</string>
+    <string name="activity_completed">Session complete</string>
+    <string name="activity_pending_resume">A session is waiting</string>
+    <string name="private_timer_note">Private timer only · Phone remains in control</string>
+    <string name="focus_state_description">%1$s. %2$s. %3$s remaining.</string>
+</resources>

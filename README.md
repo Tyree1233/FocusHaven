@@ -56,8 +56,17 @@ exact displayed state. Every request is bounded, expires after one minute, and
 is consumed once on the iPhone before Flutter independently applies its stale,
 replay, and advertised-action gates. Destructive watch actions require an extra
 confirmation. The watch stores no task, reflection, mood, history, coach, or
-account data and cannot bypass phone-side timer authorization. macOS, web, and
-every unsupported platform remain dormant.
+account data and cannot bypass phone-side timer authorization.
+
+Wear OS now has the same privacy-first foundation as a separate non-standalone
+watch app with the phone's package and signing identity. Android publishes one
+urgent Data Layer item only when the validated timer state changes. The watch
+accepts exactly seven bounded fields, rejects unknown or impossible payloads,
+and advances running time locally from the UTC deadline instead of waking for
+one-second network updates. Its round-safe, accessible surface remains
+read-only until the separately replay-protected command transport is installed.
+It carries no task, reflection, mood, history, coach, or account data. macOS,
+web, and every unsupported platform remain dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the
