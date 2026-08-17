@@ -48,7 +48,12 @@ capability, enters one app-group command inbox, and is rechecked against the
 current snapshot before Flutter applies its stale, replay, and advertised-action
 gates. Synchronization waits for timer restoration; Lock Screen, Live Activity,
 and watch commands remain disabled until their separately authorized transports
-exist. macOS, web, and every unsupported platform remain dormant.
+exist. A paired Apple Watch can now receive only the latest bounded, text-free
+timer snapshot through WatchConnectivity. Its first read-only companion shows
+the current focus or break, calm state, progress, and a live local countdown;
+it stores no task, reflection, mood, history, coach, or account data and cannot
+mutate the phone timer. macOS, web, and every unsupported platform remain
+dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the

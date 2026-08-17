@@ -6,14 +6,17 @@ import WidgetKit
 final class SystemFocusPlatformAdapter {
   private let store: SystemFocusSnapshotStore
   private let pendingCommands: SystemFocusPendingCommandStore
+  private let watchPublisher: SystemFocusWatchPublishing
   private var channel: FlutterMethodChannel?
 
   init(
     store: SystemFocusSnapshotStore = SystemFocusSnapshotStore(),
-    pendingCommands: SystemFocusPendingCommandStore = SystemFocusPendingCommandStore()
+    pendingCommands: SystemFocusPendingCommandStore = SystemFocusPendingCommandStore(),
+    watchPublisher: SystemFocusWatchPublishing = SystemFocusWatchConnectivityBridge()
   ) {
     self.store = store
     self.pendingCommands = pendingCommands
+    self.watchPublisher = watchPublisher
   }
 
   func install(binaryMessenger: FlutterBinaryMessenger) {
@@ -44,6 +47,9 @@ final class SystemFocusPlatformAdapter {
             )
           )
           return
+        }
+        if let snapshot = self.store.load() {
+          self.watchPublisher.publish(snapshot: snapshot)
         }
         WidgetCenter.shared.reloadTimelines(ofKind: SystemFocusSnapshotStore.widgetKind)
         result(nil)
