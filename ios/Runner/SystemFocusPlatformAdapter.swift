@@ -1,5 +1,6 @@
 import Flutter
 import Foundation
+import WidgetKit
 
 /// Narrow Flutter transport for Apple system-focus surfaces.
 final class SystemFocusPlatformAdapter {
@@ -39,6 +40,7 @@ final class SystemFocusPlatformAdapter {
           )
           return
         }
+        WidgetCenter.shared.reloadTimelines(ofKind: SystemFocusSnapshotStore.widgetKind)
         result(nil)
       case SystemFocusSnapshotStore.takePendingCommandMethod:
         // Apple controls remain disabled until their private command inbox is installed.

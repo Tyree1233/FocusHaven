@@ -5,6 +5,8 @@ final class SystemFocusSnapshotStore {
   static let channelName = "com.focushaven/system_focus"
   static let publishMethod = "publishSnapshot"
   static let takePendingCommandMethod = "takePendingCommand"
+  static let appGroupSuiteName = "group.com.example.focushaven"
+  static let widgetKind = "FocusHavenFocusWidget"
 
   private static let schemaVersion = 1
   private static let maximumSessionSeconds = 24 * 60 * 60
@@ -30,11 +32,11 @@ final class SystemFocusSnapshotStore {
     "pendingResume",
   ]
 
-  private let defaults: UserDefaults
+  private let defaults: UserDefaults?
   private let storageKey: String
 
   init(
-    defaults: UserDefaults = .standard,
+    defaults: UserDefaults? = UserDefaults(suiteName: appGroupSuiteName),
     storageKey: String = "focus_haven_system_focus_snapshot_v1"
   ) {
     self.defaults = defaults
@@ -85,7 +87,8 @@ final class SystemFocusSnapshotStore {
 
   @discardableResult
   func save(_ value: Any?) -> Bool {
-    guard let snapshot = validate(value),
+    guard let defaults,
+      let snapshot = validate(value),
       JSONSerialization.isValidJSONObject(snapshot),
       let data = try? JSONSerialization.data(withJSONObject: snapshot)
     else {
@@ -96,7 +99,8 @@ final class SystemFocusSnapshotStore {
   }
 
   func load() -> [String: Any]? {
-    guard let data = defaults.data(forKey: storageKey),
+    guard let defaults,
+      let data = defaults.data(forKey: storageKey),
       let decoded = try? JSONSerialization.jsonObject(with: data)
     else {
       return nil
