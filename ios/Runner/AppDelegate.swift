@@ -25,4 +25,8 @@ import UIKit
     adapter.install(binaryMessenger: registrar.messenger())
     systemFocusAdapter = adapter
   }
+
+  func deliverSystemFocusPendingCommand() {
+    systemFocusAdapter?.deliverWarmPendingCommand()
+  }
 }

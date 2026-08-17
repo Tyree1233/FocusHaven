@@ -26,6 +26,9 @@
 		A11800000000000000000004 /* FocusHavenWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11800000000000000000013 /* FocusHavenWidget.swift */; };
 		A11800000000000000000005 /* FocusHavenWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A11800000000000000000016 /* FocusHavenWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A11800000000000000000006 /* SystemFocusWidgetContentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11800000000000000000017 /* SystemFocusWidgetContentTests.swift */; };
+		A11900000000000000000001 /* SystemFocusWidgetCommandPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11900000000000000000011 /* SystemFocusWidgetCommandPolicy.swift */; };
+		A11900000000000000000002 /* SystemFocusPendingCommandStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11900000000000000000012 /* SystemFocusPendingCommandStore.swift */; };
+		A11900000000000000000003 /* SystemFocusWidgetCommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11900000000000000000013 /* SystemFocusWidgetCommandTests.swift */; };
 		C46EA16EDA9B14C312A2555B /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4C2B5A80B8AD7E65B43795F2 /* Pods_RunnerTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -103,6 +106,9 @@
 		A11800000000000000000015 /* FocusHavenWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusHavenWidget.entitlements; sourceTree = "<group>"; };
 		A11800000000000000000016 /* FocusHavenWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusHavenWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A11800000000000000000017 /* SystemFocusWidgetContentTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusWidgetContentTests.swift; sourceTree = "<group>"; };
+		A11900000000000000000011 /* SystemFocusWidgetCommandPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusWidgetCommandPolicy.swift; sourceTree = "<group>"; };
+		A11900000000000000000012 /* SystemFocusPendingCommandStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusPendingCommandStore.swift; sourceTree = "<group>"; };
+		A11900000000000000000013 /* SystemFocusWidgetCommandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusWidgetCommandTests.swift; sourceTree = "<group>"; };
 		CD7D0BCC06E1135355B657D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		E93E604BBE527C5648AE55EE /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		FC55E30B92DA14CA08B14037 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
@@ -150,6 +156,7 @@
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
 				A11800000000000000000017 /* SystemFocusWidgetContentTests.swift */,
+				A11900000000000000000013 /* SystemFocusWidgetCommandTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -218,6 +225,8 @@
 				A11700000000000000000011 /* SystemFocusSnapshotStore.swift */,
 				A11700000000000000000012 /* SystemFocusPlatformAdapter.swift */,
 				A11800000000000000000011 /* SystemFocusWidgetContent.swift */,
+				A11900000000000000000011 /* SystemFocusWidgetCommandPolicy.swift */,
+				A11900000000000000000012 /* SystemFocusPendingCommandStore.swift */,
 				A11800000000000000000012 /* Runner.entitlements */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
@@ -459,6 +468,7 @@
 			files = (
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
 				A11800000000000000000006 /* SystemFocusWidgetContentTests.swift in Sources */,
+				A11900000000000000000003 /* SystemFocusWidgetCommandTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,6 +480,8 @@
 				A11700000000000000000001 /* SystemFocusSnapshotStore.swift in Sources */,
 				A11700000000000000000002 /* SystemFocusPlatformAdapter.swift in Sources */,
 				A11800000000000000000001 /* SystemFocusWidgetContent.swift in Sources */,
+				A11900000000000000000001 /* SystemFocusWidgetCommandPolicy.swift in Sources */,
+				A11900000000000000000002 /* SystemFocusPendingCommandStore.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 			);

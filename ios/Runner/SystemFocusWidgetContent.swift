@@ -32,13 +32,35 @@ enum SystemFocusWidgetActivity: String, CaseIterable {
   }
 }
 
+enum SystemFocusWidgetAction: String, CaseIterable {
+  case start
+  case pause
+  case resume
+  case reset
+  case beginNextSession
+  case discardPending
+
+  var title: String {
+    switch self {
+    case .start: return "Start"
+    case .pause: return "Pause"
+    case .resume: return "Resume"
+    case .reset: return "Reset"
+    case .beginNextSession: return "Next session"
+    case .discardPending: return "Discard"
+    }
+  }
+}
+
 /// Text-free presentation derived only from a validated system-focus snapshot.
 struct SystemFocusWidgetContent: Equatable {
   let session: SystemFocusWidgetSession
   let activity: SystemFocusWidgetActivity
   let secondsRemaining: Int
   let totalSessionSeconds: Int
+  let snapshotGeneratedAt: String
   let endsAt: Date?
+  let availableActions: Set<SystemFocusWidgetAction>
 
   var completedSeconds: Int {
     min(max(totalSessionSeconds - secondsRemaining, 0), totalSessionSeconds)
@@ -57,6 +79,8 @@ struct SystemFocusWidgetContent: Equatable {
       let session = SystemFocusWidgetSession(rawValue: sessionText),
       let activityText = snapshot["activity"] as? String,
       let activity = SystemFocusWidgetActivity(rawValue: activityText),
+      let generatedAtText = snapshot["generatedAt"] as? String,
+      utcDate(generatedAtText) != nil,
       let remainingNumber = snapshot["secondsRemaining"] as? NSNumber,
       let totalNumber = snapshot["totalSessionSeconds"] as? NSNumber,
       CFGetTypeID(remainingNumber) != CFBooleanGetTypeID(),
@@ -80,7 +104,9 @@ struct SystemFocusWidgetContent: Equatable {
         activity: activity,
         secondsRemaining: storedRemaining,
         totalSessionSeconds: total,
-        endsAt: nil
+        snapshotGeneratedAt: generatedAtText,
+        endsAt: nil,
+        availableActions: actions(for: activity)
       )
     }
 
@@ -95,7 +121,9 @@ struct SystemFocusWidgetContent: Equatable {
         activity: .completed,
         secondsRemaining: 0,
         totalSessionSeconds: total,
-        endsAt: nil
+        snapshotGeneratedAt: generatedAtText,
+        endsAt: nil,
+        availableActions: []
       )
     }
 
@@ -105,7 +133,9 @@ struct SystemFocusWidgetContent: Equatable {
       activity: .running,
       secondsRemaining: liveRemaining,
       totalSessionSeconds: total,
-      endsAt: deadline
+      snapshotGeneratedAt: generatedAtText,
+      endsAt: deadline,
+      availableActions: actions(for: .running)
     )
   }
 
@@ -118,5 +148,17 @@ struct SystemFocusWidgetContent: Equatable {
     }
     formatter.formatOptions = [.withInternetDateTime]
     return formatter.date(from: value)
+  }
+
+  private static func actions(
+    for activity: SystemFocusWidgetActivity
+  ) -> Set<SystemFocusWidgetAction> {
+    switch activity {
+    case .ready: return [.start]
+    case .running: return [.pause, .reset]
+    case .paused: return [.resume, .reset]
+    case .completed: return [.beginNextSession]
+    case .pendingResume: return [.resume, .discardPending]
+    }
   }
 }

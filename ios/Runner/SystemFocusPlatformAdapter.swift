@@ -5,10 +5,15 @@ import WidgetKit
 /// Narrow Flutter transport for Apple system-focus surfaces.
 final class SystemFocusPlatformAdapter {
   private let store: SystemFocusSnapshotStore
+  private let pendingCommands: SystemFocusPendingCommandStore
   private var channel: FlutterMethodChannel?
 
-  init(store: SystemFocusSnapshotStore = SystemFocusSnapshotStore()) {
+  init(
+    store: SystemFocusSnapshotStore = SystemFocusSnapshotStore(),
+    pendingCommands: SystemFocusPendingCommandStore = SystemFocusPendingCommandStore()
+  ) {
     self.store = store
+    self.pendingCommands = pendingCommands
   }
 
   func install(binaryMessenger: FlutterBinaryMessenger) {
@@ -43,8 +48,7 @@ final class SystemFocusPlatformAdapter {
         WidgetCenter.shared.reloadTimelines(ofKind: SystemFocusSnapshotStore.widgetKind)
         result(nil)
       case SystemFocusSnapshotStore.takePendingCommandMethod:
-        // Apple controls remain disabled until their private command inbox is installed.
-        result(nil)
+        result(self.pendingCommands.take())
       default:
         result(FlutterMethodNotImplemented)
       }
@@ -54,5 +58,19 @@ final class SystemFocusPlatformAdapter {
   func dispose() {
     channel?.setMethodCallHandler(nil)
     channel = nil
+  }
+
+  func deliverWarmPendingCommand() {
+    guard let channel,
+      let command = pendingCommands.peek(),
+      let requestId = command["requestId"] as? String
+    else {
+      return
+    }
+    channel.invokeMethod("executeCommand", arguments: command) { [weak self] result in
+      if result is Bool {
+        self?.pendingCommands.clearIfMatches(requestId: requestId)
+      }
+    }
   }
 }

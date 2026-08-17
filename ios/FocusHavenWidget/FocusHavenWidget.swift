@@ -4,13 +4,18 @@ import WidgetKit
 struct FocusHavenWidgetEntry: TimelineEntry {
   let date: Date
   let content: SystemFocusWidgetContent?
+  let controlToken: String?
 }
 
 struct FocusHavenWidgetProvider: TimelineProvider {
   private let store = SystemFocusSnapshotStore()
 
   func placeholder(in context: Context) -> FocusHavenWidgetEntry {
-    FocusHavenWidgetEntry(date: Date(), content: Self.placeholderContent)
+    FocusHavenWidgetEntry(
+      date: Date(),
+      content: Self.placeholderContent,
+      controlToken: nil
+    )
   }
 
   func getSnapshot(
@@ -38,7 +43,8 @@ struct FocusHavenWidgetProvider: TimelineProvider {
   private func entry(at date: Date) -> FocusHavenWidgetEntry {
     FocusHavenWidgetEntry(
       date: date,
-      content: SystemFocusWidgetContent.fromSnapshot(store.load(), now: date)
+      content: SystemFocusWidgetContent.fromSnapshot(store.load(), now: date),
+      controlToken: store.loadControlToken()
     )
   }
 
@@ -47,7 +53,9 @@ struct FocusHavenWidgetProvider: TimelineProvider {
     activity: .ready,
     secondsRemaining: 25 * 60,
     totalSessionSeconds: 25 * 60,
-    endsAt: nil
+    snapshotGeneratedAt: "2026-08-16T21:00:00.000Z",
+    endsAt: nil,
+    availableActions: [.start]
   )
 }
 
@@ -94,6 +102,9 @@ struct FocusHavenWidgetView: View {
         .tint(.white)
         .accessibilityLabel("Session progress")
         .accessibilityValue("\(Int((content.progress * 100).rounded())) percent")
+      if family == .systemMedium {
+        controls(content)
+      }
     }
     .padding(family == .systemSmall ? 14 : 16)
     .accessibilityElement(children: .combine)
@@ -136,6 +147,79 @@ struct FocusHavenWidgetView: View {
     case .shortBreak: return "cup.and.saucer.fill"
     case .longBreak: return "moon.stars.fill"
     }
+  }
+
+  @ViewBuilder
+  private func controls(_ content: SystemFocusWidgetContent) -> some View {
+    if let token = entry.controlToken,
+      let primary = primaryAction(content.availableActions),
+      let primaryURL = commandURL(primary, content: content, token: token)
+    {
+      HStack(spacing: 8) {
+        commandLink(primary, url: primaryURL, prominent: true)
+        if let secondary = secondaryAction(content.availableActions),
+          let secondaryURL = commandURL(secondary, content: content, token: token)
+        {
+          commandLink(secondary, url: secondaryURL, prominent: false)
+        }
+      }
+    }
+  }
+
+  private func commandLink(
+    _ action: SystemFocusWidgetAction,
+    url: URL,
+    prominent: Bool
+  ) -> some View {
+    Link(destination: url) {
+      Text(action.title)
+        .font(.caption.weight(.semibold))
+        .lineLimit(1)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 7)
+        .background(prominent ? Color.white : Color.white.opacity(0.16))
+        .foregroundColor(prominent ? Color(red: 0.09, green: 0.18, blue: 0.31) : .white)
+        .clipShape(Capsule())
+    }
+    .accessibilityLabel("\(action.title) FocusHaven timer")
+  }
+
+  private func commandURL(
+    _ action: SystemFocusWidgetAction,
+    content: SystemFocusWidgetContent,
+    token: String
+  ) -> URL? {
+    var components = URLComponents()
+    components.scheme = "focushaven"
+    components.host = "system-focus-command"
+    components.queryItems = [
+      URLQueryItem(name: "action", value: action.rawValue),
+      URLQueryItem(name: "snapshotGeneratedAt", value: content.snapshotGeneratedAt),
+      URLQueryItem(name: "controlToken", value: token),
+    ]
+    return components.url
+  }
+
+  private func primaryAction(
+    _ actions: Set<SystemFocusWidgetAction>
+  ) -> SystemFocusWidgetAction? {
+    for action in [
+      SystemFocusWidgetAction.start,
+      .pause,
+      .resume,
+      .beginNextSession,
+    ] where actions.contains(action) {
+      return action
+    }
+    return nil
+  }
+
+  private func secondaryAction(
+    _ actions: Set<SystemFocusWidgetAction>
+  ) -> SystemFocusWidgetAction? {
+    if actions.contains(.reset) { return .reset }
+    if actions.contains(.discardPending) { return .discardPending }
+    return nil
   }
 
   private static func durationText(_ seconds: Int) -> String {

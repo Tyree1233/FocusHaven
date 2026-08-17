@@ -10,6 +10,11 @@ final class SystemFocusSnapshotStore {
 
   private static let schemaVersion = 1
   private static let maximumSessionSeconds = 24 * 60 * 60
+  private static let controlTokenKey = "focus_haven_system_focus_control_token_v1"
+  private static let controlTokenPattern = try! NSRegularExpression(
+    pattern: "^[A-Za-z0-9_-]{16,64}$"
+  )
+  private static let storageLock = NSLock()
   private static let expectedKeys: Set<String> = [
     "schemaVersion",
     "session",
@@ -94,18 +99,50 @@ final class SystemFocusSnapshotStore {
     else {
       return false
     }
+    Self.storageLock.lock()
+    defer { Self.storageLock.unlock() }
     defaults.set(data, forKey: storageKey)
+    defaults.set(Self.createControlToken(), forKey: Self.controlTokenKey)
     return true
   }
 
   func load() -> [String: Any]? {
-    guard let defaults,
-      let data = defaults.data(forKey: storageKey),
+    guard let defaults else { return nil }
+    Self.storageLock.lock()
+    let data = defaults.data(forKey: storageKey)
+    Self.storageLock.unlock()
+    guard let data,
       let decoded = try? JSONSerialization.jsonObject(with: data)
     else {
       return nil
     }
     return validate(decoded)
+  }
+
+  func loadControlToken() -> String? {
+    guard let defaults else { return nil }
+    Self.storageLock.lock()
+    defer { Self.storageLock.unlock() }
+    guard let token = defaults.string(forKey: Self.controlTokenKey),
+      Self.isValidControlToken(token)
+    else {
+      return nil
+    }
+    return token
+  }
+
+  /// Consumes one private widget capability before a command enters the inbox.
+  func consumeControlToken(_ token: String?) -> Bool {
+    guard let defaults, let token, Self.isValidControlToken(token) else {
+      return false
+    }
+    Self.storageLock.lock()
+    defer { Self.storageLock.unlock() }
+    guard defaults.string(forKey: Self.controlTokenKey) == token else {
+      return false
+    }
+    defaults.set(Self.createControlToken(), forKey: Self.controlTokenKey)
+    return true
   }
 
   private static func integer(_ value: Any?) -> Int? {
@@ -129,5 +166,14 @@ final class SystemFocusSnapshotStore {
     }
     formatter.formatOptions = [.withInternetDateTime]
     return formatter.date(from: value)
+  }
+
+  private static func createControlToken() -> String {
+    UUID().uuidString.replacingOccurrences(of: "-", with: "")
+  }
+
+  private static func isValidControlToken(_ value: String) -> Bool {
+    let range = NSRange(value.startIndex..<value.endIndex, in: value)
+    return controlTokenPattern.firstMatch(in: value, range: range) != nil
   }
 }

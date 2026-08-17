@@ -41,10 +41,14 @@ adapter. Swift revalidates every field, enum, duration, null, and UTC timestamp
 before storing the text-free snapshot as private JSON data in an app-group
 container shared only with FocusHaven extensions. The first read-only iPhone
 Home Screen widget shows the session kind, calm state, progress, and live
-system countdown without polling or private user text. Synchronization waits
-for timer restoration and stays one-way: no iPhone widget, Lock Screen, Live
-Activity, or watch command can mutate the timer until its separately authorized
-inbox exists. macOS, web, and every unsupported platform remain dormant.
+system countdown without polling or private user text. Its medium layout offers
+start, pause, resume, reset, discard, and next-session controls only when the
+exact rendered state permits them. Each link carries a rotating private
+capability, enters one app-group command inbox, and is rechecked against the
+current snapshot before Flutter applies its stale, replay, and advertised-action
+gates. Synchronization waits for timer restoration; Lock Screen, Live Activity,
+and watch commands remain disabled until their separately authorized transports
+exist. macOS, web, and every unsupported platform remain dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the
