@@ -20,6 +20,7 @@ internal object SystemFocusPendingCommandStore {
         context: Context,
         actionName: String?,
         snapshotGeneratedAt: String?,
+        requestId: String? = null,
     ): Boolean {
         val snapshot = SystemFocusSnapshotStore.load(context) ?: return false
         if (!SystemFocusWidgetCommandPolicy.isAllowed(
@@ -30,13 +31,14 @@ internal object SystemFocusPendingCommandStore {
         ) {
             return false
         }
-        val command =
+        val candidate =
             mapOf(
                 "schemaVersion" to 1,
-                "requestId" to createRequestId(),
+                "requestId" to (requestId ?: createRequestId()),
                 "action" to actionName,
                 "snapshotGeneratedAt" to snapshotGeneratedAt,
             )
+        val command = SystemFocusWidgetCommandPolicy.validateEnvelope(candidate) ?: return false
         val encoded = JSONObject(command).toString()
         return context
             .getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)

@@ -2,6 +2,7 @@ package com.focushaven.app
 
 import java.time.Duration
 import java.time.Instant
+import java.security.MessageDigest
 import kotlin.math.abs
 
 /** The only phone payload permitted to cross the private Wear OS Data Layer. */
@@ -12,6 +13,7 @@ internal data class SystemFocusWearPayload(
     val totalSessionSeconds: Int,
     val generatedAtMilliseconds: Long,
     val endsAtMilliseconds: Long,
+    val snapshotToken: String,
 ) {
     val wireMap: Map<String, Any>
         get() =
@@ -23,10 +25,12 @@ internal data class SystemFocusWearPayload(
                 "totalSessionSeconds" to totalSessionSeconds,
                 "generatedAtMilliseconds" to generatedAtMilliseconds,
                 "endsAtMilliseconds" to endsAtMilliseconds,
+                "snapshotToken" to snapshotToken,
             )
 
     companion object {
-        const val SCHEMA_VERSION = 1
+        const val SCHEMA_VERSION = 2
+        private const val APPLICATION_SCHEMA_VERSION = 1
         const val MAXIMUM_SESSION_SECONDS = 24 * 60 * 60
         val APPLICATION_KEYS =
             setOf(
@@ -47,6 +51,7 @@ internal data class SystemFocusWearPayload(
                 "totalSessionSeconds",
                 "generatedAtMilliseconds",
                 "endsAtMilliseconds",
+                "snapshotToken",
             )
         private val supportedSessions = setOf("focus", "shortBreak", "longBreak")
         private val supportedActivities =
@@ -60,7 +65,7 @@ internal data class SystemFocusWearPayload(
             val secondsRemaining = snapshot["secondsRemaining"] as? Int ?: return null
             val totalSessionSeconds = snapshot["totalSessionSeconds"] as? Int ?: return null
             val generatedAt = parseInstant(snapshot["generatedAt"] as? String) ?: return null
-            if (schemaVersion != SCHEMA_VERSION ||
+            if (schemaVersion != APPLICATION_SCHEMA_VERSION ||
                 session !in supportedSessions ||
                 activity !in supportedActivities ||
                 totalSessionSeconds !in 1..MAXIMUM_SESSION_SECONDS ||
@@ -88,8 +93,14 @@ internal data class SystemFocusWearPayload(
                 totalSessionSeconds = totalSessionSeconds,
                 generatedAtMilliseconds = generatedAt.toEpochMilli(),
                 endsAtMilliseconds = endsAtMilliseconds,
+                snapshotToken = snapshotTokenFor(snapshot["generatedAt"] as String),
             )
         }
+
+        fun snapshotTokenFor(generatedAt: String): String =
+            MessageDigest.getInstance("SHA-256")
+                .digest(generatedAt.toByteArray(Charsets.UTF_8))
+                .joinToString(separator = "") { byte -> "%02x".format(byte.toInt() and 0xff) }
 
         private fun parseInstant(value: String?): Instant? =
             try {

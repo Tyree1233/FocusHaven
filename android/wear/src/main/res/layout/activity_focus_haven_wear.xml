@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:importantForAccessibility="no"
     android:scrollbars="none">
 
     <LinearLayout
@@ -16,44 +17,84 @@
         android:paddingEnd="28dp"
         android:paddingBottom="24dp">
 
-        <TextView
-            android:id="@+id/focus_haven_wear_session"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/focus_haven_wear_state"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/focus_haven_wear_primary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/focus_haven_wear_session"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/focus_haven_wear_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/focus_haven_wear_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:maxLines="2"
+                android:textColor="@color/focus_haven_wear_secondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/focus_haven_wear_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-medium"
+                android:gravity="center"
+                android:textColor="@color/focus_haven_wear_primary"
+                android:textSize="34sp" />
+
+            <ProgressBar
+                android:id="@+id/focus_haven_wear_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginTop="12dp"
+                android:importantForAccessibility="no"
+                android:progressBackgroundTint="@color/focus_haven_wear_track"
+                android:progressTint="@color/focus_haven_wear_accent" />
+        </LinearLayout>
 
         <TextView
-            android:id="@+id/focus_haven_wear_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:maxLines="2"
-            android:textColor="@color/focus_haven_wear_secondary"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/focus_haven_wear_time"
+            android:id="@+id/focus_haven_wear_command_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:fontFamily="sans-serif-medium"
+            android:accessibilityLiveRegion="polite"
             android:gravity="center"
-            android:textColor="@color/focus_haven_wear_primary"
-            android:textSize="34sp" />
+            android:maxLines="3"
+            android:textColor="@color/focus_haven_wear_secondary"
+            android:textSize="11sp"
+            android:visibility="gone" />
 
-        <ProgressBar
-            android:id="@+id/focus_haven_wear_progress"
-            style="?android:attr/progressBarStyleHorizontal"
+        <Button
+            android:id="@+id/focus_haven_wear_primary_action"
             android:layout_width="match_parent"
-            android:layout_height="6dp"
+            android:layout_height="48dp"
             android:layout_marginTop="12dp"
-            android:importantForAccessibility="no"
-            android:progressTint="@color/focus_haven_wear_accent"
-            android:progressBackgroundTint="@color/focus_haven_wear_track" />
+            android:backgroundTint="@color/focus_haven_wear_accent"
+            android:minHeight="48dp"
+            android:textColor="@color/focus_haven_wear_button_text"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/focus_haven_wear_secondary_action"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/focus_haven_wear_track"
+            android:minHeight="48dp"
+            android:textColor="@color/focus_haven_wear_primary"
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -61,7 +102,7 @@
             android:layout_marginTop="12dp"
             android:gravity="center"
             android:maxLines="2"
-            android:text="@string/private_timer_note"
+            android:text="@string/private_controls_note"
             android:textColor="@color/focus_haven_wear_tertiary"
             android:textSize="10sp" />
     </LinearLayout>

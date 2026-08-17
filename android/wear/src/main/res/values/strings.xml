@@ -11,5 +11,22 @@
     <string name="activity_completed">Session complete</string>
     <string name="activity_pending_resume">A session is waiting</string>
     <string name="private_timer_note">Private timer only · Phone remains in control</string>
+    <string name="private_controls_note">Private controls · Phone verifies every request</string>
     <string name="focus_state_description">%1$s. %2$s. %3$s remaining.</string>
+    <string name="action_start">Start</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Resume</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_next_session">Next session</string>
+    <string name="action_discard">Discard</string>
+    <string name="confirm_reset">Reset this session?</string>
+    <string name="confirm_discard">Discard the waiting session?</string>
+    <string name="destructive_action_message">Your phone will verify this request before anything changes.</string>
+    <string name="keep_session">Keep it</string>
+    <string name="command_sending">Sending securely…</string>
+    <string name="command_waiting">Waiting for your phone…</string>
+    <string name="command_received">Phone received it. Open FocusHaven there if needed.</string>
+    <string name="command_rejected">That state changed. Syncing the latest timer.</string>
+    <string name="command_unavailable">Phone unavailable. Your timer was not changed.</string>
+    <string name="command_needs_phone">Open FocusHaven on your phone to finish.</string>
 </resources>

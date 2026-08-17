@@ -24,6 +24,11 @@ class SystemFocusWearPayloadTest {
             payload.wireMap["generatedAtMilliseconds"],
         )
         assertEquals(0L, payload.wireMap["endsAtMilliseconds"])
+        assertEquals(
+            SystemFocusWearPayload.snapshotTokenFor(generatedAt),
+            payload.wireMap["snapshotToken"],
+        )
+        assertEquals(64, payload.snapshotToken.length)
         assertTrue(
             payload.wireMap.values.none { value ->
                 value.toString().contains("private", ignoreCase = true)

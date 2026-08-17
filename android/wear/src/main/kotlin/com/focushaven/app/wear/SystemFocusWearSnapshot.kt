@@ -37,7 +37,22 @@ internal data class SystemFocusWearSnapshot(
     val totalSessionSeconds: Int,
     val generatedAt: Instant,
     val endsAt: Instant?,
+    val snapshotToken: String,
 ) {
+    val availableActions: Set<SystemFocusWearAction>
+        get() =
+            when (activity) {
+                SystemFocusWearActivity.READY -> setOf(SystemFocusWearAction.START)
+                SystemFocusWearActivity.RUNNING ->
+                    setOf(SystemFocusWearAction.PAUSE, SystemFocusWearAction.RESET)
+                SystemFocusWearActivity.PAUSED ->
+                    setOf(SystemFocusWearAction.RESUME, SystemFocusWearAction.RESET)
+                SystemFocusWearActivity.COMPLETED ->
+                    setOf(SystemFocusWearAction.BEGIN_NEXT_SESSION)
+                SystemFocusWearActivity.PENDING_RESUME ->
+                    setOf(SystemFocusWearAction.RESUME, SystemFocusWearAction.DISCARD_PENDING)
+            }
+
     fun presentation(now: Instant = Instant.now()): SystemFocusWearPresentation {
         if (activity != SystemFocusWearActivity.RUNNING || endsAt == null) {
             return SystemFocusWearPresentation(
@@ -65,7 +80,7 @@ internal data class SystemFocusWearSnapshot(
     }
 
     companion object {
-        const val SCHEMA_VERSION = 1
+        const val SCHEMA_VERSION = 2
         const val MAXIMUM_SESSION_SECONDS = 24 * 60 * 60
         val WIRE_KEYS =
             setOf(
@@ -76,7 +91,9 @@ internal data class SystemFocusWearSnapshot(
                 "totalSessionSeconds",
                 "generatedAtMilliseconds",
                 "endsAtMilliseconds",
+                "snapshotToken",
             )
+        private val snapshotTokenPattern = Regex("^[a-f0-9]{64}$")
 
         fun fromWireMap(value: Map<String, Any?>?): SystemFocusWearSnapshot? {
             if (value == null || value.keys != WIRE_KEYS) return null
@@ -101,11 +118,13 @@ internal data class SystemFocusWearSnapshot(
             val totalSessionSeconds = value["totalSessionSeconds"] as? Int ?: return null
             val generatedAtMilliseconds = value["generatedAtMilliseconds"] as? Long ?: return null
             val endsAtMilliseconds = value["endsAtMilliseconds"] as? Long ?: return null
+            val snapshotToken = value["snapshotToken"] as? String ?: return null
             if (schemaVersion != SCHEMA_VERSION ||
                 totalSessionSeconds !in 1..MAXIMUM_SESSION_SECONDS ||
                 secondsRemaining !in 0..totalSessionSeconds ||
                 generatedAtMilliseconds <= 0L ||
                 endsAtMilliseconds < 0L ||
+                !snapshotTokenPattern.matches(snapshotToken) ||
                 (activity == SystemFocusWearActivity.COMPLETED) != (secondsRemaining == 0)
             ) {
                 return null
@@ -132,6 +151,7 @@ internal data class SystemFocusWearSnapshot(
                 totalSessionSeconds,
                 generatedAt,
                 endsAt,
+                snapshotToken,
             )
         }
     }

@@ -6,4 +6,5 @@
     <color name="focus_haven_wear_tertiary">#A79EC5</color>
     <color name="focus_haven_wear_accent">#9E8CFF</color>
     <color name="focus_haven_wear_track">#302A49</color>
+    <color name="focus_haven_wear_button_text">#120E24</color>
 </resources>

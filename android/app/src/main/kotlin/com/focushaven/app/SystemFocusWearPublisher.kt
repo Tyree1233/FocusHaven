@@ -6,7 +6,7 @@ import com.google.android.gms.wearable.Wearable
 
 /** Publishes state changes once; the watch advances a running deadline locally. */
 internal object SystemFocusWearPublisher {
-    const val SNAPSHOT_PATH = "/focus_haven/system_focus/snapshot/v1"
+    const val SNAPSHOT_PATH = "/focus_haven/system_focus/snapshot/v2"
 
     fun publish(
         context: Context,
@@ -22,6 +22,7 @@ internal object SystemFocusWearPublisher {
         data.putInt("totalSessionSeconds", payload.totalSessionSeconds)
         data.putLong("generatedAtMilliseconds", payload.generatedAtMilliseconds)
         data.putLong("endsAtMilliseconds", payload.endsAtMilliseconds)
+        data.putString("snapshotToken", payload.snapshotToken)
         Wearable.getDataClient(context)
             .putDataItem(request.asPutDataRequest().setUrgent())
             .addOnFailureListener {

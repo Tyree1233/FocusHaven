@@ -11,12 +11,13 @@ class SystemFocusWearSnapshotTest {
     private val now = Instant.parse("2026-08-17T13:00:00Z")
 
     @Test
-    fun acceptsOnlyTheExactSevenFieldContract() {
+    fun acceptsOnlyTheExactBoundedContract() {
         val snapshot = SystemFocusWearSnapshot.fromWireMap(wireMap())!!
 
         assertEquals(SystemFocusWearSession.FOCUS, snapshot.session)
         assertEquals(SystemFocusWearActivity.READY, snapshot.activity)
         assertEquals(now, snapshot.generatedAt)
+        assertEquals(snapshotToken, snapshot.snapshotToken)
         assertEquals(SystemFocusWearSnapshot.WIRE_KEYS, wireMap().keys)
         assertFalse(SystemFocusWearSnapshot.WIRE_KEYS.contains("task"))
         assertFalse(SystemFocusWearSnapshot.WIRE_KEYS.contains("accountId"))
@@ -141,14 +142,18 @@ class SystemFocusWearSnapshotTest {
         totalSessionSeconds: Int = 1_500,
         generatedAtMilliseconds: Long = now.toEpochMilli(),
         endsAtMilliseconds: Long = 0L,
+        snapshotToken: String = this.snapshotToken,
     ): Map<String, Any?> =
         mapOf(
-            "schemaVersion" to 1,
+            "schemaVersion" to 2,
             "session" to session,
             "activity" to activity,
             "secondsRemaining" to secondsRemaining,
             "totalSessionSeconds" to totalSessionSeconds,
             "generatedAtMilliseconds" to generatedAtMilliseconds,
             "endsAtMilliseconds" to endsAtMilliseconds,
+            "snapshotToken" to snapshotToken,
         )
+
+    private val snapshotToken = "a".repeat(64)
 }
