@@ -12,8 +12,16 @@ admitted by the current state through an explicitly supplied host callback.
 Protection is requested only for an actively running focus session; breaks,
 timer pauses, completed sessions, and recovery decisions remain open. App and
 website selections never enter Flutter state or FocusHaven history. Every
-platform currently defaults to unsupported and blocks nothing until its
-separately consented, tested adapter is installed.
+platform defaults to unsupported and blocks nothing until its separately
+consented, tested adapter is installed. iPhone now installs the first adapter
+with Apple's Family Controls and Managed Settings frameworks. Authorization,
+distraction selection, pausing, resuming, and disabling remain explicit user
+actions. Apple supplies only opaque selection tokens, which stay encoded in
+app-private iOS preferences and never cross the Flutter channel. FocusHaven
+receives only a bounded capability state and reports protection only after the
+requested shields can be read back from the system settings store. Android
+continues to report unsupported because its consumer APIs do not provide an
+equivalent privacy-preserving enforcement contract.
 
 Future home-screen widgets, lock-screen experiences, notifications, and watch
 companions share one versioned system-focus snapshot. The contract contains
@@ -243,6 +251,11 @@ Models live under `lib/models`, and platform integrations remain isolated in
 - Dart 3.12.2
 - Xcode for iOS and macOS builds; the iOS app requires iOS 15 or later
 - Android Studio and the Android SDK for Android builds
+
+Shipping iPhone Focus Shield requires Apple approval for the Family Controls
+distribution entitlement and a provisioning profile containing
+`com.apple.developer.family-controls`. Development builds remain honest when
+authorization or entitlement access is unavailable: no protection is claimed.
 
 ## Run locally
 

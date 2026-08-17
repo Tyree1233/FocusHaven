@@ -20,6 +20,7 @@ import '../services/coaching_service.dart';
 import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/focus_shield_service.dart';
+import '../services/focus_shield_platform_bridge.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_rhythm_service.dart';
 import '../services/iap_service.dart';
@@ -181,19 +182,24 @@ final focusShieldServiceProvider = Provider<FocusShieldService>(
   name: 'focusShieldServiceProvider',
 );
 
-/// Dormant, text-free capability report for the future native shield host.
+final focusShieldPlatformBackendProvider = Provider<FocusShieldPlatformBackend>(
+  (ref) => MethodChannelFocusShieldBackend(),
+  name: 'focusShieldPlatformBackendProvider',
+);
+
+final focusShieldPlatformControllerProvider =
+    ChangeNotifierProvider<FocusShieldPlatformController>((ref) {
+      return FocusShieldPlatformController(
+        backend: ref.watch(focusShieldPlatformBackendProvider),
+      );
+    }, name: 'focusShieldPlatformControllerProvider');
+
+/// Text-free capability report owned by the native Focus Shield controller.
 ///
 /// App and website selections stay native and never enter Riverpod. Unsupported
 /// platforms fail open and cannot claim that protection is active.
 final focusShieldCapabilityProvider = Provider<FocusShieldCapability>(
-  (ref) => const (
-    isEnabled: false,
-    nativeSupportAvailable: false,
-    authorization: FocusShieldAuthorization.notRequested,
-    hasSelection: false,
-    temporarilyPaused: false,
-    nativeStatus: FocusShieldNativeStatus.unavailable,
-  ),
+  (ref) => ref.watch(focusShieldPlatformControllerProvider).capability,
   name: 'focusShieldCapabilityProvider',
 );
 

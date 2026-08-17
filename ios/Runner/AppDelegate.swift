@@ -4,6 +4,7 @@ import UIKit
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var systemFocusAdapter: SystemFocusPlatformAdapter?
+  private var focusShieldAdapter: FocusShieldPlatformAdapter?
 
   override func application(
     _ application: UIApplication,
@@ -24,6 +25,19 @@ import UIKit
     let adapter = SystemFocusPlatformAdapter()
     adapter.install(binaryMessenger: registrar.messenger())
     systemFocusAdapter = adapter
+
+    if let focusShieldRegistrar = engineBridge.pluginRegistry.registrar(
+      forPlugin: "FocusHavenFocusShieldAdapter"
+    ) {
+      let focusShieldAdapter = FocusShieldPlatformAdapter()
+      focusShieldAdapter.install(binaryMessenger: focusShieldRegistrar.messenger())
+      self.focusShieldAdapter = focusShieldAdapter
+    }
+  }
+
+  override func applicationDidBecomeActive(_ application: UIApplication) {
+    super.applicationDidBecomeActive(application)
+    focusShieldAdapter?.refreshAfterActivation()
   }
 
   func deliverSystemFocusPendingCommand() {

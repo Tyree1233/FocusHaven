@@ -36,6 +36,10 @@
 		A12000000000000000000006 /* FocusHavenWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000013 /* FocusHavenWatchApp.swift */; };
 		A12000000000000000000007 /* FocusHavenWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A12000000000000000000017 /* FocusHavenWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A12000000000000000000008 /* SystemFocusWatchSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000018 /* SystemFocusWatchSnapshotTests.swift */; };
+		A12600000000000000000001 /* FocusShieldCapabilityPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12600000000000000000011 /* FocusShieldCapabilityPayload.swift */; };
+		A12600000000000000000002 /* FocusShieldNativeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12600000000000000000012 /* FocusShieldNativeController.swift */; };
+		A12600000000000000000003 /* FocusShieldPlatformAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12600000000000000000013 /* FocusShieldPlatformAdapter.swift */; };
+		A12600000000000000000004 /* FocusShieldCapabilityPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12600000000000000000014 /* FocusShieldCapabilityPayloadTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -135,6 +139,10 @@
 		A12000000000000000000016 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A12000000000000000000017 /* FocusHavenWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FocusHavenWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A12000000000000000000018 /* SystemFocusWatchSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusWatchSnapshotTests.swift; sourceTree = "<group>"; };
+		A12600000000000000000011 /* FocusShieldCapabilityPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusShieldCapabilityPayload.swift; sourceTree = "<group>"; };
+		A12600000000000000000012 /* FocusShieldNativeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusShieldNativeController.swift; sourceTree = "<group>"; };
+		A12600000000000000000013 /* FocusShieldPlatformAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusShieldPlatformAdapter.swift; sourceTree = "<group>"; };
+		A12600000000000000000014 /* FocusShieldCapabilityPayloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusShieldCapabilityPayloadTests.swift; sourceTree = "<group>"; };
 		CD7D0BCC06E1135355B657D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -178,6 +186,7 @@
 				A11800000000000000000017 /* SystemFocusWidgetContentTests.swift */,
 				A11900000000000000000013 /* SystemFocusWidgetCommandTests.swift */,
 				A12000000000000000000018 /* SystemFocusWatchSnapshotTests.swift */,
+				A12600000000000000000014 /* FocusShieldCapabilityPayloadTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -236,6 +245,9 @@
 				A11900000000000000000012 /* SystemFocusPendingCommandStore.swift */,
 				A12000000000000000000011 /* SystemFocusWatchSnapshot.swift */,
 				A12000000000000000000012 /* SystemFocusWatchConnectivityBridge.swift */,
+				A12600000000000000000011 /* FocusShieldCapabilityPayload.swift */,
+				A12600000000000000000012 /* FocusShieldNativeController.swift */,
+				A12600000000000000000013 /* FocusShieldPlatformAdapter.swift */,
 				A11800000000000000000012 /* Runner.entitlements */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
@@ -474,6 +486,7 @@
 				A11800000000000000000006 /* SystemFocusWidgetContentTests.swift in Sources */,
 				A11900000000000000000003 /* SystemFocusWidgetCommandTests.swift in Sources */,
 				A12000000000000000000008 /* SystemFocusWatchSnapshotTests.swift in Sources */,
+				A12600000000000000000004 /* FocusShieldCapabilityPayloadTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +502,9 @@
 				A11900000000000000000002 /* SystemFocusPendingCommandStore.swift in Sources */,
 				A12000000000000000000001 /* SystemFocusWatchSnapshot.swift in Sources */,
 				A12000000000000000000002 /* SystemFocusWatchConnectivityBridge.swift in Sources */,
+				A12600000000000000000001 /* FocusShieldCapabilityPayload.swift in Sources */,
+				A12600000000000000000002 /* FocusShieldNativeController.swift in Sources */,
+				A12600000000000000000003 /* FocusShieldPlatformAdapter.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 			);

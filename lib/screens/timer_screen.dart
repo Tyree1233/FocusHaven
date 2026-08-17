@@ -815,6 +815,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final havenRhythm = ref.watch(havenRhythmInsightProvider);
     final livingLantern = ref.watch(livingLanternStateProvider);
     final focusShield = ref.watch(focusShieldStateProvider);
+    final focusShieldController = ref.watch(
+      focusShieldPlatformControllerProvider,
+    );
     final isSignedIn = ref.watch(authIsSignedInProvider);
     final queueRemaining = ref.watch(focusQueueRemainingCountProvider);
     final parkedThoughtState = ref.watch(parkedThoughtStateProvider);
@@ -912,7 +915,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
                       const SizedBox(height: 18),
                       LivingLanternCard(state: livingLantern),
                       const SizedBox(height: 12),
-                      FocusShieldCard(state: focusShield),
+                      FocusShieldCard(
+                        state: focusShield,
+                        onAction: focusShieldController.isStarted
+                            ? (action) {
+                                focusShieldController.performAction(action);
+                              }
+                            : null,
+                      ),
                       if (session.sessionType == SessionType.focus) ...[
                         const SizedBox(height: 12),
                         TextButton.icon(
