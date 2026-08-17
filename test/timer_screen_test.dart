@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/models/focus_event.dart';
+import 'package:focushaven/models/focus_shield_state.dart';
 import 'package:focushaven/models/haven_rhythm_insight.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
@@ -16,6 +17,7 @@ import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
+import 'package:focushaven/widgets/focus_shield_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
 import 'package:focushaven/widgets/haven_rhythm_card.dart';
@@ -40,6 +42,7 @@ Widget _app(
   Future<void> Function(String text)? writeClipboard,
   List<FocusQueueItem> havenQueue = const [],
   HavenRhythmInsight? rhythmInsight,
+  FocusShieldState? shieldState,
 }) {
   return ProviderScope(
     overrides: [
@@ -60,6 +63,8 @@ Widget _app(
       )),
       if (rhythmInsight != null)
         havenRhythmInsightProvider.overrideWithValue(rhythmInsight),
+      if (shieldState != null)
+        focusShieldStateProvider.overrideWithValue(shieldState),
     ],
     child: MaterialApp(
       theme: ThemeData.dark().copyWith(
@@ -123,11 +128,43 @@ void main() {
     expect(find.text('Plan my next session'), findsOneWidget);
     expect(find.byType(LivingLanternCard), findsOneWidget);
     expect(find.text('LIVING LANTERN · READY'), findsOneWidget);
+    expect(find.byType(FocusShieldCard), findsOneWidget);
+    expect(find.text('FOCUS SHIELD · OFF'), findsOneWidget);
     expect(find.byType(HavenRhythmCard), findsOneWidget);
     expect(find.byTooltip('Mindful pause'), findsOneWidget);
     expect(find.byTooltip('Reflection journal'), findsOneWidget);
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
     expect(find.byTooltip('Sign in'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('expanding Focus Shield status leaves the timer untouched', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    const shieldState = FocusShieldState(
+      phase: FocusShieldPhase.protecting,
+      headline: 'Your Haven is protected',
+      detail: 'Only the selected distractions are restricted.',
+      shouldProtect: true,
+      nativeProtectionReported: true,
+      availableActions: {FocusShieldAction.pauseProtection},
+    );
+
+    await tester.pumpWidget(_app(timer, shieldState: shieldState));
+    await tester.pump();
+    final secondsBefore = timer.secondsRemaining;
+    final toggle = find.byKey(const ValueKey('toggle-focus-shield'));
+    await tester.ensureVisible(toggle);
+    await tester.tap(toggle);
+    await tester.pump();
+
+    expect(find.text('FOCUS SHIELD · PROTECTED'), findsOneWidget);
+    expect(find.text(shieldState.detail), findsOneWidget);
+    expect(find.text('Pause protection'), findsNothing);
+    expect(timer.secondsRemaining, secondsBefore);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
