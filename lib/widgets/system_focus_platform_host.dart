@@ -10,8 +10,8 @@ import '../services/system_focus_platform_bridge.dart';
 
 /// Activates the system-focus bridge only for an intentionally supported host.
 ///
-/// Android is enabled now that its strict native snapshot store exists. Apple,
-/// web, and desktop remain dormant until their own adapters are installed.
+/// Android and iOS are enabled only because their strict native snapshot stores
+/// exist. Web and desktop remain dormant until their own adapters are installed.
 class SystemFocusPlatformHost extends ConsumerStatefulWidget {
   const SystemFocusPlatformHost({required this.child, this.enabled, super.key});
 
@@ -30,7 +30,9 @@ class _SystemFocusPlatformHostState
 
   bool get _isEnabled =>
       widget.enabled ??
-      (!kIsWeb && defaultTargetPlatform == TargetPlatform.android);
+      (!kIsWeb &&
+          (defaultTargetPlatform == TargetPlatform.android ||
+              defaultTargetPlatform == TargetPlatform.iOS));
 
   @override
   void initState() {

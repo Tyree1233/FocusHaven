@@ -34,8 +34,15 @@ trampoline, is rechecked against the exact app-private snapshot, and queues one
 text-free command. Flutter waits for timer restoration, claims a cold-start
 command once, and still applies the stale, replay, and advertised-action gates
 before any mutation. No widget code can directly change the timer or expose
-task, reflection, mood, history, coach, or account data. Apple and every
-unsupported platform remain dormant.
+task, reflection, mood, history, coach, or account data.
+
+iOS now installs the same dedicated Flutter channel through a strict native
+adapter. Swift revalidates every field, enum, duration, null, and UTC timestamp
+before storing the text-free snapshot as private JSON data. Synchronization
+waits for timer restoration and stays one-way: no iPhone widget, Lock Screen,
+Live Activity, or watch command can mutate the timer until its separately
+authorized inbox exists. macOS, web, and every unsupported platform remain
+dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the
@@ -194,7 +201,7 @@ Models live under `lib/models`, and platform integrations remain isolated in
 
 - Flutter 3.44.8 on the stable channel
 - Dart 3.12.2
-- Xcode for iOS and macOS builds
+- Xcode for iOS and macOS builds; the iOS app requires iOS 15 or later
 - Android Studio and the Android SDK for Android builds
 
 ## Run locally

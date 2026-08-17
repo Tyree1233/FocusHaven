@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -66,6 +67,32 @@ void main() {
 
     expect(backend.published.last['activity'], 'running');
     expect(backend.published.last['endsAt'], isNotNull);
+  });
+
+  testWidgets('iOS enables its strict native snapshot adapter by default', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final backend = _RecordingHostBackend();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            systemFocusPlatformBackendProvider.overrideWithValue(backend),
+          ],
+          child: const SystemFocusPlatformHost(child: SizedBox()),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(backend.handler, isNotNull);
+      expect(backend.published, hasLength(1));
+      expect(backend.published.single.keys, isNot(contains('focusTask')));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 
   testWidgets('native sync waits for restored timer initialization', (
