@@ -3,6 +3,16 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+The first Focus Shield foundation is intentionally dormant. A deterministic,
+text-free decision layer can distinguish opt-out, unsupported, permission,
+selection, ready, starting, confirmed, paused, and failed states without
+invoking platform APIs. Protection is requested only for an actively running
+focus session; breaks, timer pauses, completed sessions, and recovery decisions
+remain open. App and website selections never enter Flutter state, and the app
+cannot say a Haven is protected until a native adapter independently confirms
+enforcement. Every platform currently defaults to unsupported and blocks
+nothing until its separately consented, tested adapter is installed.
+
 Future home-screen widgets, lock-screen experiences, notifications, and watch
 companions share one versioned system-focus snapshot. The contract contains
 only the session kind, timer activity, bounded duration, UTC timestamps, and

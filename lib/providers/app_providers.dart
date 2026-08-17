@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../config/feature_flags.dart';
 import '../models/coaching_message.dart';
 import '../models/focus_event.dart';
+import '../models/focus_shield_state.dart';
 import '../models/focus_session.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_rhythm_insight.dart';
@@ -18,6 +19,7 @@ import '../services/cloud_sync_service.dart';
 import '../services/coaching_service.dart';
 import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
+import '../services/focus_shield_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_rhythm_service.dart';
 import '../services/iap_service.dart';
@@ -174,6 +176,27 @@ final focusQueueServiceProvider = ChangeNotifierProvider<FocusQueueService>(
   name: 'focusQueueServiceProvider',
 );
 
+final focusShieldServiceProvider = Provider<FocusShieldService>(
+  (ref) => const FocusShieldService(),
+  name: 'focusShieldServiceProvider',
+);
+
+/// Dormant, text-free capability report for the future native shield host.
+///
+/// App and website selections stay native and never enter Riverpod. Unsupported
+/// platforms fail open and cannot claim that protection is active.
+final focusShieldCapabilityProvider = Provider<FocusShieldCapability>(
+  (ref) => const (
+    isEnabled: false,
+    nativeSupportAvailable: false,
+    authorization: FocusShieldAuthorization.notRequested,
+    hasSelection: false,
+    temporarilyPaused: false,
+    nativeStatus: FocusShieldNativeStatus.unavailable,
+  ),
+  name: 'focusShieldCapabilityProvider',
+);
+
 final havenPlanServiceProvider = Provider<HavenPlanService>(
   (ref) => const HavenPlanService(),
   name: 'havenPlanServiceProvider',
@@ -298,6 +321,16 @@ final timerCountdownStateProvider = Provider<TimerCountdownState>((ref) {
   );
 }, name: 'timerCountdownStateProvider');
 
+/// Whether the current session has moved away from its fresh starting point.
+/// This changes only at session boundaries, unlike the one-second countdown.
+final timerHasProgressProvider = Provider<bool>((ref) {
+  return ref.watch(
+    timerServiceProvider.select(
+      (timer) => timer.secondsRemaining < timer.totalSessionSeconds,
+    ),
+  );
+}, name: 'timerHasProgressProvider');
+
 /// Narrow read model for start, pause, reset, and completion state.
 final timerSessionStateProvider = Provider<TimerSessionState>((ref) {
   final timer = ref.watch(timerServiceProvider);
@@ -370,6 +403,34 @@ final livingLanternStateProvider = Provider<LivingLanternState>((ref) {
         recentEvents: events,
       );
 }, name: 'livingLanternStateProvider');
+
+/// Derives an honest Focus Shield request from narrow timer and native states.
+/// The result cannot invoke native APIs, alter the timer, or receive selected
+/// application and website identities.
+final focusShieldStateProvider = Provider<FocusShieldState>((ref) {
+  final session = ref.watch(timerSessionStateProvider);
+  final hasProgress = ref.watch(timerHasProgressProvider);
+  final activity = session.hasPendingResume
+      ? SystemFocusActivity.pendingResume
+      : session.isComplete
+      ? SystemFocusActivity.completed
+      : session.isRunning
+      ? SystemFocusActivity.running
+      : hasProgress
+      ? SystemFocusActivity.paused
+      : SystemFocusActivity.ready;
+  final systemSession = switch (session.sessionType) {
+    SessionType.focus => SystemFocusSession.focus,
+    SessionType.shortBreak => SystemFocusSession.shortBreak,
+    SessionType.longBreak => SystemFocusSession.longBreak,
+  };
+  return ref
+      .watch(focusShieldServiceProvider)
+      .createState(
+        capability: ref.watch(focusShieldCapabilityProvider),
+        timer: (session: systemSession, activity: activity),
+      );
+}, name: 'focusShieldStateProvider');
 
 /// Creates the bounded, text-free state contract used by trusted system
 /// surfaces. No task, journal, coach, history, mood, or account data enters it.
