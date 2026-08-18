@@ -141,6 +141,14 @@ headline stays visible without interrupting the timer; the explanation,
 evidence, possible pace, and privacy note appear only when the user expands the
 card. The card is informational and cannot start, schedule, or alter a session.
 
+The private Focus Forecast cautiously observes when recent completed sessions
+began in the device's local time. It requires several completed signals and a
+clear repeated cluster before naming a possible window; sparse or mixed timing
+stays explicitly uncertain. Interrupted attempts never count against any time
+of day, and the forecast never claims to know the person's best performance,
+predict success, schedule work, or rank one part of the day. The ephemeral
+result contains no task, journal, mood, coaching, or account data.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

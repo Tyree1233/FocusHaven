@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../config/feature_flags.dart';
 import '../models/coaching_message.dart';
 import '../models/focus_event.dart';
+import '../models/focus_forecast.dart';
 import '../models/focus_shield_state.dart';
 import '../models/focus_session.dart';
 import '../models/haven_journey_state.dart';
@@ -18,6 +19,7 @@ import '../models/system_focus_snapshot.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/coaching_service.dart';
+import '../services/focus_forecast_service.dart';
 import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/focus_shield_service.dart';
@@ -167,6 +169,11 @@ final reminderStateProvider = Provider<ReminderState>((ref) {
 final authServiceProvider = ChangeNotifierProvider<AuthService>(
   (ref) => AuthService(),
   name: 'authServiceProvider',
+);
+
+final focusForecastServiceProvider = Provider<FocusForecastService>(
+  (ref) => const FocusForecastService(),
+  name: 'focusForecastServiceProvider',
 );
 
 final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(
@@ -405,6 +412,15 @@ final timerFocusEventsProvider = Provider<List<FocusEvent>>((ref) {
 
   return ref.read(timerServiceProvider).recentFocusEvents;
 }, name: 'timerFocusEventsProvider');
+
+/// Rebuilds one cautious, private time-of-day observation from the bounded
+/// text-free event snapshot. It cannot schedule, start, or rank focus time.
+final focusForecastProvider = Provider<FocusForecast>((ref) {
+  final events = ref.watch(timerFocusEventsProvider);
+  return ref
+      .watch(focusForecastServiceProvider)
+      .createForecast(recentEvents: events);
+}, name: 'focusForecastProvider');
 
 /// Rebuilds one transparent, ephemeral rhythm insight from private text-free
 /// focus events. The insight is local and is never persisted by itself.
