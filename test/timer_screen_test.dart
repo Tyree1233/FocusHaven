@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/models/focus_shield_state.dart';
+import 'package:focushaven/models/haven_journey_state.dart';
 import 'package:focushaven/models/haven_rhythm_insight.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
@@ -20,6 +21,7 @@ import 'package:focushaven/widgets/focus_session_reflection_card.dart';
 import 'package:focushaven/widgets/focus_shield_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
+import 'package:focushaven/widgets/haven_journey_card.dart';
 import 'package:focushaven/widgets/haven_rhythm_card.dart';
 import 'package:focushaven/widgets/living_lantern_card.dart';
 import 'package:focushaven/widgets/smart_reset_sheet.dart';
@@ -41,6 +43,7 @@ Widget _app(
   Future<bool> Function(Uri uri)? openExternalUrl,
   Future<void> Function(String text)? writeClipboard,
   List<FocusQueueItem> havenQueue = const [],
+  HavenJourneyState? journeyState,
   HavenRhythmInsight? rhythmInsight,
   FocusShieldState? shieldState,
 }) {
@@ -63,6 +66,8 @@ Widget _app(
       )),
       if (rhythmInsight != null)
         havenRhythmInsightProvider.overrideWithValue(rhythmInsight),
+      if (journeyState != null)
+        havenJourneyStateProvider.overrideWithValue(journeyState),
       if (shieldState != null)
         focusShieldStateProvider.overrideWithValue(shieldState),
     ],
@@ -130,11 +135,43 @@ void main() {
     expect(find.text('LIVING LANTERN · READY'), findsOneWidget);
     expect(find.byType(FocusShieldCard), findsOneWidget);
     expect(find.text('FOCUS SHIELD · OFF'), findsOneWidget);
+    expect(find.byType(HavenJourneyCard), findsOneWidget);
+    expect(find.text('HAVEN JOURNEY · LANTERN'), findsOneWidget);
     expect(find.byType(HavenRhythmCard), findsOneWidget);
     expect(find.byTooltip('Mindful pause'), findsOneWidget);
     expect(find.byTooltip('Reflection journal'), findsOneWidget);
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
     expect(find.byTooltip('Sign in'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('showing an established Haven leaves the timer untouched', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    const journey = HavenJourneyState(
+      place: HavenJourneyPlace.cabin,
+      headline: 'Your Haven has a quiet cabin',
+      detail: 'Pauses and resets never remove anything from it.',
+      supportingSessionCount: 4,
+    );
+
+    await tester.pumpWidget(_app(timer, journeyState: journey));
+    await tester.pump();
+    final secondsBefore = timer.secondsRemaining;
+    final card = find.byKey(const ValueKey('haven-journey-card'));
+    await tester.ensureVisible(card);
+    await tester.pumpAndSettle();
+
+    expect(find.text('HAVEN JOURNEY · CABIN'), findsOneWidget);
+    expect(find.text(journey.headline), findsOneWidget);
+    expect(
+      find.descendant(of: card, matching: find.byType(ButtonStyleButton)),
+      findsNothing,
+    );
+    expect(timer.secondsRemaining, secondsBefore);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
     expect(tester.takeException(), isNull);
   });
 

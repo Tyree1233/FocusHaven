@@ -108,7 +108,10 @@ public rank. Short and long completed focus sessions are valued equally, while
 pauses, resets, rest, missed days, and time away can never shrink the Haven or
 remove something already built. The foundation is informational only and does
 not start sessions, change the timer, or pressure the person toward another
-milestone.
+milestone. The dashboard now presents the current place as one complete,
+responsive scene with its compassionate explanation and a private, non-scoring
+boundary note. It never displays a progress bar, next-stage countdown, missing
+item, locked reward, or control that can alter a focus session.
 
 The optional Haven Plan check-in turns the user's current energy, available
 time, focus queue, and text-free local focus events into a transparent session
