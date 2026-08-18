@@ -12,11 +12,13 @@ import 'package:focushaven/models/focus_forecast.dart';
 import 'package:focushaven/models/focus_shield_state.dart';
 import 'package:focushaven/models/haven_journey_state.dart';
 import 'package:focushaven/models/haven_rhythm_insight.dart';
+import 'package:focushaven/models/haven_window_suggestion.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/coaching_service.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/haven_window_platform_bridge.dart';
+import 'package:focushaven/services/haven_window_hold_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
@@ -52,6 +54,8 @@ Widget _app(
   FocusForecast? forecast,
   FocusShieldState? shieldState,
   HavenWindowPlatformController? havenWindowController,
+  HavenWindowHoldService? havenWindowHoldService,
+  HavenWindowSuggestion? havenWindowSuggestion,
 }) {
   return ProviderScope(
     overrides: [
@@ -81,6 +85,12 @@ Widget _app(
         havenWindowPlatformControllerProvider.overrideWith(
           (ref) => havenWindowController,
         ),
+      if (havenWindowHoldService != null)
+        havenWindowHoldServiceProvider.overrideWith(
+          (ref) => havenWindowHoldService,
+        ),
+      if (havenWindowSuggestion != null)
+        havenWindowSuggestionProvider.overrideWithValue(havenWindowSuggestion),
     ],
     child: MaterialApp(
       theme: ThemeData.dark().copyWith(
@@ -135,6 +145,52 @@ class _RecordingHavenWindowBackend implements HavenWindowPlatformBackend {
   Future<Map<String, Object?>> requestReadOnlyAccess() async {
     operations.add('request');
     return {'schemaVersion': 1, 'status': 'denied'};
+  }
+}
+
+class _ReadyHavenWindowBackend implements HavenWindowPlatformBackend {
+  _ReadyHavenWindowBackend({required this.rangeStart, required this.rangeEnd});
+
+  final DateTime rangeStart;
+  final DateTime rangeEnd;
+
+  @override
+  Future<Map<String, Object?>> readAvailability() async {
+    return {
+      'schemaVersion': 1,
+      'status': 'ready',
+      'rangeStartUtc': rangeStart.toUtc().toIso8601String(),
+      'rangeEndUtc': rangeEnd.toUtc().toIso8601String(),
+      'busyBlocks': <Object?>[],
+    };
+  }
+
+  @override
+  Future<Map<String, Object?>> requestReadOnlyAccess() async {
+    throw StateError('permission prompting is not expected');
+  }
+}
+
+class _RecordingHavenWindowReminders implements HavenWindowReminderClient {
+  int permissionRequests = 0;
+  int cancellations = 0;
+  final scheduledStarts = <DateTime>[];
+
+  @override
+  Future<bool> requestPermissions() async {
+    permissionRequests += 1;
+    return true;
+  }
+
+  @override
+  Future<bool> scheduleHavenWindowReminder(DateTime startsAt) async {
+    scheduledStarts.add(startsAt);
+    return true;
+  }
+
+  @override
+  Future<void> cancelHavenWindowReminder() async {
+    cancellations += 1;
   }
 }
 
@@ -208,6 +264,74 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('Haven Window hold and release leave the timer untouched', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    final now = DateTime(2026, 8, 18, 8);
+    final opening = HavenWindowSuggestion(
+      kind: HavenWindowKind.opening,
+      headline: 'A possible Haven Window is open',
+      detail: 'Review this optional opening before deciding whether it fits.',
+      evidence: 'One 25-minute opening fits the private forecast.',
+      startsAt: now.add(const Duration(hours: 1)),
+      endsAt: now.add(const Duration(hours: 1, minutes: 25)),
+    );
+    final controller = HavenWindowPlatformController(
+      backend: _ReadyHavenWindowBackend(
+        rangeStart: now,
+        rangeEnd: now.add(const Duration(hours: 6)),
+      ),
+    );
+    expect(await controller.start(), isTrue);
+    final reminders = _RecordingHavenWindowReminders();
+    final holdService = HavenWindowHoldService(
+      notificationService: reminders,
+      now: () => now,
+    );
+    await holdService.initialized;
+
+    await tester.pumpWidget(
+      _app(
+        timer,
+        havenWindowController: controller,
+        havenWindowHoldService: holdService,
+        havenWindowSuggestion: opening,
+      ),
+    );
+    await tester.pump();
+    final secondsBefore = timer.secondsRemaining;
+    final card = find.byKey(const ValueKey('haven-window-card'));
+    await tester.ensureVisible(card);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+
+    expect(find.text('Hold this window'), findsOneWidget);
+    expect(reminders.permissionRequests, 0);
+    expect(reminders.scheduledStarts, isEmpty);
+    await tester.tap(find.byKey(const ValueKey('haven-window-hold')));
+    await tester.pumpAndSettle();
+
+    expect(holdService.holdState.isHeld, isTrue);
+    expect(reminders.permissionRequests, 1);
+    expect(reminders.scheduledStarts, [opening.startsAt]);
+    expect(find.text('HAVEN WINDOW · REMINDER HELD'), findsOneWidget);
+    expect(timer.secondsRemaining, secondsBefore);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
+
+    await tester.tap(find.byKey(const ValueKey('haven-window-release-hold')));
+    await tester.pumpAndSettle();
+
+    expect(holdService.holdState.isHeld, isFalse);
+    expect(reminders.cancellations, 1);
+    expect(timer.secondsRemaining, secondsBefore);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
 
   testWidgets('showing an established Haven leaves the timer untouched', (
     tester,

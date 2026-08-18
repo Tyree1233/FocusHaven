@@ -191,8 +191,11 @@ and end times in local preferences and schedules one generic local
 notification at the start. It never copies event content, creates or edits a
 calendar event, automatically holds a suggestion, or reschedules anything
 during app restoration. Expired and malformed holds are removed locally, and
-releasing a hold cancels its notification. No dashboard control is connected
-to this foundation until its separate consent-first surface is reviewed.
+releasing a hold cancels its notification. The expanded Haven Window card now
+offers an explicit **Hold this window** action only when a valid opening is
+available. A held opening is labeled as one private local reminder and can be
+released from the same card. The surface never calls the calendar write APIs,
+never describes the opening as reserved, and never starts the timer.
 
 ## Focus Coach server
 

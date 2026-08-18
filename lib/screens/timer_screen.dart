@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/focus_milestone.dart';
 import '../models/focus_session.dart';
 import '../models/haven_plan.dart';
+import '../models/haven_window_suggestion.dart';
 import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
 import '../services/coaching_service.dart';
@@ -847,6 +848,42 @@ class TimerScreen extends riverpod.ConsumerWidget {
     return refreshed;
   }
 
+  Future<bool> _holdHavenWindow(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    final held = await ref
+        .read(havenWindowHoldServiceProvider)
+        .hold(ref.read(havenWindowSuggestionProvider));
+    if (!held && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'This window could not be held. No calendar event or reminder was created.',
+          ),
+        ),
+      );
+    }
+    return held;
+  }
+
+  Future<bool> _releaseHavenWindowHold(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    final released = await ref.read(havenWindowHoldServiceProvider).release();
+    if (!released && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'The private reminder could not be released right now. No calendar event was changed.',
+          ),
+        ),
+      );
+    }
+    return released;
+  }
+
   @override
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
     final timer = ref.read(timerServiceProvider);
@@ -858,6 +895,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final focusForecast = ref.watch(focusForecastProvider);
     final havenWindow = ref.watch(havenWindowSuggestionProvider);
     final calendarAvailability = ref.watch(privateCalendarAvailabilityProvider);
+    final havenWindowHold = ref.watch(havenWindowHoldStateProvider);
     final havenWindowController = ref.watch(
       havenWindowPlatformControllerProvider,
     );
@@ -1191,6 +1229,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           suggestion: havenWindow,
                           availabilityStatus: calendarAvailability.status,
                           isPlatformStarted: havenWindowController.isStarted,
+                          isHeld: havenWindowHold.isHeld,
+                          heldStartsAtUtc: havenWindowHold.startsAtUtc,
+                          heldEndsAtUtc: havenWindowHold.endsAtUtc,
+                          isHoldUpdating: havenWindowHold.isUpdating,
                           onRequestReadOnlyAccess:
                               havenWindowController.isStarted
                               ? () => _requestHavenWindowAccess(context, ref)
@@ -1200,6 +1242,16 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                   context,
                                   ref,
                                 )
+                              : null,
+                          onHoldWindow:
+                              havenWindowController.isStarted &&
+                                  calendarAvailability.status ==
+                                      PrivateCalendarAvailabilityStatus.ready &&
+                                  havenWindow.hasOpening
+                              ? () => _holdHavenWindow(context, ref)
+                              : null,
+                          onReleaseHold: havenWindowHold.isHeld
+                              ? () => _releaseHavenWindowHold(context, ref)
                               : null,
                         ),
                         Align(

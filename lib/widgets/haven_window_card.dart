@@ -14,15 +14,27 @@ class HavenWindowCard extends StatefulWidget {
     required this.suggestion,
     required this.availabilityStatus,
     required this.isPlatformStarted,
+    this.isHeld = false,
+    this.heldStartsAtUtc,
+    this.heldEndsAtUtc,
+    this.isHoldUpdating = false,
     this.onRequestReadOnlyAccess,
     this.onRefreshAvailability,
+    this.onHoldWindow,
+    this.onReleaseHold,
   });
 
   final HavenWindowSuggestion suggestion;
   final PrivateCalendarAvailabilityStatus availabilityStatus;
   final bool isPlatformStarted;
+  final bool isHeld;
+  final DateTime? heldStartsAtUtc;
+  final DateTime? heldEndsAtUtc;
+  final bool isHoldUpdating;
   final Future<bool> Function()? onRequestReadOnlyAccess;
   final Future<bool> Function()? onRefreshAvailability;
+  final Future<bool> Function()? onHoldWindow;
+  final Future<bool> Function()? onReleaseHold;
 
   @override
   State<HavenWindowCard> createState() => _HavenWindowCardState();
@@ -51,10 +63,13 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
     final colors = Theme.of(context).colorScheme;
     final accent = _accentColor(colors);
     final borderRadius = BorderRadius.circular(18);
-    final headline = widget.isPlatformStarted
+    final headline = widget.isHeld
+        ? 'One private reminder is held'
+        : widget.isPlatformStarted
         ? widget.suggestion.headline
         : 'Calendar assistance stays off';
-    final action = _availableAction();
+    final actions = _availableActions();
+    final isBusy = _isWorking || widget.isHoldUpdating;
 
     return Material(
       key: const ValueKey('haven-window-card'),
@@ -138,7 +153,9 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    widget.isPlatformStarted
+                    widget.isHeld
+                        ? 'FocusHaven will give one private reminder for this optional opening. The hold remains local and can be released at any time.'
+                        : widget.isPlatformStarted
                         ? widget.suggestion.detail
                         : 'FocusHaven has not checked or requested calendar access. A supported native connection must be available before any permission control appears.',
                     style: TextStyle(
@@ -156,7 +173,9 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                       padding: const EdgeInsets.all(11),
                       child: _WindowNote(
                         icon: Icons.schedule_outlined,
-                        text: widget.isPlatformStarted
+                        text: widget.isHeld
+                            ? _heldWindowLabel(context)
+                            : widget.isPlatformStarted
                             ? widget.suggestion.evidence
                             : 'No calendar availability was read.',
                         accent: accent,
@@ -177,33 +196,52 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                         'FocusHaven never creates or changes calendar events. A possible opening remains optional and never starts the timer.',
                     accent: accent,
                   ),
-                  if (action != null) ...[
+                  if (widget.isHeld || widget.suggestion.hasOpening) ...[
+                    const SizedBox(height: 9),
+                    _WindowNote(
+                      icon: widget.isHeld
+                          ? Icons.notifications_active_outlined
+                          : Icons.notifications_none_outlined,
+                      text: widget.isHeld
+                          ? 'This is one local notification, not a calendar reservation. Releasing it cancels only this reminder.'
+                          : 'Holding this opening creates one generic local reminder. It does not reserve time or copy calendar content.',
+                      accent: accent,
+                    ),
+                  ],
+                  if (actions.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: action.isPrimary
-                          ? FilledButton.icon(
-                              key: ValueKey(action.key),
-                              onPressed: _isWorking
-                                  ? null
-                                  : () => _perform(action.callback),
-                              icon: _ActionIcon(
-                                icon: action.icon,
-                                isWorking: _isWorking,
-                              ),
-                              label: Text(action.label),
-                            )
-                          : OutlinedButton.icon(
-                              key: ValueKey(action.key),
-                              onPressed: _isWorking
-                                  ? null
-                                  : () => _perform(action.callback),
-                              icon: _ActionIcon(
-                                icon: action.icon,
-                                isWorking: _isWorking,
-                              ),
-                              label: Text(action.label),
-                            ),
+                    ...actions.map(
+                      (action) => Padding(
+                        padding: EdgeInsets.only(
+                          top: identical(action, actions.first) ? 0 : 9,
+                        ),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: action.isPrimary
+                              ? FilledButton.icon(
+                                  key: ValueKey(action.key),
+                                  onPressed: isBusy
+                                      ? null
+                                      : () => _perform(action.callback),
+                                  icon: _ActionIcon(
+                                    icon: action.icon,
+                                    isWorking: isBusy,
+                                  ),
+                                  label: Text(action.label),
+                                )
+                              : OutlinedButton.icon(
+                                  key: ValueKey(action.key),
+                                  onPressed: isBusy
+                                      ? null
+                                      : () => _perform(action.callback),
+                                  icon: _ActionIcon(
+                                    icon: action.icon,
+                                    isWorking: isBusy,
+                                  ),
+                                  label: Text(action.label),
+                                ),
+                        ),
+                      ),
                     ),
                   ],
                 ],
@@ -215,9 +253,23 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
     );
   }
 
-  _WindowAction? _availableAction() {
-    if (!widget.isPlatformStarted) return null;
-    return switch (widget.availabilityStatus) {
+  List<_WindowAction> _availableActions() {
+    if (widget.isHeld) {
+      final release = widget.onReleaseHold;
+      return release == null
+          ? const []
+          : [
+              _WindowAction(
+                key: 'haven-window-release-hold',
+                label: 'Release hold',
+                icon: Icons.notifications_off_outlined,
+                isPrimary: false,
+                callback: release,
+              ),
+            ];
+    }
+    if (!widget.isPlatformStarted) return const [];
+    final availabilityAction = switch (widget.availabilityStatus) {
       PrivateCalendarAvailabilityStatus.disconnected =>
         widget.onRequestReadOnlyAccess == null
             ? null
@@ -250,9 +302,23 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
               ),
       PrivateCalendarAvailabilityStatus.unsupported => null,
     };
+    final holdAction =
+        widget.availabilityStatus == PrivateCalendarAvailabilityStatus.ready &&
+            widget.suggestion.hasOpening &&
+            widget.onHoldWindow != null
+        ? _WindowAction(
+            key: 'haven-window-hold',
+            label: 'Hold this window',
+            icon: Icons.notifications_active_outlined,
+            isPrimary: true,
+            callback: widget.onHoldWindow!,
+          )
+        : null;
+    return [?holdAction, ?availabilityAction];
   }
 
   String _statusLabel() {
+    if (widget.isHeld) return 'Reminder held';
     if (!widget.isPlatformStarted) return 'Off';
     return switch (widget.availabilityStatus) {
       PrivateCalendarAvailabilityStatus.unsupported => 'Unavailable',
@@ -269,6 +335,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
   }
 
   Color _accentColor(ColorScheme colors) {
+    if (widget.isHeld) return colors.primary;
     if (!widget.isPlatformStarted) return colors.onSurfaceVariant;
     return switch (widget.availabilityStatus) {
       PrivateCalendarAvailabilityStatus.unsupported => colors.onSurfaceVariant,
@@ -285,6 +352,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
   }
 
   IconData _statusIcon() {
+    if (widget.isHeld) return Icons.notifications_active_outlined;
     if (!widget.isPlatformStarted) return Icons.calendar_month_outlined;
     return switch (widget.availabilityStatus) {
       PrivateCalendarAvailabilityStatus.unsupported =>
@@ -296,6 +364,28 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
             ? Icons.event_available_outlined
             : Icons.calendar_month_outlined,
     };
+  }
+
+  String _heldWindowLabel(BuildContext context) {
+    final startsAt = widget.heldStartsAtUtc?.toLocal();
+    final endsAt = widget.heldEndsAtUtc?.toLocal();
+    if (startsAt == null || endsAt == null || !startsAt.isBefore(endsAt)) {
+      return 'One private local reminder is held.';
+    }
+    final localizations = MaterialLocalizations.of(context);
+    final startDate = localizations.formatShortDate(startsAt);
+    final startTime = localizations.formatTimeOfDay(
+      TimeOfDay.fromDateTime(startsAt),
+    );
+    final endTime = localizations.formatTimeOfDay(
+      TimeOfDay.fromDateTime(endsAt),
+    );
+    final isSameDay =
+        startsAt.year == endsAt.year &&
+        startsAt.month == endsAt.month &&
+        startsAt.day == endsAt.day;
+    if (isSameDay) return '$startDate, $startTime–$endTime';
+    return '$startDate, $startTime – ${localizations.formatShortDate(endsAt)}, $endTime';
   }
 }
 

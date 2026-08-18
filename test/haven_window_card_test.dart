@@ -41,8 +41,14 @@ Widget _app({
   PrivateCalendarAvailabilityStatus status =
       PrivateCalendarAvailabilityStatus.unsupported,
   bool isPlatformStarted = false,
+  bool isHeld = false,
+  DateTime? heldStartsAtUtc,
+  DateTime? heldEndsAtUtc,
+  bool isHoldUpdating = false,
   Future<bool> Function()? onRequestReadOnlyAccess,
   Future<bool> Function()? onRefreshAvailability,
+  Future<bool> Function()? onHoldWindow,
+  Future<bool> Function()? onReleaseHold,
   double textScale = 1,
   double cardWidth = 380,
 }) => MaterialApp(
@@ -65,8 +71,14 @@ Widget _app({
             suggestion: suggestion,
             availabilityStatus: status,
             isPlatformStarted: isPlatformStarted,
+            isHeld: isHeld,
+            heldStartsAtUtc: heldStartsAtUtc,
+            heldEndsAtUtc: heldEndsAtUtc,
+            isHoldUpdating: isHoldUpdating,
             onRequestReadOnlyAccess: onRequestReadOnlyAccess,
             onRefreshAvailability: onRefreshAvailability,
+            onHoldWindow: onHoldWindow,
+            onReleaseHold: onReleaseHold,
           ),
         ),
       ),
@@ -294,6 +306,124 @@ void main() {
     await tester.pump();
 
     expect(requestCount, 1);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    gate.complete(true);
+    await tester.pumpAndSettle();
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('a possible opening waits for one explicit hold action', (
+    tester,
+  ) async {
+    var holdCount = 0;
+    var refreshCount = 0;
+    await tester.pumpWidget(
+      _app(
+        suggestion: _opening,
+        status: PrivateCalendarAvailabilityStatus.ready,
+        isPlatformStarted: true,
+        onHoldWindow: () async {
+          holdCount += 1;
+          return true;
+        },
+        onRefreshAvailability: () async {
+          refreshCount += 1;
+          return true;
+        },
+      ),
+    );
+
+    expect(holdCount, 0);
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+
+    expect(find.text('Hold this window'), findsOneWidget);
+    expect(find.text('Refresh private availability'), findsOneWidget);
+    expect(find.textContaining('one generic local reminder'), findsOneWidget);
+    expect(find.textContaining('does not reserve time'), findsOneWidget);
+    expect(holdCount, 0);
+
+    await tester.tap(find.byKey(const ValueKey('haven-window-hold')));
+    await tester.pumpAndSettle();
+    expect(holdCount, 1);
+    expect(refreshCount, 0);
+  });
+
+  testWidgets('a held reminder stays local and exposes only release', (
+    tester,
+  ) async {
+    var holdCount = 0;
+    var releaseCount = 0;
+    var refreshCount = 0;
+    await tester.pumpWidget(
+      _app(
+        suggestion: _opening,
+        status: PrivateCalendarAvailabilityStatus.ready,
+        isPlatformStarted: true,
+        isHeld: true,
+        heldStartsAtUtc: _opening.startsAt!.toUtc(),
+        heldEndsAtUtc: _opening.endsAt!.toUtc(),
+        onHoldWindow: () async {
+          holdCount += 1;
+          return true;
+        },
+        onReleaseHold: () async {
+          releaseCount += 1;
+          return true;
+        },
+        onRefreshAvailability: () async {
+          refreshCount += 1;
+          return true;
+        },
+      ),
+    );
+
+    expect(find.text('HAVEN WINDOW · REMINDER HELD'), findsOneWidget);
+    expect(find.text('One private reminder is held'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+
+    expect(find.text('Release hold'), findsOneWidget);
+    expect(find.text('Hold this window'), findsNothing);
+    expect(find.text('Refresh private availability'), findsNothing);
+    expect(find.textContaining('not a calendar reservation'), findsOneWidget);
+    expect(find.textContaining('cancels only this reminder'), findsOneWidget);
+
+    final releaseAction = find.byKey(
+      const ValueKey('haven-window-release-hold'),
+    );
+    await tester.ensureVisible(releaseAction);
+    await tester.tap(releaseAction);
+    await tester.pumpAndSettle();
+    expect(releaseCount, 1);
+    expect(holdCount, 0);
+    expect(refreshCount, 0);
+  });
+
+  testWidgets('serializes an in-flight hold action', (tester) async {
+    final gate = Completer<bool>();
+    var holdCount = 0;
+    await tester.pumpWidget(
+      _app(
+        suggestion: _opening,
+        status: PrivateCalendarAvailabilityStatus.ready,
+        isPlatformStarted: true,
+        onHoldWindow: () {
+          holdCount += 1;
+          return gate.future;
+        },
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+    final action = find.byKey(const ValueKey('haven-window-hold'));
+
+    await tester.tap(action);
+    await tester.pump();
+    await tester.tap(action, warnIfMissed: false);
+    await tester.pump();
+
+    expect(holdCount, 1);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
     gate.complete(true);
     await tester.pumpAndSettle();
