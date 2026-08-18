@@ -149,6 +149,12 @@ of day, and the forecast never claims to know the person's best performance,
 predict success, schedule work, or rank one part of the day. The ephemeral
 result contains no task, journal, mood, coaching, or account data.
 
+The dashboard presents that observation in a compact Focus Forecast card. Its
+headline stays visible while the supporting evidence, uncertainty boundary,
+and on-device privacy note remain behind an explicit tap. The card is
+informational: it cannot start the timer, create a schedule, or turn a possible
+window into a required routine.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

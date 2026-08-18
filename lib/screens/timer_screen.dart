@@ -20,6 +20,7 @@ import '../widgets/completed_tasks_sheet.dart';
 import '../widgets/confirmation_dialog.dart';
 import '../widgets/focus_queue_sheet.dart';
 import '../widgets/focus_history_sheet.dart';
+import '../widgets/focus_forecast_card.dart';
 import '../widgets/custom_duration_sheet.dart';
 import '../widgets/reminder_sheet.dart';
 import '../widgets/appearance_sheet.dart';
@@ -815,6 +816,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final summary = ref.watch(timerSummaryStateProvider);
     final havenJourney = ref.watch(havenJourneyStateProvider);
     final havenRhythm = ref.watch(havenRhythmInsightProvider);
+    final focusForecast = ref.watch(focusForecastProvider);
     final livingLantern = ref.watch(livingLanternStateProvider);
     final focusShield = ref.watch(focusShieldStateProvider);
     final focusShieldController = ref.watch(
@@ -1138,6 +1140,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         HavenJourneyCard(state: havenJourney),
                         const SizedBox(height: 14),
                         HavenRhythmCard(insight: havenRhythm),
+                        const SizedBox(height: 14),
+                        FocusForecastCard(forecast: focusForecast),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton.icon(

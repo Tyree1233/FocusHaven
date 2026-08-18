@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/models/focus_event.dart';
+import 'package:focushaven/models/focus_forecast.dart';
 import 'package:focushaven/models/focus_shield_state.dart';
 import 'package:focushaven/models/haven_journey_state.dart';
 import 'package:focushaven/models/haven_rhythm_insight.dart';
@@ -18,6 +19,7 @@ import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
+import 'package:focushaven/widgets/focus_forecast_card.dart';
 import 'package:focushaven/widgets/focus_shield_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
@@ -45,6 +47,7 @@ Widget _app(
   List<FocusQueueItem> havenQueue = const [],
   HavenJourneyState? journeyState,
   HavenRhythmInsight? rhythmInsight,
+  FocusForecast? forecast,
   FocusShieldState? shieldState,
 }) {
   return ProviderScope(
@@ -68,6 +71,7 @@ Widget _app(
         havenRhythmInsightProvider.overrideWithValue(rhythmInsight),
       if (journeyState != null)
         havenJourneyStateProvider.overrideWithValue(journeyState),
+      if (forecast != null) focusForecastProvider.overrideWithValue(forecast),
       if (shieldState != null)
         focusShieldStateProvider.overrideWithValue(shieldState),
     ],
@@ -138,6 +142,8 @@ void main() {
     expect(find.byType(HavenJourneyCard), findsOneWidget);
     expect(find.text('HAVEN JOURNEY · LANTERN'), findsOneWidget);
     expect(find.byType(HavenRhythmCard), findsOneWidget);
+    expect(find.byType(FocusForecastCard), findsOneWidget);
+    expect(find.text('FOCUS FORECAST · STILL LEARNING'), findsOneWidget);
     expect(find.byTooltip('Mindful pause'), findsOneWidget);
     expect(find.byTooltip('Reflection journal'), findsOneWidget);
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
@@ -230,6 +236,36 @@ void main() {
 
     expect(find.text(insight.evidence), findsOneWidget);
     expect(find.text('Possible pace · 25 min'), findsOneWidget);
+    expect(timer.secondsRemaining, secondsBefore);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('expanding Focus Forecast evidence leaves the timer untouched', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    const forecast = FocusForecast(
+      kind: FocusForecastKind.emergingWindow,
+      headline: 'Completed focus often begins in the morning',
+      detail: 'Treat this as a possible planning window, not a prediction.',
+      evidence: '4 of 6 recent sessions began between 8 AM and noon.',
+      signalCount: 6,
+      window: FocusForecastWindow.morning,
+    );
+
+    await tester.pumpWidget(_app(timer, forecast: forecast));
+    await tester.pump();
+    final secondsBefore = timer.secondsRemaining;
+    final toggle = find.byKey(const ValueKey('toggle-focus-forecast'));
+    await tester.ensureVisible(toggle);
+    await tester.pumpAndSettle();
+    await tester.tap(toggle);
+    await tester.pump();
+
+    expect(find.text('FOCUS FORECAST · POSSIBLE WINDOW'), findsOneWidget);
+    expect(find.text(forecast.evidence), findsOneWidget);
     expect(timer.secondsRemaining, secondsBefore);
     expect(timer.isRunning, isFalse);
     expect(timer.recentFocusEvents, isEmpty);
