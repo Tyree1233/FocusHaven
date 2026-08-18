@@ -7,6 +7,7 @@ import '../models/coaching_message.dart';
 import '../models/focus_event.dart';
 import '../models/focus_shield_state.dart';
 import '../models/focus_session.dart';
+import '../models/haven_journey_state.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_rhythm_insight.dart';
 import '../models/living_lantern_state.dart';
@@ -21,6 +22,7 @@ import '../services/focus_profile_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/focus_shield_service.dart';
 import '../services/focus_shield_platform_bridge.dart';
+import '../services/haven_journey_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_rhythm_service.dart';
 import '../services/iap_service.dart';
@@ -203,6 +205,11 @@ final focusShieldCapabilityProvider = Provider<FocusShieldCapability>(
   name: 'focusShieldCapabilityProvider',
 );
 
+final havenJourneyServiceProvider = Provider<HavenJourneyService>(
+  (ref) => const HavenJourneyService(),
+  name: 'havenJourneyServiceProvider',
+);
+
 final havenPlanServiceProvider = Provider<HavenPlanService>(
   (ref) => const HavenPlanService(),
   name: 'havenPlanServiceProvider',
@@ -368,6 +375,20 @@ final timerSummaryStateProvider = Provider<TimerSummaryState>((ref) {
     hasCompletedDailyChallenge: timer.hasCompletedDailyChallenge,
   );
 }, name: 'timerSummaryStateProvider');
+
+/// Rebuilds a private, non-punitive Haven place from the cumulative completion
+/// count already owned by the timer. The derived state is not persisted by
+/// itself, and no interruption, missed day, pause, or reset can reduce it.
+final havenJourneyStateProvider = Provider<HavenJourneyState>((ref) {
+  final completedSessions = ref.watch(
+    timerSummaryStateProvider.select(
+      (summary) => summary.completedFocusSessions,
+    ),
+  );
+  return ref
+      .watch(havenJourneyServiceProvider)
+      .createState(completedFocusSessions: completedSessions);
+}, name: 'havenJourneyStateProvider');
 
 /// Immutable history snapshot that changes only when sessions are added,
 /// restored, or cleared—not on every countdown tick.

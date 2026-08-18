@@ -101,6 +101,15 @@ persisted by itself, and cannot start, pause, reset, or otherwise control the
 timer. The accessible visual contains no productivity score or competitive
 progress mechanic.
 
+The private Haven Journey turns the timer's existing cumulative completed-
+session count into a lantern, campsite, cabin, garden, or sanctuary. It is
+derived locally and never persisted as a separate profile, score, level, or
+public rank. Short and long completed focus sessions are valued equally, while
+pauses, resets, rest, missed days, and time away can never shrink the Haven or
+remove something already built. The foundation is informational only and does
+not start sessions, change the timer, or pressure the person toward another
+milestone.
+
 The optional Haven Plan check-in turns the user's current energy, available
 time, focus queue, and text-free local focus events into a transparent session
 preview. Plans are created on-device, are never persisted by themselves, and
