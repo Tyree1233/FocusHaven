@@ -51,7 +51,32 @@ void main() {
     }
   });
 
-  testWidgets('non-iOS platforms leave the calendar bridge dormant', (
+  testWidgets('Android starts with one non-prompting availability read', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    try {
+      final backend = _RecordingHostBackend();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            havenWindowPlatformBackendProvider.overrideWithValue(backend),
+          ],
+          child: const HavenWindowPlatformHost(child: SizedBox()),
+        ),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(backend.operations, ['read']);
+      expect(backend.operations, isNot(contains('request')));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
+  testWidgets('unreviewed platforms leave the calendar bridge dormant', (
     tester,
   ) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.macOS;

@@ -166,15 +166,15 @@ fits. Platforms without a separately reviewed native adapter keep the provider
 unsupported and read nothing.
 
 The Haven Window platform controller uses one strict native channel. Its iPhone
-host checks existing EventKit authorization at startup without showing a
-permission prompt. Only the card's explicit review action can request Apple's
+and Android hosts check existing calendar authorization at startup without
+showing a permission prompt. Only the card's explicit review action can request
 calendar access; FocusHaven then reads event time boundaries without creating
-or changing events. The native adapter merges, bounds, and limits those UTC
-busy intervals before Flutter can receive them. Its payload has no fields for
-calendar names, event text, attendees, locations, notes, URLs, identifiers, or
-account data. Oversized fragmentation fails closed as busy time, while unknown
-fields, malformed timestamps, overlapping operations, and transport failures
-are contained without retaining stale availability. Android, web, and desktop
+or changing events. Each native adapter merges, bounds, and limits those UTC
+busy intervals before Flutter can receive them. Their payloads have no fields
+for calendar names, event text, attendees, locations, notes, URLs, identifiers,
+or account data. Oversized fragmentation fails closed as busy time, while
+unknown fields, malformed timestamps, overlapping operations, and transport
+failures are contained without retaining stale availability. Web and desktop
 leave this bridge dormant until they have separately reviewed adapters.
 
 The dashboard now includes a consent-first Haven Window card. While the native

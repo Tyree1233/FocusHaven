@@ -7,9 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import '../services/haven_window_platform_bridge.dart';
 
-/// Activates the reviewed Haven Window transport only on iOS.
+/// Activates a reviewed Haven Window transport on iOS and Android.
 ///
-/// Startup performs a non-prompting authorization read. EventKit permission
+/// Startup performs a non-prompting authorization read. Calendar permission
 /// can be requested only through the explicit action exposed by the card.
 class HavenWindowPlatformHost extends ConsumerStatefulWidget {
   const HavenWindowPlatformHost({required this.child, this.enabled, super.key});
@@ -28,7 +28,9 @@ class _HavenWindowPlatformHostState
 
   bool get _isEnabled =>
       widget.enabled ??
-      (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS);
+      (!kIsWeb &&
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.android));
 
   @override
   void initState() {

@@ -7,6 +7,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private var systemFocusChannel: MethodChannel? = null
+    private var havenWindowPlatformAdapter: HavenWindowPlatformAdapter? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -36,6 +37,10 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+        havenWindowPlatformAdapter =
+            HavenWindowPlatformAdapter(this).also { adapter ->
+                adapter.install(flutterEngine.dartExecutor.binaryMessenger)
+            }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -45,8 +50,19 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        havenWindowPlatformAdapter?.dispose()
+        havenWindowPlatformAdapter = null
         systemFocusChannel = null
         super.cleanUpFlutterEngine(flutterEngine)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        havenWindowPlatformAdapter?.onRequestPermissionsResult(requestCode)
     }
 
     private fun deliverWarmPendingCommand() {
