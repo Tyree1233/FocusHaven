@@ -162,6 +162,72 @@ void main() {
     expect(timeZoneLoads, 2);
     expect(gateway.scheduledNotifications, hasLength(1));
   });
+
+  test(
+    'schedules one generic Haven Window reminder without recurrence',
+    () async {
+      final gateway = _FakeNotificationGateway();
+      final service = createService(gateway);
+      final startsAt = DateTime(2026, 8, 9, 11);
+
+      expect(await service.scheduleHavenWindowReminder(startsAt), isTrue);
+
+      expect(gateway.oneTimeNotifications, hasLength(1));
+      final notification = gateway.oneTimeNotifications.single;
+      expect(notification.id, 2100);
+      expect(notification.title, 'Your possible Haven Window is here');
+      expect(
+        notification.body,
+        'If it still fits, you can make a little space for focus. Nothing was added to your calendar.',
+      );
+      expect(
+        notification.scheduledDate,
+        tz.TZDateTime.from(startsAt, tz.local),
+      );
+      expect(gateway.cancelledIds, isEmpty);
+    },
+  );
+
+  test('rejects UTC, elapsed, and distant Haven Window reminders', () async {
+    final gateway = _FakeNotificationGateway();
+    final service = createService(gateway);
+
+    expect(
+      await service.scheduleHavenWindowReminder(DateTime.utc(2026, 8, 9, 11)),
+      isFalse,
+    );
+    expect(
+      await service.scheduleHavenWindowReminder(DateTime(2026, 8, 8)),
+      isFalse,
+    );
+    expect(
+      await service.scheduleHavenWindowReminder(DateTime(2026, 8, 12)),
+      isFalse,
+    );
+    expect(gateway.oneTimeNotifications, isEmpty);
+    expect(gateway.cancelledIds, isEmpty);
+  });
+
+  test('contains Haven Window scheduling failures', () async {
+    final gateway = _FakeNotificationGateway()..failOneTimeSchedule = true;
+    final service = createService(gateway);
+
+    expect(
+      await service.scheduleHavenWindowReminder(DateTime(2026, 8, 9, 11)),
+      isFalse,
+    );
+    expect(gateway.oneTimeScheduleCalls, 1);
+    expect(gateway.oneTimeNotifications, isEmpty);
+  });
+
+  test('cancels only the dedicated Haven Window reminder ID', () async {
+    final gateway = _FakeNotificationGateway();
+    final service = createService(gateway);
+
+    await service.cancelHavenWindowReminder();
+
+    expect(gateway.cancelledIds, [2100]);
+  });
 }
 
 typedef _ShownNotification = ({int id, String title, String body});
@@ -177,12 +243,15 @@ final class _FakeNotificationGateway implements NotificationGateway {
 
   bool permissionGranted;
   bool throwOnPermission = false;
+  bool failOneTimeSchedule = false;
   int? failOnScheduleCall;
   int initializeCalls = 0;
   int permissionCalls = 0;
   int scheduleCalls = 0;
+  int oneTimeScheduleCalls = 0;
   final List<_ShownNotification> shownNotifications = [];
   final List<_ScheduledNotification> scheduledNotifications = [];
+  final List<_ScheduledNotification> oneTimeNotifications = [];
   final List<int> cancelledIds = [];
 
   @override
@@ -218,6 +287,23 @@ final class _FakeNotificationGateway implements NotificationGateway {
       throw StateError('schedule failed');
     }
     scheduledNotifications.add((
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+    ));
+  }
+
+  @override
+  Future<void> scheduleOneTimeNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+  }) async {
+    oneTimeScheduleCalls += 1;
+    if (failOneTimeSchedule) throw StateError('one-time schedule failed');
+    oneTimeNotifications.add((
       id: id,
       title: title,
       body: body,

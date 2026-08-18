@@ -185,6 +185,15 @@ recheck a denied choice, or refresh redacted availability. Its expanded details
 state that event content stays outside FocusHaven and that the feature cannot
 create events, start the timer, or turn a possible opening into an obligation.
 
+The private Haven Window hold foundation can remember one opening only after
+the user explicitly chooses it. It stores just the opening's bounded UTC start
+and end times in local preferences and schedules one generic local
+notification at the start. It never copies event content, creates or edits a
+calendar event, automatically holds a suggestion, or reschedules anything
+during app restoration. Expired and malformed holds are removed locally, and
+releasing a hold cancels its notification. No dashboard control is connected
+to this foundation until its separate consent-first surface is reviewed.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

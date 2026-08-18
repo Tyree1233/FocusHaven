@@ -5,6 +5,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'haven_window_hold_service.dart';
+
 abstract interface class ReminderNotificationClient {
   Future<bool> requestPermissions();
   Future<bool> scheduleDailyReminder(TimeOfDay time, Set<int> weekdays);
@@ -23,6 +25,12 @@ abstract interface class NotificationGateway {
     required String body,
   });
   Future<void> scheduleDailyNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+  });
+  Future<void> scheduleOneTimeNotification({
     required int id,
     required String title,
     required String body,
@@ -136,10 +144,41 @@ final class FlutterNotificationGateway implements NotificationGateway {
   }
 
   @override
+  Future<void> scheduleOneTimeNotification({
+    required int id,
+    required String title,
+    required String body,
+    required tz.TZDateTime scheduledDate,
+  }) async {
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'haven_window_reminder',
+        'Haven Window reminders',
+        channelDescription:
+            'A private reminder for a Haven Window the user chose to hold.',
+        importance: Importance.defaultImportance,
+        priority: Priority.defaultPriority,
+      ),
+      iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+      macOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+    );
+
+    await _notifications.zonedSchedule(
+      id: id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+    );
+  }
+
+  @override
   Future<void> cancelNotification(int id) => _notifications.cancel(id: id);
 }
 
-class NotificationService implements ReminderNotificationClient {
+class NotificationService
+    implements ReminderNotificationClient, HavenWindowReminderClient {
   NotificationService({
     NotificationGateway? gateway,
     TimeZoneIdentifierLoader? timeZoneIdentifierLoader,
@@ -150,6 +189,8 @@ class NotificationService implements ReminderNotificationClient {
        _zonedNow = zonedNow ?? _systemZonedNow;
 
   static const _dailyReminderId = 2000;
+  static const _havenWindowReminderId = 2100;
+  static const _maximumHavenWindowLeadTime = Duration(hours: 36);
   static const _weekdays = <int>{1, 2, 3, 4, 5, 6, 7};
 
   final NotificationGateway _gateway;
@@ -255,6 +296,40 @@ class NotificationService implements ReminderNotificationClient {
     for (final weekday in _weekdays) {
       await _gateway.cancelNotification(_dailyReminderId + weekday);
     }
+  }
+
+  @override
+  Future<bool> scheduleHavenWindowReminder(DateTime startsAt) async {
+    if (kIsWeb || startsAt.isUtc) return false;
+
+    try {
+      await _configureLocalTimeZone();
+      final now = _zonedNow(tz.local);
+      final scheduledDate = tz.TZDateTime.from(startsAt, tz.local);
+      final leadTime = scheduledDate.difference(now);
+      if (!scheduledDate.isAfter(now) ||
+          leadTime > _maximumHavenWindowLeadTime) {
+        return false;
+      }
+
+      await _gateway.scheduleOneTimeNotification(
+        id: _havenWindowReminderId,
+        title: 'Your possible Haven Window is here',
+        body:
+            'If it still fits, you can make a little space for focus. Nothing was added to your calendar.',
+        scheduledDate: scheduledDate,
+      );
+      return true;
+    } catch (error) {
+      debugPrint('Haven Window reminder setup failed: $error');
+      return false;
+    }
+  }
+
+  @override
+  Future<void> cancelHavenWindowReminder() async {
+    if (kIsWeb) return;
+    await _gateway.cancelNotification(_havenWindowReminderId);
   }
 
   Future<void> _configureLocalTimeZone() async {

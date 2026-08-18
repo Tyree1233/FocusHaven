@@ -11,6 +11,7 @@ import '../models/focus_session.dart';
 import '../models/haven_journey_state.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_rhythm_insight.dart';
+import '../models/haven_window_hold.dart';
 import '../models/haven_window_suggestion.dart';
 import '../models/living_lantern_state.dart';
 import '../models/journal_entry.dart';
@@ -28,6 +29,7 @@ import '../services/focus_shield_platform_bridge.dart';
 import '../services/haven_journey_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_rhythm_service.dart';
+import '../services/haven_window_hold_service.dart';
 import '../services/haven_window_service.dart';
 import '../services/haven_window_platform_bridge.dart';
 import '../services/iap_service.dart';
@@ -123,6 +125,14 @@ typedef AuthState = ({
 
 /// Immutable reminder settings rendered by the reminder sheet.
 typedef ReminderState = ({bool isEnabled, TimeOfDay time, Set<int> weekdays});
+
+/// One text-free, local reminder the user explicitly created for an opening.
+typedef HavenWindowHoldState = ({
+  bool isHeld,
+  DateTime? startsAtUtc,
+  DateTime? endsAtUtc,
+  bool isUpdating,
+});
 
 /// Central ownership and dependency wiring for FocusHaven's application state.
 ///
@@ -234,6 +244,25 @@ final havenWindowServiceProvider = Provider<HavenWindowService>(
   (ref) => const HavenWindowService(),
   name: 'havenWindowServiceProvider',
 );
+
+final havenWindowHoldServiceProvider =
+    ChangeNotifierProvider<HavenWindowHoldService>((ref) {
+      return HavenWindowHoldService(
+        notificationService: ref.watch(notificationServiceProvider),
+      );
+    }, name: 'havenWindowHoldServiceProvider');
+
+/// Narrow reminder state that contains only bounded UTC window boundaries.
+final havenWindowHoldStateProvider = Provider<HavenWindowHoldState>((ref) {
+  final service = ref.watch(havenWindowHoldServiceProvider);
+  final HavenWindowHold hold = service.holdState;
+  return (
+    isHeld: hold.isHeld,
+    startsAtUtc: hold.startsAtUtc,
+    endsAtUtc: hold.endsAtUtc,
+    isUpdating: service.isUpdating,
+  );
+}, name: 'havenWindowHoldStateProvider');
 
 final havenWindowPlatformBackendProvider = Provider<HavenWindowPlatformBackend>(
   (ref) => MethodChannelHavenWindowBackend(),
