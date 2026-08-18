@@ -884,6 +884,47 @@ class TimerScreen extends riverpod.ConsumerWidget {
     return released;
   }
 
+  Future<bool> _beginArrivedHavenWindow(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    final timer = ref.read(timerServiceProvider);
+    if (!timer.canStartHavenPlan) return false;
+
+    final released = await ref.read(havenWindowHoldServiceProvider).release();
+    if (!released || !context.mounted) {
+      if (!released && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Focus did not begin because the private hold could not be released.',
+            ),
+          ),
+        );
+      }
+      return false;
+    }
+    if (!timer.canStartHavenPlan) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'The timer changed, so this Haven Window was allowed to pass.',
+          ),
+        ),
+      );
+      return false;
+    }
+
+    timer.start();
+    final started = timer.isRunning;
+    if (started) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Focus began by your choice.')),
+      );
+    }
+    return started;
+  }
+
   @override
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
     final timer = ref.read(timerServiceProvider);
@@ -896,6 +937,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final havenWindow = ref.watch(havenWindowSuggestionProvider);
     final calendarAvailability = ref.watch(privateCalendarAvailabilityProvider);
     final havenWindowHold = ref.watch(havenWindowHoldStateProvider);
+    final canBeginFreshFocus = ref.watch(timerCanBeginFreshFocusProvider);
     final havenWindowController = ref.watch(
       havenWindowPlatformControllerProvider,
     );
@@ -1230,6 +1272,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           availabilityStatus: calendarAvailability.status,
                           isPlatformStarted: havenWindowController.isStarted,
                           isHeld: havenWindowHold.isHeld,
+                          hasArrived: havenWindowHold.hasArrived,
                           heldStartsAtUtc: havenWindowHold.startsAtUtc,
                           heldEndsAtUtc: havenWindowHold.endsAtUtc,
                           isHoldUpdating: havenWindowHold.isUpdating,
@@ -1252,6 +1295,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               : null,
                           onReleaseHold: havenWindowHold.isHeld
                               ? () => _releaseHavenWindowHold(context, ref)
+                              : null,
+                          onBeginFocus:
+                              havenWindowHold.hasArrived && canBeginFreshFocus
+                              ? () => _beginArrivedHavenWindow(context, ref)
                               : null,
                         ),
                         Align(

@@ -42,6 +42,7 @@ Widget _app({
       PrivateCalendarAvailabilityStatus.unsupported,
   bool isPlatformStarted = false,
   bool isHeld = false,
+  bool hasArrived = false,
   DateTime? heldStartsAtUtc,
   DateTime? heldEndsAtUtc,
   bool isHoldUpdating = false,
@@ -49,6 +50,7 @@ Widget _app({
   Future<bool> Function()? onRefreshAvailability,
   Future<bool> Function()? onHoldWindow,
   Future<bool> Function()? onReleaseHold,
+  Future<bool> Function()? onBeginFocus,
   double textScale = 1,
   double cardWidth = 380,
 }) => MaterialApp(
@@ -72,6 +74,7 @@ Widget _app({
             availabilityStatus: status,
             isPlatformStarted: isPlatformStarted,
             isHeld: isHeld,
+            hasArrived: hasArrived,
             heldStartsAtUtc: heldStartsAtUtc,
             heldEndsAtUtc: heldEndsAtUtc,
             isHoldUpdating: isHoldUpdating,
@@ -79,6 +82,7 @@ Widget _app({
             onRefreshAvailability: onRefreshAvailability,
             onHoldWindow: onHoldWindow,
             onReleaseHold: onReleaseHold,
+            onBeginFocus: onBeginFocus,
           ),
         ),
       ),
@@ -398,6 +402,92 @@ void main() {
     expect(releaseCount, 1);
     expect(holdCount, 0);
     expect(refreshCount, 0);
+  });
+
+  testWidgets('an arrived window waits for an explicit focus choice', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      var beginCount = 0;
+      var passCount = 0;
+      await tester.pumpWidget(
+        _app(
+          suggestion: _opening,
+          status: PrivateCalendarAvailabilityStatus.ready,
+          isPlatformStarted: true,
+          isHeld: true,
+          hasArrived: true,
+          heldStartsAtUtc: _opening.startsAt!.toUtc(),
+          heldEndsAtUtc: _opening.endsAt!.toUtc(),
+          onBeginFocus: () async {
+            beginCount += 1;
+            return true;
+          },
+          onReleaseHold: () async {
+            passCount += 1;
+            return true;
+          },
+        ),
+      );
+
+      expect(find.text('HAVEN WINDOW · WINDOW ARRIVED'), findsOneWidget);
+      expect(find.text('Your optional Haven Window is here'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(
+          'Haven Window. Window arrived. Your optional Haven Window is here. Show details.',
+        ),
+        findsOneWidget,
+      );
+      expect(beginCount, 0);
+      expect(passCount, 0);
+      await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+      await tester.pump();
+
+      expect(find.textContaining('nothing has started'), findsOneWidget);
+      expect(find.textContaining('Focus remains stopped'), findsOneWidget);
+      expect(find.text('Begin focus'), findsOneWidget);
+      expect(find.text('Let this window pass'), findsOneWidget);
+      expect(find.text('Release hold'), findsNothing);
+
+      final beginAction = find.byKey(
+        const ValueKey('haven-window-begin-focus'),
+      );
+      await tester.ensureVisible(beginAction);
+      await tester.tap(beginAction);
+      await tester.pumpAndSettle();
+      expect(beginCount, 1);
+      expect(passCount, 0);
+
+      final passAction = find.byKey(const ValueKey('haven-window-let-pass'));
+      await tester.ensureVisible(passAction);
+      await tester.tap(passAction);
+      await tester.pumpAndSettle();
+      expect(beginCount, 1);
+      expect(passCount, 1);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('an arrived window never invents an unavailable start action', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        isHeld: true,
+        hasArrived: true,
+        heldStartsAtUtc: _opening.startsAt!.toUtc(),
+        heldEndsAtUtc: _opening.endsAt!.toUtc(),
+        onReleaseHold: () async => true,
+      ),
+    );
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+
+    expect(find.text('Begin focus'), findsNothing);
+    expect(find.text('Let this window pass'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('serializes an in-flight hold action', (tester) async {

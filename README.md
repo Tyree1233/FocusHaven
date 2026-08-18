@@ -206,6 +206,14 @@ calendar, extend an opening, or infer whether the person used the time. This
 keeps a stale hold from lingering while reserving every follow-through choice
 for an explicit future action.
 
+When that arrival state is visible, the Haven Window card still leaves the
+timer untouched. It offers **Begin focus** only for a fresh, idle focus session
+and offers **Let this window pass** as a consequence-free release. Beginning
+first removes the private hold and then uses the existing timer start path;
+paused, completed, resumed, break, or otherwise active sessions never receive
+an invented start control. No choice writes to the calendar or reports whether
+the opening was used.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

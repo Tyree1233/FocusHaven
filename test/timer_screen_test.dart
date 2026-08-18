@@ -333,6 +333,89 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('an arrived Haven Window starts focus only after its action', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    final now = DateTime(2026, 8, 18, 9, 5);
+    final startsAtUtc = now.subtract(const Duration(minutes: 5)).toUtc();
+    final endsAtUtc = now.add(const Duration(minutes: 20)).toUtc();
+    SharedPreferences.setMockInitialValues({
+      'havenWindowHoldStartsAtUtcMicros': startsAtUtc.microsecondsSinceEpoch,
+      'havenWindowHoldEndsAtUtcMicros': endsAtUtc.microsecondsSinceEpoch,
+    });
+    final reminders = _RecordingHavenWindowReminders();
+    final holdService = HavenWindowHoldService(
+      notificationService: reminders,
+      now: () => now,
+    );
+    await holdService.initialized;
+
+    await tester.pumpWidget(_app(timer, havenWindowHoldService: holdService));
+    await tester.pump();
+    final card = find.byKey(const ValueKey('haven-window-card'));
+    await tester.ensureVisible(card);
+    await tester.pump();
+
+    expect(holdService.holdState.hasArrived, isTrue);
+    expect(find.text('HAVEN WINDOW · WINDOW ARRIVED'), findsOneWidget);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+
+    final begin = find.byKey(const ValueKey('haven-window-begin-focus'));
+    expect(begin, findsOneWidget);
+    expect(timer.isRunning, isFalse);
+    await tester.ensureVisible(begin);
+    await tester.tap(begin);
+    await tester.pump();
+
+    expect(timer.isRunning, isTrue);
+    expect(holdService.holdState.isHeld, isFalse);
+    expect(reminders.cancellations, 1);
+    expect(find.text('Focus began by your choice.'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('an arrived Haven Window cannot replace a paused attempt', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    timer.start();
+    timer.pause();
+    final now = DateTime(2026, 8, 18, 9, 5);
+    final startsAtUtc = now.subtract(const Duration(minutes: 5)).toUtc();
+    final endsAtUtc = now.add(const Duration(minutes: 20)).toUtc();
+    SharedPreferences.setMockInitialValues({
+      'havenWindowHoldStartsAtUtcMicros': startsAtUtc.microsecondsSinceEpoch,
+      'havenWindowHoldEndsAtUtcMicros': endsAtUtc.microsecondsSinceEpoch,
+    });
+    final holdService = HavenWindowHoldService(
+      notificationService: _RecordingHavenWindowReminders(),
+      now: () => now,
+    );
+    await holdService.initialized;
+
+    await tester.pumpWidget(_app(timer, havenWindowHoldService: holdService));
+    await tester.pump();
+    final card = find.byKey(const ValueKey('haven-window-card'));
+    await tester.ensureVisible(card);
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('haven-window-begin-focus')),
+      findsNothing,
+    );
+    expect(find.byKey(const ValueKey('haven-window-let-pass')), findsOneWidget);
+    expect(timer.isRunning, isFalse);
+    expect(timer.canStartHavenPlan, isFalse);
+    expect(holdService.holdState.hasArrived, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('showing an established Haven leaves the timer untouched', (
     tester,
   ) async {

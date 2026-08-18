@@ -15,6 +15,7 @@ class HavenWindowCard extends StatefulWidget {
     required this.availabilityStatus,
     required this.isPlatformStarted,
     this.isHeld = false,
+    this.hasArrived = false,
     this.heldStartsAtUtc,
     this.heldEndsAtUtc,
     this.isHoldUpdating = false,
@@ -22,12 +23,14 @@ class HavenWindowCard extends StatefulWidget {
     this.onRefreshAvailability,
     this.onHoldWindow,
     this.onReleaseHold,
-  });
+    this.onBeginFocus,
+  }) : assert(!hasArrived || isHeld);
 
   final HavenWindowSuggestion suggestion;
   final PrivateCalendarAvailabilityStatus availabilityStatus;
   final bool isPlatformStarted;
   final bool isHeld;
+  final bool hasArrived;
   final DateTime? heldStartsAtUtc;
   final DateTime? heldEndsAtUtc;
   final bool isHoldUpdating;
@@ -35,6 +38,7 @@ class HavenWindowCard extends StatefulWidget {
   final Future<bool> Function()? onRefreshAvailability;
   final Future<bool> Function()? onHoldWindow;
   final Future<bool> Function()? onReleaseHold;
+  final Future<bool> Function()? onBeginFocus;
 
   @override
   State<HavenWindowCard> createState() => _HavenWindowCardState();
@@ -63,7 +67,9 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
     final colors = Theme.of(context).colorScheme;
     final accent = _accentColor(colors);
     final borderRadius = BorderRadius.circular(18);
-    final headline = widget.isHeld
+    final headline = widget.hasArrived
+        ? 'Your optional Haven Window is here'
+        : widget.isHeld
         ? 'One private reminder is held'
         : widget.isPlatformStarted
         ? widget.suggestion.headline
@@ -153,7 +159,9 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    widget.isHeld
+                    widget.hasArrived
+                        ? 'This optional opening has arrived, but nothing has started. Begin focus only if the moment still fits, or let the window pass without penalty.'
+                        : widget.isHeld
                         ? 'FocusHaven will give one private reminder for this optional opening. The hold remains local and can be released at any time.'
                         : widget.isPlatformStarted
                         ? widget.suggestion.detail
@@ -199,10 +207,14 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                   if (widget.isHeld || widget.suggestion.hasOpening) ...[
                     const SizedBox(height: 9),
                     _WindowNote(
-                      icon: widget.isHeld
+                      icon: widget.hasArrived
+                          ? Icons.self_improvement_outlined
+                          : widget.isHeld
                           ? Icons.notifications_active_outlined
                           : Icons.notifications_none_outlined,
-                      text: widget.isHeld
+                      text: widget.hasArrived
+                          ? 'Focus remains stopped until you explicitly begin. Letting this window pass removes only its private local hold.'
+                          : widget.isHeld
                           ? 'This is one local notification, not a calendar reservation. Releasing it cancels only this reminder.'
                           : 'Holding this opening creates one generic local reminder. It does not reserve time or copy calendar content.',
                       accent: accent,
@@ -256,6 +268,27 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
   List<_WindowAction> _availableActions() {
     if (widget.isHeld) {
       final release = widget.onReleaseHold;
+      if (widget.hasArrived) {
+        final begin = widget.onBeginFocus;
+        return [
+          if (begin != null)
+            _WindowAction(
+              key: 'haven-window-begin-focus',
+              label: 'Begin focus',
+              icon: Icons.play_arrow_rounded,
+              isPrimary: true,
+              callback: begin,
+            ),
+          if (release != null)
+            _WindowAction(
+              key: 'haven-window-let-pass',
+              label: 'Let this window pass',
+              icon: Icons.close_rounded,
+              isPrimary: false,
+              callback: release,
+            ),
+        ];
+      }
       return release == null
           ? const []
           : [
@@ -318,6 +351,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
   }
 
   String _statusLabel() {
+    if (widget.hasArrived) return 'Window arrived';
     if (widget.isHeld) return 'Reminder held';
     if (!widget.isPlatformStarted) return 'Off';
     return switch (widget.availabilityStatus) {
@@ -352,6 +386,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
   }
 
   IconData _statusIcon() {
+    if (widget.hasArrived) return Icons.self_improvement_outlined;
     if (widget.isHeld) return Icons.notifications_active_outlined;
     if (!widget.isPlatformStarted) return Icons.calendar_month_outlined;
     return switch (widget.availabilityStatus) {

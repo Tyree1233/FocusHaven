@@ -419,6 +419,13 @@ final timerHasProgressProvider = Provider<bool>((ref) {
   );
 }, name: 'timerHasProgressProvider');
 
+/// Whether one explicit action may begin a fresh, idle focus session.
+final timerCanBeginFreshFocusProvider = Provider<bool>((ref) {
+  return ref.watch(
+    timerServiceProvider.select((timer) => timer.canStartHavenPlan),
+  );
+}, name: 'timerCanBeginFreshFocusProvider');
+
 /// Narrow read model for start, pause, reset, and completion state.
 final timerSessionStateProvider = Provider<TimerSessionState>((ref) {
   final timer = ref.watch(timerServiceProvider);
