@@ -174,6 +174,14 @@ after validation. Unknown fields, private event text, malformed timestamps,
 oversized ranges, overlapping operations, and transport failures are contained
 without retaining stale availability. No platform starts this bridge yet.
 
+The dashboard now includes a consent-first Haven Window card. While the native
+bridge is dormant, it says calendar assistance is off and presents no inert
+setup control. After a reviewed host checks existing authorization, the card
+can offer only the action appropriate to that state: review calendar access,
+recheck a denied choice, or refresh redacted availability. Its expanded details
+state that event content stays outside FocusHaven and that the feature cannot
+create events, start the timer, or turn a possible opening into an obligation.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

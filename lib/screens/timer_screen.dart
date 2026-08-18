@@ -33,6 +33,7 @@ import '../widgets/guided_breathing_sheet.dart';
 import '../widgets/haven_plan_sheet.dart';
 import '../widgets/haven_journey_card.dart';
 import '../widgets/haven_rhythm_card.dart';
+import '../widgets/haven_window_card.dart';
 import '../widgets/journal_entry_dialog.dart';
 import '../widgets/living_lantern_card.dart';
 import '../widgets/pro_sheet.dart';
@@ -808,6 +809,44 @@ class TimerScreen extends riverpod.ConsumerWidget {
     );
   }
 
+  Future<bool> _requestHavenWindowAccess(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    final connected = await ref
+        .read(havenWindowPlatformControllerProvider)
+        .requestReadOnlyAccess();
+    if (!connected && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Calendar access could not be reviewed right now. Nothing was connected.',
+          ),
+        ),
+      );
+    }
+    return connected;
+  }
+
+  Future<bool> _refreshHavenWindowAvailability(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    final refreshed = await ref
+        .read(havenWindowPlatformControllerProvider)
+        .refreshAvailability();
+    if (!refreshed && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Calendar availability could not be refreshed. No schedule or timer was changed.',
+          ),
+        ),
+      );
+    }
+    return refreshed;
+  }
+
   @override
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
     final timer = ref.read(timerServiceProvider);
@@ -817,6 +856,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final havenJourney = ref.watch(havenJourneyStateProvider);
     final havenRhythm = ref.watch(havenRhythmInsightProvider);
     final focusForecast = ref.watch(focusForecastProvider);
+    final havenWindow = ref.watch(havenWindowSuggestionProvider);
+    final calendarAvailability = ref.watch(privateCalendarAvailabilityProvider);
+    final havenWindowController = ref.watch(
+      havenWindowPlatformControllerProvider,
+    );
     final livingLantern = ref.watch(livingLanternStateProvider);
     final focusShield = ref.watch(focusShieldStateProvider);
     final focusShieldController = ref.watch(
@@ -1142,6 +1186,22 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         HavenRhythmCard(insight: havenRhythm),
                         const SizedBox(height: 14),
                         FocusForecastCard(forecast: focusForecast),
+                        const SizedBox(height: 14),
+                        HavenWindowCard(
+                          suggestion: havenWindow,
+                          availabilityStatus: calendarAvailability.status,
+                          isPlatformStarted: havenWindowController.isStarted,
+                          onRequestReadOnlyAccess:
+                              havenWindowController.isStarted
+                              ? () => _requestHavenWindowAccess(context, ref)
+                              : null,
+                          onRefreshAvailability: havenWindowController.isStarted
+                              ? () => _refreshHavenWindowAvailability(
+                                  context,
+                                  ref,
+                                )
+                              : null,
+                        ),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton.icon(

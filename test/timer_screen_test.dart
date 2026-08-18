@@ -16,6 +16,7 @@ import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/coaching_service.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
+import 'package:focushaven/services/haven_window_platform_bridge.dart';
 import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
@@ -25,6 +26,7 @@ import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
 import 'package:focushaven/widgets/haven_journey_card.dart';
 import 'package:focushaven/widgets/haven_rhythm_card.dart';
+import 'package:focushaven/widgets/haven_window_card.dart';
 import 'package:focushaven/widgets/living_lantern_card.dart';
 import 'package:focushaven/widgets/smart_reset_sheet.dart';
 
@@ -49,6 +51,7 @@ Widget _app(
   HavenRhythmInsight? rhythmInsight,
   FocusForecast? forecast,
   FocusShieldState? shieldState,
+  HavenWindowPlatformController? havenWindowController,
 }) {
   return ProviderScope(
     overrides: [
@@ -74,6 +77,10 @@ Widget _app(
       if (forecast != null) focusForecastProvider.overrideWithValue(forecast),
       if (shieldState != null)
         focusShieldStateProvider.overrideWithValue(shieldState),
+      if (havenWindowController != null)
+        havenWindowPlatformControllerProvider.overrideWith(
+          (ref) => havenWindowController,
+        ),
     ],
     child: MaterialApp(
       theme: ThemeData.dark().copyWith(
@@ -115,6 +122,22 @@ class _TimerContextResponder implements CoachingResponder {
   }
 }
 
+class _RecordingHavenWindowBackend implements HavenWindowPlatformBackend {
+  final operations = <String>[];
+
+  @override
+  Future<Map<String, Object?>> readAvailability() async {
+    operations.add('read');
+    return {'schemaVersion': 1, 'status': 'disconnected'};
+  }
+
+  @override
+  Future<Map<String, Object?>> requestReadOnlyAccess() async {
+    operations.add('request');
+    return {'schemaVersion': 1, 'status': 'denied'};
+  }
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -144,12 +167,47 @@ void main() {
     expect(find.byType(HavenRhythmCard), findsOneWidget);
     expect(find.byType(FocusForecastCard), findsOneWidget);
     expect(find.text('FOCUS FORECAST · STILL LEARNING'), findsOneWidget);
+    expect(find.byType(HavenWindowCard), findsOneWidget);
+    expect(find.text('HAVEN WINDOW · OFF'), findsOneWidget);
     expect(find.byTooltip('Mindful pause'), findsOneWidget);
     expect(find.byTooltip('Reflection journal'), findsOneWidget);
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
     expect(find.byTooltip('Sign in'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'Haven Window access remains explicit and leaves the timer alone',
+    (tester) async {
+      final timer = await _createTimer(tester);
+      final backend = _RecordingHavenWindowBackend();
+      final controller = HavenWindowPlatformController(backend: backend);
+      expect(await controller.start(), isTrue);
+
+      await tester.pumpWidget(_app(timer, havenWindowController: controller));
+      await tester.pump();
+      final secondsBefore = timer.secondsRemaining;
+      final card = find.byKey(const ValueKey('haven-window-card'));
+      await tester.ensureVisible(card);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+      await tester.pump();
+
+      expect(find.text('HAVEN WINDOW · NOT CONNECTED'), findsOneWidget);
+      expect(backend.operations, ['read']);
+      await tester.tap(
+        find.byKey(const ValueKey('haven-window-request-access')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(backend.operations, ['read', 'request']);
+      expect(find.text('HAVEN WINDOW · ACCESS OFF'), findsOneWidget);
+      expect(timer.secondsRemaining, secondsBefore);
+      expect(timer.isRunning, isFalse);
+      expect(timer.recentFocusEvents, isEmpty);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('showing an established Haven leaves the timer untouched', (
     tester,
