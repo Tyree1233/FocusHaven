@@ -162,17 +162,20 @@ busy-time boundaries—never calendar names, event titles, notes, locations,
 attendees, or account identities. It offers at most one opening when a clear
 Focus Forecast overlaps genuinely free time. It never creates an event,
 changes the timer, predicts success, or pressures the user when no opening
-fits. Until a separately consented native adapter is installed, the provider
-defaults to unsupported and reads nothing.
+fits. Platforms without a separately reviewed native adapter keep the provider
+unsupported and read nothing.
 
-The dormant Haven Window platform controller now reserves one strict native
-channel for that adapter. Startup can check existing authorization without
-showing a permission prompt; requesting read-only calendar access is a separate
-explicit operation. Native responses must use the complete versioned contract
-and UTC busy boundaries, which Flutter converts to device-local civil time only
-after validation. Unknown fields, private event text, malformed timestamps,
-oversized ranges, overlapping operations, and transport failures are contained
-without retaining stale availability. No platform starts this bridge yet.
+The Haven Window platform controller uses one strict native channel. Its iPhone
+host checks existing EventKit authorization at startup without showing a
+permission prompt. Only the card's explicit review action can request Apple's
+calendar access; FocusHaven then reads event time boundaries without creating
+or changing events. The native adapter merges, bounds, and limits those UTC
+busy intervals before Flutter can receive them. Its payload has no fields for
+calendar names, event text, attendees, locations, notes, URLs, identifiers, or
+account data. Oversized fragmentation fails closed as busy time, while unknown
+fields, malformed timestamps, overlapping operations, and transport failures
+are contained without retaining stale availability. Android, web, and desktop
+leave this bridge dormant until they have separately reviewed adapters.
 
 The dashboard now includes a consent-first Haven Window card. While the native
 bridge is dormant, it says calendar assistance is off and presents no inert

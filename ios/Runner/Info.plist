@@ -41,6 +41,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>FocusHaven reads only event time boundaries to suggest an optional focus window. It never creates or changes calendar events.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>FocusHaven reads only event time boundaries to suggest an optional focus window. It never creates or changes calendar events.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

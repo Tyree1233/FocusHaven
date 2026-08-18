@@ -5,6 +5,7 @@ import UIKit
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var systemFocusAdapter: SystemFocusPlatformAdapter?
   private var focusShieldAdapter: FocusShieldPlatformAdapter?
+  private var havenWindowAdapter: HavenWindowPlatformAdapter?
 
   override func application(
     _ application: UIApplication,
@@ -32,6 +33,14 @@ import UIKit
       let focusShieldAdapter = FocusShieldPlatformAdapter()
       focusShieldAdapter.install(binaryMessenger: focusShieldRegistrar.messenger())
       self.focusShieldAdapter = focusShieldAdapter
+    }
+
+    if let havenWindowRegistrar = engineBridge.pluginRegistry.registrar(
+      forPlugin: "FocusHavenHavenWindowAdapter"
+    ) {
+      let havenWindowAdapter = HavenWindowPlatformAdapter()
+      havenWindowAdapter.install(binaryMessenger: havenWindowRegistrar.messenger())
+      self.havenWindowAdapter = havenWindowAdapter
     }
   }
 
