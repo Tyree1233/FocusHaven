@@ -11,6 +11,7 @@ import '../models/focus_session.dart';
 import '../models/haven_journey_state.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_rhythm_insight.dart';
+import '../models/haven_window_suggestion.dart';
 import '../models/living_lantern_state.dart';
 import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
@@ -27,6 +28,7 @@ import '../services/focus_shield_platform_bridge.dart';
 import '../services/haven_journey_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_rhythm_service.dart';
+import '../services/haven_window_service.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/living_lantern_service.dart';
@@ -227,6 +229,30 @@ final havenRhythmServiceProvider = Provider<HavenRhythmService>(
   name: 'havenRhythmServiceProvider',
 );
 
+final havenWindowServiceProvider = Provider<HavenWindowService>(
+  (ref) => const HavenWindowService(),
+  name: 'havenWindowServiceProvider',
+);
+
+/// Platform adapters must explicitly replace this value before any calendar
+/// availability can enter Flutter. The default reads nothing and schedules
+/// nothing.
+final privateCalendarAvailabilityProvider =
+    Provider<PrivateCalendarAvailability>(
+      (ref) => const PrivateCalendarAvailability(
+        status: PrivateCalendarAvailabilityStatus.disconnected,
+      ),
+      name: 'privateCalendarAvailabilityProvider',
+    );
+
+/// Captures the local evaluation time when a new private availability snapshot
+/// arrives. It is overridable so boundary behavior stays deterministic in
+/// tests without introducing a background clock.
+final havenWindowCurrentTimeProvider = Provider<DateTime>(
+  (ref) => DateTime.now().toLocal(),
+  name: 'havenWindowCurrentTimeProvider',
+);
+
 final livingLanternServiceProvider = Provider<LivingLanternService>(
   (ref) => const LivingLanternService(),
   name: 'livingLanternServiceProvider',
@@ -421,6 +447,19 @@ final focusForecastProvider = Provider<FocusForecast>((ref) {
       .watch(focusForecastServiceProvider)
       .createForecast(recentEvents: events);
 }, name: 'focusForecastProvider');
+
+/// Combines only a cautious forecast and redacted busy-time boundaries into
+/// one optional opening. The result cannot create calendar events or control
+/// the timer.
+final havenWindowSuggestionProvider = Provider<HavenWindowSuggestion>((ref) {
+  return ref
+      .watch(havenWindowServiceProvider)
+      .createSuggestion(
+        forecast: ref.watch(focusForecastProvider),
+        availability: ref.watch(privateCalendarAvailabilityProvider),
+        now: ref.watch(havenWindowCurrentTimeProvider),
+      );
+}, name: 'havenWindowSuggestionProvider');
 
 /// Rebuilds one transparent, ephemeral rhythm insight from private text-free
 /// focus events. The insight is local and is never persisted by itself.

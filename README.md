@@ -155,6 +155,16 @@ and on-device privacy note remain behind an explicit tap. The card is
 informational: it cannot start the timer, create a schedule, or turn a possible
 window into a required routine.
 
+The private Haven Window foundation prepares for optional calendar assistance
+without exposing calendar content to FocusHaven. Its bounded Flutter contract
+can receive only connection status, a short availability range, and redacted
+busy-time boundaries—never calendar names, event titles, notes, locations,
+attendees, or account identities. It offers at most one opening when a clear
+Focus Forecast overlaps genuinely free time. It never creates an event,
+changes the timer, predicts success, or pressures the user when no opening
+fits. Until a separately consented native adapter is installed, the provider
+defaults to disconnected and reads nothing.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
