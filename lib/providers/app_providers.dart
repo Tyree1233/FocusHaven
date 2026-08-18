@@ -29,6 +29,7 @@ import '../services/haven_journey_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_rhythm_service.dart';
 import '../services/haven_window_service.dart';
+import '../services/haven_window_platform_bridge.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
 import '../services/living_lantern_service.dart';
@@ -234,14 +235,24 @@ final havenWindowServiceProvider = Provider<HavenWindowService>(
   name: 'havenWindowServiceProvider',
 );
 
-/// Platform adapters must explicitly replace this value before any calendar
-/// availability can enter Flutter. The default reads nothing and schedules
-/// nothing.
+final havenWindowPlatformBackendProvider = Provider<HavenWindowPlatformBackend>(
+  (ref) => MethodChannelHavenWindowBackend(),
+  name: 'havenWindowPlatformBackendProvider',
+);
+
+final havenWindowPlatformControllerProvider =
+    ChangeNotifierProvider<HavenWindowPlatformController>((ref) {
+      return HavenWindowPlatformController(
+        backend: ref.watch(havenWindowPlatformBackendProvider),
+      );
+    }, name: 'havenWindowPlatformControllerProvider');
+
+/// Redacted calendar availability from the dormant consent-first controller.
+/// Unless a supported host explicitly starts that controller, the default
+/// remains unsupported and reads or schedules nothing.
 final privateCalendarAvailabilityProvider =
     Provider<PrivateCalendarAvailability>(
-      (ref) => const PrivateCalendarAvailability(
-        status: PrivateCalendarAvailabilityStatus.disconnected,
-      ),
+      (ref) => ref.watch(havenWindowPlatformControllerProvider).availability,
       name: 'privateCalendarAvailabilityProvider',
     );
 

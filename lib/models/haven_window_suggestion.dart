@@ -1,6 +1,11 @@
 import 'focus_forecast.dart';
 
-enum PrivateCalendarAvailabilityStatus { disconnected, denied, ready }
+enum PrivateCalendarAvailabilityStatus {
+  unsupported,
+  disconnected,
+  denied,
+  ready,
+}
 
 enum HavenWindowKind { unavailable, learning, opening, noOpening }
 

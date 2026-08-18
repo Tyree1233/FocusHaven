@@ -23,6 +23,14 @@ class HavenWindowService {
     _validatePreferredDuration(preferredDuration);
 
     switch (availability.status) {
+      case PrivateCalendarAvailabilityStatus.unsupported:
+        return const HavenWindowSuggestion(
+          kind: HavenWindowKind.unavailable,
+          headline: 'Calendar availability is unavailable here',
+          detail:
+              'This device does not currently offer a supported private calendar connection.',
+          evidence: 'No calendar availability was read.',
+        );
       case PrivateCalendarAvailabilityStatus.disconnected:
         return const HavenWindowSuggestion(
           kind: HavenWindowKind.unavailable,

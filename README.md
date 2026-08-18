@@ -163,7 +163,16 @@ attendees, or account identities. It offers at most one opening when a clear
 Focus Forecast overlaps genuinely free time. It never creates an event,
 changes the timer, predicts success, or pressures the user when no opening
 fits. Until a separately consented native adapter is installed, the provider
-defaults to disconnected and reads nothing.
+defaults to unsupported and reads nothing.
+
+The dormant Haven Window platform controller now reserves one strict native
+channel for that adapter. Startup can check existing authorization without
+showing a permission prompt; requesting read-only calendar access is a separate
+explicit operation. Native responses must use the complete versioned contract
+and UTC busy boundaries, which Flutter converts to device-local civil time only
+after validation. Unknown fields, private event text, malformed timestamps,
+oversized ranges, overlapping operations, and transport failures are contained
+without retaining stale availability. No platform starts this bridge yet.
 
 ## Focus Coach server
 

@@ -49,6 +49,22 @@ void main() {
     expect(suggestion.evidence, 'No calendar availability was read.');
   });
 
+  test('unsupported platforms remain honest and empty', () {
+    const snapshot = PrivateCalendarAvailability(
+      status: PrivateCalendarAvailabilityStatus.unsupported,
+    );
+    final suggestion = service.createSuggestion(
+      forecast: forecast(),
+      availability: snapshot,
+      now: day,
+    );
+
+    expect(suggestion.kind, HavenWindowKind.unavailable);
+    expect(suggestion.hasOpening, isFalse);
+    expect(suggestion.headline, contains('unavailable here'));
+    expect(suggestion.evidence, 'No calendar availability was read.');
+  });
+
   test('respects denied access without framing it as an error', () {
     const snapshot = PrivateCalendarAvailability(
       status: PrivateCalendarAvailabilityStatus.denied,
