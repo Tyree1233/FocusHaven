@@ -15,11 +15,17 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError('DefaultFirebaseOptions have not been configured for windows.');
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for windows.',
+        );
       case TargetPlatform.linux:
-        throw UnsupportedError('DefaultFirebaseOptions have not been configured for linux.');
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for linux.',
+        );
       default:
-        throw UnsupportedError('DefaultFirebaseOptions are not supported for this platform.');
+        throw UnsupportedError(
+          'DefaultFirebaseOptions are not supported for this platform.',
+        );
     }
   }
 
@@ -43,11 +49,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyD8_ejiWc0qJYAp2h7_B8PXJFGslpuCO9k',
-    appId: '1:791775983697:ios:2ba1a9fff04365c2b1a070',
+    appId: '1:791775983697:ios:a031c3cefb601fa2b1a070',
     messagingSenderId: '791775983697',
     projectId: 'focushaven-68c59',
     storageBucket: 'focushaven-68c59.firebasestorage.app',
-    iosBundleId: 'com.example.focushaven',
+    iosBundleId: 'com.focushaven.app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

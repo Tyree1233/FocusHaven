@@ -28,10 +28,18 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.example.focushaven.system-focus</string>
+			<string>com.focushaven.app.system-focus</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>focushaven</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.791775983697-b437u0jd2eh0t7emqq16brufsjb6kdes</string>
 			</array>
 		</dict>
 	</array>

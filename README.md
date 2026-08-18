@@ -313,6 +313,14 @@ distribution entitlement and a provisioning profile containing
 `com.apple.developer.family-controls`. Development builds remain honest when
 authorization or entitlement access is unavailable: no protection is claimed.
 
+The production Apple identity uses `com.focushaven.app` for the iPhone app,
+`com.focushaven.app.widget` for its home-screen widget, and
+`com.focushaven.app.watchkitapp` for the companion watch app. The iPhone app
+and widget exchange only their bounded private snapshot through
+`group.com.focushaven.app`. Automatic signing is pinned to the registered
+FocusHaven Apple development team; generated profiles must preserve these
+explicit identifiers and capabilities.
+
 ## Run locally
 
 Install the exact dependency versions recorded in `pubspec.lock`:

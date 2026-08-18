@@ -5,7 +5,7 @@ final class SystemFocusSnapshotStore {
   static let channelName = "com.focushaven/system_focus"
   static let publishMethod = "publishSnapshot"
   static let takePendingCommandMethod = "takePendingCommand"
-  static let appGroupSuiteName = "group.com.example.focushaven"
+  static let appGroupSuiteName = "group.com.focushaven.app"
   static let widgetKind = "FocusHavenFocusWidget"
 
   private static let schemaVersion = 1

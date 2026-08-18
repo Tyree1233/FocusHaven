@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>791775983697-b437u0jd2eh0t7emqq16brufsjb6kdes.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.791775983697-b437u0jd2eh0t7emqq16brufsjb6kdes</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>791775983697-8vlin5q31fuge9ljpcns1s8447q9s3hc.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyD8_ejiWc0qJYAp2h7_B8PXJFGslpuCO9k</string>
 	<key>GCM_SENDER_ID</key>
@@ -9,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.focushaven</string>
+	<string>com.focushaven.app</string>
 	<key>PROJECT_ID</key>
 	<string>focushaven-68c59</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:791775983697:ios:2ba1a9fff04365c2b1a070</string>
+	<string>1:791775983697:ios:a031c3cefb601fa2b1a070</string>
 </dict>
 </plist>

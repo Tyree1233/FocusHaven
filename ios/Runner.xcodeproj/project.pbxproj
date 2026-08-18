@@ -381,17 +381,25 @@
 				TargetAttributes = {
 					331C8080294A63A400263BE5 = {
 						CreatedOnToolsVersion = 14.0;
+						DevelopmentTeam = J3QFMX6H2P;
+						ProvisioningStyle = Automatic;
 						TestTargetID = 97C146ED1CF9000F007C117D;
 					};
 					97C146ED1CF9000F007C117D = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = J3QFMX6H2P;
 						LastSwiftMigration = 1100;
+						ProvisioningStyle = Automatic;
 					};
 					A11800000000000000000040 = {
 						CreatedOnToolsVersion = 26.6;
+						DevelopmentTeam = J3QFMX6H2P;
+						ProvisioningStyle = Automatic;
 					};
 					A12000000000000000000040 = {
 						CreatedOnToolsVersion = 26.6;
+						DevelopmentTeam = J3QFMX6H2P;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -646,14 +654,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -667,9 +677,10 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -684,9 +695,10 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -699,9 +711,10 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.RunnerTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.RunnerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
@@ -826,14 +839,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -849,14 +864,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -871,6 +888,7 @@
 				CODE_SIGN_ENTITLEMENTS = FocusHavenWidget/FocusHavenWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FocusHavenWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -880,7 +898,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.FocusHavenWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -898,6 +916,7 @@
 				CODE_SIGN_ENTITLEMENTS = FocusHavenWidget/FocusHavenWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FocusHavenWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -907,7 +926,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.FocusHavenWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -925,6 +944,7 @@
 				CODE_SIGN_ENTITLEMENTS = FocusHavenWidget/FocusHavenWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FocusHavenWidget/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -934,7 +954,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.FocusHavenWidget;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -950,10 +970,11 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FocusHavenWatch/Info.plist;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -971,10 +992,11 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FocusHavenWatch/Info.plist;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -993,10 +1015,11 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = FocusHavenWatch/Info.plist;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.focushaven.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;

@@ -23,6 +23,6 @@
 	<key>WKApplication</key>
 	<true/>
 	<key>WKCompanionAppBundleIdentifier</key>
-	<string>com.example.focushaven</string>
+	<string>com.focushaven.app</string>
 </dict>
 </plist>
