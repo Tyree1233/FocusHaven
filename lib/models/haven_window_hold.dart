@@ -1,4 +1,4 @@
-enum HavenWindowHoldStatus { empty, held }
+enum HavenWindowHoldStatus { empty, held, arrived }
 
 /// One private, user-created reminder for an optional Haven Window.
 ///
@@ -27,12 +27,28 @@ class HavenWindowHold {
     );
   }
 
+  factory HavenWindowHold.arrived({
+    required DateTime startsAtUtc,
+    required DateTime endsAtUtc,
+  }) {
+    assert(startsAtUtc.isUtc);
+    assert(endsAtUtc.isUtc);
+    assert(startsAtUtc.isBefore(endsAtUtc));
+    return HavenWindowHold._(
+      status: HavenWindowHoldStatus.arrived,
+      startsAtUtc: startsAtUtc,
+      endsAtUtc: endsAtUtc,
+    );
+  }
+
   final HavenWindowHoldStatus status;
   final DateTime? startsAtUtc;
   final DateTime? endsAtUtc;
 
   bool get isHeld =>
-      status == HavenWindowHoldStatus.held &&
+      status != HavenWindowHoldStatus.empty &&
       startsAtUtc != null &&
       endsAtUtc != null;
+
+  bool get hasArrived => status == HavenWindowHoldStatus.arrived && isHeld;
 }

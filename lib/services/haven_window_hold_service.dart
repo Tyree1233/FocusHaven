@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,6 +11,10 @@ abstract interface class HavenWindowReminderClient {
   Future<bool> scheduleHavenWindowReminder(DateTime startsAt);
   Future<void> cancelHavenWindowReminder();
 }
+
+/// Creates the one-shot clock used to cross a held window boundary.
+typedef HavenWindowBoundaryTimerFactory =
+    Timer Function(Duration duration, void Function() callback);
 
 /// Owns one explicitly requested, private reminder for a Haven Window.
 ///
@@ -25,17 +31,28 @@ class HavenWindowHoldService extends ChangeNotifier {
   factory HavenWindowHoldService({
     required HavenWindowReminderClient notificationService,
     DateTime Function()? now,
+    HavenWindowBoundaryTimerFactory? boundaryTimerFactory,
   }) {
-    return HavenWindowHoldService._(notificationService, now ?? DateTime.now);
+    return HavenWindowHoldService._(
+      notificationService,
+      now ?? DateTime.now,
+      boundaryTimerFactory ?? (duration, callback) => Timer(duration, callback),
+    );
   }
 
-  HavenWindowHoldService._(this._notificationService, this._now) {
+  HavenWindowHoldService._(
+    this._notificationService,
+    this._now,
+    this._boundaryTimerFactory,
+  ) {
     initialized = _load();
   }
 
   final HavenWindowReminderClient _notificationService;
   final DateTime Function() _now;
+  final HavenWindowBoundaryTimerFactory _boundaryTimerFactory;
   HavenWindowHold _hold = const HavenWindowHold.empty();
+  Timer? _boundaryTimer;
   bool _isDisposed = false;
   bool _isUpdating = false;
 
@@ -80,6 +97,7 @@ class HavenWindowHoldService extends ChangeNotifier {
       }
 
       _hold = nextHold;
+      _armBoundaryTimer();
       return true;
     } catch (error) {
       if (scheduled) {
@@ -112,6 +130,8 @@ class HavenWindowHoldService extends ChangeNotifier {
       await _clear(preferences);
       if (_isDisposed) return false;
 
+      _boundaryTimer?.cancel();
+      _boundaryTimer = null;
       _hold = const HavenWindowHold.empty();
       return true;
     } catch (error) {
@@ -162,15 +182,23 @@ class HavenWindowHoldService extends ChangeNotifier {
         );
         final duration = endsAtUtc.difference(startsAtUtc);
         final nowUtc = _now().toUtc();
+        final isStillActive = endsAtUtc.isAfter(nowUtc);
+        final isFuture = startsAtUtc.isAfter(nowUtc);
         final leadTime = startsAtUtc.difference(nowUtc);
-        if (startsAtUtc.isAfter(nowUtc) &&
+        if (isStillActive &&
             duration >= _minimumDuration &&
             duration <= _maximumDuration &&
-            leadTime <= _maximumLeadTime) {
-          _hold = HavenWindowHold.held(
-            startsAtUtc: startsAtUtc,
-            endsAtUtc: endsAtUtc,
-          );
+            (!isFuture || leadTime <= _maximumLeadTime)) {
+          _hold = isFuture
+              ? HavenWindowHold.held(
+                  startsAtUtc: startsAtUtc,
+                  endsAtUtc: endsAtUtc,
+                )
+              : HavenWindowHold.arrived(
+                  startsAtUtc: startsAtUtc,
+                  endsAtUtc: endsAtUtc,
+                );
+          _armBoundaryTimer();
         } else {
           await _clear(preferences);
         }
@@ -181,6 +209,71 @@ class HavenWindowHoldService extends ChangeNotifier {
       debugPrint('Haven Window hold could not be loaded: $error');
     }
     _notifyListenersSafely();
+  }
+
+  void _armBoundaryTimer() {
+    _boundaryTimer?.cancel();
+    _boundaryTimer = null;
+    if (_isDisposed || !_hold.isHeld) return;
+
+    final nowUtc = _now().toUtc();
+    final nextBoundary = _hold.hasArrived
+        ? _hold.endsAtUtc!
+        : _hold.startsAtUtc!;
+    final delay = nextBoundary.difference(nowUtc);
+    if (delay <= Duration.zero) {
+      scheduleMicrotask(_handleBoundary);
+      return;
+    }
+    _boundaryTimer = _boundaryTimerFactory(delay, _handleBoundary);
+  }
+
+  void _handleBoundary() {
+    _boundaryTimer = null;
+    if (_isDisposed || !_hold.isHeld) return;
+    if (_isUpdating) {
+      _boundaryTimer = _boundaryTimerFactory(
+        const Duration(seconds: 1),
+        _handleBoundary,
+      );
+      return;
+    }
+
+    final nowUtc = _now().toUtc();
+    final startsAtUtc = _hold.startsAtUtc!;
+    final endsAtUtc = _hold.endsAtUtc!;
+    if (nowUtc.isBefore(startsAtUtc)) {
+      _armBoundaryTimer();
+      return;
+    }
+    if (nowUtc.isBefore(endsAtUtc)) {
+      if (!_hold.hasArrived) {
+        _hold = HavenWindowHold.arrived(
+          startsAtUtc: startsAtUtc,
+          endsAtUtc: endsAtUtc,
+        );
+        _notifyListenersSafely();
+      }
+      _armBoundaryTimer();
+      return;
+    }
+    _isUpdating = true;
+    _notifyListenersSafely();
+    unawaited(_expire());
+  }
+
+  Future<void> _expire() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await _clear(preferences);
+    } catch (error) {
+      debugPrint('Haven Window expiration cleanup failed: $error');
+    }
+    _isUpdating = false;
+    if (!_isDisposed) {
+      _hold = const HavenWindowHold.empty();
+      _notifyListenersSafely();
+    }
   }
 
   static Future<void> _save(
@@ -210,6 +303,8 @@ class HavenWindowHoldService extends ChangeNotifier {
   @override
   void dispose() {
     _isDisposed = true;
+    _boundaryTimer?.cancel();
+    _boundaryTimer = null;
     super.dispose();
   }
 }

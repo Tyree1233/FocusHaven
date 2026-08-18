@@ -129,6 +129,7 @@ typedef ReminderState = ({bool isEnabled, TimeOfDay time, Set<int> weekdays});
 /// One text-free, local reminder the user explicitly created for an opening.
 typedef HavenWindowHoldState = ({
   bool isHeld,
+  bool hasArrived,
   DateTime? startsAtUtc,
   DateTime? endsAtUtc,
   bool isUpdating,
@@ -258,6 +259,7 @@ final havenWindowHoldStateProvider = Provider<HavenWindowHoldState>((ref) {
   final HavenWindowHold hold = service.holdState;
   return (
     isHeld: hold.isHeld,
+    hasArrived: hold.hasArrived,
     startsAtUtc: hold.startsAtUtc,
     endsAtUtc: hold.endsAtUtc,
     isUpdating: service.isUpdating,

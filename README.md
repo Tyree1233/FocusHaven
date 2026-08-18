@@ -197,6 +197,15 @@ available. A held opening is labeled as one private local reminder and can be
 released from the same card. The surface never calls the calendar write APIs,
 never describes the opening as reserved, and never starts the timer.
 
+The gentle Haven Window arrival lifecycle derives one additional text-free
+state from those same local UTC boundaries. At the held start time, the state
+can say that the optional opening has arrived; at the end time, it expires and
+removes its saved boundaries automatically. App restoration never reschedules
+the notification, and the boundary clock cannot start a session, write to a
+calendar, extend an opening, or infer whether the person used the time. This
+keeps a stale hold from lingering while reserving every follow-through choice
+for an explicit future action.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

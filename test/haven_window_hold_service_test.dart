@@ -32,11 +32,14 @@ void main() {
   }
 
   Future<HavenWindowHoldService> createService(
-    _FakeHavenWindowNotifications notifications,
-  ) async {
+    _FakeHavenWindowNotifications notifications, {
+    DateTime Function()? nowSource,
+    HavenWindowBoundaryTimerFactory? boundaryTimerFactory,
+  }) async {
     final service = HavenWindowHoldService(
       notificationService: notifications,
-      now: () => now,
+      now: nowSource ?? () => now,
+      boundaryTimerFactory: boundaryTimerFactory,
     );
     await service.initialized;
     return service;
@@ -152,6 +155,61 @@ void main() {
     expect(service.holdState.endsAtUtc, endsAtUtc);
     expect(notifications.permissionCalls, 0);
     expect(notifications.scheduleCalls, 0);
+  });
+
+  test(
+    'an in-progress saved hold restores as arrived without rescheduling',
+    () async {
+      final startsAtUtc = now.subtract(const Duration(minutes: 5)).toUtc();
+      final endsAtUtc = now.add(const Duration(minutes: 20)).toUtc();
+      SharedPreferences.setMockInitialValues({
+        'havenWindowHoldStartsAtUtcMicros': startsAtUtc.microsecondsSinceEpoch,
+        'havenWindowHoldEndsAtUtcMicros': endsAtUtc.microsecondsSinceEpoch,
+      });
+      final notifications = _FakeHavenWindowNotifications();
+      final service = await createService(notifications);
+      addTearDown(service.dispose);
+
+      expect(service.holdState.isHeld, isTrue);
+      expect(service.holdState.hasArrived, isTrue);
+      expect(service.holdState.startsAtUtc, startsAtUtc);
+      expect(service.holdState.endsAtUtc, endsAtUtc);
+      expect(notifications.permissionCalls, 0);
+      expect(notifications.scheduleCalls, 0);
+    },
+  );
+
+  test('a held window arrives and expires at its local boundaries', () async {
+    var currentTime = now;
+    final timers = _ManualBoundaryTimers();
+    final notifications = _FakeHavenWindowNotifications();
+    final service = await createService(
+      notifications,
+      nowSource: () => currentTime,
+      boundaryTimerFactory: timers.create,
+    );
+    addTearDown(service.dispose);
+    final suggestion = opening();
+
+    expect(await service.hold(suggestion), isTrue);
+    expect(service.holdState.hasArrived, isFalse);
+    expect(timers.active.single.duration, const Duration(hours: 1));
+
+    currentTime = suggestion.startsAt!;
+    timers.fireNext();
+    expect(service.holdState.isHeld, isTrue);
+    expect(service.holdState.hasArrived, isTrue);
+    expect(timers.active.single.duration, const Duration(minutes: 25));
+
+    currentTime = suggestion.endsAt!;
+    timers.fireNext();
+    await pumpEventQueue();
+    expect(service.holdState.isHeld, isFalse);
+    expect(timers.active, isEmpty);
+    expect(notifications.cancelCalls, 0);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+    expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
   });
 
   test('expired, oversized, and incomplete saved holds fail closed', () async {
@@ -278,5 +336,43 @@ final class _FakeHavenWindowNotifications implements HavenWindowReminderClient {
   @override
   Future<void> cancelHavenWindowReminder() async {
     cancelCalls += 1;
+  }
+}
+
+final class _ManualBoundaryTimers {
+  final List<_ManualTimer> _timers = [];
+
+  List<_ManualTimer> get active =>
+      _timers.where((timer) => timer.isActive).toList(growable: false);
+
+  Timer create(Duration duration, void Function() callback) {
+    final timer = _ManualTimer(duration, callback);
+    _timers.add(timer);
+    return timer;
+  }
+
+  void fireNext() => active.first.fire();
+}
+
+final class _ManualTimer implements Timer {
+  _ManualTimer(this.duration, this._callback);
+
+  final Duration duration;
+  final void Function() _callback;
+  bool _isActive = true;
+
+  @override
+  bool get isActive => _isActive;
+
+  @override
+  int get tick => _isActive ? 0 : 1;
+
+  @override
+  void cancel() => _isActive = false;
+
+  void fire() {
+    if (!_isActive) return;
+    _isActive = false;
+    _callback();
   }
 }
