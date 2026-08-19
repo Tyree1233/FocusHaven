@@ -75,6 +75,7 @@ class HavenWindowHoldService extends ChangeNotifier
   Timer? _boundaryTimer;
   bool _isDisposed = false;
   bool _isUpdating = false;
+  bool _hasPendingCleanup = false;
   int _lifecycleRevision = 0;
 
   late final Future<void> initialized;
@@ -89,8 +90,12 @@ class HavenWindowHoldService extends ChangeNotifier
       _lifecycleRevision++;
       _boundaryTimer?.cancel();
       _boundaryTimer = null;
-      _notifyListenersSafely();
-      _handleBoundary();
+      if (_hasPendingCleanup) {
+        _retryPendingCleanup();
+      } else {
+        _notifyListenersSafely();
+        _handleBoundary();
+      }
     }
   }
 
@@ -128,6 +133,7 @@ class HavenWindowHoldService extends ChangeNotifier
       if (!saved) {
         throw StateError('Haven Window hold boundaries were not saved.');
       }
+      _hasPendingCleanup = false;
       if (_isDisposed || !_isValidSuggestion(suggestion)) {
         await _notificationService.cancelHavenWindowReminder();
         await _clear(preferences);
@@ -145,6 +151,7 @@ class HavenWindowHoldService extends ChangeNotifier
           await _clear(preferences);
           if (!_isDisposed) _hold = const HavenWindowHold.empty();
         } catch (cleanupError) {
+          _hasPendingCleanup = true;
           debugPrint('Haven Window reminder cleanup failed: $cleanupError');
         }
       }
@@ -168,6 +175,7 @@ class HavenWindowHoldService extends ChangeNotifier
       await _clear(preferences);
       if (_isDisposed) return false;
 
+      _hasPendingCleanup = false;
       _boundaryTimer?.cancel();
       _boundaryTimer = null;
       _hold = const HavenWindowHold.empty();
@@ -238,10 +246,10 @@ class HavenWindowHoldService extends ChangeNotifier
                 );
           _armBoundaryTimer();
         } else {
-          await _clear(preferences);
+          await _discardSavedState(preferences);
         }
       } else if (savedStart != null || savedEnd != null) {
-        await _clear(preferences);
+        await _discardSavedState(preferences);
       }
     } catch (error) {
       debugPrint('Haven Window hold could not be loaded: $error');
@@ -304,12 +312,45 @@ class HavenWindowHoldService extends ChangeNotifier
     try {
       final preferences = await SharedPreferences.getInstance();
       await _clear(preferences);
+      _hasPendingCleanup = false;
     } catch (error) {
+      _hasPendingCleanup = true;
       debugPrint('Haven Window expiration cleanup failed: $error');
     }
     _isUpdating = false;
     if (!_isDisposed) {
       _hold = const HavenWindowHold.empty();
+      _notifyListenersSafely();
+    }
+  }
+
+  Future<void> _discardSavedState(SharedPreferences preferences) async {
+    try {
+      await _clear(preferences);
+      _hasPendingCleanup = false;
+    } catch (error) {
+      _hasPendingCleanup = true;
+      debugPrint('Haven Window invalid hold cleanup failed: $error');
+    }
+  }
+
+  void _retryPendingCleanup() {
+    if (_isDisposed || _isUpdating || !_hasPendingCleanup) return;
+
+    _isUpdating = true;
+    _notifyListenersSafely();
+    unawaited(_completePendingCleanup());
+  }
+
+  Future<void> _completePendingCleanup() async {
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      await _clear(preferences);
+      _hasPendingCleanup = false;
+    } catch (error) {
+      debugPrint('Haven Window pending cleanup failed: $error');
+    } finally {
+      _isUpdating = false;
       _notifyListenersSafely();
     }
   }

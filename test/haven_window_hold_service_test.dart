@@ -335,6 +335,56 @@ void main() {
   });
 
   test(
+    'rejected expiration cleanup retries privately on foreground resume',
+    () async {
+      var currentTime = now;
+      var clearCalls = 0;
+      final timers = _ManualBoundaryTimers();
+      final notifications = _FakeHavenWindowNotifications();
+      final service = await createService(
+        notifications,
+        nowSource: () => currentTime,
+        boundaryTimerFactory: timers.create,
+        clearHold: (preferences) async {
+          clearCalls += 1;
+          if (clearCalls == 1) return false;
+          final results = await Future.wait([
+            preferences.remove('havenWindowHoldStartsAtUtcMicros'),
+            preferences.remove('havenWindowHoldEndsAtUtcMicros'),
+          ]);
+          return results.every((cleared) => cleared);
+        },
+      );
+      addTearDown(service.dispose);
+      final suggestion = opening();
+
+      expect(await service.hold(suggestion), isTrue);
+      currentTime = suggestion.endsAt!;
+      timers.fireNext();
+      await pumpEventQueue();
+
+      expect(clearCalls, 1);
+      expect(service.holdState.isHeld, isFalse);
+      var preferences = await SharedPreferences.getInstance();
+      expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNotNull);
+      expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNotNull);
+
+      service.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await pumpEventQueue();
+
+      expect(clearCalls, 2);
+      expect(service.holdState.isHeld, isFalse);
+      expect(service.isUpdating, isFalse);
+      expect(notifications.permissionCalls, 1);
+      expect(notifications.scheduleCalls, 1);
+      expect(notifications.cancelCalls, 0);
+      preferences = await SharedPreferences.getInstance();
+      expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+      expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+    },
+  );
+
+  test(
     'foreground resume catches up an arrived hold without new access',
     () async {
       var currentTime = now;
@@ -435,6 +485,52 @@ void main() {
       service.dispose();
     }
   });
+
+  test(
+    'rejected invalid restoration cleanup retries on foreground resume',
+    () async {
+      final startsAtUtc = now.subtract(const Duration(hours: 1)).toUtc();
+      final endsAtUtc = now.subtract(const Duration(minutes: 30)).toUtc();
+      SharedPreferences.setMockInitialValues({
+        'havenWindowHoldStartsAtUtcMicros': startsAtUtc.microsecondsSinceEpoch,
+        'havenWindowHoldEndsAtUtcMicros': endsAtUtc.microsecondsSinceEpoch,
+      });
+      var clearCalls = 0;
+      final notifications = _FakeHavenWindowNotifications();
+      final service = await createService(
+        notifications,
+        clearHold: (preferences) async {
+          clearCalls += 1;
+          if (clearCalls == 1) return false;
+          final results = await Future.wait([
+            preferences.remove('havenWindowHoldStartsAtUtcMicros'),
+            preferences.remove('havenWindowHoldEndsAtUtcMicros'),
+          ]);
+          return results.every((cleared) => cleared);
+        },
+      );
+      addTearDown(service.dispose);
+
+      expect(clearCalls, 1);
+      expect(service.holdState.isHeld, isFalse);
+      var preferences = await SharedPreferences.getInstance();
+      expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNotNull);
+      expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNotNull);
+
+      service.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await pumpEventQueue();
+
+      expect(clearCalls, 2);
+      expect(service.holdState.isHeld, isFalse);
+      expect(service.isUpdating, isFalse);
+      expect(notifications.permissionCalls, 0);
+      expect(notifications.scheduleCalls, 0);
+      expect(notifications.cancelCalls, 0);
+      preferences = await SharedPreferences.getInstance();
+      expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+      expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+    },
+  );
 
   test('release cancels the reminder and removes local boundaries', () async {
     final notifications = _FakeHavenWindowNotifications();

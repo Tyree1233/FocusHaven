@@ -273,6 +273,12 @@ the dashboard says the hold is gone. If local storage rejects that cleanup,
 the action fails honestly and keeps the held state available for another
 release attempt instead of claiming that potentially restorable data vanished.
 
+Expiration remains gentle even when local storage temporarily rejects cleanup.
+The passed window disappears from the dashboard immediately, while FocusHaven
+remembers only that private cleanup is still pending. The next foreground
+resume retries removal without requesting access, scheduling a reminder, or
+restoring the expired window to the interface.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
