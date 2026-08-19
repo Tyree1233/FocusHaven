@@ -220,6 +220,14 @@ catch-up reads only the already-saved UTC start and end boundaries: it does not
 reread calendar availability, request permission, schedule another
 notification, or treat reopening the app as evidence that focus happened.
 
+The optional opening is also recalculated from a fresh local clock whenever
+the app resumes or the private hold changes. FocusHaven therefore never keeps
+offering a hold whose start boundary has already arrived: an opening beginning
+exactly now advances to the next five-minute boundary or disappears if it no
+longer fits. This refresh still uses only the existing redacted availability
+snapshot and does not reread the calendar, request access, or run a background
+clock.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

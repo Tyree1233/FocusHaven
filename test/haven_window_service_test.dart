@@ -1,12 +1,17 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/models/focus_forecast.dart';
 import 'package:focushaven/models/haven_window_suggestion.dart';
 import 'package:focushaven/providers/app_providers.dart';
+import 'package:focushaven/services/haven_window_hold_service.dart';
 import 'package:focushaven/services/haven_window_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   const service = HavenWindowService();
   final day = DateTime(2026, 8, 18);
 
@@ -92,6 +97,19 @@ void main() {
     expect(suggestion.evidence, contains('still learning'));
   });
 
+  test('an opening beginning now advances to a future boundary', () {
+    final now = day.add(const Duration(hours: 8));
+    final suggestion = service.createSuggestion(
+      forecast: forecast(),
+      availability: availability(),
+      now: now,
+    );
+
+    expect(suggestion.kind, HavenWindowKind.opening);
+    expect(suggestion.startsAt, now.add(const Duration(minutes: 5)));
+    expect(suggestion.startsAt!.isAfter(now), isTrue);
+  });
+
   test('finds one forecast-aligned opening around unsorted busy blocks', () {
     final suggestion = service.createSuggestion(
       forecast: forecast(),
@@ -167,8 +185,8 @@ void main() {
     );
 
     expect(suggestion.kind, HavenWindowKind.opening);
-    expect(suggestion.startsAt, start);
-    expect(suggestion.endsAt, day.add(const Duration(days: 1, minutes: 5)));
+    expect(suggestion.startsAt, start.add(const Duration(minutes: 5)));
+    expect(suggestion.endsAt, day.add(const Duration(days: 1, minutes: 10)));
   });
 
   test('malformed and oversized snapshots fail closed', () {
@@ -224,14 +242,58 @@ void main() {
     }
   });
 
+  test(
+    'foreground resume refreshes a cached opening from the local clock',
+    () async {
+      SharedPreferences.setMockInitialValues({});
+      var now = day.add(const Duration(hours: 8));
+      final notifications = _SilentHavenWindowReminderClient();
+      final holdService = HavenWindowHoldService(
+        notificationService: notifications,
+        now: () => now,
+      );
+      await holdService.initialized;
+      final container = ProviderContainer(
+        overrides: [
+          focusForecastProvider.overrideWithValue(forecast()),
+          privateCalendarAvailabilityProvider.overrideWithValue(availability()),
+          havenWindowHoldServiceProvider.overrideWith((ref) => holdService),
+          havenWindowCurrentTimeProvider.overrideWithValue(() => now),
+        ],
+      );
+      addTearDown(container.dispose);
+
+      final initial = container.read(havenWindowSuggestionProvider);
+      expect(initial.startsAt, day.add(const Duration(hours: 8, minutes: 5)));
+
+      now = day.add(const Duration(hours: 11, minutes: 50));
+      holdService.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      final refreshed = container.read(havenWindowSuggestionProvider);
+
+      expect(refreshed.kind, HavenWindowKind.noOpening);
+      expect(refreshed.hasOpening, isFalse);
+      expect(notifications.permissionCalls, 0);
+      expect(notifications.scheduleCalls, 0);
+      expect(notifications.cancelCalls, 0);
+    },
+  );
+
   test('Riverpod composes one opening from narrow private snapshots', () {
     final snapshot = availability();
     final container = ProviderContainer(
       overrides: [
         focusForecastProvider.overrideWithValue(forecast()),
         privateCalendarAvailabilityProvider.overrideWithValue(snapshot),
+        havenWindowHoldStateProvider.overrideWithValue((
+          isHeld: false,
+          hasArrived: false,
+          startsAtUtc: null,
+          endsAtUtc: null,
+          isUpdating: false,
+          lifecycleRevision: 0,
+        )),
         havenWindowCurrentTimeProvider.overrideWithValue(
-          day.add(const Duration(hours: 8)),
+          () => day.add(const Duration(hours: 8)),
         ),
       ],
     );
@@ -240,7 +302,31 @@ void main() {
     final suggestion = container.read(havenWindowSuggestionProvider);
 
     expect(suggestion.kind, HavenWindowKind.opening);
-    expect(suggestion.startsAt, day.add(const Duration(hours: 8)));
+    expect(suggestion.startsAt, day.add(const Duration(hours: 8, minutes: 5)));
     expect(suggestion.hasOpening, isTrue);
   });
+}
+
+final class _SilentHavenWindowReminderClient
+    implements HavenWindowReminderClient {
+  int permissionCalls = 0;
+  int scheduleCalls = 0;
+  int cancelCalls = 0;
+
+  @override
+  Future<bool> requestPermissions() async {
+    permissionCalls += 1;
+    return true;
+  }
+
+  @override
+  Future<bool> scheduleHavenWindowReminder(DateTime startsAt) async {
+    scheduleCalls += 1;
+    return true;
+  }
+
+  @override
+  Future<void> cancelHavenWindowReminder() async {
+    cancelCalls += 1;
+  }
 }

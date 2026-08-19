@@ -77,7 +77,8 @@ class HavenWindowService {
 
     final rangeStart = availability.rangeStart!;
     final rangeEnd = availability.rangeEnd!;
-    var candidate = _roundUpToStep(_later(rangeStart, now));
+    final firstFutureMoment = now.add(const Duration(microseconds: 1));
+    var candidate = _roundUpToStep(_later(rangeStart, firstFutureMoment));
 
     while (!candidate.add(preferredDuration).isAfter(rangeEnd)) {
       final candidateEnd = candidate.add(preferredDuration);

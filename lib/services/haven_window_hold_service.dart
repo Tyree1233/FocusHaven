@@ -59,17 +59,21 @@ class HavenWindowHoldService extends ChangeNotifier
   Timer? _boundaryTimer;
   bool _isDisposed = false;
   bool _isUpdating = false;
+  int _lifecycleRevision = 0;
 
   late final Future<void> initialized;
 
   HavenWindowHold get holdState => _hold;
   bool get isUpdating => _isUpdating;
+  int get lifecycleRevision => _lifecycleRevision;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      _lifecycleRevision++;
       _boundaryTimer?.cancel();
       _boundaryTimer = null;
+      _notifyListenersSafely();
       _handleBoundary();
     }
   }

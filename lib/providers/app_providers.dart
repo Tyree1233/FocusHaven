@@ -133,6 +133,7 @@ typedef HavenWindowHoldState = ({
   DateTime? startsAtUtc,
   DateTime? endsAtUtc,
   bool isUpdating,
+  int lifecycleRevision,
 });
 
 /// Central ownership and dependency wiring for FocusHaven's application state.
@@ -263,6 +264,7 @@ final havenWindowHoldStateProvider = Provider<HavenWindowHoldState>((ref) {
     startsAtUtc: hold.startsAtUtc,
     endsAtUtc: hold.endsAtUtc,
     isUpdating: service.isUpdating,
+    lifecycleRevision: service.lifecycleRevision,
   );
 }, name: 'havenWindowHoldStateProvider');
 
@@ -287,11 +289,11 @@ final privateCalendarAvailabilityProvider =
       name: 'privateCalendarAvailabilityProvider',
     );
 
-/// Captures the local evaluation time when a new private availability snapshot
-/// arrives. It is overridable so boundary behavior stays deterministic in
+/// Supplies a fresh local evaluation time whenever the private suggestion is
+/// rebuilt. It is overridable so boundary behavior stays deterministic in
 /// tests without introducing a background clock.
-final havenWindowCurrentTimeProvider = Provider<DateTime>(
-  (ref) => DateTime.now().toLocal(),
+final havenWindowCurrentTimeProvider = Provider<DateTime Function()>(
+  (ref) => DateTime.now,
   name: 'havenWindowCurrentTimeProvider',
 );
 
@@ -501,12 +503,17 @@ final focusForecastProvider = Provider<FocusForecast>((ref) {
 /// one optional opening. The result cannot create calendar events or control
 /// the timer.
 final havenWindowSuggestionProvider = Provider<HavenWindowSuggestion>((ref) {
+  ref.watch(
+    havenWindowHoldStateProvider.select(
+      (state) => (state.isHeld, state.hasArrived, state.lifecycleRevision),
+    ),
+  );
   return ref
       .watch(havenWindowServiceProvider)
       .createSuggestion(
         forecast: ref.watch(focusForecastProvider),
         availability: ref.watch(privateCalendarAvailabilityProvider),
-        now: ref.watch(havenWindowCurrentTimeProvider),
+        now: ref.watch(havenWindowCurrentTimeProvider)().toLocal(),
       );
 }, name: 'havenWindowSuggestionProvider');
 
