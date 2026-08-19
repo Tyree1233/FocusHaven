@@ -17,10 +17,12 @@ void main() {
   Future<CoachingService> createCoach({
     CoachingResponder? responder,
     CoachingResponder? enhancedResponder,
+    CoachingConversationSave? saveConversation,
   }) async {
     final coach = CoachingService(
       responder: responder,
       enhancedResponder: enhancedResponder,
+      saveConversation: saveConversation,
     );
     await coach.initialized;
     return coach;
@@ -1286,6 +1288,71 @@ void main() {
     expect(restoredCoach.messages, isEmpty);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey('coachingConversation'), isFalse);
+  });
+
+  test('a rejected user-message commit never invokes either coach', () async {
+    final localResponder = _RecordingResponder('Local guidance.');
+    final enhancedResponder = _RecordingResponder('Enhanced guidance.');
+    final coach = await createCoach(
+      responder: localResponder,
+      enhancedResponder: enhancedResponder,
+      saveConversation: (_, _) async => false,
+    );
+    addTearDown(coach.dispose);
+    await coach.setEnhancedCoachingEnabled(true);
+
+    expect(
+      await coach.send('Do not lose this.', const CoachingContext()),
+      isFalse,
+    );
+
+    expect(localResponder.calls, 0);
+    expect(enhancedResponder.calls, 0);
+    expect(coach.messages, isEmpty);
+    expect(
+      coach.errorMessage,
+      'Your coach could not respond right now. Please retry.',
+    );
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('coachingConversation'), isFalse);
+  });
+
+  test('a rejected coach-message commit never surfaces the reply', () async {
+    var saveCalls = 0;
+    final responder = _RecordingResponder('Unsaved guidance.');
+    final coach = await createCoach(
+      responder: responder,
+      saveConversation: (preferences, messages) async {
+        saveCalls += 1;
+        if (saveCalls > 1) return false;
+        return preferences.setString(
+          'coachingConversation',
+          jsonEncode(messages.map((message) => message.toJson()).toList()),
+        );
+      },
+    );
+    addTearDown(coach.dispose);
+
+    expect(
+      await coach.send('Keep only this.', const CoachingContext()),
+      isFalse,
+    );
+
+    expect(saveCalls, 2);
+    expect(responder.calls, 1);
+    expect(coach.messages, hasLength(1));
+    expect(coach.messages.single.role, CoachingMessageRole.user);
+    expect(coach.messages.single.text, 'Keep only this.');
+    expect(
+      coach.messages.map((message) => message.text),
+      isNot(contains('Unsaved guidance.')),
+    );
+    final preferences = await SharedPreferences.getInstance();
+    final saved =
+        jsonDecode(preferences.getString('coachingConversation')!)
+            as List<dynamic>;
+    expect(saved, hasLength(1));
+    expect((saved.single as Map<String, dynamic>)['text'], 'Keep only this.');
   });
 
   test('repairs damaged saved messages without losing valid history', () async {

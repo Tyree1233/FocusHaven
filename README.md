@@ -344,6 +344,12 @@ DeviceCheck fallback in Apple releases, and reCAPTCHA v3 on web. Debug builds
 use Firebase debug providers; register their generated tokens only for trusted
 development devices and never distribute a debug build.
 
+Private coaching history is also commit-checked before it is treated as saved.
+If local storage rejects the user's message, FocusHaven rolls the unsaved text
+back, does not invoke either coach, and reports that the response could not be
+completed. A coach reply is surfaced only after the bounded conversation has
+been verified in local storage.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

@@ -52,6 +52,13 @@ abstract interface class CoachingResponder {
   });
 }
 
+/// Persists one bounded private coaching conversation as a verified commit.
+typedef CoachingConversationSave =
+    Future<bool> Function(
+      SharedPreferences preferences,
+      List<CoachingMessage> messages,
+    );
+
 enum CoachingFallbackReason {
   allowanceReached,
   accessUnavailable,
@@ -948,13 +955,19 @@ class CoachingService extends ChangeNotifier {
   factory CoachingService({
     CoachingResponder? responder,
     CoachingResponder? enhancedResponder,
+    CoachingConversationSave? saveConversation,
   }) => CoachingService._(
     responder: responder,
     enhancedResponder: enhancedResponder,
+    saveConversation: saveConversation,
   );
 
-  CoachingService._({CoachingResponder? responder, this._enhancedResponder})
-    : _localResponder = responder ?? const LocalCoachingResponder() {
+  CoachingService._({
+    CoachingResponder? responder,
+    this._enhancedResponder,
+    CoachingConversationSave? saveConversation,
+  }) : _localResponder = responder ?? const LocalCoachingResponder(),
+       _saveConversation = saveConversation ?? _saveToPreferences {
     initialized = _load();
   }
 
@@ -965,6 +978,7 @@ class CoachingService extends ChangeNotifier {
 
   final CoachingResponder _localResponder;
   final CoachingResponder? _enhancedResponder;
+  final CoachingConversationSave _saveConversation;
   List<CoachingMessage> _messages = [];
   int _conversationRevision = 0;
   bool _isResponding = false;
@@ -989,6 +1003,8 @@ class CoachingService extends ChangeNotifier {
     await initialized;
     if (_isDisposed || _isResponding) return false;
 
+    final previousMessages = _messages;
+    var userMessageCommitted = false;
     _isResponding = true;
     _errorMessage = null;
     _noticeMessage = null;
@@ -1003,6 +1019,7 @@ class CoachingService extends ChangeNotifier {
 
     try {
       await _save(_messages);
+      userMessageCommitted = true;
       final requiresLocalResponse =
           LocalCoachingResponder.isSafetyConcern(cleanedMessage) ||
           LocalCoachingResponder.isBoundaryRequest(cleanedMessage) ||
@@ -1042,6 +1059,7 @@ class CoachingService extends ChangeNotifier {
       return true;
     } catch (error) {
       if (_isDisposed) return false;
+      if (!userMessageCommitted) _messages = previousMessages;
       _isResponding = false;
       _errorMessage = 'Your coach could not respond right now. Please retry.';
       debugPrint('Focus coach response failed: $error');
@@ -1173,10 +1191,21 @@ class CoachingService extends ChangeNotifier {
 
   Future<void> _save(List<CoachingMessage> messages) async {
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setString(
-      _storageKey,
-      jsonEncode(messages.map((message) => message.toJson()).toList()),
+    final saved = await _saveConversation(preferences, messages);
+    if (!saved) {
+      throw StateError('Focus coach conversation was not saved.');
+    }
+  }
+
+  static Future<bool> _saveToPreferences(
+    SharedPreferences preferences,
+    List<CoachingMessage> messages,
+  ) async {
+    final encoded = jsonEncode(
+      messages.map((message) => message.toJson()).toList(),
     );
+    final saved = await preferences.setString(_storageKey, encoded);
+    return saved && preferences.getString(_storageKey) == encoded;
   }
 
   Future<void> _removeCorruptedStorage() async {
