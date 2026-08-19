@@ -350,6 +350,11 @@ back, does not invoke either coach, and reports that the response could not be
 completed. A coach reply is surfaced only after the bounded conversation has
 been verified in local storage.
 
+Enhanced AI consent is commit-checked before the active responder changes. A
+rejected opt-in cannot enable the enhanced responder, while a rejected opt-out
+keeps the prior consent state visible and asks the user to retry instead of
+claiming that an unsaved preference took effect.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

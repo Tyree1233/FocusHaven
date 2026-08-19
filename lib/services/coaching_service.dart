@@ -59,6 +59,10 @@ typedef CoachingConversationSave =
       List<CoachingMessage> messages,
     );
 
+/// Persists the user's enhanced-coaching consent as a verified commit.
+typedef CoachingEnhancedPreferenceSave =
+    Future<bool> Function(SharedPreferences preferences, bool enabled);
+
 enum CoachingFallbackReason {
   allowanceReached,
   accessUnavailable,
@@ -956,18 +960,23 @@ class CoachingService extends ChangeNotifier {
     CoachingResponder? responder,
     CoachingResponder? enhancedResponder,
     CoachingConversationSave? saveConversation,
+    CoachingEnhancedPreferenceSave? saveEnhancedPreference,
   }) => CoachingService._(
     responder: responder,
     enhancedResponder: enhancedResponder,
     saveConversation: saveConversation,
+    saveEnhancedPreference: saveEnhancedPreference,
   );
 
   CoachingService._({
     CoachingResponder? responder,
     this._enhancedResponder,
     CoachingConversationSave? saveConversation,
+    CoachingEnhancedPreferenceSave? saveEnhancedPreference,
   }) : _localResponder = responder ?? const LocalCoachingResponder(),
-       _saveConversation = saveConversation ?? _saveToPreferences {
+       _saveConversation = saveConversation ?? _saveToPreferences,
+       _saveEnhancedPreference =
+           saveEnhancedPreference ?? _saveEnhancedPreferenceToPreferences {
     initialized = _load();
   }
 
@@ -979,6 +988,7 @@ class CoachingService extends ChangeNotifier {
   final CoachingResponder _localResponder;
   final CoachingResponder? _enhancedResponder;
   final CoachingConversationSave _saveConversation;
+  final CoachingEnhancedPreferenceSave _saveEnhancedPreference;
   List<CoachingMessage> _messages = [];
   int _conversationRevision = 0;
   bool _isResponding = false;
@@ -1076,10 +1086,18 @@ class CoachingService extends ChangeNotifier {
     if (_enhancedCoachingEnabled == enabled) return false;
 
     final preferences = await SharedPreferences.getInstance();
-    await preferences.setBool(_enhancedCoachingKey, enabled);
+    final saved = await _saveEnhancedPreference(preferences, enabled);
     if (_isDisposed) return false;
+    if (!saved) {
+      _errorMessage =
+          'Your enhanced coaching preference could not be saved. Please retry.';
+      _noticeMessage = null;
+      notifyListeners();
+      return false;
+    }
 
     _enhancedCoachingEnabled = enabled;
+    _errorMessage = null;
     _noticeMessage = null;
     notifyListeners();
     return true;
@@ -1206,6 +1224,14 @@ class CoachingService extends ChangeNotifier {
     );
     final saved = await preferences.setString(_storageKey, encoded);
     return saved && preferences.getString(_storageKey) == encoded;
+  }
+
+  static Future<bool> _saveEnhancedPreferenceToPreferences(
+    SharedPreferences preferences,
+    bool enabled,
+  ) async {
+    final saved = await preferences.setBool(_enhancedCoachingKey, enabled);
+    return saved && preferences.getBool(_enhancedCoachingKey) == enabled;
   }
 
   Future<void> _removeCorruptedStorage() async {
