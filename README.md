@@ -261,6 +261,12 @@ dashboard. If that final write crossed the proposed start, it cancels the
 reminder and removes both keys, so restoration can never recover a hold that
 was already stale when its save finished.
 
+Both boundary writes must also report that they reached private local storage.
+If either write is rejected, FocusHaven treats the entire commit as failed,
+cancels the just-created reminder, clears both boundary keys, and never
+publishes the hold. A partial platform write therefore cannot look like a
+durable Haven Window in memory or return after an app restart.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

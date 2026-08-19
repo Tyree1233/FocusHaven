@@ -16,6 +16,10 @@ abstract interface class HavenWindowReminderClient {
 typedef HavenWindowBoundaryTimerFactory =
     Timer Function(Duration duration, void Function() callback);
 
+/// Persists both private UTC boundaries as one verified hold commit.
+typedef HavenWindowHoldSave =
+    Future<bool> Function(SharedPreferences preferences, HavenWindowHold hold);
+
 /// Owns one explicitly requested, private reminder for a Haven Window.
 ///
 /// Loading saved state never requests permission or schedules anything. A
@@ -35,11 +39,13 @@ class HavenWindowHoldService extends ChangeNotifier
     required HavenWindowReminderClient notificationService,
     DateTime Function()? now,
     HavenWindowBoundaryTimerFactory? boundaryTimerFactory,
+    HavenWindowHoldSave? saveHold,
   }) {
     return HavenWindowHoldService._(
       notificationService,
       now ?? DateTime.now,
       boundaryTimerFactory ?? (duration, callback) => Timer(duration, callback),
+      saveHold ?? _saveToPreferences,
     );
   }
 
@@ -47,6 +53,7 @@ class HavenWindowHoldService extends ChangeNotifier
     this._notificationService,
     this._now,
     this._boundaryTimerFactory,
+    this._saveHold,
   ) {
     WidgetsBinding.instance.addObserver(this);
     initialized = _load();
@@ -55,6 +62,7 @@ class HavenWindowHoldService extends ChangeNotifier
   final HavenWindowReminderClient _notificationService;
   final DateTime Function() _now;
   final HavenWindowBoundaryTimerFactory _boundaryTimerFactory;
+  final HavenWindowHoldSave _saveHold;
   HavenWindowHold _hold = const HavenWindowHold.empty();
   Timer? _boundaryTimer;
   bool _isDisposed = false;
@@ -108,7 +116,10 @@ class HavenWindowHoldService extends ChangeNotifier
         endsAtUtc: endsAt.toUtc(),
       );
       final preferences = await SharedPreferences.getInstance();
-      await _save(preferences, nextHold);
+      final saved = await _saveHold(preferences, nextHold);
+      if (!saved) {
+        throw StateError('Haven Window hold boundaries were not saved.');
+      }
       if (_isDisposed || !_isValidSuggestion(suggestion)) {
         await _notificationService.cancelHavenWindowReminder();
         await _clear(preferences);
@@ -295,17 +306,18 @@ class HavenWindowHoldService extends ChangeNotifier
     }
   }
 
-  static Future<void> _save(
+  static Future<bool> _saveToPreferences(
     SharedPreferences preferences,
     HavenWindowHold hold,
   ) async {
-    await Future.wait([
+    final results = await Future.wait([
       preferences.setInt(
         _startsAtUtcKey,
         hold.startsAtUtc!.microsecondsSinceEpoch,
       ),
       preferences.setInt(_endsAtUtcKey, hold.endsAtUtc!.microsecondsSinceEpoch),
     ]);
+    return results.every((saved) => saved);
   }
 
   static Future<void> _clear(SharedPreferences preferences) async {

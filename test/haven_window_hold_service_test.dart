@@ -36,11 +36,13 @@ void main() {
     _FakeHavenWindowNotifications notifications, {
     DateTime Function()? nowSource,
     HavenWindowBoundaryTimerFactory? boundaryTimerFactory,
+    HavenWindowHoldSave? saveHold,
   }) async {
     final service = HavenWindowHoldService(
       notificationService: notifications,
       now: nowSource ?? () => now,
       boundaryTimerFactory: boundaryTimerFactory,
+      saveHold: saveHold,
     );
     await service.initialized;
     return service;
@@ -226,6 +228,31 @@ void main() {
     addTearDown(service.dispose);
 
     expect(await service.hold(opening()), isFalse);
+    expect(service.holdState.isHeld, isFalse);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+    expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+  });
+
+  test('a rejected boundary write rolls back the partial commit', () async {
+    final notifications = _FakeHavenWindowNotifications();
+    final service = await createService(
+      notifications,
+      saveHold: (preferences, hold) async {
+        await preferences.setInt(
+          'havenWindowHoldStartsAtUtcMicros',
+          hold.startsAtUtc!.microsecondsSinceEpoch,
+        );
+        return false;
+      },
+    );
+    addTearDown(service.dispose);
+
+    expect(await service.hold(opening()), isFalse);
+
+    expect(notifications.permissionCalls, 1);
+    expect(notifications.scheduleCalls, 1);
+    expect(notifications.cancelCalls, 1);
     expect(service.holdState.isHeld, isFalse);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
