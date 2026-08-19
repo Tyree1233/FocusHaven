@@ -99,6 +99,38 @@ void main() {
     expect(service.holdState.isHeld, isFalse);
   });
 
+  test('an opening that passes during consent is never scheduled', () async {
+    var currentTime = now;
+    final permission = Completer<bool>();
+    final notifications = _FakeHavenWindowNotifications(
+      permissionResult: permission.future,
+    );
+    final service = await createService(
+      notifications,
+      nowSource: () => currentTime,
+    );
+    addTearDown(service.dispose);
+    final suggestion = opening(
+      startsAt: now.add(const Duration(minutes: 1)),
+      endsAt: now.add(const Duration(minutes: 26)),
+    );
+
+    final holdResult = service.hold(suggestion);
+    await Future<void>.delayed(Duration.zero);
+    expect(notifications.permissionCalls, 1);
+
+    currentTime = suggestion.startsAt!;
+    permission.complete(true);
+
+    expect(await holdResult, isFalse);
+    expect(notifications.scheduleCalls, 0);
+    expect(notifications.cancelCalls, 0);
+    expect(service.holdState.isHeld, isFalse);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+    expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+  });
+
   test('invalid or distant openings never request permission', () async {
     final notifications = _FakeHavenWindowNotifications();
     final service = await createService(notifications);

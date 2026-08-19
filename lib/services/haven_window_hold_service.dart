@@ -91,7 +91,9 @@ class HavenWindowHoldService extends ChangeNotifier
       final startsAt = suggestion.startsAt!;
       final endsAt = suggestion.endsAt!;
       final permitted = await _notificationService.requestPermissions();
-      if (!permitted || _isDisposed) return false;
+      if (!permitted || _isDisposed || !_isValidSuggestion(suggestion)) {
+        return false;
+      }
 
       scheduled = await _notificationService.scheduleHavenWindowReminder(
         startsAt,

@@ -242,6 +242,13 @@ schedule a reminder, or save local hold boundaries. The person may then choose
 whether to refresh; no calendar read happens as a side effect of the failed
 hold.
 
+The hold service also rechecks the opening after the system notification
+permission sheet closes. If that consent step stayed open until the proposed
+start passed, FocusHaven stops before scheduling a reminder or saving any hold
+boundaries. Granting notification access therefore never turns an expired
+opening into a hold, and the app still does not reread the calendar or start
+the timer as part of that check.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
