@@ -355,6 +355,11 @@ rejected opt-in cannot enable the enhanced responder, while a rejected opt-out
 keeps the prior consent state visible and asks the user to retry instead of
 claiming that an unsaved preference took effect.
 
+Private coaching deletion is verified per stored value. If history or consent
+cannot be removed, FocusHaven keeps the uncleared state visible and reports that
+cleanup is incomplete; values that were verifiably removed disappear without
+waiting for the remaining cleanup to succeed.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

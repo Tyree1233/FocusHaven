@@ -19,12 +19,14 @@ void main() {
     CoachingResponder? enhancedResponder,
     CoachingConversationSave? saveConversation,
     CoachingEnhancedPreferenceSave? saveEnhancedPreference,
+    CoachingPreferenceRemove? removePreference,
   }) async {
     final coach = CoachingService(
       responder: responder,
       enhancedResponder: enhancedResponder,
       saveConversation: saveConversation,
       saveEnhancedPreference: saveEnhancedPreference,
+      removePreference: removePreference,
     );
     await coach.initialized;
     return coach;
@@ -1340,6 +1342,70 @@ void main() {
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey('coachingConversation'), isFalse);
   });
+
+  test('a rejected history deletion keeps private messages visible', () async {
+    final firstCoach = await createCoach(
+      responder: _RecordingResponder('Stored guidance.'),
+    );
+    expect(
+      await firstCoach.send('Keep this private.', const CoachingContext()),
+      isTrue,
+    );
+    firstCoach.dispose();
+
+    final coach = await createCoach(removePreference: (_, _) async => false);
+    addTearDown(coach.dispose);
+    expect(coach.messages, hasLength(2));
+
+    await coach.clearConversation();
+
+    expect(coach.messages, hasLength(2));
+    expect(
+      coach.errorMessage,
+      'Your private coaching data could not be completely cleared. '
+      'Please retry.',
+    );
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('coachingConversation'), isTrue);
+  });
+
+  test(
+    'partial local-data deletion exposes only the uncleared consent',
+    () async {
+      final firstCoach = await createCoach(
+        enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+      );
+      await firstCoach.setEnhancedCoachingEnabled(true);
+      expect(
+        await firstCoach.send('Remove this later.', const CoachingContext()),
+        isTrue,
+      );
+      firstCoach.dispose();
+
+      final coach = await createCoach(
+        enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+        removePreference: (preferences, key) async {
+          if (key == 'enhancedCoachingEnabled') return false;
+          await preferences.remove(key);
+          return !preferences.containsKey(key);
+        },
+      );
+      addTearDown(coach.dispose);
+
+      await coach.clearLocalData();
+
+      expect(coach.messages, isEmpty);
+      expect(coach.enhancedCoachingEnabled, isTrue);
+      expect(
+        coach.errorMessage,
+        'Your private coaching data could not be completely cleared. '
+        'Please retry.',
+      );
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.containsKey('coachingConversation'), isFalse);
+      expect(preferences.getBool('enhancedCoachingEnabled'), isTrue);
+    },
+  );
 
   test('a rejected user-message commit never invokes either coach', () async {
     final localResponder = _RecordingResponder('Local guidance.');

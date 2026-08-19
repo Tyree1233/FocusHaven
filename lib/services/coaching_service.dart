@@ -63,6 +63,10 @@ typedef CoachingConversationSave =
 typedef CoachingEnhancedPreferenceSave =
     Future<bool> Function(SharedPreferences preferences, bool enabled);
 
+/// Removes one private coaching value and verifies that it is gone.
+typedef CoachingPreferenceRemove =
+    Future<bool> Function(SharedPreferences preferences, String key);
+
 enum CoachingFallbackReason {
   allowanceReached,
   accessUnavailable,
@@ -961,11 +965,13 @@ class CoachingService extends ChangeNotifier {
     CoachingResponder? enhancedResponder,
     CoachingConversationSave? saveConversation,
     CoachingEnhancedPreferenceSave? saveEnhancedPreference,
+    CoachingPreferenceRemove? removePreference,
   }) => CoachingService._(
     responder: responder,
     enhancedResponder: enhancedResponder,
     saveConversation: saveConversation,
     saveEnhancedPreference: saveEnhancedPreference,
+    removePreference: removePreference,
   );
 
   CoachingService._({
@@ -973,10 +979,13 @@ class CoachingService extends ChangeNotifier {
     this._enhancedResponder,
     CoachingConversationSave? saveConversation,
     CoachingEnhancedPreferenceSave? saveEnhancedPreference,
+    CoachingPreferenceRemove? removePreference,
   }) : _localResponder = responder ?? const LocalCoachingResponder(),
        _saveConversation = saveConversation ?? _saveToPreferences,
        _saveEnhancedPreference =
-           saveEnhancedPreference ?? _saveEnhancedPreferenceToPreferences {
+           saveEnhancedPreference ?? _saveEnhancedPreferenceToPreferences,
+       _removePreference =
+           removePreference ?? _removePreferenceFromPreferences {
     initialized = _load();
   }
 
@@ -989,6 +998,7 @@ class CoachingService extends ChangeNotifier {
   final CoachingResponder? _enhancedResponder;
   final CoachingConversationSave _saveConversation;
   final CoachingEnhancedPreferenceSave _saveEnhancedPreference;
+  final CoachingPreferenceRemove _removePreference;
   List<CoachingMessage> _messages = [];
   int _conversationRevision = 0;
   bool _isResponding = false;
@@ -1116,24 +1126,41 @@ class CoachingService extends ChangeNotifier {
     if (_isDisposed || _isResponding) return;
 
     final preferences = await SharedPreferences.getInstance();
-    await preferences.remove(_storageKey);
-    if (includeEnhancedPreference) {
-      await preferences.remove(_enhancedCoachingKey);
-    }
+    final conversationCleared = await _removePreference(
+      preferences,
+      _storageKey,
+    );
+    final enhancedPreferenceCleared =
+        !includeEnhancedPreference ||
+        await _removePreference(preferences, _enhancedCoachingKey);
     if (_isDisposed) return;
 
     final conversationChanged =
-        _messages.isNotEmpty || _errorMessage != null || _noticeMessage != null;
+        conversationCleared &&
+        (_messages.isNotEmpty ||
+            _errorMessage != null ||
+            _noticeMessage != null);
     final settingChanged =
-        includeEnhancedPreference && _enhancedCoachingEnabled;
-    if (!conversationChanged && !settingChanged) return;
-    _messages = [];
-    _errorMessage = null;
-    _noticeMessage = null;
-    if (includeEnhancedPreference) _enhancedCoachingEnabled = false;
+        includeEnhancedPreference &&
+        enhancedPreferenceCleared &&
+        _enhancedCoachingEnabled;
+    final clearCompleted = conversationCleared && enhancedPreferenceCleared;
+
+    if (conversationCleared) {
+      _messages = [];
+      _noticeMessage = null;
+    }
+    if (includeEnhancedPreference && enhancedPreferenceCleared) {
+      _enhancedCoachingEnabled = false;
+    }
+    _errorMessage = clearCompleted
+        ? null
+        : 'Your private coaching data could not be completely cleared. '
+              'Please retry.';
+
     if (conversationChanged) {
       _notifyConversationChanged();
-    } else {
+    } else if (settingChanged || !clearCompleted) {
       notifyListeners();
     }
   }
@@ -1232,6 +1259,14 @@ class CoachingService extends ChangeNotifier {
   ) async {
     final saved = await preferences.setBool(_enhancedCoachingKey, enabled);
     return saved && preferences.getBool(_enhancedCoachingKey) == enabled;
+  }
+
+  static Future<bool> _removePreferenceFromPreferences(
+    SharedPreferences preferences,
+    String key,
+  ) async {
+    await preferences.remove(key);
+    return !preferences.containsKey(key);
   }
 
   Future<void> _removeCorruptedStorage() async {
