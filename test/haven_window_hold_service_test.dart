@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/models/haven_window_hold.dart';
 import 'package:focushaven/models/haven_window_suggestion.dart';
@@ -211,6 +212,67 @@ void main() {
     expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
     expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
   });
+
+  test(
+    'foreground resume catches up an arrived hold without new access',
+    () async {
+      var currentTime = now;
+      final timers = _ManualBoundaryTimers();
+      final notifications = _FakeHavenWindowNotifications();
+      final service = await createService(
+        notifications,
+        nowSource: () => currentTime,
+        boundaryTimerFactory: timers.create,
+      );
+      addTearDown(service.dispose);
+      final suggestion = opening();
+
+      expect(await service.hold(suggestion), isTrue);
+      final suspendedTimer = timers.active.single;
+      currentTime = suggestion.startsAt!.add(const Duration(minutes: 4));
+
+      service.didChangeAppLifecycleState(AppLifecycleState.resumed);
+
+      expect(suspendedTimer.isActive, isFalse);
+      expect(service.holdState.isHeld, isTrue);
+      expect(service.holdState.hasArrived, isTrue);
+      expect(timers.active.single.duration, const Duration(minutes: 21));
+      expect(notifications.permissionCalls, 1);
+      expect(notifications.scheduleCalls, 1);
+      expect(notifications.cancelCalls, 0);
+    },
+  );
+
+  test(
+    'foreground resume expires a passed hold without rescheduling',
+    () async {
+      var currentTime = now;
+      final timers = _ManualBoundaryTimers();
+      final notifications = _FakeHavenWindowNotifications();
+      final service = await createService(
+        notifications,
+        nowSource: () => currentTime,
+        boundaryTimerFactory: timers.create,
+      );
+      addTearDown(service.dispose);
+      final suggestion = opening();
+
+      expect(await service.hold(suggestion), isTrue);
+      currentTime = suggestion.endsAt!;
+
+      service.didChangeAppLifecycleState(AppLifecycleState.resumed);
+      await pumpEventQueue();
+
+      expect(service.holdState.isHeld, isFalse);
+      expect(timers.active, isEmpty);
+      expect(notifications.permissionCalls, 1);
+      expect(notifications.scheduleCalls, 1);
+      expect(notifications.cancelCalls, 0);
+      final preferences = await SharedPreferences.getInstance();
+      expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+      expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+    },
+  );
 
   test('expired, oversized, and incomplete saved holds fail closed', () async {
     final invalidStates = [

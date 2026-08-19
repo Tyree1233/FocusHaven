@@ -214,6 +214,12 @@ paused, completed, resumed, break, or otherwise active sessions never receive
 an invented start control. No choice writes to the calendar or reports whether
 the opening was used.
 
+If FocusHaven was suspended while a held boundary passed, the private hold
+clock now reconciles immediately when the app returns to the foreground. That
+catch-up reads only the already-saved UTC start and end boundaries: it does not
+reread calendar availability, request permission, schedule another
+notification, or treat reopening the app as evidence that focus happened.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

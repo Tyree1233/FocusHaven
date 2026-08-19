@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/haven_window_hold.dart';
@@ -20,8 +20,11 @@ typedef HavenWindowBoundaryTimerFactory =
 ///
 /// Loading saved state never requests permission or schedules anything. A
 /// notification can be created only through [hold], and [release] removes it
-/// without writing to the person's calendar.
-class HavenWindowHoldService extends ChangeNotifier {
+/// without writing to the person's calendar. Returning to the foreground
+/// reconciles only the already-saved UTC boundaries so a suspended app cannot
+/// leave an arrived or expired hold looking stale.
+class HavenWindowHoldService extends ChangeNotifier
+    with WidgetsBindingObserver {
   static const _startsAtUtcKey = 'havenWindowHoldStartsAtUtcMicros';
   static const _endsAtUtcKey = 'havenWindowHoldEndsAtUtcMicros';
   static const _minimumDuration = Duration(minutes: 5);
@@ -45,6 +48,7 @@ class HavenWindowHoldService extends ChangeNotifier {
     this._now,
     this._boundaryTimerFactory,
   ) {
+    WidgetsBinding.instance.addObserver(this);
     initialized = _load();
   }
 
@@ -60,6 +64,15 @@ class HavenWindowHoldService extends ChangeNotifier {
 
   HavenWindowHold get holdState => _hold;
   bool get isUpdating => _isUpdating;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _boundaryTimer?.cancel();
+      _boundaryTimer = null;
+      _handleBoundary();
+    }
+  }
 
   Future<bool> hold(HavenWindowSuggestion suggestion) async {
     await initialized;
@@ -305,6 +318,7 @@ class HavenWindowHoldService extends ChangeNotifier {
     _isDisposed = true;
     _boundaryTimer?.cancel();
     _boundaryTimer = null;
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 }
