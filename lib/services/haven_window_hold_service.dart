@@ -98,7 +98,7 @@ class HavenWindowHoldService extends ChangeNotifier
       scheduled = await _notificationService.scheduleHavenWindowReminder(
         startsAt,
       );
-      if (!scheduled || _isDisposed) {
+      if (!scheduled || _isDisposed || !_isValidSuggestion(suggestion)) {
         if (scheduled) await _notificationService.cancelHavenWindowReminder();
         return false;
       }

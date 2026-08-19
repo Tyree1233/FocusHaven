@@ -249,6 +249,12 @@ boundaries. Granting notification access therefore never turns an expired
 opening into a hold, and the app still does not reread the calendar or start
 the timer as part of that check.
 
+Reminder delivery has the same final boundary. After the native scheduler
+returns, FocusHaven checks the local opening once more before saving it. If the
+start passed while scheduling was in flight, the just-created reminder is
+cancelled and no hold boundaries are persisted. This keeps a delayed platform
+operation from manufacturing an already-arrived hold.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

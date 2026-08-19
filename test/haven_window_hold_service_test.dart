@@ -131,6 +131,38 @@ void main() {
     expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
   });
 
+  test('an opening that passes during scheduling is cancelled', () async {
+    var currentTime = now;
+    final schedule = Completer<bool>();
+    final notifications = _FakeHavenWindowNotifications(
+      scheduleResult: schedule.future,
+    );
+    final service = await createService(
+      notifications,
+      nowSource: () => currentTime,
+    );
+    addTearDown(service.dispose);
+    final suggestion = opening(
+      startsAt: now.add(const Duration(minutes: 1)),
+      endsAt: now.add(const Duration(minutes: 26)),
+    );
+
+    final holdResult = service.hold(suggestion);
+    await Future<void>.delayed(Duration.zero);
+    expect(notifications.permissionCalls, 1);
+    expect(notifications.scheduleCalls, 1);
+
+    currentTime = suggestion.startsAt!;
+    schedule.complete(true);
+
+    expect(await holdResult, isFalse);
+    expect(notifications.cancelCalls, 1);
+    expect(service.holdState.isHeld, isFalse);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+    expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+  });
+
   test('invalid or distant openings never request permission', () async {
     final notifications = _FakeHavenWindowNotifications();
     final service = await createService(notifications);
@@ -403,11 +435,13 @@ final class _FakeHavenWindowNotifications implements HavenWindowReminderClient {
     this.permissionGranted = true,
     this.scheduleSucceeds = true,
     this.permissionResult,
+    this.scheduleResult,
   });
 
   final bool permissionGranted;
   final bool scheduleSucceeds;
   final Future<bool>? permissionResult;
+  final Future<bool>? scheduleResult;
   int permissionCalls = 0;
   int scheduleCalls = 0;
   int cancelCalls = 0;
@@ -423,8 +457,10 @@ final class _FakeHavenWindowNotifications implements HavenWindowReminderClient {
   @override
   Future<bool> scheduleHavenWindowReminder(DateTime startsAt) async {
     scheduleCalls += 1;
-    if (scheduleSucceeds) scheduledStarts.add(startsAt);
-    return scheduleSucceeds;
+    final result = scheduleResult;
+    final succeeds = result == null ? scheduleSucceeds : await result;
+    if (succeeds) scheduledStarts.add(startsAt);
+    return succeeds;
   }
 
   @override
