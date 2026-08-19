@@ -248,6 +248,33 @@ void main() {
     }
   });
 
+  test('busy blocks outside their declared range fail closed', () {
+    final rangeStart = day.add(const Duration(hours: 8));
+    final rangeEnd = day.add(const Duration(hours: 12));
+    final outsideBlocks = [
+      CalendarBusyBlock(
+        startsAt: rangeStart.subtract(const Duration(minutes: 5)),
+        endsAt: rangeStart.add(const Duration(minutes: 5)),
+      ),
+      CalendarBusyBlock(
+        startsAt: rangeEnd.subtract(const Duration(minutes: 5)),
+        endsAt: rangeEnd.add(const Duration(minutes: 5)),
+      ),
+    ];
+
+    for (final block in outsideBlocks) {
+      final suggestion = service.createSuggestion(
+        forecast: forecast(),
+        availability: availability(busy: [block]),
+        now: rangeStart,
+      );
+
+      expect(suggestion.kind, HavenWindowKind.unavailable);
+      expect(suggestion.hasOpening, isFalse);
+      expect(suggestion.evidence, contains('rejected'));
+    }
+  });
+
   test('UTC calendar boundaries are rejected instead of misranked', () {
     final snapshot = PrivateCalendarAvailability(
       status: PrivateCalendarAvailabilityStatus.ready,

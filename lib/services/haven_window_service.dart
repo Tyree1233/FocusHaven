@@ -160,7 +160,9 @@ class HavenWindowService {
     for (final block in availability.busyBlocks) {
       if (!block.startsAt.isBefore(block.endsAt) ||
           block.startsAt.isUtc ||
-          block.endsAt.isUtc) {
+          block.endsAt.isUtc ||
+          block.startsAt.isBefore(start) ||
+          block.endsAt.isAfter(end)) {
         return false;
       }
     }

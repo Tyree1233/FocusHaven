@@ -177,6 +177,11 @@ unknown fields, malformed timestamps, overlapping operations, and transport
 failures are contained without retaining stale availability. Web and desktop
 leave this bridge dormant until they have separately reviewed adapters.
 
+The Flutter suggestion boundary independently verifies every redacted busy
+interval again. A block that begins before or ends after its declared snapshot
+range invalidates the whole snapshot instead of being ignored or influencing
+an opening outside the native adapter's reviewed bounds.
+
 The dashboard now includes a consent-first Haven Window card. While the native
 bridge is dormant, it says calendar assistance is off and presents no inert
 setup control. After a reviewed host checks existing authorization, the card
