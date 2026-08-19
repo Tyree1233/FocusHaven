@@ -1126,13 +1126,18 @@ class CoachingService extends ChangeNotifier {
     if (_isDisposed || _isResponding) return;
 
     final preferences = await SharedPreferences.getInstance();
-    final conversationCleared = await _removePreference(
+    final conversationCleared = await _removePrivateValue(
       preferences,
       _storageKey,
+      'conversation',
     );
     final enhancedPreferenceCleared =
         !includeEnhancedPreference ||
-        await _removePreference(preferences, _enhancedCoachingKey);
+        await _removePrivateValue(
+          preferences,
+          _enhancedCoachingKey,
+          'enhanced coaching preference',
+        );
     if (_isDisposed) return;
 
     final conversationChanged =
@@ -1304,12 +1309,20 @@ class CoachingService extends ChangeNotifier {
     String key,
     String description,
   ) async {
+    final removed = await _removePrivateValue(preferences, key, description);
+    if (!removed) _reportStorageRepairFailure(description);
+  }
+
+  Future<bool> _removePrivateValue(
+    SharedPreferences preferences,
+    String key,
+    String description,
+  ) async {
     try {
-      final removed = await _removePreference(preferences, key);
-      if (!removed) _reportStorageRepairFailure(description);
+      return await _removePreference(preferences, key);
     } catch (error) {
-      debugPrint('Invalid coach $description could not be removed: $error');
-      _reportStorageRepairFailure(description);
+      debugPrint('Private coach $description could not be removed: $error');
+      return false;
     }
   }
 

@@ -366,6 +366,11 @@ normalized conversation is only treated as repaired after its replacement is
 verified. Failed repairs stay private, remain recoverable for another cleanup
 attempt, and surface an honest local error instead of being silently ignored.
 
+Private coaching deletion failures are contained per value. If one storage
+operation throws, FocusHaven still attempts the remaining requested cleanup,
+keeps any uncleared history or consent visible, and reports a retryable local
+error rather than leaking the storage exception through the interface.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 
