@@ -37,12 +37,14 @@ void main() {
     DateTime Function()? nowSource,
     HavenWindowBoundaryTimerFactory? boundaryTimerFactory,
     HavenWindowHoldSave? saveHold,
+    HavenWindowHoldClear? clearHold,
   }) async {
     final service = HavenWindowHoldService(
       notificationService: notifications,
       now: nowSource ?? () => now,
       boundaryTimerFactory: boundaryTimerFactory,
       saveHold: saveHold,
+      clearHold: clearHold,
     );
     await service.initialized;
     return service;
@@ -447,6 +449,32 @@ void main() {
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
     expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+  });
+
+  test('rejected cleanup keeps a released hold visible for retry', () async {
+    var clearCalls = 0;
+    final notifications = _FakeHavenWindowNotifications();
+    final service = await createService(
+      notifications,
+      clearHold: (_) async {
+        clearCalls += 1;
+        return false;
+      },
+    );
+    addTearDown(service.dispose);
+    final suggestion = opening();
+    expect(await service.hold(suggestion), isTrue);
+
+    expect(await service.release(), isFalse);
+
+    expect(clearCalls, 1);
+    expect(notifications.cancelCalls, 1);
+    expect(service.holdState.isHeld, isTrue);
+    expect(service.holdState.startsAtUtc, suggestion.startsAt!.toUtc());
+    expect(service.holdState.endsAtUtc, suggestion.endsAt!.toUtc());
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNotNull);
+    expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNotNull);
   });
 
   test('overlapping explicit holds are serialized', () async {

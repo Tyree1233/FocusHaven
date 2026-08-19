@@ -20,6 +20,10 @@ typedef HavenWindowBoundaryTimerFactory =
 typedef HavenWindowHoldSave =
     Future<bool> Function(SharedPreferences preferences, HavenWindowHold hold);
 
+/// Removes both private UTC boundaries as one verified cleanup.
+typedef HavenWindowHoldClear =
+    Future<bool> Function(SharedPreferences preferences);
+
 /// Owns one explicitly requested, private reminder for a Haven Window.
 ///
 /// Loading saved state never requests permission or schedules anything. A
@@ -40,12 +44,14 @@ class HavenWindowHoldService extends ChangeNotifier
     DateTime Function()? now,
     HavenWindowBoundaryTimerFactory? boundaryTimerFactory,
     HavenWindowHoldSave? saveHold,
+    HavenWindowHoldClear? clearHold,
   }) {
     return HavenWindowHoldService._(
       notificationService,
       now ?? DateTime.now,
       boundaryTimerFactory ?? (duration, callback) => Timer(duration, callback),
       saveHold ?? _saveToPreferences,
+      clearHold ?? _clearFromPreferences,
     );
   }
 
@@ -54,6 +60,7 @@ class HavenWindowHoldService extends ChangeNotifier
     this._now,
     this._boundaryTimerFactory,
     this._saveHold,
+    this._clearHold,
   ) {
     WidgetsBinding.instance.addObserver(this);
     initialized = _load();
@@ -63,6 +70,7 @@ class HavenWindowHoldService extends ChangeNotifier
   final DateTime Function() _now;
   final HavenWindowBoundaryTimerFactory _boundaryTimerFactory;
   final HavenWindowHoldSave _saveHold;
+  final HavenWindowHoldClear _clearHold;
   HavenWindowHold _hold = const HavenWindowHold.empty();
   Timer? _boundaryTimer;
   bool _isDisposed = false;
@@ -320,11 +328,21 @@ class HavenWindowHoldService extends ChangeNotifier
     return results.every((saved) => saved);
   }
 
-  static Future<void> _clear(SharedPreferences preferences) async {
-    await Future.wait([
+  Future<void> _clear(SharedPreferences preferences) async {
+    final cleared = await _clearHold(preferences);
+    if (!cleared) {
+      throw StateError('Haven Window hold boundaries were not cleared.');
+    }
+  }
+
+  static Future<bool> _clearFromPreferences(
+    SharedPreferences preferences,
+  ) async {
+    final results = await Future.wait([
       preferences.remove(_startsAtUtcKey),
       preferences.remove(_endsAtUtcKey),
     ]);
+    return results.every((cleared) => cleared);
   }
 
   void _notifyListenersSafely() {

@@ -267,6 +267,12 @@ cancels the just-created reminder, clears both boundary keys, and never
 publishes the hold. A partial platform write therefore cannot look like a
 durable Haven Window in memory or return after an app restart.
 
+Removal is verified with the same care. Releasing a held window cancels its
+reminder and requires both private boundary removals to report success before
+the dashboard says the hold is gone. If local storage rejects that cleanup,
+the action fails honestly and keeps the held state available for another
+release attempt instead of claiming that potentially restorable data vanished.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
