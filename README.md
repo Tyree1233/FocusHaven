@@ -228,6 +228,13 @@ longer fits. This refresh still uses only the existing redacted availability
 snapshot and does not reread the calendar, request access, or run a background
 clock.
 
+Redacted calendar availability now has a short local freshness boundary. Once
+its captured range is more than fifteen minutes old—or no longer covers a
+future moment—FocusHaven removes every hold action and asks for an explicit
+refresh instead of treating cached free time as current. The app never refreshes
+that snapshot on its own, so returning from the background still cannot prompt
+for access or silently reread the calendar.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

@@ -12,6 +12,7 @@ class HavenWindowService {
   static const _minimumDuration = Duration(minutes: 5);
   static const _maximumDuration = Duration(hours: 2);
   static const _maximumRange = Duration(hours: 36);
+  static const _maximumSnapshotAge = Duration(minutes: 15);
   static const _maximumBusyBlocks = 64;
 
   HavenWindowSuggestion createSuggestion({
@@ -61,6 +62,20 @@ class HavenWindowService {
       );
     }
 
+    final rangeStart = availability.rangeStart!;
+    final rangeEnd = availability.rangeEnd!;
+    if (now.isBefore(rangeStart) ||
+        now.difference(rangeStart) > _maximumSnapshotAge ||
+        !rangeEnd.isAfter(now)) {
+      return const HavenWindowSuggestion(
+        kind: HavenWindowKind.unavailable,
+        headline: 'Refresh your private availability',
+        detail:
+            'This redacted calendar snapshot is no longer current enough to suggest an opening. Refresh only if you want FocusHaven to check again.',
+        evidence: 'No calendar content was retained or reread automatically.',
+      );
+    }
+
     final forecastWindow = forecast.window;
     if (forecast.kind != FocusForecastKind.emergingWindow ||
         forecastWindow == null) {
@@ -75,8 +90,6 @@ class HavenWindowService {
       );
     }
 
-    final rangeStart = availability.rangeStart!;
-    final rangeEnd = availability.rangeEnd!;
     final firstFutureMoment = now.add(const Duration(microseconds: 1));
     var candidate = _roundUpToStep(_later(rangeStart, firstFutureMoment));
 

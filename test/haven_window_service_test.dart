@@ -110,6 +110,46 @@ void main() {
     expect(suggestion.startsAt!.isAfter(now), isTrue);
   });
 
+  test('a fifteen-minute-old snapshot can still offer an opening', () {
+    final now = day.add(const Duration(hours: 8, minutes: 15));
+    final suggestion = service.createSuggestion(
+      forecast: forecast(),
+      availability: availability(),
+      now: now,
+    );
+
+    expect(suggestion.kind, HavenWindowKind.opening);
+    expect(suggestion.startsAt, day.add(const Duration(hours: 8, minutes: 20)));
+    expect(suggestion.startsAt!.isAfter(now), isTrue);
+  });
+
+  test('older redacted availability requires an explicit refresh', () {
+    final suggestion = service.createSuggestion(
+      forecast: forecast(),
+      availability: availability(),
+      now: day.add(const Duration(hours: 8, minutes: 16)),
+    );
+
+    expect(suggestion.kind, HavenWindowKind.unavailable);
+    expect(suggestion.hasOpening, isFalse);
+    expect(suggestion.headline, contains('Refresh'));
+    expect(suggestion.detail, contains('no longer current'));
+    expect(suggestion.evidence, contains('reread automatically'));
+  });
+
+  test('availability without future coverage requires a refresh', () {
+    final now = day.add(const Duration(hours: 8, minutes: 10));
+    final suggestion = service.createSuggestion(
+      forecast: forecast(),
+      availability: availability(end: now),
+      now: now,
+    );
+
+    expect(suggestion.kind, HavenWindowKind.unavailable);
+    expect(suggestion.hasOpening, isFalse);
+    expect(suggestion.headline, contains('Refresh'));
+  });
+
   test('finds one forecast-aligned opening around unsorted busy blocks', () {
     final suggestion = service.createSuggestion(
       forecast: forecast(),
@@ -270,8 +310,9 @@ void main() {
       holdService.didChangeAppLifecycleState(AppLifecycleState.resumed);
       final refreshed = container.read(havenWindowSuggestionProvider);
 
-      expect(refreshed.kind, HavenWindowKind.noOpening);
+      expect(refreshed.kind, HavenWindowKind.unavailable);
       expect(refreshed.hasOpening, isFalse);
+      expect(refreshed.headline, contains('Refresh'));
       expect(notifications.permissionCalls, 0);
       expect(notifications.scheduleCalls, 0);
       expect(notifications.cancelCalls, 0);
