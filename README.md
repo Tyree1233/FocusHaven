@@ -255,6 +255,12 @@ start passed while scheduling was in flight, the just-created reminder is
 cancelled and no hold boundaries are persisted. This keeps a delayed platform
 operation from manufacturing an already-arrived hold.
 
+The local persistence commit is guarded too. FocusHaven rechecks the opening
+after both UTC boundary writes complete but before publishing the hold to the
+dashboard. If that final write crossed the proposed start, it cancels the
+reminder and removes both keys, so restoration can never recover a hold that
+was already stale when its save finished.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable

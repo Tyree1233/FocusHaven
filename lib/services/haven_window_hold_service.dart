@@ -109,7 +109,7 @@ class HavenWindowHoldService extends ChangeNotifier
       );
       final preferences = await SharedPreferences.getInstance();
       await _save(preferences, nextHold);
-      if (_isDisposed) {
+      if (_isDisposed || !_isValidSuggestion(suggestion)) {
         await _notificationService.cancelHavenWindowReminder();
         await _clear(preferences);
         return false;

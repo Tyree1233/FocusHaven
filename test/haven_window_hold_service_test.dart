@@ -163,6 +163,34 @@ void main() {
     expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
   });
 
+  test('an opening that passes while saving is fully rolled back', () async {
+    final suggestion = opening(
+      startsAt: now.add(const Duration(minutes: 1)),
+      endsAt: now.add(const Duration(minutes: 26)),
+    );
+    var clockReads = 0;
+    final notifications = _FakeHavenWindowNotifications();
+    final service = await createService(
+      notifications,
+      nowSource: () {
+        clockReads += 1;
+        return clockReads < 4 ? now : suggestion.startsAt!;
+      },
+    );
+    addTearDown(service.dispose);
+
+    expect(await service.hold(suggestion), isFalse);
+
+    expect(clockReads, 4);
+    expect(notifications.permissionCalls, 1);
+    expect(notifications.scheduleCalls, 1);
+    expect(notifications.cancelCalls, 1);
+    expect(service.holdState.isHeld, isFalse);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.get('havenWindowHoldStartsAtUtcMicros'), isNull);
+    expect(preferences.get('havenWindowHoldEndsAtUtcMicros'), isNull);
+  });
+
   test('invalid or distant openings never request permission', () async {
     final notifications = _FakeHavenWindowNotifications();
     final service = await createService(notifications);
