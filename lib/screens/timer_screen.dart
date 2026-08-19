@@ -852,9 +852,23 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     riverpod.WidgetRef ref,
   ) async {
+    final currentSuggestion = ref.refresh(havenWindowSuggestionProvider);
+    if (!currentSuggestion.hasOpening) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'This window is no longer current enough to hold. Refresh only if you want to check again.',
+            ),
+          ),
+        );
+      }
+      return false;
+    }
+
     final held = await ref
         .read(havenWindowHoldServiceProvider)
-        .hold(ref.read(havenWindowSuggestionProvider));
+        .hold(currentSuggestion);
     if (!held && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

@@ -56,6 +56,7 @@ Widget _app(
   HavenWindowPlatformController? havenWindowController,
   HavenWindowHoldService? havenWindowHoldService,
   HavenWindowSuggestion? havenWindowSuggestion,
+  DateTime Function()? havenWindowCurrentTime,
 }) {
   return ProviderScope(
     overrides: [
@@ -91,6 +92,10 @@ Widget _app(
         ),
       if (havenWindowSuggestion != null)
         havenWindowSuggestionProvider.overrideWithValue(havenWindowSuggestion),
+      if (havenWindowCurrentTime != null)
+        havenWindowCurrentTimeProvider.overrideWithValue(
+          havenWindowCurrentTime,
+        ),
     ],
     child: MaterialApp(
       theme: ThemeData.dark().copyWith(
@@ -153,9 +158,11 @@ class _ReadyHavenWindowBackend implements HavenWindowPlatformBackend {
 
   final DateTime rangeStart;
   final DateTime rangeEnd;
+  int readCalls = 0;
 
   @override
   Future<Map<String, Object?>> readAvailability() async {
+    readCalls += 1;
     return {
       'schemaVersion': 1,
       'status': 'ready',
@@ -328,6 +335,72 @@ void main() {
     expect(holdService.holdState.isHeld, isFalse);
     expect(reminders.cancellations, 1);
     expect(timer.secondsRemaining, secondsBefore);
+    expect(timer.isRunning, isFalse);
+    expect(timer.recentFocusEvents, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('an aged opening cannot reach reminder permission at hold tap', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    var now = DateTime(2026, 8, 18, 8);
+    const forecast = FocusForecast(
+      kind: FocusForecastKind.emergingWindow,
+      headline: 'Morning may be one possible window',
+      detail: 'A repeated completed-session pattern appears here.',
+      evidence: 'Six private completed-session signals support this window.',
+      signalCount: 6,
+      window: FocusForecastWindow.morning,
+    );
+    final backend = _ReadyHavenWindowBackend(
+      rangeStart: now,
+      rangeEnd: now.add(const Duration(hours: 6)),
+    );
+    final controller = HavenWindowPlatformController(backend: backend);
+    expect(await controller.start(), isTrue);
+    final reminders = _RecordingHavenWindowReminders();
+    final holdService = HavenWindowHoldService(
+      notificationService: reminders,
+      now: () => now,
+    );
+    await holdService.initialized;
+
+    await tester.pumpWidget(
+      _app(
+        timer,
+        forecast: forecast,
+        havenWindowController: controller,
+        havenWindowHoldService: holdService,
+        havenWindowCurrentTime: () => now,
+      ),
+    );
+    await tester.pump();
+    final card = find.byKey(const ValueKey('haven-window-card'));
+    await tester.ensureVisible(card);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('toggle-haven-window')));
+    await tester.pump();
+
+    final holdAction = find.byKey(const ValueKey('haven-window-hold'));
+    expect(holdAction, findsOneWidget);
+    expect(backend.readCalls, 1);
+
+    now = now.add(const Duration(minutes: 16));
+    await tester.tap(holdAction);
+    await tester.pump();
+
+    expect(holdService.holdState.isHeld, isFalse);
+    expect(reminders.permissionRequests, 0);
+    expect(reminders.scheduledStarts, isEmpty);
+    expect(backend.readCalls, 1);
+    expect(
+      find.text(
+        'This window is no longer current enough to hold. Refresh only if you want to check again.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Refresh your private availability'), findsOneWidget);
     expect(timer.isRunning, isFalse);
     expect(timer.recentFocusEvents, isEmpty);
     expect(tester.takeException(), isNull);

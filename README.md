@@ -235,6 +235,13 @@ refresh instead of treating cached free time as current. The app never refreshes
 that snapshot on its own, so returning from the background still cannot prompt
 for access or silently reread the calendar.
 
+The explicit hold action now repeats that freshness check at the instant of
+the tap. If the dashboard has remained open while its redacted snapshot ages,
+FocusHaven removes the opening before it can request notification permission,
+schedule a reminder, or save local hold boundaries. The person may then choose
+whether to refresh; no calendar read happens as a side effect of the failed
+hold.
+
 ## Focus Coach server
 
 The optional remote Focus Coach runs through an authenticated Firebase callable
