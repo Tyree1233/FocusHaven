@@ -1472,6 +1472,76 @@ void main() {
     expect((saved.single as Map<String, dynamic>)['text'], 'Keep only this.');
   });
 
+  test('a rejected malformed-history cleanup remains visible', () async {
+    SharedPreferences.setMockInitialValues({
+      'coachingConversation': '{not valid json',
+    });
+
+    final coach = await createCoach(removePreference: (_, _) async => false);
+    addTearDown(coach.dispose);
+
+    expect(coach.messages, isEmpty);
+    expect(
+      coach.errorMessage,
+      'Your private coaching data could not be completely repaired. '
+      'Please clear it and retry.',
+    );
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('coachingConversation'), '{not valid json');
+  });
+
+  test('a rejected consent cleanup remains disabled and visible', () async {
+    SharedPreferences.setMockInitialValues({
+      'enhancedCoachingEnabled': 'not a consent value',
+    });
+
+    final coach = await createCoach(
+      enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+      removePreference: (_, _) async => false,
+    );
+    addTearDown(coach.dispose);
+
+    expect(coach.enhancedCoachingEnabled, isFalse);
+    expect(
+      coach.errorMessage,
+      'Your private coaching data could not be completely repaired. '
+      'Please clear it and retry.',
+    );
+    final preferences = await SharedPreferences.getInstance();
+    expect(
+      preferences.getString('enhancedCoachingEnabled'),
+      'not a consent value',
+    );
+  });
+
+  test('a rejected normalized-history repair stays visible', () async {
+    final validMessage = CoachingMessage(
+      id: 'valid-1',
+      role: CoachingMessageRole.user,
+      text: 'Keep this message.',
+      createdAt: DateTime.utc(2026, 8, 10),
+    ).toJson();
+    SharedPreferences.setMockInitialValues({
+      'coachingConversation': jsonEncode([validMessage, validMessage]),
+    });
+
+    final coach = await createCoach(saveConversation: (_, _) async => false);
+    addTearDown(coach.dispose);
+
+    expect(coach.messages, hasLength(1));
+    expect(coach.messages.single.id, 'valid-1');
+    expect(
+      coach.errorMessage,
+      'Your private coaching data could not be completely repaired. '
+      'Please clear it and retry.',
+    );
+    final preferences = await SharedPreferences.getInstance();
+    final unrepaired =
+        jsonDecode(preferences.getString('coachingConversation')!)
+            as List<dynamic>;
+    expect(unrepaired, hasLength(2));
+  });
+
   test('repairs damaged saved messages without losing valid history', () async {
     final validMessage = CoachingMessage(
       id: 'valid-1',

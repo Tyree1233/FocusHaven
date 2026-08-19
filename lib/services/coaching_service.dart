@@ -1175,18 +1175,30 @@ class CoachingService extends ChangeNotifier {
             _enhancedResponder != null && savedEnhancedPreference;
         if (_enhancedCoachingEnabled) notifyListeners();
       } else if (savedEnhancedPreference != null) {
-        await preferences.remove(_enhancedCoachingKey);
+        await _removeInvalidStoredValue(
+          preferences,
+          _enhancedCoachingKey,
+          'enhanced coaching preference',
+        );
       }
       final savedValue = preferences.get(_storageKey);
       if (savedValue == null) return;
       if (savedValue is! String) {
-        await preferences.remove(_storageKey);
+        await _removeInvalidStoredValue(
+          preferences,
+          _storageKey,
+          'conversation',
+        );
         return;
       }
 
       final decoded = jsonDecode(savedValue);
       if (decoded is! List) {
-        await preferences.remove(_storageKey);
+        await _removeInvalidStoredValue(
+          preferences,
+          _storageKey,
+          'conversation',
+        );
         return;
       }
       final loadedMessages = <CoachingMessage>[];
@@ -1219,9 +1231,16 @@ class CoachingService extends ChangeNotifier {
         _messages.map((message) => message.toJson()).toList(),
       );
       if (_messages.isEmpty) {
-        await preferences.remove(_storageKey);
+        await _removeInvalidStoredValue(
+          preferences,
+          _storageKey,
+          'conversation',
+        );
       } else if (normalizedStorage != savedValue) {
-        await preferences.setString(_storageKey, normalizedStorage);
+        final repaired = await _saveConversation(preferences, _messages);
+        if (!repaired) {
+          _reportStorageRepairFailure('conversation');
+        }
       }
       if (_isDisposed || _messages.isEmpty) return;
       _notifyConversationChanged();
@@ -1273,10 +1292,34 @@ class CoachingService extends ChangeNotifier {
     if (_isDisposed) return;
     try {
       final preferences = await SharedPreferences.getInstance();
-      await preferences.remove(_storageKey);
+      await _removeInvalidStoredValue(preferences, _storageKey, 'conversation');
     } catch (error) {
       debugPrint('Corrupted coach storage could not be removed: $error');
+      _reportStorageRepairFailure('conversation');
     }
+  }
+
+  Future<void> _removeInvalidStoredValue(
+    SharedPreferences preferences,
+    String key,
+    String description,
+  ) async {
+    try {
+      final removed = await _removePreference(preferences, key);
+      if (!removed) _reportStorageRepairFailure(description);
+    } catch (error) {
+      debugPrint('Invalid coach $description could not be removed: $error');
+      _reportStorageRepairFailure(description);
+    }
+  }
+
+  void _reportStorageRepairFailure(String description) {
+    if (_isDisposed) return;
+    _errorMessage =
+        'Your private coaching data could not be completely repaired. '
+        'Please clear it and retry.';
+    debugPrint('Private coach $description repair was not committed.');
+    notifyListeners();
   }
 
   void _notifyConversationChanged() {

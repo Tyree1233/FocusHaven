@@ -360,6 +360,12 @@ cannot be removed, FocusHaven keeps the uncleared state visible and reports that
 cleanup is incomplete; values that were verifiably removed disappear without
 waiting for the remaining cleanup to succeed.
 
+Private coaching restoration also verifies every repair. Malformed history or
+consent is only treated as removed after storage confirms deletion, and a
+normalized conversation is only treated as repaired after its replacement is
+verified. Failed repairs stay private, remain recoverable for another cleanup
+attempt, and surface an honest local error instead of being silently ignored.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 
