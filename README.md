@@ -394,6 +394,11 @@ FocusHaven does not invoke a responder afterward or persist a reply that
 arrived after disposal. The already verified user message remains private on
 the device for the next service instance to restore.
 
+The coaching composer preserves text that never reached verified local
+storage. A rejected initial conversation write restores the uncommitted draft
+for an explicit retry, while a user message that was saved before a responder
+failure remains only in the conversation and is not duplicated in the input.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

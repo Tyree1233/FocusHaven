@@ -32,11 +32,13 @@ Widget _app(CoachingService coach, {CoachingContext? coachingContext}) {
 Future<CoachingService> _createCoach({
   CoachingResponder? responder,
   CoachingResponder? enhancedResponder,
+  CoachingConversationSave? saveConversation,
   CoachingEnhancedPreferenceSave? saveEnhancedPreference,
 }) async {
   final coach = CoachingService(
     responder: responder,
     enhancedResponder: enhancedResponder,
+    saveConversation: saveConversation,
     saveEnhancedPreference: saveEnhancedPreference,
   );
   await coach.initialized;
@@ -777,7 +779,43 @@ void main() {
       findsOneWidget,
     );
     expect(coach.messages, hasLength(1));
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('coach-message-input')))
+          .controller!
+          .text,
+      isEmpty,
+    );
     expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('restores a draft that private storage never committed', (
+    tester,
+  ) async {
+    final coach = await _createCoach(saveConversation: (_, _) async => false);
+
+    await tester.pumpWidget(_app(coach));
+    await tester.pumpAndSettle();
+    const draft = 'Please keep this draft available.';
+    final input = find.byKey(const ValueKey('coach-message-input'));
+    await tester.enterText(input, draft);
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(coach.messages, isEmpty);
+    expect(tester.widget<TextField>(input).controller!.text, draft);
+    expect(
+      find.text('Your coach could not respond right now. Please retry.'),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const ValueKey('coach-send-message')))
+          .onPressed,
+      isNotNull,
+    );
     expect(tester.takeException(), isNull);
   });
 

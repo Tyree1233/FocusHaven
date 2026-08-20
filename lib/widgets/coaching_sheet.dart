@@ -133,6 +133,17 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     });
   }
 
+  static bool _hasSameMessageIds(
+    List<String> previousIds,
+    List<CoachingMessage> currentMessages,
+  ) {
+    if (previousIds.length != currentMessages.length) return false;
+    for (var index = 0; index < previousIds.length; index++) {
+      if (previousIds[index] != currentMessages[index].id) return false;
+    }
+    return true;
+  }
+
   Future<void> _send([String? suggestedMessage]) async {
     if (_isSubmitting || _isManagingHistory) return;
     final message = (suggestedMessage ?? _controller.text).trim();
@@ -140,10 +151,13 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
 
     setState(() => _isSubmitting = true);
     if (suggestedMessage == null) _controller.clear();
+    final coach = ref.read(coachingServiceProvider);
+    final previousMessageIds = coach.messages
+        .map((entry) => entry.id)
+        .toList(growable: false);
+    var sendCompleted = false;
     try {
-      await ref
-          .read(coachingServiceProvider)
-          .send(message, widget.contextBuilder());
+      sendCompleted = await coach.send(message, widget.contextBuilder());
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -155,6 +169,16 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
           );
       }
     } finally {
+      if (!sendCompleted &&
+          mounted &&
+          _controller.text.trim().isEmpty &&
+          _hasSameMessageIds(previousMessageIds, coach.messages)) {
+        _controller.value = TextEditingValue(
+          text: message,
+          selection: TextSelection.collapsed(offset: message.length),
+        );
+        _inputFocusNode.requestFocus();
+      }
       if (mounted) setState(() => _isSubmitting = false);
     }
   }
