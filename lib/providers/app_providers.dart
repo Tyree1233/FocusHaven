@@ -103,6 +103,7 @@ typedef JournalState = ({
 typedef CoachingState = ({
   List<CoachingMessage> messages,
   bool isResponding,
+  bool isManagingPrivateData,
   bool enhancedCoachingAvailable,
   bool enhancedCoachingEnabled,
   String? errorMessage,
@@ -670,6 +671,7 @@ final coachingStateProvider = Provider<CoachingState>((ref) {
   return (
     messages: List<CoachingMessage>.unmodifiable(coach.messages),
     isResponding: coach.isResponding,
+    isManagingPrivateData: coach.isManagingPrivateData,
     enhancedCoachingAvailable: coach.enhancedCoachingAvailable,
     enhancedCoachingEnabled: coach.enhancedCoachingEnabled,
     errorMessage: coach.errorMessage,

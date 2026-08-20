@@ -213,7 +213,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     }
 
     final isBusy =
-        coachingState.isResponding || _isSubmitting || _isManagingHistory;
+        coachingState.isResponding ||
+        coachingState.isManagingPrivateData ||
+        _isSubmitting ||
+        _isManagingHistory;
     final canSend = !isBusy && _controller.text.trim().isNotEmpty;
     final quickReplies = !isBusy && coachingState.errorMessage == null
         ? _quickRepliesFor(coachingState.messages)

@@ -1269,6 +1269,7 @@ void main() {
     final optIn = coach.setEnhancedCoachingEnabled(true);
     await saveStarted.future;
 
+    expect(coach.isManagingPrivateData, isTrue);
     expect(
       await coach.send('Do not race this.', const CoachingContext()),
       isFalse,
@@ -1279,6 +1280,7 @@ void main() {
 
     allowSave.complete();
     expect(await optIn, isTrue);
+    expect(coach.isManagingPrivateData, isFalse);
     expect(coach.enhancedCoachingEnabled, isTrue);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getBool('enhancedCoachingEnabled'), isTrue);
@@ -1575,6 +1577,7 @@ void main() {
     final clearing = coach.clearLocalData();
     await removalStarted.future;
 
+    expect(coach.isManagingPrivateData, isTrue);
     expect(
       await coach.send('Do not save this.', const CoachingContext()),
       isFalse,
@@ -1586,6 +1589,7 @@ void main() {
 
     allowRemoval.complete();
     await clearing;
+    expect(coach.isManagingPrivateData, isFalse);
     expect(removalCalls, 2);
     expect(coach.messages, isEmpty);
     expect(coach.enhancedCoachingEnabled, isFalse);

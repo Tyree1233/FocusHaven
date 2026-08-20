@@ -1013,6 +1013,7 @@ class CoachingService extends ChangeNotifier {
   List<CoachingMessage> get messages => List.unmodifiable(_messages);
   int get conversationRevision => _conversationRevision;
   bool get isResponding => _isResponding;
+  bool get isManagingPrivateData => _isManagingPrivateData;
   bool get enhancedCoachingAvailable => _enhancedResponder != null;
   bool get enhancedCoachingEnabled => _enhancedCoachingEnabled;
   String? get errorMessage => _errorMessage;
@@ -1099,7 +1100,7 @@ class CoachingService extends ChangeNotifier {
     }
     if (_enhancedCoachingEnabled == enabled) return false;
 
-    _isManagingPrivateData = true;
+    _setManagingPrivateData(true);
     try {
       late final bool saved;
       try {
@@ -1123,7 +1124,7 @@ class CoachingService extends ChangeNotifier {
       notifyListeners();
       return true;
     } finally {
-      _isManagingPrivateData = false;
+      _setManagingPrivateData(false);
     }
   }
 
@@ -1139,13 +1140,13 @@ class CoachingService extends ChangeNotifier {
     await initialized;
     if (_isDisposed || _isResponding || _isManagingPrivateData) return;
 
-    _isManagingPrivateData = true;
+    _setManagingPrivateData(true);
     try {
       await _performClearLocalData(
         includeEnhancedPreference: includeEnhancedPreference,
       );
     } finally {
-      _isManagingPrivateData = false;
+      _setManagingPrivateData(false);
     }
   }
 
@@ -1368,6 +1369,12 @@ class CoachingService extends ChangeNotifier {
         'Your enhanced coaching preference could not be saved. Please retry.';
     _noticeMessage = null;
     notifyListeners();
+  }
+
+  void _setManagingPrivateData(bool value) {
+    if (_isManagingPrivateData == value) return;
+    _isManagingPrivateData = value;
+    if (!_isDisposed) notifyListeners();
   }
 
   void _notifyConversationChanged() {

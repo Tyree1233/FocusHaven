@@ -32,10 +32,12 @@ Widget _app(CoachingService coach, {CoachingContext? coachingContext}) {
 Future<CoachingService> _createCoach({
   CoachingResponder? responder,
   CoachingResponder? enhancedResponder,
+  CoachingEnhancedPreferenceSave? saveEnhancedPreference,
 }) async {
   final coach = CoachingService(
     responder: responder,
     enhancedResponder: enhancedResponder,
+    saveEnhancedPreference: saveEnhancedPreference,
   );
   await coach.initialized;
   return coach;
@@ -577,6 +579,90 @@ void main() {
 
     expect(find.text('Use enhanced AI coaching?'), findsNothing);
     expect(coach.enhancedCoachingEnabled, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('disables controls during an external private storage action', (
+    tester,
+  ) async {
+    final saveStarted = Completer<void>();
+    final allowSave = Completer<void>();
+    final coach = await _createCoach(
+      enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+      saveEnhancedPreference: (preferences, enabled) async {
+        saveStarted.complete();
+        await allowSave.future;
+        return preferences.setBool('enhancedCoachingEnabled', enabled);
+      },
+    );
+
+    await tester.pumpWidget(_app(coach));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'Keep this draft private.',
+    );
+    await tester.pump();
+
+    final enabling = coach.setEnhancedCoachingEnabled(true);
+    await saveStarted.future;
+    await tester.pump();
+
+    expect(coach.isManagingPrivateData, isTrue);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('coach-message-input')))
+          .enabled,
+      isFalse,
+    );
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const ValueKey('coach-send-message')))
+          .onPressed,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const ValueKey('coach-enhanced-ai-toggle')),
+          )
+          .onChanged,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<ActionChip>(
+            find.byKey(const ValueKey('coach-prompt-I’m stuck—help me start')),
+          )
+          .onPressed,
+      isNull,
+    );
+
+    allowSave.complete();
+    expect(await enabling, isTrue);
+    await tester.pumpAndSettle();
+
+    expect(coach.isManagingPrivateData, isFalse);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('coach-message-input')))
+          .enabled,
+      isTrue,
+    );
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const ValueKey('coach-send-message')))
+          .onPressed,
+      isNotNull,
+    );
+    expect(
+      tester
+          .widget<SwitchListTile>(
+            find.byKey(const ValueKey('coach-enhanced-ai-toggle')),
+          )
+          .value,
+      isTrue,
+    );
     expect(tester.takeException(), isNull);
   });
 

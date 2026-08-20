@@ -379,6 +379,9 @@ rejected preference write.
 Private coaching storage actions are serialized. A conversation send, consent
 change, or local-data deletion already in progress prevents another action from
 mutating the same private values until the first operation has finished.
+That private-action state is surfaced to the coaching sheet so its message,
+consent, and deletion controls remain disabled until the verified operation
+finishes, even when it began outside the sheet.
 
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
