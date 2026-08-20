@@ -1095,14 +1095,19 @@ class CoachingService extends ChangeNotifier {
     }
     if (_enhancedCoachingEnabled == enabled) return false;
 
-    final preferences = await SharedPreferences.getInstance();
-    final saved = await _saveEnhancedPreference(preferences, enabled);
+    late final bool saved;
+    try {
+      final preferences = await SharedPreferences.getInstance();
+      saved = await _saveEnhancedPreference(preferences, enabled);
+    } catch (error) {
+      if (_isDisposed) return false;
+      _reportEnhancedPreferenceSaveFailure();
+      debugPrint('Enhanced coaching preference could not be saved: $error');
+      return false;
+    }
     if (_isDisposed) return false;
     if (!saved) {
-      _errorMessage =
-          'Your enhanced coaching preference could not be saved. Please retry.';
-      _noticeMessage = null;
-      notifyListeners();
+      _reportEnhancedPreferenceSaveFailure();
       return false;
     }
 
@@ -1332,6 +1337,14 @@ class CoachingService extends ChangeNotifier {
         'Your private coaching data could not be completely repaired. '
         'Please clear it and retry.';
     debugPrint('Private coach $description repair was not committed.');
+    notifyListeners();
+  }
+
+  void _reportEnhancedPreferenceSaveFailure() {
+    if (_isDisposed) return;
+    _errorMessage =
+        'Your enhanced coaching preference could not be saved. Please retry.';
+    _noticeMessage = null;
     notifyListeners();
   }
 

@@ -371,6 +371,11 @@ operation throws, FocusHaven still attempts the remaining requested cleanup,
 keeps any uncleared history or consent visible, and reports a retryable local
 error rather than leaking the storage exception through the interface.
 
+Enhanced-coaching consent changes also fail closed when local storage is
+unavailable. An interrupted opt-in or opt-out keeps the last verified choice,
+contains the storage failure, and presents the same safe retry path as a
+rejected preference write.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

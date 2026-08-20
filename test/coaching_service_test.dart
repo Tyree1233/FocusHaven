@@ -1164,6 +1164,37 @@ void main() {
     expect(enhancedResponder.calls, 0);
   });
 
+  test('a thrown opt-in stays disabled and exposes a safe retry', () async {
+    final localResponder = _RecordingResponder('Local guidance.');
+    final enhancedResponder = _RecordingResponder('Enhanced guidance.');
+    final coach = await createCoach(
+      responder: localResponder,
+      enhancedResponder: enhancedResponder,
+      saveEnhancedPreference: (_, _) async {
+        throw StateError('consent storage unavailable');
+      },
+    );
+    addTearDown(coach.dispose);
+
+    await expectLater(
+      coach.setEnhancedCoachingEnabled(true),
+      completion(false),
+    );
+
+    expect(coach.enhancedCoachingEnabled, isFalse);
+    expect(
+      coach.errorMessage,
+      'Your enhanced coaching preference could not be saved. Please retry.',
+    );
+    expect(coach.noticeMessage, isNull);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('enhancedCoachingEnabled'), isFalse);
+
+    expect(await coach.send('Help me begin.', const CoachingContext()), isTrue);
+    expect(localResponder.calls, 1);
+    expect(enhancedResponder.calls, 0);
+  });
+
   test('a rejected opt-out keeps the prior consent state visible', () async {
     var saveCalls = 0;
     final coach = await createCoach(
@@ -1185,6 +1216,37 @@ void main() {
       coach.errorMessage,
       'Your enhanced coaching preference could not be saved. Please retry.',
     );
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool('enhancedCoachingEnabled'), isTrue);
+  });
+
+  test('a thrown opt-out keeps the last verified consent visible', () async {
+    var saveCalls = 0;
+    final coach = await createCoach(
+      enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+      saveEnhancedPreference: (preferences, enabled) async {
+        saveCalls += 1;
+        if (saveCalls > 1) {
+          throw StateError('consent storage unavailable');
+        }
+        return preferences.setBool('enhancedCoachingEnabled', enabled);
+      },
+    );
+    addTearDown(coach.dispose);
+
+    expect(await coach.setEnhancedCoachingEnabled(true), isTrue);
+    await expectLater(
+      coach.setEnhancedCoachingEnabled(false),
+      completion(false),
+    );
+
+    expect(saveCalls, 2);
+    expect(coach.enhancedCoachingEnabled, isTrue);
+    expect(
+      coach.errorMessage,
+      'Your enhanced coaching preference could not be saved. Please retry.',
+    );
+    expect(coach.noticeMessage, isNull);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getBool('enhancedCoachingEnabled'), isTrue);
   });
