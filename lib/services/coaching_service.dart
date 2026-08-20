@@ -1002,6 +1002,7 @@ class CoachingService extends ChangeNotifier {
   List<CoachingMessage> _messages = [];
   int _conversationRevision = 0;
   bool _isResponding = false;
+  bool _isManagingPrivateData = false;
   bool _enhancedCoachingEnabled = false;
   bool _isDisposed = false;
   String? _errorMessage;
@@ -1021,7 +1022,7 @@ class CoachingService extends ChangeNotifier {
     final cleanedMessage = _cleanText(message);
     if (cleanedMessage == null) return false;
     await initialized;
-    if (_isDisposed || _isResponding) return false;
+    if (_isDisposed || _isResponding || _isManagingPrivateData) return false;
 
     final previousMessages = _messages;
     var userMessageCommitted = false;
@@ -1090,32 +1091,40 @@ class CoachingService extends ChangeNotifier {
 
   Future<bool> setEnhancedCoachingEnabled(bool enabled) async {
     await initialized;
-    if (_isDisposed || _isResponding || _enhancedResponder == null) {
+    if (_isDisposed ||
+        _isResponding ||
+        _isManagingPrivateData ||
+        _enhancedResponder == null) {
       return false;
     }
     if (_enhancedCoachingEnabled == enabled) return false;
 
-    late final bool saved;
+    _isManagingPrivateData = true;
     try {
-      final preferences = await SharedPreferences.getInstance();
-      saved = await _saveEnhancedPreference(preferences, enabled);
-    } catch (error) {
+      late final bool saved;
+      try {
+        final preferences = await SharedPreferences.getInstance();
+        saved = await _saveEnhancedPreference(preferences, enabled);
+      } catch (error) {
+        if (_isDisposed) return false;
+        _reportEnhancedPreferenceSaveFailure();
+        debugPrint('Enhanced coaching preference could not be saved: $error');
+        return false;
+      }
       if (_isDisposed) return false;
-      _reportEnhancedPreferenceSaveFailure();
-      debugPrint('Enhanced coaching preference could not be saved: $error');
-      return false;
-    }
-    if (_isDisposed) return false;
-    if (!saved) {
-      _reportEnhancedPreferenceSaveFailure();
-      return false;
-    }
+      if (!saved) {
+        _reportEnhancedPreferenceSaveFailure();
+        return false;
+      }
 
-    _enhancedCoachingEnabled = enabled;
-    _errorMessage = null;
-    _noticeMessage = null;
-    notifyListeners();
-    return true;
+      _enhancedCoachingEnabled = enabled;
+      _errorMessage = null;
+      _noticeMessage = null;
+      notifyListeners();
+      return true;
+    } finally {
+      _isManagingPrivateData = false;
+    }
   }
 
   Future<void> clearConversation() =>
@@ -1128,8 +1137,21 @@ class CoachingService extends ChangeNotifier {
     required bool includeEnhancedPreference,
   }) async {
     await initialized;
-    if (_isDisposed || _isResponding) return;
+    if (_isDisposed || _isResponding || _isManagingPrivateData) return;
 
+    _isManagingPrivateData = true;
+    try {
+      await _performClearLocalData(
+        includeEnhancedPreference: includeEnhancedPreference,
+      );
+    } finally {
+      _isManagingPrivateData = false;
+    }
+  }
+
+  Future<void> _performClearLocalData({
+    required bool includeEnhancedPreference,
+  }) async {
     final preferences = await SharedPreferences.getInstance();
     final conversationCleared = await _removePrivateValue(
       preferences,

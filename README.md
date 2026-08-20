@@ -376,6 +376,10 @@ unavailable. An interrupted opt-in or opt-out keeps the last verified choice,
 contains the storage failure, and presents the same safe retry path as a
 rejected preference write.
 
+Private coaching storage actions are serialized. A conversation send, consent
+change, or local-data deletion already in progress prevents another action from
+mutating the same private values until the first operation has finished.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

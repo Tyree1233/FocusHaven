@@ -1251,6 +1251,39 @@ void main() {
     expect(preferences.getBool('enhancedCoachingEnabled'), isTrue);
   });
 
+  test('an in-flight consent write blocks other private actions', () async {
+    final saveStarted = Completer<void>();
+    final allowSave = Completer<void>();
+    final localResponder = _RecordingResponder('Local guidance.');
+    final coach = await createCoach(
+      responder: localResponder,
+      enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+      saveEnhancedPreference: (preferences, enabled) async {
+        saveStarted.complete();
+        await allowSave.future;
+        return preferences.setBool('enhancedCoachingEnabled', enabled);
+      },
+    );
+    addTearDown(coach.dispose);
+
+    final optIn = coach.setEnhancedCoachingEnabled(true);
+    await saveStarted.future;
+
+    expect(
+      await coach.send('Do not race this.', const CoachingContext()),
+      isFalse,
+    );
+    await expectLater(coach.clearLocalData(), completes);
+    expect(await coach.setEnhancedCoachingEnabled(true), isFalse);
+    expect(localResponder.calls, 0);
+
+    allowSave.complete();
+    expect(await optIn, isTrue);
+    expect(coach.enhancedCoachingEnabled, isTrue);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool('enhancedCoachingEnabled'), isTrue);
+  });
+
   test('keeps immediate safety concerns on the local responder', () async {
     final enhancedResponder = _RecordingResponder(
       'This remote response must not be used.',
@@ -1506,6 +1539,58 @@ void main() {
     );
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey('coachingConversation'), isTrue);
+    expect(preferences.containsKey('enhancedCoachingEnabled'), isFalse);
+  });
+
+  test('an in-flight deletion blocks other private actions', () async {
+    final firstCoach = await createCoach(
+      enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+    );
+    await firstCoach.setEnhancedCoachingEnabled(true);
+    expect(
+      await firstCoach.send('Delete this once.', const CoachingContext()),
+      isTrue,
+    );
+    firstCoach.dispose();
+
+    final removalStarted = Completer<void>();
+    final allowRemoval = Completer<void>();
+    var removalCalls = 0;
+    final localResponder = _RecordingResponder('Local guidance.');
+    final coach = await createCoach(
+      responder: localResponder,
+      enhancedResponder: _RecordingResponder('Enhanced guidance.'),
+      removePreference: (preferences, key) async {
+        removalCalls += 1;
+        if (removalCalls == 1) {
+          removalStarted.complete();
+          await allowRemoval.future;
+        }
+        await preferences.remove(key);
+        return !preferences.containsKey(key);
+      },
+    );
+    addTearDown(coach.dispose);
+
+    final clearing = coach.clearLocalData();
+    await removalStarted.future;
+
+    expect(
+      await coach.send('Do not save this.', const CoachingContext()),
+      isFalse,
+    );
+    expect(await coach.setEnhancedCoachingEnabled(false), isFalse);
+    await expectLater(coach.clearLocalData(), completes);
+    expect(removalCalls, 1);
+    expect(localResponder.calls, 0);
+
+    allowRemoval.complete();
+    await clearing;
+    expect(removalCalls, 2);
+    expect(coach.messages, isEmpty);
+    expect(coach.enhancedCoachingEnabled, isFalse);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('coachingConversation'), isFalse);
     expect(preferences.containsKey('enhancedCoachingEnabled'), isFalse);
   });
 
