@@ -791,6 +791,18 @@ void main() {
     final retry = find.byKey(const ValueKey('coach-retry-response'));
     expect(retry, findsOneWidget);
 
+    const nextDraft = 'Please help with the next step too.';
+    final input = find.byKey(const ValueKey('coach-message-input'));
+    await tester.enterText(input, nextDraft);
+    await tester.pump();
+    expect(tester.widget<TextField>(input).enabled, isTrue);
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const ValueKey('coach-send-message')))
+          .onPressed,
+      isNull,
+    );
+
     await tester.tap(retry);
     await tester.pumpAndSettle();
 
@@ -803,6 +815,13 @@ void main() {
     expect(
       find.text('Your coach could not respond right now. Please retry.'),
       findsNothing,
+    );
+    expect(tester.widget<TextField>(input).controller!.text, nextDraft);
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const ValueKey('coach-send-message')))
+          .onPressed,
+      isNotNull,
     );
     expect(tester.takeException(), isNull);
   });

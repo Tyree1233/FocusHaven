@@ -1029,7 +1029,12 @@ class CoachingService extends ChangeNotifier {
     final cleanedMessage = _cleanText(message);
     if (cleanedMessage == null) return false;
     await initialized;
-    if (_isDisposed || _isResponding || _isManagingPrivateData) return false;
+    if (_isDisposed ||
+        _isResponding ||
+        _isManagingPrivateData ||
+        canRetryResponse) {
+      return false;
+    }
 
     final previousMessages = _messages;
     var userMessageCommitted = false;

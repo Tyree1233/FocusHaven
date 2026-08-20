@@ -263,8 +263,15 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         coachingState.isManagingPrivateData ||
         _isSubmitting ||
         _isManagingHistory;
-    final canSend = !isBusy && _controller.text.trim().isNotEmpty;
-    final quickReplies = !isBusy && coachingState.errorMessage == null
+    final isAwaitingResponseRetry = coachingState.canRetryResponse;
+    final canSend =
+        !isBusy &&
+        !isAwaitingResponseRetry &&
+        _controller.text.trim().isNotEmpty;
+    final quickReplies =
+        !isBusy &&
+            !isAwaitingResponseRetry &&
+            coachingState.errorMessage == null
         ? _quickRepliesFor(coachingState.messages)
         : const <String>[];
     final primaryColor = Theme.of(context).colorScheme.primary;

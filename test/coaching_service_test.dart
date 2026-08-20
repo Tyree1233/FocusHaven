@@ -1470,6 +1470,17 @@ void main() {
     expect(restoredCoach.messages, hasLength(1));
     expect(restoredCoach.canRetryResponse, isTrue);
     expect(
+      await restoredCoach.send(
+        'Do not replace the pending message.',
+        const CoachingContext(),
+      ),
+      isFalse,
+    );
+    expect(retryCalls, 0);
+    expect(restoredCoach.messages.map((entry) => entry.text), [
+      'Help me recover this response.',
+    ]);
+    expect(
       await restoredCoach.retryLastResponse(const CoachingContext()),
       isTrue,
     );

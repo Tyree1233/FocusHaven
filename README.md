@@ -405,6 +405,12 @@ FocusHaven context, follows the same local and enhanced-coaching safety gates,
 and commits only the missing reply instead of duplicating the user's text. An
 unanswered message restored after restart remains retryable.
 
+An unanswered saved message must be resolved before another message can be
+submitted. FocusHaven keeps any newly typed draft in the composer, disables its
+send action and contextual quick replies, and leaves the explicit response
+retry available. This prevents a newer prompt from hiding or duplicating the
+pending private coaching turn.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 
