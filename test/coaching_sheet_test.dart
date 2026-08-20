@@ -761,7 +761,8 @@ void main() {
   testWidgets('shows contained coach failures without losing the message', (
     tester,
   ) async {
-    final coach = await _createCoach(responder: const _FailingResponder());
+    final responder = _RetryResponder('Use one small planning step.');
+    final coach = await _createCoach(responder: responder);
 
     await tester.pumpWidget(_app(coach));
     await tester.pumpAndSettle();
@@ -787,6 +788,22 @@ void main() {
       isEmpty,
     );
     expect(find.byKey(const ValueKey('coach-quick-replies')), findsNothing);
+    final retry = find.byKey(const ValueKey('coach-retry-response'));
+    expect(retry, findsOneWidget);
+
+    await tester.tap(retry);
+    await tester.pumpAndSettle();
+
+    expect(responder.calls, 2);
+    expect(coach.messages.map((entry) => entry.text), [
+      'Please help me plan.',
+      'Use one small planning step.',
+    ]);
+    expect(retry, findsNothing);
+    expect(
+      find.text('Your coach could not respond right now. Please retry.'),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -889,15 +906,22 @@ class _PendingResponder implements CoachingResponder {
   }
 }
 
-class _FailingResponder implements CoachingResponder {
-  const _FailingResponder();
+class _RetryResponder implements CoachingResponder {
+  _RetryResponder(this.response);
+
+  final String response;
+  int calls = 0;
 
   @override
   Future<String> respond({
     required String message,
     required CoachingContext context,
     required List<CoachingMessage> conversation,
-  }) => Future.error(StateError('coach unavailable'));
+  }) async {
+    calls += 1;
+    if (calls == 1) throw StateError('coach unavailable');
+    return response;
+  }
 }
 
 class _FallbackResponder implements CoachingResponder {

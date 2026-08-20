@@ -183,6 +183,28 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     }
   }
 
+  Future<void> _retryResponse() async {
+    if (_isSubmitting || _isManagingHistory) return;
+    setState(() => _isSubmitting = true);
+    try {
+      await ref
+          .read(coachingServiceProvider)
+          .retryLastResponse(widget.contextBuilder());
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Your coach could not respond. Please try again.'),
+            ),
+          );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
   Future<void> _clearConversation() async {
     if (_isManagingHistory || _isSubmitting) return;
     setState(() => _isManagingHistory = true);
@@ -388,6 +410,19 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                           Expanded(child: Text(coachingState.noticeMessage!)),
                         ],
                       ),
+                    ),
+                  ),
+                ),
+              if (coachingState.canRetryResponse)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton.icon(
+                      key: const ValueKey<String>('coach-retry-response'),
+                      onPressed: isBusy ? null : _retryResponse,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry coach response'),
                     ),
                   ),
                 ),

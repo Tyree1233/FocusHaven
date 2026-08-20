@@ -399,6 +399,12 @@ storage. A rejected initial conversation write restores the uncommitted draft
 for an explicit retry, while a user message that was saved before a responder
 failure remains only in the conversation and is not duplicated in the input.
 
+When a verified user message has no coach reply, the conversation exposes one
+explicit response retry. The retry reuses the saved message and current
+FocusHaven context, follows the same local and enhanced-coaching safety gates,
+and commits only the missing reply instead of duplicating the user's text. An
+unanswered message restored after restart remains retryable.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

@@ -1440,6 +1440,58 @@ void main() {
     expect(preferences.containsKey('coachingConversation'), isFalse);
   });
 
+  test('restores and retries one unanswered saved message', () async {
+    final firstCoach = await createCoach(
+      responder: _CallbackResponder(
+        (_) => Future.error(StateError('coach unavailable')),
+      ),
+    );
+    expect(
+      await firstCoach.send(
+        'Help me recover this response.',
+        const CoachingContext(),
+      ),
+      isFalse,
+    );
+    expect(firstCoach.messages, hasLength(1));
+    expect(firstCoach.canRetryResponse, isTrue);
+    firstCoach.dispose();
+
+    var retryCalls = 0;
+    final restoredCoach = await createCoach(
+      responder: _CallbackResponder((message) async {
+        retryCalls += 1;
+        expect(message, 'Help me recover this response.');
+        return 'Use one calm next step.';
+      }),
+    );
+    addTearDown(restoredCoach.dispose);
+
+    expect(restoredCoach.messages, hasLength(1));
+    expect(restoredCoach.canRetryResponse, isTrue);
+    expect(
+      await restoredCoach.retryLastResponse(const CoachingContext()),
+      isTrue,
+    );
+
+    expect(retryCalls, 1);
+    expect(restoredCoach.messages.map((entry) => entry.text), [
+      'Help me recover this response.',
+      'Use one calm next step.',
+    ]);
+    expect(restoredCoach.canRetryResponse, isFalse);
+    expect(
+      await restoredCoach.retryLastResponse(const CoachingContext()),
+      isFalse,
+    );
+    expect(retryCalls, 1);
+    final preferences = await SharedPreferences.getInstance();
+    final savedConversation =
+        jsonDecode(preferences.getString('coachingConversation')!)
+            as List<dynamic>;
+    expect(savedConversation, hasLength(2));
+  });
+
   test('a rejected history deletion keeps private messages visible', () async {
     final firstCoach = await createCoach(
       responder: _RecordingResponder('Stored guidance.'),

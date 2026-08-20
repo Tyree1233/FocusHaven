@@ -1014,6 +1014,12 @@ class CoachingService extends ChangeNotifier {
   int get conversationRevision => _conversationRevision;
   bool get isResponding => _isResponding;
   bool get isManagingPrivateData => _isManagingPrivateData;
+  bool get canRetryResponse =>
+      !_isDisposed &&
+      !_isResponding &&
+      !_isManagingPrivateData &&
+      _messages.isNotEmpty &&
+      _messages.last.role == CoachingMessageRole.user;
   bool get enhancedCoachingAvailable => _enhancedResponder != null;
   bool get enhancedCoachingEnabled => _enhancedCoachingEnabled;
   String? get errorMessage => _errorMessage;
@@ -1043,44 +1049,7 @@ class CoachingService extends ChangeNotifier {
       await _save(_messages);
       if (_isDisposed) return false;
       userMessageCommitted = true;
-      final requiresLocalResponse =
-          LocalCoachingResponder.isSafetyConcern(cleanedMessage) ||
-          LocalCoachingResponder.isBoundaryRequest(cleanedMessage) ||
-          LocalCoachingResponder.isRepairRequest(cleanedMessage) ||
-          LocalCoachingResponder.isReflectiveConversation(_messages);
-      final responder = requiresLocalResponse
-          ? _localResponder
-          : _enhancedCoachingEnabled && _enhancedResponder != null
-          ? _enhancedResponder
-          : _localResponder;
-      final response = await responder.respond(
-        message: cleanedMessage,
-        context: context,
-        conversation: List.unmodifiable(_messages),
-      );
-      if (_isDisposed) return false;
-      final cleanedResponse = _cleanText(response);
-      if (cleanedResponse == null) {
-        throw StateError('The coach returned an empty response.');
-      }
-      final coachMessage = CoachingMessage(
-        id: _nextMessageId(),
-        role: CoachingMessageRole.coach,
-        text: cleanedResponse,
-        createdAt: DateTime.now(),
-      );
-      final updatedMessages = _bounded([..._messages, coachMessage]);
-      await _save(updatedMessages);
-      if (_isDisposed) return false;
-
-      _messages = updatedMessages;
-      final fallbackReason = responder is CoachingFallbackNoticeSource
-          ? (responder as CoachingFallbackNoticeSource).takeFallbackReason()
-          : null;
-      _noticeMessage = fallbackReason?.userMessage;
-      _isResponding = false;
-      _notifyConversationChanged();
-      return true;
+      return await _completeResponse(cleanedMessage, context);
     } catch (error) {
       if (_isDisposed) return false;
       if (!userMessageCommitted) _messages = previousMessages;
@@ -1090,6 +1059,71 @@ class CoachingService extends ChangeNotifier {
       _notifyConversationChanged();
       return false;
     }
+  }
+
+  Future<bool> retryLastResponse(CoachingContext context) async {
+    await initialized;
+    if (!canRetryResponse) return false;
+
+    final message = _messages.last.text;
+    _isResponding = true;
+    _errorMessage = null;
+    _noticeMessage = null;
+    _notifyConversationChanged();
+    try {
+      return await _completeResponse(message, context);
+    } catch (error) {
+      if (_isDisposed) return false;
+      _isResponding = false;
+      _errorMessage = 'Your coach could not respond right now. Please retry.';
+      debugPrint('Focus coach response retry failed: $error');
+      _notifyConversationChanged();
+      return false;
+    }
+  }
+
+  Future<bool> _completeResponse(
+    String message,
+    CoachingContext context,
+  ) async {
+    final requiresLocalResponse =
+        LocalCoachingResponder.isSafetyConcern(message) ||
+        LocalCoachingResponder.isBoundaryRequest(message) ||
+        LocalCoachingResponder.isRepairRequest(message) ||
+        LocalCoachingResponder.isReflectiveConversation(_messages);
+    final responder = requiresLocalResponse
+        ? _localResponder
+        : _enhancedCoachingEnabled && _enhancedResponder != null
+        ? _enhancedResponder
+        : _localResponder;
+    final response = await responder.respond(
+      message: message,
+      context: context,
+      conversation: List.unmodifiable(_messages),
+    );
+    if (_isDisposed) return false;
+    final cleanedResponse = _cleanText(response);
+    if (cleanedResponse == null) {
+      throw StateError('The coach returned an empty response.');
+    }
+    final coachMessage = CoachingMessage(
+      id: _nextMessageId(),
+      role: CoachingMessageRole.coach,
+      text: cleanedResponse,
+      createdAt: DateTime.now(),
+    );
+    final updatedMessages = _bounded([..._messages, coachMessage]);
+    await _save(updatedMessages);
+    if (_isDisposed) return false;
+
+    _messages = updatedMessages;
+    final fallbackReason = responder is CoachingFallbackNoticeSource
+        ? (responder as CoachingFallbackNoticeSource).takeFallbackReason()
+        : null;
+    _noticeMessage = fallbackReason?.userMessage;
+    _isResponding = false;
+    _notifyConversationChanged();
+    return true;
   }
 
   Future<bool> setEnhancedCoachingEnabled(bool enabled) async {
