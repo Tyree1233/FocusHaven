@@ -388,6 +388,12 @@ before removing the remaining local stores or leaving the account screen. If
 coaching history or consent is busy or cannot be removed, the action stays on
 screen and reports an incomplete deletion so the user can retry.
 
+In-flight coaching also stops at lifecycle boundaries. If its service is
+disposed while the user's verified local save or a coach response is pending,
+FocusHaven does not invoke a responder afterward or persist a reply that
+arrived after disposal. The already verified user message remains private on
+the device for the next service instance to restore.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 

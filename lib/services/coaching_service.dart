@@ -1041,6 +1041,7 @@ class CoachingService extends ChangeNotifier {
 
     try {
       await _save(_messages);
+      if (_isDisposed) return false;
       userMessageCommitted = true;
       final requiresLocalResponse =
           LocalCoachingResponder.isSafetyConcern(cleanedMessage) ||
@@ -1057,6 +1058,7 @@ class CoachingService extends ChangeNotifier {
         context: context,
         conversation: List.unmodifiable(_messages),
       );
+      if (_isDisposed) return false;
       final cleanedResponse = _cleanText(response);
       if (cleanedResponse == null) {
         throw StateError('The coach returned an empty response.');

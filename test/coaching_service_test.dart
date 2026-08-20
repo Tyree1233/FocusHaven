@@ -1787,6 +1787,68 @@ void main() {
     expect(coach.messages.last.id, '44');
   });
 
+  test('disposal after the user save never invokes either coach', () async {
+    final saveStarted = Completer<void>();
+    final allowSave = Completer<void>();
+    var saveCalls = 0;
+    final localResponder = _RecordingResponder('Local guidance.');
+    final enhancedResponder = _RecordingResponder('Enhanced guidance.');
+    final coach = await createCoach(
+      responder: localResponder,
+      enhancedResponder: enhancedResponder,
+      saveConversation: (_, _) async {
+        saveCalls += 1;
+        if (saveCalls == 1) {
+          saveStarted.complete();
+          await allowSave.future;
+        }
+        return true;
+      },
+    );
+    expect(await coach.setEnhancedCoachingEnabled(true), isTrue);
+
+    final sending = coach.send(
+      'Keep this private after shutdown.',
+      const CoachingContext(),
+    );
+    await saveStarted.future;
+    coach.dispose();
+    allowSave.complete();
+
+    expect(await sending, isFalse);
+    expect(saveCalls, 1);
+    expect(localResponder.calls, 0);
+    expect(enhancedResponder.calls, 0);
+  });
+
+  test('a reply arriving after disposal is never persisted', () async {
+    final responder = _PendingResponder();
+    final coach = await createCoach(responder: responder);
+
+    final sending = coach.send(
+      'Save my message, but not a late reply.',
+      const CoachingContext(),
+    );
+    await responder.invoked.future;
+    coach.dispose();
+    responder.response.complete('This reply arrived too late.');
+
+    expect(await sending, isFalse);
+    expect(responder.calls, 1);
+    final preferences = await SharedPreferences.getInstance();
+    final savedConversation =
+        jsonDecode(preferences.getString('coachingConversation')!)
+            as List<dynamic>;
+    expect(savedConversation, hasLength(1));
+    final savedMessage = Map<String, dynamic>.from(
+      savedConversation.single as Map,
+    );
+    expect(savedMessage['id'], isA<String>());
+    expect(savedMessage['role'], 'user');
+    expect(savedMessage['text'], 'Save my message, but not a late reply.');
+    expect(savedMessage['createdAt'], isA<String>());
+  });
+
   test('initialization and sends are safe after disposal', () async {
     final coach = CoachingService();
 
