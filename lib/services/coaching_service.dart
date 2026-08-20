@@ -1128,29 +1128,37 @@ class CoachingService extends ChangeNotifier {
     }
   }
 
-  Future<void> clearConversation() =>
+  Future<bool> clearConversation() =>
       _clearLocalData(includeEnhancedPreference: false);
 
-  Future<void> clearLocalData() =>
+  Future<bool> clearLocalData() =>
       _clearLocalData(includeEnhancedPreference: true);
 
-  Future<void> _clearLocalData({
+  Future<bool> _clearLocalData({
     required bool includeEnhancedPreference,
   }) async {
     await initialized;
-    if (_isDisposed || _isResponding || _isManagingPrivateData) return;
+    if (_isDisposed || _isResponding || _isManagingPrivateData) return false;
 
     _setManagingPrivateData(true);
     try {
-      await _performClearLocalData(
+      return await _performClearLocalData(
         includeEnhancedPreference: includeEnhancedPreference,
       );
+    } catch (error) {
+      if (_isDisposed) return false;
+      _errorMessage =
+          'Your private coaching data could not be completely cleared. '
+          'Please retry.';
+      debugPrint('Private coaching cleanup failed: $error');
+      notifyListeners();
+      return false;
     } finally {
       _setManagingPrivateData(false);
     }
   }
 
-  Future<void> _performClearLocalData({
+  Future<bool> _performClearLocalData({
     required bool includeEnhancedPreference,
   }) async {
     final preferences = await SharedPreferences.getInstance();
@@ -1166,7 +1174,7 @@ class CoachingService extends ChangeNotifier {
           _enhancedCoachingKey,
           'enhanced coaching preference',
         );
-    if (_isDisposed) return;
+    if (_isDisposed) return false;
 
     final conversationChanged =
         conversationCleared &&
@@ -1196,6 +1204,7 @@ class CoachingService extends ChangeNotifier {
     } else if (settingChanged || !clearCompleted) {
       notifyListeners();
     }
+    return clearCompleted;
   }
 
   Future<void> _load() async {

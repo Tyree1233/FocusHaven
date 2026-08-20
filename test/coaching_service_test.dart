@@ -1274,7 +1274,7 @@ void main() {
       await coach.send('Do not race this.', const CoachingContext()),
       isFalse,
     );
-    await expectLater(coach.clearLocalData(), completes);
+    expect(await coach.clearLocalData(), isFalse);
     expect(await coach.setEnhancedCoachingEnabled(true), isFalse);
     expect(localResponder.calls, 0);
 
@@ -1433,7 +1433,7 @@ void main() {
     expect(restoredCoach.messages.first.role, CoachingMessageRole.user);
     expect(restoredCoach.messages.last.role, CoachingMessageRole.coach);
 
-    await restoredCoach.clearLocalData();
+    expect(await restoredCoach.clearLocalData(), isTrue);
 
     expect(restoredCoach.messages, isEmpty);
     final preferences = await SharedPreferences.getInstance();
@@ -1454,7 +1454,7 @@ void main() {
     addTearDown(coach.dispose);
     expect(coach.messages, hasLength(2));
 
-    await coach.clearConversation();
+    expect(await coach.clearConversation(), isFalse);
 
     expect(coach.messages, hasLength(2));
     expect(
@@ -1489,7 +1489,7 @@ void main() {
       );
       addTearDown(coach.dispose);
 
-      await coach.clearLocalData();
+      expect(await coach.clearLocalData(), isFalse);
 
       expect(coach.messages, isEmpty);
       expect(coach.enhancedCoachingEnabled, isTrue);
@@ -1530,7 +1530,7 @@ void main() {
     );
     addTearDown(coach.dispose);
 
-    await expectLater(coach.clearLocalData(), completes);
+    expect(await coach.clearLocalData(), isFalse);
 
     expect(coach.messages, hasLength(2));
     expect(coach.enhancedCoachingEnabled, isFalse);
@@ -1583,12 +1583,12 @@ void main() {
       isFalse,
     );
     expect(await coach.setEnhancedCoachingEnabled(false), isFalse);
-    await expectLater(coach.clearLocalData(), completes);
+    expect(await coach.clearLocalData(), isFalse);
     expect(removalCalls, 1);
     expect(localResponder.calls, 0);
 
     allowRemoval.complete();
-    await clearing;
+    expect(await clearing, isTrue);
     expect(coach.isManagingPrivateData, isFalse);
     expect(removalCalls, 2);
     expect(coach.messages, isEmpty);

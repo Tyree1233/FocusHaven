@@ -880,6 +880,56 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('refuses to claim local deletion when coaching remains', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    timer.setFocusTask('Keep this focus task');
+    final firstCoach = CoachingService(responder: _TimerContextResponder());
+    await firstCoach.initialized;
+    expect(
+      await firstCoach.send('Keep this conversation.', const CoachingContext()),
+      isTrue,
+    );
+    firstCoach.dispose();
+    final coach = CoachingService(removePreference: (_, _) async => false);
+    await coach.initialized;
+
+    await tester.pumpWidget(_app(timer, coachingService: coach));
+    await tester.pump();
+    await tester.tap(find.byTooltip('Sign in'));
+    await tester.pumpAndSettle();
+
+    final deleteAction = find.widgetWithText(TextButton, 'Delete local data');
+    await tester.ensureVisible(deleteAction);
+    await tester.tap(deleteAction);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delete local data?'), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey<String>('confirmation-confirm')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'That account action could not be completed. Please try again.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Your FocusHaven account'), findsOneWidget);
+    expect(timer.focusTask, 'Keep this focus task');
+    expect(coach.messages, hasLength(2));
+    expect(
+      coach.errorMessage,
+      'Your private coaching data could not be completely cleared. '
+      'Please retry.',
+    );
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.containsKey('coachingConversation'), isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('reports a refused privacy policy launch', (tester) async {
     final timer = await _createTimer(tester);
     Uri? attemptedUri;

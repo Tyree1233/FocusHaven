@@ -383,6 +383,11 @@ That private-action state is surfaced to the coaching sheet so its message,
 consent, and deletion controls remain disabled until the verified operation
 finishes, even when it began outside the sheet.
 
+The app-wide local-data deletion gate requires a verified coaching cleanup
+before removing the remaining local stores or leaving the account screen. If
+coaching history or consent is busy or cannot be removed, the action stays on
+screen and reports an incomplete deletion so the user can retry.
+
 After the function, secret, App Check registrations, entitlement verification,
 and quotas are available, enable the interface at build time:
 
