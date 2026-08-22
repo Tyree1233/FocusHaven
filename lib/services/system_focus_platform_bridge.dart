@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 
 import '../models/system_focus_command.dart';
@@ -218,7 +220,7 @@ class SystemFocusPlatformBridge {
       // The timer mutation invalidates the snapshot provider synchronously.
       // Publication is best-effort; authorization success remains truthful
       // even if the native surface becomes temporarily unavailable afterward.
-      await publishCurrent();
+      unawaited(publishCurrent());
       return true;
     } catch (_) {
       return false;

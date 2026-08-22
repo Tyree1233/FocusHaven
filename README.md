@@ -77,6 +77,12 @@ is consumed once on the iPhone before Flutter independently applies its stale,
 replay, and advertised-action gates. Destructive watch actions require an extra
 confirmation. The watch stores no task, reflection, mood, history, coach, or
 account data and cannot bypass phone-side timer authorization.
+An accepted watch command now receives its text-free result before the
+resulting snapshot is published back through the same native transport. That
+publication remains serialized and best-effort, and a watch-state change
+retries the latest pending snapshot when the companion becomes available. This
+prevents the command reply and its follow-up state from waiting on each other
+without weakening either authorization boundary.
 
 Wear OS now has the same privacy-first foundation as a separate non-standalone
 watch app with the phone's package and signing identity. Android publishes one

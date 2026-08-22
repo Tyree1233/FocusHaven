@@ -1,4 +1,5 @@
 import Foundation
+import WatchConnectivity
 import XCTest
 
 @testable import Runner
@@ -335,6 +336,53 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     XCTAssertEqual(deliveries, 1)
   }
 
+  func testWatchStateChangePublishesTheLatestPendingSnapshotOnce() throws {
+    let session = RecordingWatchSession()
+    let bridge = SystemFocusWatchConnectivityBridge(session: session)
+    let first = applicationSnapshot()
+    let laterDate = generatedAt.addingTimeInterval(1)
+    let second = applicationSnapshot(
+      activity: "paused",
+      secondsRemaining: 299,
+      generatedAt: laterDate
+    )
+
+    bridge.publish(snapshot: first)
+    bridge.publish(snapshot: second)
+    XCTAssertEqual(session.publishedContexts.count, 0)
+
+    session.activationState = .activated
+    session.isPaired = true
+    session.isWatchAppInstalled = true
+    bridge.retryPendingSnapshotAfterWatchStateChange()
+    bridge.retryPendingSnapshotAfterWatchStateChange()
+
+    XCTAssertEqual(session.publishedContexts.count, 1)
+    XCTAssertEqual(
+      session.publishedContexts.first?["generatedAtMilliseconds"] as? Int,
+      Int(laterDate.timeIntervalSince1970 * 1_000)
+    )
+  }
+
+  func testFailedWatchPublicationRemainsPendingForStateChangeRetry() {
+    let session = RecordingWatchSession()
+    session.activationState = .activated
+    session.isPaired = true
+    session.isWatchAppInstalled = true
+    session.publishError = RecordingWatchSession.TestError.unavailable
+    let bridge = SystemFocusWatchConnectivityBridge(session: session)
+
+    bridge.publish(snapshot: applicationSnapshot())
+    XCTAssertEqual(session.publishAttempts, 1)
+    XCTAssertEqual(session.publishedContexts.count, 0)
+
+    session.publishError = nil
+    bridge.retryPendingSnapshotAfterWatchStateChange()
+
+    XCTAssertEqual(session.publishAttempts, 2)
+    XCTAssertEqual(session.publishedContexts.count, 1)
+  }
+
   func testCommandResultRequiresTheExactBooleanEnvelope() {
     let valid = SystemFocusWatchCommandResult(
       requestId: "watch-request-123",
@@ -357,7 +405,8 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     session: String = "focus",
     activity: String = "ready",
     secondsRemaining: Int = 300,
-    endsAt: Any = NSNull()
+    endsAt: Any = NSNull(),
+    generatedAt: Date? = nil
   ) -> [String: Any] {
     [
       "schemaVersion": 1,
@@ -365,7 +414,7 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
       "activity": activity,
       "secondsRemaining": secondsRemaining,
       "totalSessionSeconds": 300,
-      "generatedAt": isoDate(generatedAt),
+      "generatedAt": isoDate(generatedAt ?? self.generatedAt),
       "endsAt": endsAt,
     ]
   }
@@ -407,5 +456,30 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     let formatter = ISO8601DateFormatter()
     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     return formatter.string(from: date)
+  }
+}
+
+private final class RecordingWatchSession: SystemFocusWatchConnectivitySession {
+  enum TestError: Error {
+    case unavailable
+  }
+
+  weak var delegate: WCSessionDelegate?
+  var activationState: WCSessionActivationState = .notActivated
+  var isPaired = false
+  var isWatchAppInstalled = false
+  var publishError: Error?
+  private(set) var activationCount = 0
+  private(set) var publishAttempts = 0
+  private(set) var publishedContexts: [[String: Any]] = []
+
+  func activate() {
+    activationCount += 1
+  }
+
+  func updateApplicationContext(_ applicationContext: [String: Any]) throws {
+    publishAttempts += 1
+    if let publishError { throw publishError }
+    publishedContexts.append(applicationContext)
   }
 }

@@ -156,6 +156,7 @@ void main() {
       final accepted = await backend.handler!(command().toJson());
 
       expect(accepted, isTrue);
+      expect(await bridge.publishCurrent(), isTrue);
       expect(calls, ['start']);
       expect(backend.published, hasLength(2));
       expect(backend.published.last['activity'], 'running');
@@ -163,6 +164,48 @@ void main() {
         backend.published.last['generatedAt'],
         current.generatedAt.toIso8601String(),
       );
+    },
+  );
+
+  test(
+    'accepted native command replies before its snapshot publication',
+    () async {
+      final backend = _RecordingPlatformBackend();
+      var current = snapshot();
+      final calls = <String>[];
+      final bridge = SystemFocusPlatformBridge(
+        backend: backend,
+        router: SystemFocusCommandRouter(),
+        readSnapshot: () => current,
+        target: _target(
+          calls,
+          start: () {
+            current = snapshot(
+              activity: SystemFocusActivity.running,
+              at: generatedAt.add(const Duration(seconds: 1)),
+            );
+          },
+        ),
+      );
+      expect(await bridge.start(), isTrue);
+      final publicationGate = Completer<void>();
+      backend.publishGate = publicationGate.future;
+
+      final acknowledgement = backend.handler!(command().toJson());
+
+      expect(await acknowledgement.timeout(const Duration(seconds: 1)), isTrue);
+      expect(calls, ['start']);
+      expect(backend.published, hasLength(1));
+
+      final settled = bridge.publishCurrent();
+      await Future<void>.delayed(Duration.zero);
+      expect(backend.published, hasLength(1));
+      publicationGate.complete();
+
+      expect(await settled, isTrue);
+      expect(backend.published, hasLength(2));
+      expect(backend.published.last['activity'], 'running');
+      expect(backend.maximumConcurrentPublishes, 1);
     },
   );
 
@@ -190,6 +233,7 @@ void main() {
       );
 
       expect(await bridge.start(), isTrue);
+      expect(await bridge.publishCurrent(), isTrue);
 
       expect(backend.pendingTakeCount, 1);
       expect(backend.pendingCommand, isNull);
@@ -285,6 +329,7 @@ void main() {
       );
 
       expect(accepted, isTrue);
+      expect(await bridge.publishCurrent(), isTrue);
       expect(calls, ['pause']);
       expect(backend.published, hasLength(2));
       expect(backend.published.last['activity'], 'paused');

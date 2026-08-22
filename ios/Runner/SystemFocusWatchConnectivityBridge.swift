@@ -11,11 +11,23 @@ typealias SystemFocusWatchCommandHandler = (
   _ completion: @escaping (Bool) -> Void
 ) -> Void
 
+protocol SystemFocusWatchConnectivitySession: AnyObject {
+  var delegate: WCSessionDelegate? { get set }
+  var activationState: WCSessionActivationState { get }
+  var isPaired: Bool { get }
+  var isWatchAppInstalled: Bool { get }
+
+  func activate()
+  func updateApplicationContext(_ applicationContext: [String: Any]) throws
+}
+
+extension WCSession: SystemFocusWatchConnectivitySession {}
+
 /// Keeps one latest, text-free snapshot available to the paired watch.
 final class SystemFocusWatchConnectivityBridge: NSObject, SystemFocusWatchPublishing {
   private static let maximumRememberedRequestIds = 128
 
-  private let session: WCSession?
+  private let session: SystemFocusWatchConnectivitySession?
   private let stateLock = NSLock()
   private var pendingSnapshot: [String: Any]?
   private var currentSnapshot: SystemFocusWatchSnapshot?
@@ -24,7 +36,11 @@ final class SystemFocusWatchConnectivityBridge: NSObject, SystemFocusWatchPublis
   private var requestOrder: [String] = []
   private var consumedSnapshotAtMilliseconds: Int?
 
-  init(session: WCSession? = WCSession.isSupported() ? .default : nil) {
+  init(
+    session: SystemFocusWatchConnectivitySession? = WCSession.isSupported()
+      ? WCSession.default
+      : nil
+  ) {
     self.session = session
     super.init()
     session?.delegate = self
@@ -146,6 +162,14 @@ extension SystemFocusWatchConnectivityBridge: WCSessionDelegate {
     error: Error?
   ) {
     guard activationState == .activated, error == nil else { return }
+    publishIfAvailable()
+  }
+
+  func sessionWatchStateDidChange(_: WCSession) {
+    retryPendingSnapshotAfterWatchStateChange()
+  }
+
+  func retryPendingSnapshotAfterWatchStateChange() {
     publishIfAvailable()
   }
 
