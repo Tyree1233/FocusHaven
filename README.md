@@ -83,6 +83,10 @@ publication remains serialized and best-effort, and a watch-state change
 retries the latest pending snapshot when the companion becomes available. This
 prevents the command reply and its follow-up state from waiting on each other
 without weakening either authorization boundary.
+System-surface snapshot timestamps are canonicalized to the millisecond
+precision shared by Dart, Swift, Kotlin, and companion-device transports, so
+exact stale and replay checks survive a native round trip without accepting a
+different snapshot.
 
 Wear OS now has the same privacy-first foundation as a separate non-standalone
 watch app with the phone's package and signing identity. Android publishes one

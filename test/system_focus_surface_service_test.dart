@@ -129,6 +129,33 @@ void main() {
     expect(restored.endsAt, original.endsAt);
   });
 
+  test('snapshot identity is canonical at native millisecond precision', () {
+    final sourceTime = DateTime.utc(2026, 8, 16, 18, 0, 0, 123, 456);
+    final state = service.createSnapshot(
+      sessionType: SessionType.focus,
+      isRunning: true,
+      isComplete: false,
+      hasPendingResume: false,
+      secondsRemaining: 42,
+      totalSessionSeconds: 300,
+      generatedAt: sourceTime,
+    );
+
+    expect(
+      state.generatedAt,
+      DateTime.fromMillisecondsSinceEpoch(
+        sourceTime.millisecondsSinceEpoch,
+        isUtc: true,
+      ),
+    );
+    expect(state.generatedAt.microsecond, 0);
+    expect(state.endsAt!.microsecond, 0);
+    expect(
+      SystemFocusSnapshot.fromJson(state.toJson()).generatedAt,
+      state.generatedAt,
+    );
+  });
+
   test('running equivalence follows the deadline instead of each tick', () {
     final original = snapshot(isRunning: true, secondsRemaining: 300);
     final refreshed = SystemFocusSnapshot(

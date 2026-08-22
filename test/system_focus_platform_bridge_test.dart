@@ -168,6 +168,42 @@ void main() {
   );
 
   test(
+    'native millisecond timestamps preserve exact command authorization',
+    () async {
+      final backend = _RecordingPlatformBackend();
+      final sourceTime = DateTime.utc(2026, 8, 16, 21, 0, 0, 123, 456);
+      var current = snapshot(at: sourceTime);
+      final calls = <String>[];
+      final bridge = SystemFocusPlatformBridge(
+        backend: backend,
+        router: SystemFocusCommandRouter(),
+        readSnapshot: () => current,
+        target: _target(
+          calls,
+          start: () {
+            current = snapshot(
+              activity: SystemFocusActivity.running,
+              at: sourceTime.add(const Duration(seconds: 1)),
+            );
+          },
+        ),
+      );
+      expect(await bridge.start(), isTrue);
+      final nativeTimestamp = DateTime.fromMillisecondsSinceEpoch(
+        current.generatedAt.millisecondsSinceEpoch,
+        isUtc: true,
+      );
+
+      final accepted = await backend.handler!(
+        command(snapshotGeneratedAt: nativeTimestamp).toJson(),
+      );
+
+      expect(accepted, isTrue);
+      expect(calls, ['start']);
+    },
+  );
+
+  test(
     'accepted native command replies before its snapshot publication',
     () async {
       final backend = _RecordingPlatformBackend();

@@ -25,20 +25,24 @@ class SystemFocusSnapshot {
     required DateTime generatedAt,
     DateTime? endsAt,
   }) {
+    final canonicalGeneratedAt = _canonicalSystemTimestamp(generatedAt);
+    final canonicalEndsAt = endsAt == null
+        ? null
+        : _canonicalSystemTimestamp(endsAt);
     _validate(
       activity: activity,
       secondsRemaining: secondsRemaining,
       totalSessionSeconds: totalSessionSeconds,
-      generatedAt: generatedAt,
-      endsAt: endsAt,
+      generatedAt: canonicalGeneratedAt,
+      endsAt: canonicalEndsAt,
     );
     return SystemFocusSnapshot._(
       session: session,
       activity: activity,
       secondsRemaining: secondsRemaining,
       totalSessionSeconds: totalSessionSeconds,
-      generatedAt: generatedAt.toUtc(),
-      endsAt: endsAt?.toUtc(),
+      generatedAt: canonicalGeneratedAt,
+      endsAt: canonicalEndsAt,
     );
   }
 
@@ -204,4 +208,13 @@ class SystemFocusSnapshot {
     if (parsed == null || !parsed.isUtc) return null;
     return parsed;
   }
+
+  /// Native companion contracts carry timestamp identities in milliseconds.
+  /// Canonicalizing at the model boundary keeps exact stale/replay checks valid
+  /// after a timestamp has crossed Swift, Kotlin, or a platform channel.
+  static DateTime _canonicalSystemTimestamp(DateTime value) =>
+      DateTime.fromMillisecondsSinceEpoch(
+        value.millisecondsSinceEpoch,
+        isUtc: true,
+      );
 }
