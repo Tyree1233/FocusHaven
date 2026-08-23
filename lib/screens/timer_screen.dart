@@ -1204,16 +1204,21 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           ],
                         )
                       else
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          key: const ValueKey('timer-actions'),
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 18,
+                          runSpacing: 10,
                           children: [
                             IconButton.outlined(
+                              key: const ValueKey('timer-reset-action'),
                               onPressed: () => _resetTimer(context, ref, timer),
                               tooltip: 'Reset timer',
                               icon: const Icon(Icons.replay),
                             ),
-                            const SizedBox(width: 18),
                             FilledButton.icon(
+                              key: const ValueKey('timer-primary-action'),
                               onPressed: session.isRunning
                                   ? timer.pause
                                   : timer.start,

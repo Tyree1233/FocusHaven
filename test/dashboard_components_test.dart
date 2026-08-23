@@ -6,12 +6,15 @@ import 'package:focushaven/widgets/pro_benefit.dart';
 import 'package:focushaven/widgets/stat_card.dart';
 import 'package:focushaven/widgets/timer_countdown.dart';
 
-Widget _materialApp(Widget child) {
+Widget _materialApp(Widget child, {double textScale = 1}) {
   return MaterialApp(
     theme: ThemeData.dark().copyWith(
       colorScheme: const ColorScheme.dark(primary: Color(0xFFF064B7)),
     ),
-    home: Scaffold(body: Center(child: child)),
+    home: MediaQuery(
+      data: MediaQueryData(textScaler: TextScaler.linear(textScale)),
+      child: Scaffold(body: Center(child: child)),
+    ),
   );
 }
 
@@ -50,6 +53,54 @@ void main() {
     expect(progress.value, 0.5);
     expect(progress.color, const Color(0xFFF064B7));
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('countdown supports narrow width and large accessible text', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            timerCountdownStateProvider.overrideWithValue((
+              secondsRemaining: 125,
+              totalSessionSeconds: 1500,
+              progress: 0.5,
+            )),
+          ],
+          child: _materialApp(
+            SizedBox(
+              width: 210,
+              child: TimerCountdown(
+                sessionColor: const Color(0xFFF064B7),
+                formatTime: (seconds) {
+                  final minutes = seconds ~/ 60;
+                  final remainder = seconds % 60;
+                  return '$minutes:${remainder.toString().padLeft(2, '0')}';
+                },
+                durationLabel: (seconds) => '${seconds ~/ 60} minutes',
+              ),
+            ),
+            textScale: 2,
+          ),
+        ),
+      );
+
+      final countdown = find.byKey(const ValueKey('timer-countdown-semantics'));
+      expect(tester.getSize(countdown), const Size(210, 210));
+      final countdownSemantics = tester.getSemantics(countdown);
+      expect(countdownSemantics.label, 'Session timer');
+      expect(
+        countdownSemantics.value,
+        '2 minutes, 5 seconds remaining of 25 minutes. 50 percent complete.',
+      );
+      expect(find.text('2:05'), findsOneWidget);
+      expect(find.text('25 minutes'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
   });
 
   testWidgets('stat card renders its icon, value, and label', (tester) async {

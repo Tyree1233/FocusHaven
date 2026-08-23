@@ -3,6 +3,13 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+The core session countdown now adapts to its available width instead of
+assuming a fixed phone layout. Large accessibility text scales down only when
+needed to stay inside the timer ring, and screen readers receive one coherent
+remaining-time, total-duration, and progress description. Reset and primary
+timer controls wrap onto another line on narrow or enlarged-text surfaces
+without changing the timer's authorization or persistence behavior.
+
 Focus Shield now has one compact, expandable dashboard surface for its private,
 text-free decision state. It distinguishes opt-out, unsupported, permission,
 selection, ready, starting, confirmed, paused, and failed states without
