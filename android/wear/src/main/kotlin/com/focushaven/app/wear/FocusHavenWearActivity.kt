@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
@@ -29,6 +30,8 @@ class FocusHavenWearActivity :
     private lateinit var dataClient: DataClient
     private lateinit var messageClient: MessageClient
     private lateinit var commandSender: SystemFocusWearCommandSender
+    private val commandCooldown =
+        SystemFocusWearCommandCooldown(SystemClock::elapsedRealtime)
     private var snapshot: SystemFocusWearSnapshot? = null
     private var pendingRequestId: String? = null
     private var commandState = CommandState.IDLE
@@ -48,6 +51,7 @@ class FocusHavenWearActivity :
                 loadLatestSnapshot()
             }
         }
+    private val commandCooldownComplete = Runnable(::render)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +72,7 @@ class FocusHavenWearActivity :
     override fun onStop() {
         handler.removeCallbacks(ticker)
         handler.removeCallbacks(commandTimeout)
+        handler.removeCallbacks(commandCooldownComplete)
         if (pendingRequestId != null) {
             pendingRequestId = null
             commandState = CommandState.NEEDS_PHONE
@@ -152,11 +157,24 @@ class FocusHavenWearActivity :
         runOnUiThread {
             if (snapshot == null || value.generatedAt >= checkNotNull(snapshot).generatedAt) {
                 val isNewSnapshot = snapshot == null || value.generatedAt > checkNotNull(snapshot).generatedAt
+                val settledCommand = isNewSnapshot && commandState != CommandState.IDLE
                 snapshot = value
-                if (isNewSnapshot) clearCommandState()
+                if (isNewSnapshot) {
+                    clearCommandState()
+                    if (settledCommand) startCommandCooldown()
+                }
                 render()
             }
         }
+    }
+
+    private fun startCommandCooldown() {
+        commandCooldown.start(COMMAND_INPUT_COOLDOWN_MILLIS)
+        handler.removeCallbacks(commandCooldownComplete)
+        handler.postDelayed(
+            commandCooldownComplete,
+            commandCooldown.remainingMilliseconds,
+        )
     }
 
     private fun render() {
@@ -231,9 +249,9 @@ class FocusHavenWearActivity :
         val statusResource = commandState.statusResource
         commandStatusView.visibility = if (statusResource == null) View.GONE else View.VISIBLE
         if (statusResource != null) commandStatusView.setText(statusResource)
-        val commandPending = pendingRequestId != null
-        primaryButton.isEnabled = !commandPending
-        secondaryButton.isEnabled = !commandPending
+        val controlsBlocked = pendingRequestId != null || commandCooldown.isActive
+        primaryButton.isEnabled = !controlsBlocked
+        secondaryButton.isEnabled = !controlsBlocked
     }
 
     private fun bindAction(
@@ -262,6 +280,7 @@ class FocusHavenWearActivity :
     }
 
     private fun send(action: SystemFocusWearAction) {
+        if (commandCooldown.isActive) return
         val current = snapshot ?: return
         val command = SystemFocusWearCommand.create(current, action)
         if (command == null) {
@@ -320,6 +339,7 @@ class FocusHavenWearActivity :
         const val SNAPSHOT_PATH = "/focus_haven/system_focus/snapshot/v2"
         private const val RECEIPT_TIMEOUT_MILLIS = 8_000L
         private const val COMMAND_COMPLETION_TIMEOUT_MILLIS = 12_000L
+        internal const val COMMAND_INPUT_COOLDOWN_MILLIS = 1_000L
     }
 
     private enum class CommandState(val statusResource: Int?) {

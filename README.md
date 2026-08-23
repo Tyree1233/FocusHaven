@@ -98,9 +98,11 @@ actions allowed by the exact displayed state. Each request contains a random ID
 and opaque snapshot token; the phone revalidates it, persistently rejects
 replays, queues it through the shared Flutter authorization router, and returns
 a text-free receipt. Reset and discard require confirmation, and the watch does
-not claim a mutation before the phone publishes the resulting state. It carries
-no task, reflection, mood, history, coach, or account data. macOS, web, and every
-unsupported platform remain dormant.
+not claim a mutation before the phone publishes the resulting state. After that
+state arrives, a bounded one-second input cooldown keeps a repeated tap from
+falling through to the newly rendered action in the same button position. It
+carries no task, reflection, mood, history, coach, or account data. macOS, web,
+and every unsupported platform remain dormant.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the
