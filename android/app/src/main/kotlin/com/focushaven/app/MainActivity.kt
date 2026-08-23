@@ -73,7 +73,10 @@ class MainActivity : FlutterActivity() {
             command,
             object : MethodChannel.Result {
                 override fun success(result: Any?) {
-                    if (result is Boolean) {
+                    if (SystemFocusPendingCommandStore.shouldClearAfterAcknowledgement(
+                            result,
+                        )
+                    ) {
                         SystemFocusPendingCommandStore.clearIfMatches(
                             applicationContext,
                             requestId,

@@ -55,6 +55,11 @@ text-free command. Flutter waits for timer restoration, claims a cold-start
 command once, and still applies the stale, replay, and advertised-action gates
 before any mutation. No widget code can directly change the timer or expose
 task, reflection, mood, history, coach, or account data.
+Every Android widget command now gives its immutable `PendingIntent` a distinct
+identity derived from the advertised action and exact snapshot timestamp. A
+launcher therefore cannot retain extras from an older rendered state. Warm
+commands remain queued unless Flutter explicitly returns `true`, so a rejected
+or unavailable handler cannot silently discard the person's action.
 Cold-start recovery also bounds a persisted future deadline to the validated
 session total before publishing. Clock rollback or damaged local timing data
 therefore cannot invent extra focus time or strand phone widgets on stale state;

@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
@@ -199,12 +200,21 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
             content: SystemFocusWidgetContent,
             action: SystemFocusWidgetAction,
         ): PendingIntent {
+            val snapshotGeneratedAt = content.snapshotGeneratedAt.toString()
+            val pendingIntentIdentity =
+                checkNotNull(
+                    SystemFocusWidgetCommandPolicy.pendingIntentIdentity(
+                        action.wireName,
+                        snapshotGeneratedAt,
+                    ),
+                )
             val intent =
                 Intent(context, FocusHavenWidgetCommandActivity::class.java).apply {
+                    data = Uri.parse(pendingIntentIdentity)
                     putExtra(FocusHavenWidgetCommandActivity.EXTRA_ACTION, action.wireName)
                     putExtra(
                         FocusHavenWidgetCommandActivity.EXTRA_SNAPSHOT_GENERATED_AT,
-                        content.snapshotGeneratedAt.toString(),
+                        snapshotGeneratedAt,
                     )
                 }
             return PendingIntent.getActivity(

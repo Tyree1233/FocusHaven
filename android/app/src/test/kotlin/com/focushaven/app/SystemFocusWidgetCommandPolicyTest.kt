@@ -84,6 +84,54 @@ class SystemFocusWidgetCommandPolicyTest {
     }
 
     @Test
+    fun pendingIntentIdentityRotatesWithActionAndSnapshot() {
+        val startIdentity =
+            SystemFocusWidgetCommandPolicy.pendingIntentIdentity(
+                "start",
+                generatedAt,
+            )
+
+        assertEquals(
+            "focushaven://system-focus-command/start/1786914000000",
+            startIdentity,
+        )
+        assertTrue(
+            startIdentity !=
+                SystemFocusWidgetCommandPolicy.pendingIntentIdentity(
+                    "pause",
+                    generatedAt,
+                ),
+        )
+        assertTrue(
+            startIdentity !=
+                SystemFocusWidgetCommandPolicy.pendingIntentIdentity(
+                    "start",
+                    "2026-08-16T21:00:01Z",
+                ),
+        )
+        assertNull(
+            SystemFocusWidgetCommandPolicy.pendingIntentIdentity(
+                "unknown",
+                generatedAt,
+            ),
+        )
+        assertNull(
+            SystemFocusWidgetCommandPolicy.pendingIntentIdentity(
+                "start",
+                "not-a-time",
+            ),
+        )
+    }
+
+    @Test
+    fun onlyTrueAcknowledgementAllowsPendingCommandRemoval() {
+        assertTrue(SystemFocusPendingCommandStore.shouldClearAfterAcknowledgement(true))
+        assertFalse(SystemFocusPendingCommandStore.shouldClearAfterAcknowledgement(false))
+        assertFalse(SystemFocusPendingCommandStore.shouldClearAfterAcknowledgement(null))
+        assertFalse(SystemFocusPendingCommandStore.shouldClearAfterAcknowledgement("true"))
+    }
+
+    @Test
     fun pendingCommandsExpireQuicklyAndRejectFutureCreationTimes() {
         val now = 1_700_000_000_000L
 

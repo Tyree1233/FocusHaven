@@ -95,6 +95,9 @@ internal object SystemFocusPendingCommandStore {
             .commit()
     }
 
+    fun shouldClearAfterAcknowledgement(result: Any?): Boolean =
+        result == true
+
     private fun decode(encoded: String): Map<String, Any?>? =
         try {
             val json = JSONObject(encoded)
