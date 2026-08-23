@@ -126,6 +126,42 @@ void main() {
     expect(backend.published, hasLength(1));
   });
 
+  testWidgets('bounded cold recovery publishes one pending-resume snapshot', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 120,
+      'secondsRemaining': 90,
+      'totalSessionSeconds': 120,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now()
+          .add(const Duration(days: 1))
+          .millisecondsSinceEpoch,
+    });
+    final timer = TimerService();
+    await timer.initialized;
+    final backend = _RecordingHostBackend();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          timerServiceProvider.overrideWith((ref) => timer),
+          systemFocusPlatformBackendProvider.overrideWithValue(backend),
+        ],
+        child: const SystemFocusPlatformHost(enabled: true, child: SizedBox()),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(backend.handler, isNotNull);
+    expect(backend.published, hasLength(1));
+    expect(backend.published.single['activity'], 'pendingResume');
+    expect(backend.published.single['secondsRemaining'], 120);
+    expect(backend.published.single['totalSessionSeconds'], 120);
+    expect(backend.published.single['endsAt'], isNull);
+  });
+
   testWidgets('host disposal removes the native command handler', (
     tester,
   ) async {

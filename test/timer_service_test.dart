@@ -656,6 +656,32 @@ void main() {
     expect(timer.secondsRemaining, 1500);
   });
 
+  test('cold recovery cannot restore more than the planned session', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 120,
+      'secondsRemaining': 90,
+      'totalSessionSeconds': 120,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now()
+          .add(const Duration(days: 1))
+          .millisecondsSinceEpoch,
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.hasPendingResume, isTrue);
+    expect(timer.isRunning, isFalse);
+    expect(timer.isComplete, isFalse);
+    expect(timer.secondsRemaining, 120);
+    expect(timer.totalSessionSeconds, 120);
+    expect(timer.endsAt, isNull);
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getInt('secondsRemaining'), 120);
+    expect(preferences.getBool('hasPendingTimerResume'), isTrue);
+    expect(preferences.containsKey('timerEndsAt'), isFalse);
+  });
+
   test(
     'completed parked thoughts remain available and can be reopened',
     () async {

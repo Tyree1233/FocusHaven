@@ -55,6 +55,10 @@ text-free command. Flutter waits for timer restoration, claims a cold-start
 command once, and still applies the stale, replay, and advertised-action gates
 before any mutation. No widget code can directly change the timer or expose
 task, reflection, mood, history, coach, or account data.
+Cold-start recovery also bounds a persisted future deadline to the validated
+session total before publishing. Clock rollback or damaged local timing data
+therefore cannot invent extra focus time or strand phone widgets on stale state;
+the recovered timer remains paused and explicitly awaits the person's choice.
 
 iOS now installs the same dedicated Flutter channel through a strict native
 adapter. Swift revalidates every field, enum, duration, null, and UTC timestamp

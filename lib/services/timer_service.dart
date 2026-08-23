@@ -1019,7 +1019,11 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         _secondsRemaining = 0;
         _finishSession();
       } else {
-        _secondsRemaining = remaining;
+        // A wall-clock rollback or damaged future deadline must never restore
+        // more time than the already-validated session total. Keeping this
+        // state bounded also guarantees that trusted system surfaces can
+        // publish their first cold-start snapshot instead of remaining stale.
+        _secondsRemaining = remaining.clamp(1, _totalSessionSeconds).toInt();
         _endsAt = null;
         _hasPendingResume = true;
         _saveToPrefs();
