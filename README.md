@@ -121,6 +121,13 @@ is consumed once on the iPhone before Flutter independently applies its stale,
 replay, and advertised-action gates. Destructive watch actions require an extra
 confirmation. The watch stores no task, reflection, mood, history, coach, or
 account data and cannot bypass phone-side timer authorization.
+Both UIKit application and scene lifecycle callbacks now enter one shared
+private-URL command handler. Cold scene connections queue the authenticated
+command before Flutter attaches and request delivery again after connection;
+application-level URL delivery provides the equivalent fallback when iOS does
+not include the URL in scene connection options. The same snapshot identity,
+single-use capability, pending-command expiry, and Flutter authorization gates
+remain mandatory on both paths.
 An accepted watch command now receives its text-free result before the
 resulting snapshot is published back through the same native transport. That
 publication remains serialized and best-effort, and a watch-state change

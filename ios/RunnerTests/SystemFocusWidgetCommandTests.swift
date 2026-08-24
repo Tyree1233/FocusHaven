@@ -216,6 +216,57 @@ final class SystemFocusWidgetCommandTests: XCTestCase {
     XCTAssertNil(commandStore.take(now: now))
   }
 
+  func testSharedURLHandlerQueuesBeforeRequestingWarmDelivery() {
+    XCTAssertTrue(snapshotStore.save(snapshot(activity: "ready")))
+    let currentToken = tryUnwrap(snapshotStore.loadControlToken())
+    var deliveryCount = 0
+    let handler = SystemFocusURLCommandHandler(
+      pendingCommands: commandStore,
+      deliverPendingCommand: { deliveryCount += 1 }
+    )
+
+    XCTAssertTrue(
+      handler.handle(
+        url: commandURL(action: .start, token: currentToken),
+        now: now
+      )
+    )
+    XCTAssertEqual(deliveryCount, 1)
+    XCTAssertEqual(commandStore.peek(now: now)?["action"] as? String, "start")
+
+    XCTAssertFalse(
+      handler.handle(
+        url: commandURL(action: .start, token: currentToken),
+        now: now
+      )
+    )
+    XCTAssertEqual(deliveryCount, 1)
+  }
+
+  func testColdSceneCanQueueBeforeFlutterAdapterDelivery() {
+    XCTAssertTrue(snapshotStore.save(snapshot(activity: "ready")))
+    let currentToken = tryUnwrap(snapshotStore.loadControlToken())
+    var deliveryCount = 0
+    let handler = SystemFocusURLCommandHandler(
+      pendingCommands: commandStore,
+      deliverPendingCommand: { deliveryCount += 1 }
+    )
+
+    XCTAssertTrue(
+      handler.enqueue(
+        url: commandURL(action: .start, token: currentToken),
+        now: now
+      )
+    )
+    XCTAssertEqual(deliveryCount, 0)
+    XCTAssertEqual(commandStore.peek(now: now)?["action"] as? String, "start")
+
+    handler.deliverIfAvailable()
+
+    XCTAssertEqual(deliveryCount, 1)
+    XCTAssertEqual(commandStore.peek(now: now)?["action"] as? String, "start")
+  }
+
   private func snapshot(activity: String) -> [String: Any] {
     let completed = activity == "completed"
     return [

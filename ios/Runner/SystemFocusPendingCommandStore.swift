@@ -92,3 +92,37 @@ final class SystemFocusPendingCommandStore {
     defaults?.removeObject(forKey: Self.createdAtKey)
   }
 }
+
+/// Routes one authenticated widget URL into the native inbox before asking an
+/// already-installed Flutter adapter to consume it.
+///
+/// Keeping this tiny coordinator independent of UIKit lets both application
+/// and scene lifecycle callbacks share exactly the same fail-closed boundary.
+final class SystemFocusURLCommandHandler {
+  private let pendingCommands: SystemFocusPendingCommandStore
+  private let deliverPendingCommand: () -> Void
+
+  init(
+    pendingCommands: SystemFocusPendingCommandStore = SystemFocusPendingCommandStore(),
+    deliverPendingCommand: @escaping () -> Void
+  ) {
+    self.pendingCommands = pendingCommands
+    self.deliverPendingCommand = deliverPendingCommand
+  }
+
+  @discardableResult
+  func enqueue(url: URL, now: Date = Date()) -> Bool {
+    pendingCommands.enqueue(url: url, now: now)
+  }
+
+  func deliverIfAvailable() {
+    deliverPendingCommand()
+  }
+
+  @discardableResult
+  func handle(url: URL, now: Date = Date()) -> Bool {
+    guard enqueue(url: url, now: now) else { return false }
+    deliverIfAvailable()
+    return true
+  }
+}

@@ -6,6 +6,11 @@ import UIKit
   private var systemFocusAdapter: SystemFocusPlatformAdapter?
   private var focusShieldAdapter: FocusShieldPlatformAdapter?
   private var havenWindowAdapter: HavenWindowPlatformAdapter?
+  private lazy var systemFocusURLCommands = SystemFocusURLCommandHandler(
+    deliverPendingCommand: { [weak self] in
+      self?.deliverSystemFocusPendingCommand()
+    }
+  )
 
   override func application(
     _ application: UIApplication,
@@ -47,6 +52,22 @@ import UIKit
   override func applicationDidBecomeActive(_ application: UIApplication) {
     super.applicationDidBecomeActive(application)
     focusShieldAdapter?.refreshAfterActivation()
+  }
+
+  override func application(
+    _ application: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    if systemFocusURLCommands.handle(url: url) {
+      return true
+    }
+    return super.application(application, open: url, options: options)
+  }
+
+  @discardableResult
+  func enqueueSystemFocusCommand(url: URL) -> Bool {
+    systemFocusURLCommands.enqueue(url: url)
   }
 
   func deliverSystemFocusPendingCommand() {
