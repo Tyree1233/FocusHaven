@@ -50,6 +50,17 @@ enum SystemFocusWidgetAction: String, CaseIterable {
     case .discardPending: return "Discard"
     }
   }
+
+  var accessibilityLabel: String {
+    switch self {
+    case .start: return "Start FocusHaven timer"
+    case .pause: return "Pause FocusHaven timer"
+    case .resume: return "Resume FocusHaven timer"
+    case .reset: return "Reset FocusHaven timer"
+    case .beginNextSession: return "Begin next FocusHaven session"
+    case .discardPending: return "Discard paused FocusHaven timer"
+    }
+  }
 }
 
 /// Text-free presentation derived only from a validated system-focus snapshot.
@@ -68,6 +79,39 @@ struct SystemFocusWidgetContent: Equatable {
 
   var progress: Double {
     Double(completedSeconds) / Double(totalSessionSeconds)
+  }
+
+  var progressPercent: Int {
+    min(max(Int((progress * 100).rounded()), 0), 100)
+  }
+
+  var accessibilitySummary: String {
+    let duration = Self.accessibleDuration(secondsRemaining)
+    let timing: String
+    if activity == .running {
+      timing = "Live countdown, \(duration) remaining at last update."
+    } else {
+      timing = "\(duration) remaining."
+    }
+    return "\(session.title). \(activity.title). \(timing) \(progressPercent) percent complete."
+  }
+
+  static func accessibleDuration(_ seconds: Int) -> String {
+    let bounded = max(seconds, 0)
+    let hours = bounded / 3_600
+    let minutes = (bounded % 3_600) / 60
+    let remainder = bounded % 60
+    var parts: [String] = []
+    if hours > 0 {
+      parts.append("\(hours) \(hours == 1 ? "hour" : "hours")")
+    }
+    if minutes > 0 {
+      parts.append("\(minutes) \(minutes == 1 ? "minute" : "minutes")")
+    }
+    if remainder > 0 || parts.isEmpty {
+      parts.append("\(remainder) \(remainder == 1 ? "second" : "seconds")")
+    }
+    return parts.joined(separator: ", ")
   }
 
   static func fromSnapshot(

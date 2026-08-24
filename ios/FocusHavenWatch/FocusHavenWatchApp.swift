@@ -13,6 +13,7 @@ struct FocusHavenWatchApp: App {
 
 struct FocusHavenWatchView: View {
   @ObservedObject var model: SystemFocusWatchModel
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
   @State private var pendingDestructiveAction: SystemFocusWatchAction?
 
   var body: some View {
@@ -44,19 +45,24 @@ struct FocusHavenWatchView: View {
   }
 
   private var waitingView: some View {
-    VStack(spacing: 8) {
-      Image(systemName: "moon.stars.fill")
-        .font(.title2)
-        .foregroundStyle(.indigo)
-      Text("FocusHaven")
-        .font(.headline)
-      Text("Open FocusHaven on your iPhone to sync the timer.")
-        .font(.caption2)
-        .foregroundStyle(.secondary)
-        .multilineTextAlignment(.center)
+    ScrollView {
+      VStack(spacing: 8) {
+        Image(systemName: "moon.stars.fill")
+          .font(.title2)
+          .foregroundStyle(.indigo)
+        Text("FocusHaven")
+          .font(.headline)
+        Text("Open FocusHaven on your iPhone to sync the timer.")
+          .font(.caption2)
+          .foregroundStyle(.secondary)
+          .multilineTextAlignment(.center)
+      }
+      .padding(dynamicTypeSize.isAccessibilitySize ? 6 : 12)
+      .accessibilityElement(children: .ignore)
+      .accessibilityLabel(
+        "FocusHaven. Open FocusHaven on your iPhone to sync the timer."
+      )
     }
-    .padding()
-    .accessibilityElement(children: .combine)
   }
 
   private func snapshotView(
@@ -69,29 +75,21 @@ struct FocusHavenWatchView: View {
     return ScrollView {
       VStack(spacing: 8) {
         VStack(spacing: 6) {
-          HStack(spacing: 5) {
-            Image(
-              systemName: snapshot.session == .focus
-                ? "moon.stars.fill"
-                : "cup.and.saucer.fill"
-            )
-            .foregroundStyle(snapshot.session == .focus ? .indigo : .teal)
-            Text(snapshot.session.title)
-              .font(.headline)
-          }
+          sessionHeading(snapshot)
           Text(activity.title)
             .font(.caption)
             .foregroundStyle(.secondary)
           Text(Self.durationText(remaining))
             .font(.system(.title, design: .rounded, weight: .semibold))
             .monospacedDigit()
+            .minimumScaleFactor(0.65)
+            .lineLimit(1)
+            .frame(maxWidth: .infinity)
           ProgressView(value: snapshot.progress(at: date))
             .tint(snapshot.session == .focus ? .indigo : .teal)
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(
-          "\(snapshot.session.title), \(activity.title), \(Self.accessibleDuration(remaining)) remaining"
-        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(snapshot.accessibilitySummary(at: date))
 
         controls(actions)
 
@@ -106,17 +104,46 @@ struct FocusHavenWatchView: View {
             .foregroundStyle(.secondary)
         }
       }
-      .padding(.horizontal, 8)
+      .padding(.horizontal, dynamicTypeSize.isAccessibilitySize ? 4 : 8)
+    }
+  }
+
+  @ViewBuilder
+  private func sessionHeading(_ snapshot: SystemFocusWatchSnapshot) -> some View {
+    if dynamicTypeSize.isAccessibilitySize {
+      Text(snapshot.session.title)
+        .font(.headline)
+        .multilineTextAlignment(.center)
+    } else {
+      HStack(spacing: 5) {
+        Image(
+          systemName: snapshot.session == .focus
+            ? "moon.stars.fill"
+            : "cup.and.saucer.fill"
+        )
+        .foregroundStyle(snapshot.session == .focus ? .indigo : .teal)
+        Text(snapshot.session.title)
+          .font(.headline)
+      }
     }
   }
 
   @ViewBuilder
   private func controls(_ actions: Set<SystemFocusWatchAction>) -> some View {
     if let primary = primaryAction(actions) {
-      HStack(spacing: 6) {
-        commandButton(primary, prominent: true)
-        if let secondary = secondaryAction(actions) {
-          commandButton(secondary, prominent: false)
+      if dynamicTypeSize.isAccessibilitySize {
+        VStack(spacing: 4) {
+          commandButton(primary, prominent: true)
+          if let secondary = secondaryAction(actions) {
+            commandButton(secondary, prominent: false)
+          }
+        }
+      } else {
+        HStack(spacing: 6) {
+          commandButton(primary, prominent: true)
+          if let secondary = secondaryAction(actions) {
+            commandButton(secondary, prominent: false)
+          }
         }
       }
     }
@@ -135,13 +162,15 @@ struct FocusHavenWatchView: View {
     } label: {
       Text(action.title)
         .font(.caption.weight(.semibold))
-        .lineLimit(1)
-        .frame(maxWidth: .infinity)
+        .lineLimit(2)
+        .multilineTextAlignment(.center)
+        .minimumScaleFactor(0.75)
+        .frame(maxWidth: .infinity, minHeight: 44)
     }
     .buttonStyle(.borderedProminent)
     .tint(prominent ? .indigo : .gray)
     .disabled(!model.canSend(action))
-    .accessibilityLabel("\(action.title) FocusHaven timer")
+    .accessibilityLabel(action.accessibilityLabel)
   }
 
   private func primaryAction(
@@ -170,10 +199,4 @@ struct FocusHavenWatchView: View {
     String(format: "%d:%02d", seconds / 60, seconds % 60)
   }
 
-  private static func accessibleDuration(_ seconds: Int) -> String {
-    let minutes = seconds / 60
-    let remainder = seconds % 60
-    if remainder == 0 { return "\(minutes) minutes" }
-    return "\(minutes) minutes, \(remainder) seconds"
-  }
 }

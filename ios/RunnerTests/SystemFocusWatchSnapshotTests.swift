@@ -122,6 +122,49 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     XCTAssertEqual(snapshot.activity, .running)
   }
 
+  func testWatchAccessibilitySummaryUsesHumanDurationAndProgress() throws {
+    let ready = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(
+        applicationSnapshot(secondsRemaining: 180)
+      )
+    )
+    XCTAssertEqual(ready.progressPercent(at: generatedAt), 40)
+    XCTAssertEqual(
+      ready.accessibilitySummary(at: generatedAt),
+      "Focus. Ready when you are. 3 minutes remaining. 40 percent complete."
+    )
+
+    let running = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(
+        applicationSnapshot(
+          activity: "running",
+          secondsRemaining: 83,
+          endsAt: isoDate(generatedAt.addingTimeInterval(83))
+        )
+      )
+    )
+    XCTAssertEqual(
+      running.accessibilitySummary(at: generatedAt),
+      "Focus. Steady focus. Live countdown, 1 minute, 23 seconds remaining at last update. 72 percent complete."
+    )
+  }
+
+  func testWatchAccessibilityDurationsAndActionsStayExplicit() {
+    XCTAssertEqual(SystemFocusWatchSnapshot.accessibleDuration(0), "0 seconds")
+    XCTAssertEqual(SystemFocusWatchSnapshot.accessibleDuration(1), "1 second")
+    XCTAssertEqual(SystemFocusWatchSnapshot.accessibleDuration(60), "1 minute")
+    XCTAssertEqual(SystemFocusWatchSnapshot.accessibleDuration(61), "1 minute, 1 second")
+    XCTAssertEqual(
+      SystemFocusWatchSnapshot.accessibleDuration(3_661),
+      "1 hour, 1 minute, 1 second"
+    )
+    XCTAssertEqual(SystemFocusWatchAction.pause.accessibilityLabel, "Pause FocusHaven timer")
+    XCTAssertEqual(
+      Set(SystemFocusWatchAction.allCases.map(\.accessibilityLabel)).count,
+      SystemFocusWatchAction.allCases.count
+    )
+  }
+
   func testImpossibleDeadlineShapesFailClosed() {
     let pausedWithDeadline = applicationSnapshot(
       activity: "paused",

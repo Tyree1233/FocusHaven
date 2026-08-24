@@ -105,6 +105,52 @@ final class SystemFocusWidgetContentTests: XCTestCase {
     )
   }
 
+  func testAccessibilitySummaryUsesHumanDurationAndBoundedProgress() throws {
+    let ready = try XCTUnwrap(
+      SystemFocusWidgetContent.fromSnapshot(snapshot(), now: now)
+    )
+    XCTAssertEqual(ready.progressPercent, 40)
+    XCTAssertEqual(
+      ready.accessibilitySummary,
+      "Focus. Ready when you are. 15 minutes remaining. 40 percent complete."
+    )
+
+    let running = try XCTUnwrap(
+      SystemFocusWidgetContent.fromSnapshot(
+        snapshot(
+          activity: "running",
+          secondsRemaining: 120,
+          endsAt: Self.utcText(now.addingTimeInterval(83))
+        ),
+        now: now
+      )
+    )
+    XCTAssertEqual(
+      running.accessibilitySummary,
+      "Focus. Steady focus. Live countdown, 1 minute, 23 seconds remaining at last update. 94 percent complete."
+    )
+  }
+
+  func testAccessibilityDurationsAndActionsStayExplicit() {
+    XCTAssertEqual(SystemFocusWidgetContent.accessibleDuration(0), "0 seconds")
+    XCTAssertEqual(SystemFocusWidgetContent.accessibleDuration(1), "1 second")
+    XCTAssertEqual(SystemFocusWidgetContent.accessibleDuration(60), "1 minute")
+    XCTAssertEqual(SystemFocusWidgetContent.accessibleDuration(61), "1 minute, 1 second")
+    XCTAssertEqual(
+      SystemFocusWidgetContent.accessibleDuration(3_661),
+      "1 hour, 1 minute, 1 second"
+    )
+    XCTAssertEqual(SystemFocusWidgetAction.start.accessibilityLabel, "Start FocusHaven timer")
+    XCTAssertEqual(
+      SystemFocusWidgetAction.beginNextSession.accessibilityLabel,
+      "Begin next FocusHaven session"
+    )
+    XCTAssertEqual(
+      Set(SystemFocusWidgetAction.allCases.map(\.accessibilityLabel)).count,
+      SystemFocusWidgetAction.allCases.count
+    )
+  }
+
   func testUnavailableSharedDefaultsFailClosed() {
     let store = SystemFocusSnapshotStore(defaults: nil)
 

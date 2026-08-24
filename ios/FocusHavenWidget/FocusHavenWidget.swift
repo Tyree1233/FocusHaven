@@ -61,6 +61,8 @@ struct FocusHavenWidgetProvider: TimelineProvider {
 
 struct FocusHavenWidgetView: View {
   @Environment(\.widgetFamily) private var family
+  @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+  @ScaledMetric(relativeTo: .title) private var countdownFontSize: CGFloat = 36
   let entry: FocusHavenWidgetEntry
 
   var body: some View {
@@ -80,34 +82,44 @@ struct FocusHavenWidgetView: View {
   }
 
   private func availableView(_ content: SystemFocusWidgetContent) -> some View {
-    VStack(alignment: .leading, spacing: family == .systemSmall ? 8 : 10) {
-      HStack {
-        Label(content.session.title, systemImage: icon(for: content.session))
-          .font(.caption.weight(.semibold))
-          .lineLimit(1)
-        Spacer(minLength: 4)
-        Circle()
-          .fill(content.activity == .running ? Color.green : Color.white.opacity(0.55))
-          .frame(width: 8, height: 8)
-          .accessibilityHidden(true)
-      }
-
-      Spacer(minLength: 2)
-      countdown(content)
-      Text(content.activity.title)
-        .font(.caption)
-        .foregroundColor(.white.opacity(0.82))
-        .lineLimit(1)
-      ProgressView(value: content.progress)
-        .tint(.white)
-        .accessibilityLabel("Session progress")
-        .accessibilityValue("\(Int((content.progress * 100).rounded())) percent")
+    VStack(alignment: .leading, spacing: compactPresentation ? 6 : 10) {
+      timerState(content)
       if family == .systemMedium {
         controls(content)
       }
     }
-    .padding(family == .systemSmall ? 14 : 16)
-    .accessibilityElement(children: .combine)
+    .padding(compactPresentation ? 12 : 16)
+  }
+
+  private var compactPresentation: Bool {
+    family == .systemSmall || dynamicTypeSize.isAccessibilitySize
+  }
+
+  private func timerState(_ content: SystemFocusWidgetContent) -> some View {
+    VStack(alignment: .leading, spacing: compactPresentation ? 4 : 7) {
+      HStack {
+        Label(content.session.title, systemImage: icon(for: content.session))
+          .font(.caption.weight(.semibold))
+          .lineLimit(dynamicTypeSize.isAccessibilitySize ? 2 : 1)
+        Spacer(minLength: 4)
+        Circle()
+          .fill(content.activity == .running ? Color.green : Color.white.opacity(0.55))
+          .frame(width: 8, height: 8)
+      }
+
+      Spacer(minLength: compactPresentation ? 0 : 2)
+      countdown(content)
+      if !dynamicTypeSize.isAccessibilitySize {
+        Text(content.activity.title)
+          .font(.caption)
+          .foregroundColor(.white.opacity(0.82))
+          .lineLimit(1)
+      }
+      ProgressView(value: content.progress)
+        .tint(.white)
+    }
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(content.accessibilitySummary)
   }
 
   private var unavailableView: some View {
@@ -122,6 +134,10 @@ struct FocusHavenWidgetView: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     .padding(16)
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(
+      "Open FocusHaven. Your private timer will appear here after the app is ready."
+    )
   }
 
   @ViewBuilder
@@ -129,15 +145,29 @@ struct FocusHavenWidgetView: View {
     if let deadline = content.endsAt, deadline > entry.date {
       Text(deadline, style: .timer)
         .monospacedDigit()
-        .font(.system(size: family == .systemSmall ? 31 : 36, weight: .bold, design: .rounded))
-        .minimumScaleFactor(0.75)
+        .font(
+          .system(
+            size: family == .systemSmall ? countdownFontSize * (31.0 / 36.0) : countdownFontSize,
+            weight: .bold,
+            design: .rounded
+          )
+        )
+        .minimumScaleFactor(0.65)
         .lineLimit(1)
+        .accessibilityHidden(true)
     } else {
       Text(Self.durationText(content.secondsRemaining))
         .monospacedDigit()
-        .font(.system(size: family == .systemSmall ? 31 : 36, weight: .bold, design: .rounded))
-        .minimumScaleFactor(0.75)
+        .font(
+          .system(
+            size: family == .systemSmall ? countdownFontSize * (31.0 / 36.0) : countdownFontSize,
+            weight: .bold,
+            design: .rounded
+          )
+        )
+        .minimumScaleFactor(0.65)
         .lineLimit(1)
+        .accessibilityHidden(true)
     }
   }
 
@@ -155,7 +185,7 @@ struct FocusHavenWidgetView: View {
       let primary = primaryAction(content.availableActions),
       let primaryURL = commandURL(primary, content: content, token: token)
     {
-      HStack(spacing: 8) {
+      HStack(spacing: dynamicTypeSize.isAccessibilitySize ? 4 : 8) {
         commandLink(primary, url: primaryURL, prominent: true)
         if let secondary = secondaryAction(content.availableActions),
           let secondaryURL = commandURL(secondary, content: content, token: token)
@@ -174,14 +204,15 @@ struct FocusHavenWidgetView: View {
     Link(destination: url) {
       Text(action.title)
         .font(.caption.weight(.semibold))
-        .lineLimit(1)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 7)
+        .lineLimit(2)
+        .multilineTextAlignment(.center)
+        .minimumScaleFactor(0.75)
+        .frame(maxWidth: .infinity, minHeight: 44)
         .background(prominent ? Color.white : Color.white.opacity(0.16))
         .foregroundColor(prominent ? Color(red: 0.09, green: 0.18, blue: 0.31) : .white)
         .clipShape(Capsule())
     }
-    .accessibilityLabel("\(action.title) FocusHaven timer")
+    .accessibilityLabel(action.accessibilityLabel)
   }
 
   private func commandURL(

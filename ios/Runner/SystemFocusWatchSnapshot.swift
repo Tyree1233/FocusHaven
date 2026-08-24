@@ -50,6 +50,17 @@ enum SystemFocusWatchAction: String, CaseIterable {
     case .discardPending: return "Start fresh"
     }
   }
+
+  var accessibilityLabel: String {
+    switch self {
+    case .start: return "Start FocusHaven timer"
+    case .pause: return "Pause FocusHaven timer"
+    case .resume: return "Resume FocusHaven timer"
+    case .reset: return "Reset FocusHaven timer"
+    case .beginNextSession: return "Begin next FocusHaven session"
+    case .discardPending: return "Start a fresh FocusHaven session"
+    }
+  }
 }
 
 /// The complete property-list-safe contract sent from the iPhone to its watch.
@@ -133,6 +144,42 @@ struct SystemFocusWatchSnapshot: Equatable {
   func progress(at date: Date) -> Double {
     let remaining = remainingSeconds(at: date)
     return Double(totalSessionSeconds - remaining) / Double(totalSessionSeconds)
+  }
+
+  func progressPercent(at date: Date) -> Int {
+    min(max(Int((progress(at: date) * 100).rounded()), 0), 100)
+  }
+
+  func accessibilitySummary(at date: Date) -> String {
+    let currentActivity = activity(at: date)
+    let remaining = remainingSeconds(at: date)
+    let duration = Self.accessibleDuration(remaining)
+    let timing: String
+    if currentActivity == .running {
+      timing = "Live countdown, \(duration) remaining at last update."
+    } else {
+      timing = "\(duration) remaining."
+    }
+    let percent = progressPercent(at: date)
+    return "\(session.title). \(currentActivity.title). \(timing) \(percent) percent complete."
+  }
+
+  static func accessibleDuration(_ seconds: Int) -> String {
+    let bounded = max(seconds, 0)
+    let hours = bounded / 3_600
+    let minutes = (bounded % 3_600) / 60
+    let remainder = bounded % 60
+    var parts: [String] = []
+    if hours > 0 {
+      parts.append("\(hours) \(hours == 1 ? "hour" : "hours")")
+    }
+    if minutes > 0 {
+      parts.append("\(minutes) \(minutes == 1 ? "minute" : "minutes")")
+    }
+    if remainder > 0 || parts.isEmpty {
+      parts.append("\(remainder) \(remainder == 1 ? "second" : "seconds")")
+    }
+    return parts.joined(separator: ", ")
   }
 
   static func fromApplicationSnapshot(_ value: [String: Any]?) -> Self? {

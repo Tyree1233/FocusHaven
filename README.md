@@ -3,6 +3,19 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+Apple system-focus surfaces now complete the same large-text and screen-reader
+boundary as their Android counterparts. The iPhone widget exposes its timer
+state separately from every interactive link, announces human-readable
+duration and bounded progress, identifies a running value as a live countdown,
+and gives every control a full-height, wrapping label at accessibility sizes.
+Its visual countdown uses a scalable text style and can contract inside the
+fixed WidgetKit canvas without changing command URLs. Apple Watch
+uses a scrollable waiting state, a reduced large-text heading, width-bounded
+countdown text, vertically stacked 44-point controls at accessibility sizes,
+and the same coherent duration/progress semantics. All action labels remain
+explicit, while private snapshot content, destructive confirmation, phone-side
+authority, stale-command checks, and replay protection are unchanged.
+
 Android system-focus surfaces now adapt without weakening their private command
 contract. The home-screen widget selects a compact layout when either launcher
 dimension is below 180 dp or the system font scale reaches large-text size; its
