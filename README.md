@@ -585,6 +585,11 @@ flutter build web --release
 
 The GitHub Actions workflow uses the locked dependencies and the project's
 pinned Flutter version before analyzing, testing, and building the web release.
+It also runs the Android phone and Wear OS Kotlin unit suites in a separate
+unsigned job using Java 17 and the project's pinned Gradle 9.1.0 version. That
+native job creates only ignored runner-local SDK metadata and has no access to
+release keystores, Apple signing identities, store credentials, or private
+server secrets.
 
 ## Release builds
 

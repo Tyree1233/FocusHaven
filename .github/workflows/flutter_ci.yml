@@ -54,3 +54,54 @@ jobs:
 
       - name: Build web release
         run: flutter build web --release
+
+  native_android:
+    name: Test Android and Wear OS native code
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.44.8
+          channel: stable
+          cache: true
+
+      - name: Install locked dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Configure local Android SDK paths
+        shell: bash
+        run: |
+          flutter_sdk="$(dirname "$(dirname "$(command -v flutter)")")"
+          android_sdk="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          test -n "$android_sdk"
+          printf 'flutter.sdk=%s\nsdk.dir=%s\n' \
+            "$flutter_sdk" "$android_sdk" > android/local.properties
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '9.1.0'
+          cache-provider: basic
+
+      - name: Run Android and Wear OS native tests
+        run: >-
+          gradle -p android
+          :app:testDebugUnitTest
+          :wear:testDebugUnitTest
+          --no-daemon
+          --no-configuration-cache
+          --max-workers=2
+          -Dorg.gradle.jvmargs=-Xmx4G
+          --stacktrace
