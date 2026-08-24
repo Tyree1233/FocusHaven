@@ -205,6 +205,14 @@ class FocusHavenWearActivity :
         val sessionLabel = getString(sessionLabel(presentation.session))
         val statusLabel = getString(activityLabel(presentation.activity))
         val timeLabel = formatTime(presentation.secondsRemaining)
+        val accessibleTimeLabel = formatAccessibleDuration(presentation.secondsRemaining)
+        val completedPercent =
+            checkNotNull(
+                SystemFocusWearAccessibility.completedPercent(
+                    presentation.secondsRemaining,
+                    presentation.totalSessionSeconds,
+                ),
+            )
         sessionView.text = sessionLabel
         statusView.text = statusLabel
         timeView.text = timeLabel
@@ -215,7 +223,8 @@ class FocusHavenWearActivity :
                 R.string.focus_state_description,
                 sessionLabel,
                 statusLabel,
-                timeLabel,
+                accessibleTimeLabel,
+                formatAccessiblePercent(completedPercent),
             )
         renderControls(
             if (presentation.activity == current.activity) current.availableActions else emptySet(),
@@ -260,11 +269,13 @@ class FocusHavenWearActivity :
     ) {
         if (action == null) {
             button.visibility = View.GONE
+            button.contentDescription = null
             button.setOnClickListener(null)
             return
         }
         button.visibility = View.VISIBLE
         button.setText(action.labelResource)
+        button.contentDescription = getString(action.accessibilityLabelResource)
         button.setOnClickListener {
             if (action.isDestructive) confirmDestructiveAction(action) else send(action)
         }
@@ -335,6 +346,43 @@ class FocusHavenWearActivity :
     private fun formatTime(seconds: Int): String =
         String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60)
 
+    private fun formatAccessibleDuration(seconds: Int): String {
+        val duration = SystemFocusWearAccessibility.duration(seconds)
+        val minutes =
+            if (duration.minutes > 0) {
+                resources.getQuantityString(
+                    R.plurals.accessible_minutes,
+                    duration.minutes,
+                    duration.minutes,
+                )
+            } else {
+                null
+            }
+        val remainingSeconds =
+            if (duration.seconds > 0 || minutes == null) {
+                resources.getQuantityString(
+                    R.plurals.accessible_seconds,
+                    duration.seconds,
+                    duration.seconds,
+                )
+            } else {
+                null
+            }
+        return when {
+            minutes != null && remainingSeconds != null ->
+                getString(R.string.accessible_duration_join, minutes, remainingSeconds)
+            minutes != null -> minutes
+            else -> checkNotNull(remainingSeconds)
+        }
+    }
+
+    private fun formatAccessiblePercent(percent: Int): String =
+        resources.getQuantityString(
+            R.plurals.accessible_percent_complete,
+            percent,
+            percent,
+        )
+
     companion object {
         const val SNAPSHOT_PATH = "/focus_haven/system_focus/snapshot/v2"
         private const val RECEIPT_TIMEOUT_MILLIS = 8_000L
@@ -365,6 +413,19 @@ class FocusHavenWearActivity :
 
     private val SystemFocusWearAction.isDestructive: Boolean
         get() = this == SystemFocusWearAction.RESET || this == SystemFocusWearAction.DISCARD_PENDING
+
+    private val SystemFocusWearAction.accessibilityLabelResource: Int
+        get() =
+            when (this) {
+                SystemFocusWearAction.START -> R.string.action_start_accessibility
+                SystemFocusWearAction.PAUSE -> R.string.action_pause_accessibility
+                SystemFocusWearAction.RESUME -> R.string.action_resume_accessibility
+                SystemFocusWearAction.RESET -> R.string.action_reset_accessibility
+                SystemFocusWearAction.BEGIN_NEXT_SESSION ->
+                    R.string.action_next_session_accessibility
+                SystemFocusWearAction.DISCARD_PENDING ->
+                    R.string.action_discard_accessibility
+            }
 
     private val SystemFocusWearAction.confirmationTitleResource: Int
         get() =

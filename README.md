@@ -3,6 +3,21 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+Android system-focus surfaces now adapt without weakening their private command
+contract. The home-screen widget selects a compact layout when either launcher
+dimension is below 180 dp or the system font scale reaches large-text size; its
+minimum resize size is 110 dp, both layouts retain 48 dp controls, and compact
+mode hides duplicate decoration while preserving the complete semantic timer
+state. Static states announce human-readable duration and completion progress,
+while a running state identifies its live countdown instead of freezing a stale
+spoken timestamp. Package replacement also republishes every bound widget so an
+app update cannot leave stale presentation or accessibility metadata. Wear OS
+uses smaller round-screen insets, vertically growing
+two-line controls, a width-bounded countdown, one coherent duration/progress
+description, and explicit focus-timer action labels. These presentation rules
+derive only from the validated text-free snapshot and do not alter command
+authorization, replay protection, or phone authority.
+
 The core session countdown now adapts to its available width instead of
 assuming a fixed phone layout. Large accessibility text scales down only when
 needed to stay inside the timer ring, and screen readers receive one coherent

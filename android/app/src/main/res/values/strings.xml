@@ -11,12 +11,33 @@
     <string name="focus_haven_widget_completed">Session complete</string>
     <string name="focus_haven_widget_pending_resume">Ready to return</string>
     <string name="focus_haven_widget_open_to_begin">Open FocusHaven to begin</string>
-    <string name="focus_haven_widget_description_template">%1$s, %2$s, %3$s remaining</string>
+    <string name="focus_haven_widget_default_time">25:00</string>
+    <string name="focus_haven_widget_description_template">%1$s. %2$s. %3$s remaining. %4$s</string>
+    <string name="focus_haven_widget_running_description_template">%1$s. %2$s. Live countdown</string>
     <string name="focus_haven_widget_accessibility">%1$s. Double tap to open FocusHaven.</string>
+    <plurals name="focus_haven_accessible_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="focus_haven_accessible_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+    <plurals name="focus_haven_accessible_percent_complete">
+        <item quantity="one">%d percent complete</item>
+        <item quantity="other">%d percent complete</item>
+    </plurals>
+    <string name="focus_haven_accessible_duration_join">%1$s, %2$s</string>
     <string name="focus_haven_widget_start">Start</string>
     <string name="focus_haven_widget_pause">Pause</string>
     <string name="focus_haven_widget_resume">Resume</string>
     <string name="focus_haven_widget_reset">Reset</string>
     <string name="focus_haven_widget_next">Next session</string>
     <string name="focus_haven_widget_discard">Discard</string>
+    <string name="focus_haven_widget_start_accessibility">Start focus timer</string>
+    <string name="focus_haven_widget_pause_accessibility">Pause focus timer</string>
+    <string name="focus_haven_widget_resume_accessibility">Resume focus timer</string>
+    <string name="focus_haven_widget_reset_accessibility">Reset focus timer</string>
+    <string name="focus_haven_widget_next_accessibility">Begin next timer session</string>
+    <string name="focus_haven_widget_discard_accessibility">Discard waiting timer session</string>
 </resources>

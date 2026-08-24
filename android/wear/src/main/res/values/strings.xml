@@ -12,13 +12,32 @@
     <string name="activity_pending_resume">A session is waiting</string>
     <string name="private_timer_note">Private timer only · Phone remains in control</string>
     <string name="private_controls_note">Private controls · Phone verifies every request</string>
-    <string name="focus_state_description">%1$s. %2$s. %3$s remaining.</string>
+    <string name="focus_state_description">%1$s. %2$s. %3$s remaining. %4$s.</string>
+    <plurals name="accessible_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="accessible_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+    <plurals name="accessible_percent_complete">
+        <item quantity="one">%d percent complete</item>
+        <item quantity="other">%d percent complete</item>
+    </plurals>
+    <string name="accessible_duration_join">%1$s, %2$s</string>
     <string name="action_start">Start</string>
     <string name="action_pause">Pause</string>
     <string name="action_resume">Resume</string>
     <string name="action_reset">Reset</string>
     <string name="action_next_session">Next session</string>
     <string name="action_discard">Discard</string>
+    <string name="action_start_accessibility">Start focus timer</string>
+    <string name="action_pause_accessibility">Pause focus timer</string>
+    <string name="action_resume_accessibility">Resume focus timer</string>
+    <string name="action_reset_accessibility">Reset focus timer</string>
+    <string name="action_next_session_accessibility">Begin next timer session</string>
+    <string name="action_discard_accessibility">Discard waiting timer session</string>
     <string name="confirm_reset">Reset this session?</string>
     <string name="confirm_discard">Discard the waiting session?</string>
     <string name="destructive_action_message">Your phone will verify this request before anything changes.</string>

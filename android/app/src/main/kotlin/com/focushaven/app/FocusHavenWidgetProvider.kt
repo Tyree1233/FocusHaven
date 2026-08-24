@@ -23,7 +23,12 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
         intent: Intent,
     ) {
         super.onReceive(context, intent)
-        if (intent.action == DEADLINE_REFRESH_ACTION) refresh(context)
+        if (
+            intent.action == DEADLINE_REFRESH_ACTION ||
+            intent.action == Intent.ACTION_MY_PACKAGE_REPLACED
+        ) {
+            refresh(context)
+        }
     }
 
     override fun onUpdate(
@@ -70,15 +75,36 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
                 )
             scheduleDeadlineRefresh(context, content?.endsAt)
             for (widgetId in widgetIds) {
-                manager.updateAppWidget(widgetId, render(context, content))
+                val options = manager.getAppWidgetOptions(widgetId)
+                val layout =
+                    SystemFocusWidgetAccessibility.layoutFor(
+                        minWidthDp =
+                            options.getInt(
+                                AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH,
+                                SystemFocusWidgetAccessibility.STANDARD_MIN_WIDTH_DP,
+                            ),
+                        minHeightDp =
+                            options.getInt(
+                                AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT,
+                                SystemFocusWidgetAccessibility.STANDARD_MIN_HEIGHT_DP,
+                            ),
+                        fontScale = context.resources.configuration.fontScale,
+                    )
+                manager.updateAppWidget(widgetId, render(context, content, layout))
             }
         }
 
         private fun render(
             context: Context,
             content: SystemFocusWidgetContent?,
+            layout: SystemFocusWidgetLayout,
         ): RemoteViews {
-            val views = RemoteViews(context.packageName, R.layout.focus_haven_widget)
+            val layoutResource =
+                when (layout) {
+                    SystemFocusWidgetLayout.STANDARD -> R.layout.focus_haven_widget
+                    SystemFocusWidgetLayout.COMPACT -> R.layout.focus_haven_widget_compact
+                }
+            val views = RemoteViews(context.packageName, layoutResource)
             val openIntent =
                 Intent(context, MainActivity::class.java).apply {
                     action = Intent.ACTION_VIEW
@@ -140,16 +166,31 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
             } else {
                 showStaticTime(views, content.secondsRemaining)
             }
-            setDescription(
-                context,
-                views,
-                context.getString(
-                    R.string.focus_haven_widget_description_template,
-                    sessionLabel,
-                    statusLabel,
-                    formatTime(content.secondsRemaining),
-                ),
-            )
+            val stateDescription =
+                if (content.isRunning) {
+                    context.getString(
+                        R.string.focus_haven_widget_running_description_template,
+                        sessionLabel,
+                        statusLabel,
+                    )
+                } else {
+                    context.getString(
+                        R.string.focus_haven_widget_description_template,
+                        sessionLabel,
+                        statusLabel,
+                        formatAccessibleDuration(context, content.secondsRemaining),
+                        formatAccessiblePercent(
+                            context,
+                            checkNotNull(
+                                SystemFocusWidgetAccessibility.completedPercent(
+                                    content.secondsRemaining,
+                                    content.totalSessionSeconds,
+                                ),
+                            ),
+                        ),
+                    )
+                }
+            setDescription(context, views, stateDescription)
             return views
         }
 
@@ -180,12 +221,22 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
                 R.id.focus_haven_widget_primary_action,
                 context.getString(primaryAction.labelResource),
             )
+            views.setContentDescription(
+                R.id.focus_haven_widget_primary_action,
+                context.getString(primaryAction.accessibilityLabelResource),
+            )
             views.setOnClickPendingIntent(
                 R.id.focus_haven_widget_primary_action,
                 commandPendingIntent(context, content, primaryAction),
             )
             if (SystemFocusWidgetAction.RESET in content.availableActions) {
                 views.setViewVisibility(R.id.focus_haven_widget_reset_action, View.VISIBLE)
+                views.setContentDescription(
+                    R.id.focus_haven_widget_reset_action,
+                    context.getString(
+                        SystemFocusWidgetAction.RESET.accessibilityLabelResource,
+                    ),
+                )
                 views.setOnClickPendingIntent(
                     R.id.focus_haven_widget_reset_action,
                     commandPendingIntent(context, content, SystemFocusWidgetAction.RESET),
@@ -286,6 +337,53 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
         private fun formatTime(seconds: Int): String =
             String.format(Locale.US, "%d:%02d", seconds / 60, seconds % 60)
 
+        private fun formatAccessibleDuration(
+            context: Context,
+            seconds: Int,
+        ): String {
+            val duration = SystemFocusWidgetAccessibility.duration(seconds)
+            val minutes =
+                if (duration.minutes > 0) {
+                    context.resources.getQuantityString(
+                        R.plurals.focus_haven_accessible_minutes,
+                        duration.minutes,
+                        duration.minutes,
+                    )
+                } else {
+                    null
+                }
+            val remainingSeconds =
+                if (duration.seconds > 0 || minutes == null) {
+                    context.resources.getQuantityString(
+                        R.plurals.focus_haven_accessible_seconds,
+                        duration.seconds,
+                        duration.seconds,
+                    )
+                } else {
+                    null
+                }
+            return when {
+                minutes != null && remainingSeconds != null ->
+                    context.getString(
+                        R.string.focus_haven_accessible_duration_join,
+                        minutes,
+                        remainingSeconds,
+                    )
+                minutes != null -> minutes
+                else -> checkNotNull(remainingSeconds)
+            }
+        }
+
+        private fun formatAccessiblePercent(
+            context: Context,
+            percent: Int,
+        ): String =
+            context.resources.getQuantityString(
+                R.plurals.focus_haven_accessible_percent_complete,
+                percent,
+                percent,
+            )
+
         private val SystemFocusWidgetSession.labelResource: Int
             get() =
                 when (this) {
@@ -316,6 +414,23 @@ class FocusHavenWidgetProvider : AppWidgetProvider() {
                         R.string.focus_haven_widget_next
                     SystemFocusWidgetAction.DISCARD_PENDING ->
                         R.string.focus_haven_widget_discard
+                }
+
+        private val SystemFocusWidgetAction.accessibilityLabelResource: Int
+            get() =
+                when (this) {
+                    SystemFocusWidgetAction.START ->
+                        R.string.focus_haven_widget_start_accessibility
+                    SystemFocusWidgetAction.PAUSE ->
+                        R.string.focus_haven_widget_pause_accessibility
+                    SystemFocusWidgetAction.RESUME ->
+                        R.string.focus_haven_widget_resume_accessibility
+                    SystemFocusWidgetAction.RESET ->
+                        R.string.focus_haven_widget_reset_accessibility
+                    SystemFocusWidgetAction.BEGIN_NEXT_SESSION ->
+                        R.string.focus_haven_widget_next_accessibility
+                    SystemFocusWidgetAction.DISCARD_PENDING ->
+                        R.string.focus_haven_widget_discard_accessibility
                 }
     }
 }
