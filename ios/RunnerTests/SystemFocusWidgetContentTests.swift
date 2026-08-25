@@ -18,10 +18,12 @@ final class SystemFocusWidgetContentTests: XCTestCase {
     ]
 
     for (session, activity, expectedSession) in expectations {
-      guard let content = SystemFocusWidgetContent.fromSnapshot(
-        snapshot(session: session, activity: activity),
-        now: now
-      ) else {
+      guard
+        let content = SystemFocusWidgetContent.fromSnapshot(
+          snapshot(session: session, activity: activity),
+          now: now
+        )
+      else {
         XCTFail("Expected safe widget content for \(session) \(activity)")
         continue
       }
@@ -149,6 +151,24 @@ final class SystemFocusWidgetContentTests: XCTestCase {
       Set(SystemFocusWidgetAction.allCases.map(\.accessibilityLabel)).count,
       SystemFocusWidgetAction.allCases.count
     )
+  }
+
+  func testLockScreenClockTextStaysBoundedAndPredictable() {
+    XCTAssertEqual(SystemFocusWidgetContent.clockText(-1), "0:00")
+    XCTAssertEqual(SystemFocusWidgetContent.clockText(0), "0:00")
+    XCTAssertEqual(SystemFocusWidgetContent.clockText(61), "1:01")
+    XCTAssertEqual(SystemFocusWidgetContent.clockText(3_661), "1:01:01")
+  }
+
+  func testCircularLockScreenDurationRoundsUpWithoutInventingAnHour() {
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(-1), "0s")
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(59), "59s")
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(60), "1m")
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(61), "2m")
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(3_599), "60m")
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(3_600), "1h")
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(3_601), "1h 1m")
+    XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(7_199), "2h")
   }
 
   func testUnavailableSharedDefaultsFailClosed() {

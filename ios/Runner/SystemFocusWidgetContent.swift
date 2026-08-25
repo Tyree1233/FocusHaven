@@ -85,6 +85,14 @@ struct SystemFocusWidgetContent: Equatable {
     min(max(Int((progress * 100).rounded()), 0), 100)
   }
 
+  var clockText: String {
+    Self.clockText(secondsRemaining)
+  }
+
+  var compactDurationText: String {
+    Self.compactDurationText(secondsRemaining)
+  }
+
   var accessibilitySummary: String {
     let duration = Self.accessibleDuration(secondsRemaining)
     let timing: String
@@ -112,6 +120,39 @@ struct SystemFocusWidgetContent: Equatable {
       parts.append("\(remainder) \(remainder == 1 ? "second" : "seconds")")
     }
     return parts.joined(separator: ", ")
+  }
+
+  static func clockText(_ seconds: Int) -> String {
+    let bounded = max(seconds, 0)
+    let hours = bounded / 3_600
+    let minutes = (bounded % 3_600) / 60
+    let remainder = bounded % 60
+    if hours > 0 {
+      return String(format: "%d:%02d:%02d", hours, minutes, remainder)
+    }
+    return String(format: "%d:%02d", minutes, remainder)
+  }
+
+  static func compactDurationText(_ seconds: Int) -> String {
+    let bounded = max(seconds, 0)
+    if bounded >= 3_600 {
+      let hours = bounded / 3_600
+      let secondsAfterHour = bounded % 3_600
+      let remainingMinutes =
+        secondsAfterHour / 60 + (secondsAfterHour % 60 == 0 ? 0 : 1)
+      if remainingMinutes == 60 {
+        return "\(hours + 1)h"
+      }
+      if remainingMinutes > 0 {
+        return "\(hours)h \(remainingMinutes)m"
+      }
+      return "\(hours)h"
+    }
+    if bounded >= 60 {
+      let roundedMinutes = bounded / 60 + (bounded % 60 == 0 ? 0 : 1)
+      return "\(roundedMinutes)m"
+    }
+    return "\(bounded)s"
   }
 
   static func fromSnapshot(

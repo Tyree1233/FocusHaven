@@ -15,6 +15,13 @@ countdown text, vertically stacked 44-point controls at accessibility sizes,
 and the same coherent duration/progress semantics. All action labels remain
 explicit, while private snapshot content, destructive confirmation, phone-side
 authority, stale-command checks, and replay protection are unchanged.
+On iOS 16 and later, that same extension now offers purpose-built inline,
+circular, and rectangular Lock Screen families. They remain read-only,
+text-free status surfaces: the exact validated session, calm activity,
+remaining time, and bounded progress are available at a glance without putting
+task, journal, queue, mood, coaching, history, or account content on a locked
+device. The iOS 15 Home Screen widget and its existing medium-size private
+controls remain unchanged.
 
 Android system-focus surfaces now adapt without weakening their private command
 contract. The home-screen widget selects a compact layout when either launcher
@@ -110,10 +117,11 @@ start, pause, resume, reset, discard, and next-session controls only when the
 exact rendered state permits them. Each link carries a rotating private
 capability, enters one app-group command inbox, and is rechecked against the
 current snapshot before Flutter applies its stale, replay, and advertised-action
-gates. Synchronization waits for timer restoration; Lock Screen and Live
-Activity commands remain disabled until their separately authorized transports
-exist. A paired Apple Watch receives only the latest bounded, text-free timer
-snapshot through WatchConnectivity. Its companion shows the current focus or
+gates. Synchronization waits for timer restoration; the iOS 16 Lock Screen
+families are read-only, and Live Activity commands remain disabled until their
+separately authorized transport exists. A paired Apple Watch receives only the
+latest bounded, text-free timer snapshot through WatchConnectivity. Its
+companion shows the current focus or
 break, calm state, progress, and a live local countdown. It offers only the
 start, pause, resume, reset, discard, or next-session actions advertised by the
 exact displayed state. Every request is bounded, expires after one minute, and

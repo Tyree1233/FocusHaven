@@ -65,10 +65,21 @@ struct FocusHavenWidgetView: View {
   @ScaledMetric(relativeTo: .title) private var countdownFontSize: CGFloat = 36
   let entry: FocusHavenWidgetEntry
 
+  @ViewBuilder
   var body: some View {
+    if #available(iOSApplicationExtension 16.0, *), Self.isAccessoryFamily(family) {
+      accessorySurface
+    } else {
+      homeScreenSurface
+    }
+  }
+
+  private var homeScreenSurface: some View {
     ZStack {
       LinearGradient(
-        colors: [Color(red: 0.09, green: 0.18, blue: 0.31), Color(red: 0.20, green: 0.38, blue: 0.49)],
+        colors: [
+          Color(red: 0.09, green: 0.18, blue: 0.31), Color(red: 0.20, green: 0.38, blue: 0.49),
+        ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
       )
@@ -79,6 +90,85 @@ struct FocusHavenWidgetView: View {
       }
     }
     .foregroundColor(.white)
+  }
+
+  @available(iOSApplicationExtension 16.0, *)
+  @ViewBuilder
+  private var accessorySurface: some View {
+    if let content = entry.content {
+      accessoryAvailableView(content)
+    } else {
+      accessoryUnavailableView
+    }
+  }
+
+  @available(iOSApplicationExtension 16.0, *)
+  @ViewBuilder
+  private func accessoryAvailableView(_ content: SystemFocusWidgetContent) -> some View {
+    switch family {
+    case .accessoryInline:
+      Label {
+        inlineTimerText(content)
+      } icon: {
+        Image(systemName: icon(for: content.session))
+      }
+      .lineLimit(1)
+      .accessibilityElement(children: .ignore)
+      .accessibilityLabel(content.accessibilitySummary)
+    case .accessoryCircular:
+      Gauge(value: content.progress) {
+        Image(systemName: icon(for: content.session))
+      } currentValueLabel: {
+        Text(content.compactDurationText)
+          .font(.caption2.weight(.bold))
+          .minimumScaleFactor(0.65)
+      }
+      .gaugeStyle(.accessoryCircular)
+      .accessibilityElement(children: .ignore)
+      .accessibilityLabel(content.accessibilitySummary)
+    case .accessoryRectangular:
+      VStack(alignment: .leading, spacing: 2) {
+        HStack(spacing: 4) {
+          Label(content.session.title, systemImage: icon(for: content.session))
+            .font(.caption.weight(.semibold))
+          Spacer(minLength: 2)
+          Text(content.activity.title)
+            .font(.caption2)
+            .lineLimit(1)
+        }
+        accessoryCountdown(content)
+          .font(.headline.monospacedDigit().weight(.bold))
+          .minimumScaleFactor(0.7)
+          .lineLimit(1)
+        ProgressView(value: content.progress)
+      }
+      .accessibilityElement(children: .ignore)
+      .accessibilityLabel(content.accessibilitySummary)
+    default:
+      EmptyView()
+    }
+  }
+
+  @available(iOSApplicationExtension 16.0, *)
+  @ViewBuilder
+  private var accessoryUnavailableView: some View {
+    switch family {
+    case .accessoryInline:
+      Label("Open FocusHaven", systemImage: "timer")
+    case .accessoryCircular:
+      Image(systemName: "timer")
+        .font(.title2)
+    case .accessoryRectangular:
+      VStack(alignment: .leading, spacing: 3) {
+        Label("FocusHaven", systemImage: "timer")
+          .font(.caption.weight(.semibold))
+        Text("Open the app to prepare your private timer.")
+          .font(.caption2)
+          .lineLimit(2)
+      }
+    default:
+      EmptyView()
+    }
   }
 
   private func availableView(_ content: SystemFocusWidgetContent) -> some View {
@@ -168,6 +258,34 @@ struct FocusHavenWidgetView: View {
         .minimumScaleFactor(0.65)
         .lineLimit(1)
         .accessibilityHidden(true)
+    }
+  }
+
+  @available(iOSApplicationExtension 16.0, *)
+  private func inlineTimerText(_ content: SystemFocusWidgetContent) -> Text {
+    if let deadline = content.endsAt, deadline > entry.date {
+      return Text("\(content.session.title) ") + Text(deadline, style: .timer)
+    }
+    return Text("\(content.session.title) \(content.clockText)")
+  }
+
+  @available(iOSApplicationExtension 16.0, *)
+  @ViewBuilder
+  private func accessoryCountdown(_ content: SystemFocusWidgetContent) -> some View {
+    if let deadline = content.endsAt, deadline > entry.date {
+      Text(deadline, style: .timer)
+    } else {
+      Text(content.clockText)
+    }
+  }
+
+  @available(iOSApplicationExtension 16.0, *)
+  private static func isAccessoryFamily(_ family: WidgetFamily) -> Bool {
+    switch family {
+    case .accessoryInline, .accessoryCircular, .accessoryRectangular:
+      return true
+    default:
+      return false
     }
   }
 
@@ -262,6 +380,18 @@ struct FocusHavenWidgetView: View {
 
 @main
 struct FocusHavenFocusWidget: Widget {
+  private static var supportedWidgetFamilies: [WidgetFamily] {
+    var families: [WidgetFamily] = [.systemSmall, .systemMedium]
+    if #available(iOSApplicationExtension 16.0, *) {
+      families.append(contentsOf: [
+        .accessoryInline,
+        .accessoryCircular,
+        .accessoryRectangular,
+      ])
+    }
+    return families
+  }
+
   var body: some WidgetConfiguration {
     StaticConfiguration(
       kind: SystemFocusSnapshotStore.widgetKind,
@@ -270,7 +400,7 @@ struct FocusHavenFocusWidget: Widget {
       FocusHavenWidgetView(entry: entry)
     }
     .configurationDisplayName("FocusHaven Timer")
-    .description("See your current private focus or break timer at a glance.")
-    .supportedFamilies([.systemSmall, .systemMedium])
+    .description("See your current private focus or break timer on the Home or Lock Screen.")
+    .supportedFamilies(Self.supportedWidgetFamilies)
   }
 }
