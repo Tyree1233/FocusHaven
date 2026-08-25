@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 
-/** Private trampoline that validates a widget tap before opening Flutter. */
+/** Private trampoline that validates a local system-surface tap before opening Flutter. */
 class FocusHavenWidgetCommandActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

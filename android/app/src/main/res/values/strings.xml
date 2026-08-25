@@ -40,4 +40,14 @@
     <string name="focus_haven_widget_reset_accessibility">Reset focus timer</string>
     <string name="focus_haven_widget_next_accessibility">Begin next timer session</string>
     <string name="focus_haven_widget_discard_accessibility">Discard waiting timer session</string>
+    <string name="focus_haven_notification_channel_name">Active focus timer</string>
+    <string name="focus_haven_notification_channel_description">Shows the current private FocusHaven timer and its controls.</string>
+    <string name="focus_haven_notification_focus">Focus timer</string>
+    <string name="focus_haven_notification_short_break">Short break timer</string>
+    <string name="focus_haven_notification_long_break">Long break timer</string>
+    <string name="focus_haven_notification_ready">Ready when you are</string>
+    <string name="focus_haven_notification_running">FocusHaven timer in progress</string>
+    <string name="focus_haven_notification_paused">FocusHaven timer paused</string>
+    <string name="focus_haven_notification_completed">FocusHaven timer complete</string>
+    <string name="focus_haven_notification_pending_resume">FocusHaven timer ready to return</string>
 </resources>

@@ -121,6 +121,29 @@ class SystemFocusWidgetCommandPolicyTest {
                 "not-a-time",
             ),
         )
+
+        val notificationIdentity =
+            SystemFocusWidgetCommandPolicy.notificationPendingIntentIdentity(
+                "start",
+                generatedAt,
+            )
+        assertEquals(
+            "focushaven://system-focus-notification-command/start/1786914000000",
+            notificationIdentity,
+        )
+        assertTrue(notificationIdentity != startIdentity)
+        assertNull(
+            SystemFocusWidgetCommandPolicy.notificationPendingIntentIdentity(
+                "unknown",
+                generatedAt,
+            ),
+        )
+        assertNull(
+            SystemFocusWidgetCommandPolicy.notificationPendingIntentIdentity(
+                "start",
+                "not-a-time",
+            ),
+        )
     }
 
     @Test

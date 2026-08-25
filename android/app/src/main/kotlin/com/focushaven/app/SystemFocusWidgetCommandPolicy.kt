@@ -52,6 +52,16 @@ internal object SystemFocusWidgetCommandPolicy {
             "$actionName/${generatedAt.toEpochMilli()}"
     }
 
+    fun notificationPendingIntentIdentity(
+        actionName: String?,
+        snapshotGeneratedAt: String?,
+    ): String? {
+        if (actionName !in supportedActions) return null
+        val generatedAt = parseInstant(snapshotGeneratedAt) ?: return null
+        return "focushaven://system-focus-notification-command/" +
+            "$actionName/${generatedAt.toEpochMilli()}"
+    }
+
     fun isFreshPendingCommand(
         createdAtEpochMillis: Long,
         nowEpochMillis: Long,

@@ -1,6 +1,6 @@
 # FocusHaven Store Privacy and Permission Disclosure Matrix
 
-**Audit date: August 24, 2026**
+**Audit date: August 25, 2026**
 
 This document is the source-backed working record for FocusHaven's Apple App
 Store privacy answers, Google Play Data safety answers, permission explanations,
@@ -55,9 +55,9 @@ service limits. The app claims success only after the callable confirms it.
 
 | Permission or capability | Why it exists | Request or activation boundary | Data handling |
 | --- | --- | --- | --- |
-| `POST_NOTIFICATIONS` | Local reminders and timer-completion notices | Requested only from a reminder flow | Notification content and schedules remain on device |
+| `POST_NOTIFICATIONS` | Local reminders, timer-completion notices, and one optional text-free ongoing timer with Lock Screen controls | Requested only from a reminder flow; the ongoing surface never prompts by itself | Notification content, schedules, and bounded timer snapshot remain on device |
 | `READ_CALENDAR` | Optional Haven Window suggestions | Requested only after the user chooses to review calendar access | Reads busy start/end boundaries only; titles, calendar names, notes, attendees, locations, URLs, and identifiers do not enter the model or leave the device |
-| `RECEIVE_BOOT_COMPLETED` | Restore locally scheduled reminders after reboot | No runtime prompt | Does not collect reboot history |
+| `RECEIVE_BOOT_COMPLETED` | Restore locally scheduled reminders and reconcile an already-authorized ongoing timer after reboot | No runtime prompt | Does not collect reboot history |
 | `VIBRATE` and `WAKE_LOCK` | Local notification delivery | Indirect plugin permissions | No user data is collected for these capabilities |
 | `INTERNET` and `ACCESS_NETWORK_STATE` | Firebase authentication, optional backup, enhanced coaching, Google sign-in, and purchases | Network access follows the feature boundaries below | All application network endpoints use encrypted transport; cleartext traffic is disabled |
 | `BILLING` | Optional Google Play purchase and restore flow | Only after a purchase or restore action | Google Play processes payment details; FocusHaven receives product and transaction status, not payment-card numbers |
@@ -89,7 +89,7 @@ Advertising Identifier or App Tracking Transparency framework.
 | Local focus experience | Timer settings and state, session history, goals, focus task, queue items, parked thoughts, journal reflections and moods, focus profile, appearance/onboarding settings, coaching conversation, reminder settings, and recognized Pro state | Required for the feature that stores it | App-private device storage | Delete local data, feature-specific clear controls, OS app-data clearing, or uninstall |
 | Calendar assistance | Busy event start/end boundaries and derived open windows | Optional | On-device only; not included in cloud backup or coaching | Deny/revoke calendar access or leave Haven Window off |
 | Focus Shield | Opaque Family Controls selections and coarse authorization/protection state | Optional | Apple system stores and app-private device storage | Disable Focus Shield, change selection, or revoke authorization |
-| System widgets and watches | Session type, activity, remaining/total seconds, generated/deadline timestamps, and rotating command capability | Optional surface | App group, app-private preferences, or paired-device transport | Remove the widget/companion app; reset or stop the timer |
+| System widgets, Android ongoing notification, and watches | Session type, activity, remaining/total seconds, generated/deadline timestamps, and rotating command capability | Optional surface | App group, app-private preferences, local notification, or paired-device transport | Remove the widget/companion app, revoke notification access, or reset/stop the timer |
 | Anonymous authentication | Firebase Authentication user ID, IP address, Firebase/user-agent metadata, app identifier, and security metadata | Automatic when Firebase is available | Google Firebase Authentication according to the configured project and Firebase terms | Guests do not receive signed-in cloud-backup storage; signing into a provider replaces the guest session, and confirmed signed-in account deletion returns the app to a fresh guest identity |
 | Google sign-in | Name, email address, Google/federated identifier, Firebase user ID, authentication tokens handled by the SDK, IP and service metadata | Optional | Google Sign-In and Firebase Authentication | Sign out; confirmed account deletion reauthenticates before removing the Firebase identity and associated FocusHaven cloud data |
 | Apple sign-in | Apple/federated identifier, authentication credentials, and optional name, email, or private relay address | Optional on supported Apple devices after production activation | Apple and Firebase Authentication | Sign out; confirmed account deletion reauthenticates and attempts automatic Apple authorization revocation. Missing or failed revocation cannot block verified deletion; the app directs the user to stop using Sign in with Apple manually |
@@ -202,6 +202,8 @@ Review notes should make these boundaries easy to verify:
 - [Firebase Android data-disclosure guidance](https://firebase.google.com/docs/android/play-data-disclosure)
 - [Firebase Apple data-collection guidance](https://firebase.google.com/docs/ios/app-store-data-collection)
 - [Firebase Flutter federated authentication](https://firebase.google.com/docs/auth/flutter/federated-auth)
+- [Android notification runtime permission](https://developer.android.com/develop/ui/compose/notifications/notification-permission)
+- [Android notification and Lock Screen visibility](https://developer.android.com/develop/ui/compose/notifications/create-notification)
 
 This matrix must be reviewed whenever a permission, entitlement, SDK, backend
 field, authentication provider, purchase path, diagnostic path, or remote data

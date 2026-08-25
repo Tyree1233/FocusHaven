@@ -32,6 +32,20 @@ system-disabled Live Activity is dismissed. The payload remains below
 ActivityKit's four-kilobyte boundary and carries no command capability or
 user-authored content. All Live Activity regions are intentionally read-only.
 
+On Android, a running timer can now publish one low-interruption ongoing
+notification using the notification access the person has already chosen. Its
+notification-drawer and Lock Screen presentation contain only the validated
+session kind, calm activity, system-rendered deadline countdown, and bounded
+progress; task, journal, queue, mood, coaching, history, and account content
+never enter it. Pause, resume, reset, and recovery controls use immutable
+snapshot-specific intents and the same non-exported command trampoline,
+app-private inbox, stale/replay checks, and Flutter authorization router as the
+home-screen widget. Paused or pending-resume state can update only an already
+active notification, while ready, completed, malformed, denied, or expired
+state removes it. The surface never requests permission, starts a foreground
+service, polls, or changes the timer directly, and it restores or settles only
+from the private snapshot after reboot or package replacement.
+
 Android system-focus surfaces now adapt without weakening their private command
 contract. The home-screen widget selects a compact layout when either launcher
 dimension is below 180 dp or the system font scale reaches large-text size; its
@@ -74,8 +88,8 @@ requested shields can be read back from the system settings store. Android
 continues to report unsupported because its consumer APIs do not provide an
 equivalent privacy-preserving enforcement contract.
 
-Future home-screen widgets, lock-screen experiences, notifications, and watch
-companions share one versioned system-focus snapshot. The contract contains
+System widgets, lock-screen experiences, notifications, and watch companions
+share one versioned system-focus snapshot. The contract contains
 only the session kind, timer activity, bounded duration, UTC timestamps, and
 the commands valid for that state. It excludes task names, reflections,
 journal and coaching content, focus history, moods, and account identifiers by

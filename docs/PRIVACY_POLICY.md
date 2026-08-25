@@ -1,6 +1,6 @@
 # FocusHaven Privacy Policy
 
-**Effective date: August 24, 2026**
+**Effective date: August 25, 2026**
 
 FocusHaven is a focus timer and wellbeing companion created by Tyree Jones. This policy explains what information FocusHaven uses and why.
 
@@ -22,7 +22,7 @@ FocusHaven can optionally use calendar access for Haven Window suggestions. It r
 
 On supported Apple devices, Focus Shield uses Apple's Family Controls and Managed Settings frameworks. Your selected applications, categories, and web domains are represented by opaque system tokens that remain in Apple system storage and FocusHaven's private on-device storage. They are not sent to Flutter, Firebase, OpenAI, or an advertising service.
 
-FocusHaven's widgets, Live Activity, Apple Watch app, and Wear OS app receive only a bounded timer snapshot: session type and activity, remaining and total seconds, and timestamps needed to render the timer. Interactive Home Screen, Apple Watch, and Wear OS surfaces also receive a rotating private command capability. The iPhone Lock Screen widget, Live Activity, and Dynamic Island are read-only and receive no command capability. None of these surfaces receive your task, journal, mood, queue, parked thoughts, coaching conversation, or focus history.
+FocusHaven's widgets, Android ongoing timer notification, Live Activity, Apple Watch app, and Wear OS app receive only a bounded timer snapshot: session type and activity, remaining and total seconds, and timestamps needed to render the timer. Interactive Android Home Screen and Lock Screen notification controls, Apple Watch, and Wear OS surfaces also receive a rotating private command identity. The iPhone Lock Screen widget, Live Activity, and Dynamic Island are read-only and receive no command capability. None of these surfaces receive your task, journal, mood, queue, parked thoughts, coaching conversation, or focus history.
 
 ## Focus Coach and optional enhanced AI coaching
 
@@ -52,7 +52,7 @@ FocusHaven also uses Firebase App Check and platform integrity services to prote
 
 ## Notifications
 
-FocusHaven asks for notification permission only to send device-local reminders and session-completion messages. Notifications are generated on your device and are not used for advertising.
+FocusHaven asks for notification permission only from its reminder flow. When you grant it, FocusHaven can send device-local reminders and session-completion messages and can show one optional ongoing Android timer notification with generic Lock Screen controls. That ongoing surface contains only the bounded timer snapshot described above, never requests permission by itself, and is removed when the session no longer needs it or notification access is unavailable. Notifications are generated on your device and are not used for advertising.
 
 ## Operational diagnostics
 

@@ -77,6 +77,7 @@ internal object SystemFocusSnapshotStore {
             .putString(SNAPSHOT_KEY, encoded.toString())
             .apply()
         FocusHavenWidgetProvider.refresh(context)
+        SystemFocusOngoingNotificationPublisher.publish(context, snapshot)
         SystemFocusWearPublisher.publish(context, snapshot)
     }
 
