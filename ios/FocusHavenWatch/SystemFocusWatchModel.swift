@@ -1,5 +1,6 @@
 import Foundation
 import WatchConnectivity
+import WidgetKit
 
 enum SystemFocusWatchCommandState: Equatable {
   case idle
@@ -90,6 +91,9 @@ final class SystemFocusWatchModel: NSObject, ObservableObject {
 
   private func receive(_ value: [String: Any]) {
     guard store.save(value), let snapshot = store.load() else { return }
+    WidgetCenter.shared.reloadTimelines(
+      ofKind: SystemFocusWatchComplicationContent.widgetKind
+    )
     DispatchQueue.main.async { [weak self] in
       if self?.snapshot?.generatedAtMilliseconds != snapshot.generatedAtMilliseconds {
         self?.commandState = .idle

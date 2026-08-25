@@ -148,8 +148,12 @@ capability, enters one app-group command inbox, and is rechecked against the
 current snapshot before Flutter applies its stale, replay, and advertised-action
 gates. Synchronization waits for timer restoration; the iOS 16 Lock Screen
 families and iOS 16.1 Live Activity/Dynamic Island presentation are read-only,
-and Live Activity commands remain disabled. A paired Apple Watch receives only the
-latest bounded, text-free timer snapshot through WatchConnectivity. Its
+and Live Activity commands remain disabled. A paired Apple Watch receives only
+the latest bounded, text-free timer snapshot through WatchConnectivity. The
+Watch app and its WidgetKit complication share only that validated snapshot
+through the registered app-group container, and a valid incoming state reloads
+the inline, circular, rectangular, and corner complication families.
+Complications remain read-only and open the Watch app for any action. The
 companion shows the current focus or
 break, calm state, progress, and a live local countdown. It offers only the
 start, pause, resume, reset, discard, or next-session actions advertised by the

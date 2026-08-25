@@ -165,6 +165,113 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     )
   }
 
+  func testComplicationProjectsOnlyCurrentBoundedTimerState() throws {
+    let snapshot = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(
+        applicationSnapshot(secondsRemaining: 180)
+      )
+    )
+
+    let content = SystemFocusWatchComplicationContent(
+      snapshot: snapshot,
+      at: generatedAt
+    )
+
+    XCTAssertEqual(content.session, .focus)
+    XCTAssertEqual(content.activity, .ready)
+    XCTAssertEqual(content.secondsRemaining, 180)
+    XCTAssertEqual(content.totalSessionSeconds, 300)
+    XCTAssertEqual(content.clockText, "3:00")
+    XCTAssertEqual(content.compactDurationText, "3:00")
+    XCTAssertEqual(content.progress, 0.4, accuracy: 0.001)
+    XCTAssertNil(content.endsAt)
+    XCTAssertNil(content.timelineReloadDate)
+    XCTAssertEqual(
+      content.accessibilitySummary,
+      "Focus. Ready when you are. 3 minutes remaining. 40 percent complete."
+    )
+  }
+
+  func testRunningComplicationUsesDeadlineAndExpiresLocally() throws {
+    let deadline = generatedAt.addingTimeInterval(300)
+    let snapshot = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(
+        applicationSnapshot(
+          activity: "running",
+          endsAt: isoDate(deadline)
+        )
+      )
+    )
+
+    let running = SystemFocusWatchComplicationContent(
+      snapshot: snapshot,
+      at: generatedAt.addingTimeInterval(75)
+    )
+    XCTAssertEqual(running.activity, .running)
+    XCTAssertEqual(running.secondsRemaining, 225)
+    XCTAssertEqual(running.clockText, "3:45")
+    XCTAssertEqual(running.progress, 0.25, accuracy: 0.001)
+    XCTAssertEqual(running.endsAt, deadline)
+    XCTAssertEqual(running.timelineReloadDate, deadline)
+
+    let expired = SystemFocusWatchComplicationContent(
+      snapshot: snapshot,
+      at: deadline.addingTimeInterval(1)
+    )
+    XCTAssertEqual(expired.activity, .completed)
+    XCTAssertEqual(expired.secondsRemaining, 0)
+    XCTAssertEqual(expired.progress, 1)
+    XCTAssertNil(expired.endsAt)
+    XCTAssertNil(expired.timelineReloadDate)
+  }
+
+  func testComplicationFormatsLongDurationsWithoutUnboundedText() throws {
+    let snapshot = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(
+        applicationSnapshot(
+          secondsRemaining: 3_661,
+          totalSessionSeconds: 7_200
+        )
+      )
+    )
+    let content = SystemFocusWatchComplicationContent(
+      snapshot: snapshot,
+      at: generatedAt
+    )
+
+    XCTAssertEqual(content.clockText, "61:01")
+    XCTAssertEqual(content.compactDurationText, "1:01")
+  }
+
+  func testWatchStoreMigratesValidatedLegacySnapshotIntoSharedDefaults() throws {
+    let sharedSuite = "FocusHavenWatchSharedTests.\(UUID().uuidString)"
+    let legacySuite = "FocusHavenWatchLegacyTests.\(UUID().uuidString)"
+    let key = "snapshot"
+    let shared = try XCTUnwrap(UserDefaults(suiteName: sharedSuite))
+    let legacy = try XCTUnwrap(UserDefaults(suiteName: legacySuite))
+    defer {
+      shared.removePersistentDomain(forName: sharedSuite)
+      legacy.removePersistentDomain(forName: legacySuite)
+    }
+    let snapshot = try XCTUnwrap(
+      SystemFocusWatchSnapshot.fromApplicationSnapshot(applicationSnapshot())
+    )
+    let legacyStore = SystemFocusWatchSnapshotStore(
+      defaults: legacy,
+      legacyDefaults: legacy,
+      storageKey: key
+    )
+    XCTAssertTrue(legacyStore.save(snapshot.wireDictionary))
+
+    let sharedStore = SystemFocusWatchSnapshotStore(
+      defaults: shared,
+      legacyDefaults: legacy,
+      storageKey: key
+    )
+    XCTAssertEqual(sharedStore.load(), snapshot)
+    XCTAssertNotNil(shared.data(forKey: key))
+  }
+
   func testImpossibleDeadlineShapesFailClosed() {
     let pausedWithDeadline = applicationSnapshot(
       activity: "paused",
@@ -271,7 +378,8 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
 
     for (activity, expected) in expectations {
       let remaining = activity == "completed" ? 0 : 300
-      let endsAt: Any = activity == "running"
+      let endsAt: Any =
+        activity == "running"
         ? isoDate(generatedAt.addingTimeInterval(300))
         : NSNull()
       let snapshot = try XCTUnwrap(
@@ -448,6 +556,7 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     session: String = "focus",
     activity: String = "ready",
     secondsRemaining: Int = 300,
+    totalSessionSeconds: Int = 300,
     endsAt: Any = NSNull(),
     generatedAt: Date? = nil
   ) -> [String: Any] {
@@ -456,7 +565,7 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
       "session": session,
       "activity": activity,
       "secondsRemaining": secondsRemaining,
-      "totalSessionSeconds": 300,
+      "totalSessionSeconds": totalSessionSeconds,
       "generatedAt": isoDate(generatedAt ?? self.generatedAt),
       "endsAt": endsAt,
     ]
@@ -489,9 +598,11 @@ final class SystemFocusWatchSnapshotTests: XCTestCase {
     now: Date
   ) -> SystemFocusWatchCommandResult? {
     var result: SystemFocusWatchCommandResult?
-    bridge.receiveCommand(command.wireDictionary, reply: { value in
-      result = SystemFocusWatchCommandResult.fromWireDictionary(value)
-    }, now: now)
+    bridge.receiveCommand(
+      command.wireDictionary,
+      reply: { value in
+        result = SystemFocusWatchCommandResult.fromWireDictionary(value)
+      }, now: now)
     return result
   }
 

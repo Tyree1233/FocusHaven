@@ -46,6 +46,14 @@
 		A13400000000000000000004 /* HavenWindowAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13400000000000000000014 /* HavenWindowAvailabilityTests.swift */; };
 		A18300000000000000000001 /* SystemFocusLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18300000000000000000011 /* SystemFocusLiveActivityController.swift */; };
 		A12000000000000000000060 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000061 /* Assets.xcassets */; };
+		A18600000000000000000001 /* SystemFocusWatchComplicationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18600000000000000000011 /* SystemFocusWatchComplicationContent.swift */; };
+		A18600000000000000000002 /* SystemFocusWatchComplicationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18600000000000000000011 /* SystemFocusWatchComplicationContent.swift */; };
+		A18600000000000000000003 /* SystemFocusWatchComplicationContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18600000000000000000011 /* SystemFocusWatchComplicationContent.swift */; };
+		A18600000000000000000004 /* SystemFocusWatchSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000011 /* SystemFocusWatchSnapshot.swift */; };
+		A18600000000000000000005 /* SystemFocusWatchSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000015 /* SystemFocusWatchSnapshotStore.swift */; };
+		A18600000000000000000006 /* FocusHavenWatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18600000000000000000012 /* FocusHavenWatchWidget.swift */; };
+		A18600000000000000000007 /* FocusHavenWatchWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A18600000000000000000015 /* FocusHavenWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A18600000000000000000008 /* SystemFocusWatchSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000015 /* SystemFocusWatchSnapshotStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +77,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A12000000000000000000040;
 			remoteInfo = FocusHavenWatch;
+		};
+		A18600000000000000000041 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A18600000000000000000040;
+			remoteInfo = FocusHavenWatchWidget;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -103,6 +118,17 @@
 				A12000000000000000000007 /* FocusHavenWatch.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A18600000000000000000030 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A18600000000000000000007 /* FocusHavenWatchWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -156,6 +182,12 @@
 		A18300000000000000000011 /* SystemFocusLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusLiveActivityController.swift; sourceTree = "<group>"; };
 		CD7D0BCC06E1135355B657D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A12000000000000000000061 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A18600000000000000000011 /* SystemFocusWatchComplicationContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusWatchComplicationContent.swift; sourceTree = "<group>"; };
+		A18600000000000000000012 /* FocusHavenWatchWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusHavenWatchWidget.swift; sourceTree = "<group>"; };
+		A18600000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A18600000000000000000014 /* FocusHavenWatchWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusHavenWatchWidget.entitlements; sourceTree = "<group>"; };
+		A18600000000000000000015 /* FocusHavenWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusHavenWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A18600000000000000000016 /* FocusHavenWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusHavenWatch.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +214,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A12000000000000000000031 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A18600000000000000000031 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -225,6 +264,7 @@
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				A11800000000000000000020 /* FocusHavenWidget */,
 				A12000000000000000000020 /* FocusHavenWatch */,
+				A18600000000000000000020 /* FocusHavenWatchWidget */,
 				CD7D0BCC06E1135355B657D6 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
@@ -236,6 +276,7 @@
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
 				A11800000000000000000016 /* FocusHavenWidget.appex */,
 				A12000000000000000000017 /* FocusHavenWatch.app */,
+				A18600000000000000000015 /* FocusHavenWatchWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -259,6 +300,7 @@
 				A11900000000000000000012 /* SystemFocusPendingCommandStore.swift */,
 				A12000000000000000000011 /* SystemFocusWatchSnapshot.swift */,
 				A12000000000000000000012 /* SystemFocusWatchConnectivityBridge.swift */,
+				A18600000000000000000011 /* SystemFocusWatchComplicationContent.swift */,
 				A12600000000000000000011 /* FocusShieldCapabilityPayload.swift */,
 				A12600000000000000000012 /* FocusShieldNativeController.swift */,
 				A12600000000000000000013 /* FocusShieldPlatformAdapter.swift */,
@@ -288,9 +330,20 @@
 				A12000000000000000000013 /* FocusHavenWatchApp.swift */,
 				A12000000000000000000014 /* SystemFocusWatchModel.swift */,
 				A12000000000000000000015 /* SystemFocusWatchSnapshotStore.swift */,
+				A18600000000000000000016 /* FocusHavenWatch.entitlements */,
 				A12000000000000000000016 /* Info.plist */,
 			);
 			path = FocusHavenWatch;
+			sourceTree = "<group>";
+		};
+		A18600000000000000000020 /* FocusHavenWatchWidget */ = {
+			isa = PBXGroup;
+			children = (
+				A18600000000000000000012 /* FocusHavenWatchWidget.swift */,
+				A18600000000000000000013 /* Info.plist */,
+				A18600000000000000000014 /* FocusHavenWatchWidget.entitlements */,
+			);
+			path = FocusHavenWatchWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -365,15 +418,34 @@
 				A12000000000000000000033 /* Sources */,
 				A12000000000000000000031 /* Frameworks */,
 				A12000000000000000000032 /* Resources */,
+				A18600000000000000000030 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A18600000000000000000042 /* PBXTargetDependency */,
 			);
 			name = FocusHavenWatch;
 			productName = FocusHavenWatch;
 			productReference = A12000000000000000000017 /* FocusHavenWatch.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A18600000000000000000040 /* FocusHavenWatchWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A18600000000000000000054 /* Build configuration list for PBXNativeTarget "FocusHavenWatchWidget" */;
+			buildPhases = (
+				A18600000000000000000033 /* Sources */,
+				A18600000000000000000031 /* Frameworks */,
+				A18600000000000000000032 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FocusHavenWatchWidget;
+			productName = FocusHavenWatchWidget;
+			productReference = A18600000000000000000015 /* FocusHavenWatchWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -412,6 +484,11 @@
 						DevelopmentTeam = J3QFMX6H2P;
 						ProvisioningStyle = Automatic;
 					};
+					A18600000000000000000040 = {
+						CreatedOnToolsVersion = 26.6;
+						DevelopmentTeam = J3QFMX6H2P;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 97C146E91CF9000F007C117D /* Build configuration list for PBXProject "Runner" */;
@@ -434,6 +511,7 @@
 				331C8080294A63A400263BE5 /* RunnerTests */,
 				A11800000000000000000040 /* FocusHavenWidget */,
 				A12000000000000000000040 /* FocusHavenWatch */,
+				A18600000000000000000040 /* FocusHavenWatchWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -470,6 +548,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A12000000000000000000060 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A18600000000000000000032 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -536,6 +621,8 @@
 				A11900000000000000000002 /* SystemFocusPendingCommandStore.swift in Sources */,
 				A12000000000000000000001 /* SystemFocusWatchSnapshot.swift in Sources */,
 				A12000000000000000000002 /* SystemFocusWatchConnectivityBridge.swift in Sources */,
+				A18600000000000000000001 /* SystemFocusWatchComplicationContent.swift in Sources */,
+				A18600000000000000000008 /* SystemFocusWatchSnapshotStore.swift in Sources */,
 				A12600000000000000000001 /* FocusShieldCapabilityPayload.swift in Sources */,
 				A12600000000000000000002 /* FocusShieldNativeController.swift in Sources */,
 				A12600000000000000000003 /* FocusShieldPlatformAdapter.swift in Sources */,
@@ -565,6 +652,18 @@
 				A12000000000000000000004 /* SystemFocusWatchSnapshotStore.swift in Sources */,
 				A12000000000000000000005 /* SystemFocusWatchModel.swift in Sources */,
 				A12000000000000000000006 /* FocusHavenWatchApp.swift in Sources */,
+				A18600000000000000000002 /* SystemFocusWatchComplicationContent.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A18600000000000000000033 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A18600000000000000000003 /* SystemFocusWatchComplicationContent.swift in Sources */,
+				A18600000000000000000004 /* SystemFocusWatchSnapshot.swift in Sources */,
+				A18600000000000000000005 /* SystemFocusWatchSnapshotStore.swift in Sources */,
+				A18600000000000000000006 /* FocusHavenWatchWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -585,6 +684,11 @@
 			isa = PBXTargetDependency;
 			target = A12000000000000000000040 /* FocusHavenWatch */;
 			targetProxy = A12000000000000000000041 /* PBXContainerItemProxy */;
+		};
+		A18600000000000000000042 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A18600000000000000000040 /* FocusHavenWatchWidget */;
+			targetProxy = A18600000000000000000041 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -981,7 +1085,8 @@
 		A12000000000000000000051 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-		ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FocusHavenWatch/FocusHavenWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = J3QFMX6H2P;
@@ -1004,7 +1109,8 @@
 		A12000000000000000000052 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-		ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FocusHavenWatch/FocusHavenWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = J3QFMX6H2P;
@@ -1028,7 +1134,8 @@
 		A12000000000000000000053 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-		ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FocusHavenWatch/FocusHavenWatch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = J3QFMX6H2P;
@@ -1036,6 +1143,94 @@
 				INFOPLIST_FILE = FocusHavenWatch/Info.plist;
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Profile;
+		};
+		A18600000000000000000051 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = FocusHavenWatchWidget/FocusHavenWatchWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FocusHavenWatchWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.watchkitapp.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		A18600000000000000000052 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = FocusHavenWatchWidget/FocusHavenWatchWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FocusHavenWatchWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.watchkitapp.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		A18600000000000000000053 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = FocusHavenWatchWidget/FocusHavenWatchWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = J3QFMX6H2P;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FocusHavenWatchWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.focushaven.app.watchkitapp.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -1097,6 +1292,16 @@
 				A12000000000000000000051 /* Debug */,
 				A12000000000000000000052 /* Release */,
 				A12000000000000000000053 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A18600000000000000000054 /* Build configuration list for PBXNativeTarget "FocusHavenWatchWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A18600000000000000000051 /* Debug */,
+				A18600000000000000000052 /* Release */,
+				A18600000000000000000053 /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

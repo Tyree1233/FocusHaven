@@ -7,6 +7,7 @@ void main() {
   const appBundleId = 'com.focushaven.app';
   const widgetBundleId = 'com.focushaven.app.widget';
   const watchBundleId = 'com.focushaven.app.watchkitapp';
+  const watchWidgetBundleId = 'com.focushaven.app.watchkitapp.widget';
   const appGroupId = 'group.com.focushaven.app';
 
   test('every Apple target uses its registered production identity', () {
@@ -32,27 +33,42 @@ void main() {
     );
     expect(
       RegExp(
+        'PRODUCT_BUNDLE_IDENTIFIER = ${RegExp.escape(watchWidgetBundleId)};',
+      ).allMatches(project),
+      hasLength(3),
+    );
+    expect(
+      RegExp(
         r'PRODUCT_BUNDLE_IDENTIFIER = com\.focushaven\.app\.RunnerTests;',
       ).allMatches(project),
       hasLength(3),
     );
     expect(
       RegExp('DEVELOPMENT_TEAM = $teamId;').allMatches(project),
-      hasLength(12),
+      hasLength(15),
     );
     expect(
       RegExp('DevelopmentTeam = $teamId;').allMatches(project),
-      hasLength(4),
+      hasLength(5),
     );
     expect(project, isNot(contains('com.example.focushaven')));
   });
 
-  test('app and widget share only the registered production group', () {
+  test('app and extensions share only the registered production group', () {
     final runnerEntitlements = _read('ios/Runner/Runner.entitlements');
     final widgetEntitlements = _read(
       'ios/FocusHavenWidget/FocusHavenWidget.entitlements',
     );
     final snapshotStore = _read('ios/Runner/SystemFocusSnapshotStore.swift');
+    final watchEntitlements = _read(
+      'ios/FocusHavenWatch/FocusHavenWatch.entitlements',
+    );
+    final watchWidgetEntitlements = _read(
+      'ios/FocusHavenWatchWidget/FocusHavenWatchWidget.entitlements',
+    );
+    final watchSnapshotStore = _read(
+      'ios/FocusHavenWatch/SystemFocusWatchSnapshotStore.swift',
+    );
 
     expect(runnerEntitlements, contains(appGroupId));
     expect(widgetEntitlements, contains(appGroupId));
@@ -63,6 +79,9 @@ void main() {
       runnerEntitlements,
       widgetEntitlements,
       snapshotStore,
+      watchEntitlements,
+      watchWidgetEntitlements,
+      watchSnapshotStore,
     ]) {
       expect(source, isNot(contains('group.com.example.focushaven')));
     }
