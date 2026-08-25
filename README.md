@@ -630,8 +630,11 @@ Focus-event history is bounded and excludes task names, journal text, mood
 labels, and other user-authored content. It stays on the device unless the user
 explicitly includes local FocusHaven data in an optional cloud backup.
 See the [FocusHaven Privacy Policy](https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html)
-for details. The repository also defines an enforceable
-[privacy-safe diagnostics policy](docs/DIAGNOSTICS_POLICY.md): release clients
-do not include a third-party crash-reporting SDK or upload app-owned crash
-reports, and developer/function diagnostics are restricted to closed,
-content-free fields.
+for details. Store disclosure work is tracked in the source-backed
+[store privacy and permission matrix](docs/STORE_PRIVACY_DISCLOSURE_MATRIX.md),
+including the current pre-submission blockers for equivalent Apple login and
+complete in-app/external account deletion. The repository also defines an
+enforceable [privacy-safe diagnostics policy](docs/DIAGNOSTICS_POLICY.md):
+release clients do not include a third-party crash-reporting SDK or upload
+app-owned crash reports, and developer/function diagnostics are restricted to
+closed, content-free fields.

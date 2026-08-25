@@ -16,6 +16,14 @@ FocusHaven stores the following information locally on your device so its featur
 
 Unless a section below says otherwise, this information remains on your device. Optional cloud backup sends only the supported focus data described in that section.
 
+## Optional device permissions and private system surfaces
+
+FocusHaven can optionally use calendar access for Haven Window suggestions. It reads only busy event start and end times to find a possible opening. Calendar names, event titles, notes, attendees, locations, URLs, and identifiers do not enter FocusHaven's model, and FocusHaven does not create, change, or delete calendar events. Calendar-derived time boundaries remain on your device.
+
+On supported Apple devices, Focus Shield uses Apple's Family Controls and Managed Settings frameworks. Your selected applications, categories, and web domains are represented by opaque system tokens that remain in Apple system storage and FocusHaven's private on-device storage. They are not sent to Flutter, Firebase, OpenAI, or an advertising service.
+
+FocusHaven's widgets, Live Activity, Apple Watch app, and Wear OS app receive only a bounded timer snapshot: session type and activity, remaining and total seconds, timestamps needed to render the timer, and a rotating private command capability. These surfaces do not receive your task, journal, mood, queue, parked thoughts, coaching conversation, or focus history.
+
 ## Focus Coach and optional enhanced AI coaching
 
 Focus Coach uses a local coaching responder by default. Your coaching conversation is saved on your device and is not included in cloud backup.
@@ -34,9 +42,13 @@ Messages that FocusHaven recognizes as an immediate self-harm or suicide concern
 
 ## Optional sign-in and cloud backup
 
-You may use FocusHaven as a guest. If you choose **Sign in with Google**, Google provides account information such as your name, email address, and a unique account identifier to authenticate you.
+You may use FocusHaven as a guest without providing your name or email address. When Firebase is available, FocusHaven automatically creates or restores an anonymous Firebase Authentication identity so protected services can distinguish one app user from another. Firebase Authentication processes a unique user identifier, IP address, app and user-agent metadata, and security information for authentication and abuse prevention.
 
-If you choose to back up or restore your data while signed in, FocusHaven stores your focus data in Google Firebase Cloud Firestore under your account. This can include the local information listed above, such as session history, goals, focus task, and related app preferences. Cloud backup is optional.
+If you choose **Sign in with Google**, Google provides account information such as your name, email address, federated account identifier, and authentication tokens handled by the Google and Firebase SDKs. FocusHaven uses that information only to authenticate your FocusHaven account and make optional cloud backup available.
+
+If you choose to back up or restore your data while signed in, FocusHaven stores only the supported focus backup in Google Firebase Cloud Firestore under your account. It can include focus, short-break, and long-break durations; completed-session count; current focus task; daily goal; completed-session timestamps, durations, and optional task; and focus-event start/end times, planned and focused durations, pause count, resume status, outcome, and optional session-fit rating. Cloud backup does not include journal reflections, mood labels, queue items, parked thoughts, your focus profile, appearance choices, reminder settings, Focus Shield selections, calendar boundaries, or your coaching conversation.
+
+FocusHaven also uses Firebase App Check and platform integrity services to protect Firebase resources from unauthorized clients. Those services process app and SDK metadata and an integrity or attestation token. FocusHaven does not use those signals for advertising.
 
 ## Notifications
 
@@ -52,7 +64,7 @@ The detailed engineering boundary is documented in the [FocusHaven Privacy-Safe 
 
 ## Purchases
 
-FocusHaven may offer optional in-app purchases. Purchases are processed by Google Play or Apple, as applicable. FocusHaven does not receive or store your payment-card number.
+FocusHaven may offer optional in-app purchases. Purchases are processed by Google Play or Apple, as applicable. FocusHaven receives the product identifier, purchase or restore status, and transaction information needed to recognize the entitlement, and stores the recognized Pro state on your device. FocusHaven does not receive or store your payment-card number.
 
 ## How information is used
 
@@ -66,7 +78,11 @@ FocusHaven uses Google Firebase for authentication, optional cloud backup, and t
 
 You can delete your local coaching conversation from Focus Coach. Clearing all local app data or uninstalling the app also removes the locally saved conversation and enhanced-coaching preference. Turning enhanced coaching off prevents future coaching requests from being sent to OpenAI but does not alter any provider abuse-monitoring logs that may already be subject to OpenAI’s retention period.
 
-If you used cloud backup and want your cloud-backed FocusHaven data deleted, contact us at the email below from the account used to sign in. We may need to verify the request before deleting associated backup data.
+You can choose **Delete cloud backup** in the signed-in account controls. That permanently removes the `focusBackup` value stored in your Firestore account document while leaving the data on your device in place. Deleting a cloud backup is not the same as deleting the Firebase Authentication account.
+
+You can choose **Delete local data** to remove the local timer history, coaching conversation, journal entries, tasks, parked thoughts, goals, focus profile, and appearance choices covered by that control. Feature-specific system permissions, notification schedules, store purchase history, and data held under a provider's own retention rules may require their separate controls or operating-system settings. Uninstalling the app removes its app-private local storage.
+
+For complete FocusHaven account deletion, including the Firebase Authentication identity and associated cloud data, contact us at the email below from the account used to sign in. We may need to verify the request. A self-service in-app account-deletion path and an external deletion resource are required before FocusHaven is submitted for public store distribution; the current development build's cloud-backup deletion control does not make that broader claim.
 
 ## Children’s privacy
 
