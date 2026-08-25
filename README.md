@@ -129,6 +129,12 @@ Cold-start recovery also bounds a persisted future deadline to the validated
 session total before publishing. Clock rollback or damaged local timing data
 therefore cannot invent extra focus time or strand phone widgets on stale state;
 the recovered timer remains paused and explicitly awaits the person's choice.
+A completed timer is now persisted as an explicit lifecycle state. Older
+zero-second records with no deadline migrate to that same completed state on
+cold start, while incompatible completion metadata is repaired locally. This
+keeps the intended next-session action available after an app restart and lets
+every native surface replace a stale snapshot with the authoritative completed
+state instead of leaving the app stranded at an unstartable 00:00.
 
 iOS now installs the same dedicated Flutter channel through a strict native
 adapter. Swift revalidates every field, enum, duration, null, and UTC timestamp

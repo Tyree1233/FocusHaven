@@ -162,6 +162,39 @@ void main() {
     expect(backend.published.single['endsAt'], isNull);
   });
 
+  testWidgets('legacy completed storage republishes a completed snapshot', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1500,
+      'secondsRemaining': 0,
+      'totalSessionSeconds': 1500,
+      'sessionType': SessionType.focus.index,
+    });
+    final timer = TimerService();
+    await timer.initialized;
+    final backend = _RecordingHostBackend();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          timerServiceProvider.overrideWith((ref) => timer),
+          systemFocusPlatformBackendProvider.overrideWithValue(backend),
+        ],
+        child: const SystemFocusPlatformHost(enabled: true, child: SizedBox()),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+
+    expect(timer.isComplete, isTrue);
+    expect(backend.handler, isNotNull);
+    expect(backend.published, hasLength(1));
+    expect(backend.published.single['activity'], 'completed');
+    expect(backend.published.single['secondsRemaining'], 0);
+    expect(backend.published.single['endsAt'], isNull);
+  });
+
   testWidgets('host disposal removes the native command handler', (
     tester,
   ) async {

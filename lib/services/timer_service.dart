@@ -28,6 +28,7 @@ extension SessionTypeDetails on SessionType {
 class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static const _timerEndsAtKey = 'timerEndsAt';
   static const _pendingResumeKey = 'hasPendingTimerResume';
+  static const _completeKey = 'isComplete';
   static const _parkedThoughtsKey = 'parkedThoughts';
   static const _focusEventsKey = 'focusEvents';
   static const _activeFocusAttemptKey = 'activeFocusAttempt';
@@ -43,6 +44,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     'sessionType',
     _timerEndsAtKey,
     _pendingResumeKey,
+    _completeKey,
     'focusHistory',
     _focusEventsKey,
     _activeFocusAttemptKey,
@@ -635,6 +637,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       prefs.remove('sessionType'),
       prefs.remove(_timerEndsAtKey),
       prefs.remove(_pendingResumeKey),
+      prefs.remove(_completeKey),
       prefs.remove('focusHistory'),
       prefs.remove(_focusEventsKey),
       prefs.remove(_activeFocusAttemptKey),
@@ -882,6 +885,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
           ? prefs.remove(_timerEndsAtKey)
           : prefs.setInt(_timerEndsAtKey, _endsAt!.millisecondsSinceEpoch),
       prefs.setBool(_pendingResumeKey, _hasPendingResume),
+      prefs.setBool(_completeKey, _isComplete),
       prefs.setString(
         'focusHistory',
         jsonEncode(_focusHistory.map((session) => session.toJson()).toList()),
@@ -1011,7 +1015,19 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       _totalSessionSeconds,
     );
     final savedEndsAt = _storedInt(prefs, _timerEndsAtKey);
+    // A zero-second timer with no recoverable deadline is complete by
+    // definition. Inferring this invariant migrates builds that predate the
+    // explicit completion key and prevents a cold start from restoring an
+    // unstartable ready timer at 00:00.
+    if (_secondsRemaining == 0 && savedEndsAt == null) {
+      _isComplete = true;
+      _hasPendingResume = false;
+      _clearActiveFocusAttempt();
+    } else {
+      _isComplete = false;
+    }
     if (savedEndsAt != null) {
+      _isComplete = false;
       _endsAt = DateTime.fromMillisecondsSinceEpoch(savedEndsAt);
       final remaining =
           (_endsAt!.difference(DateTime.now()).inMilliseconds / 1000).ceil();
@@ -1204,6 +1220,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
         preferences.get('sessionType') != _sessionType.index ||
         preferences.get(_timerEndsAtKey) != _endsAt?.millisecondsSinceEpoch ||
         preferences.get(_pendingResumeKey) != _hasPendingResume ||
+        preferences.get(_completeKey) != _isComplete ||
         preferences.get('focusHistory') != normalizedHistory ||
         preferences.get(_focusEventsKey) != normalizedEvents ||
         preferences.get(_activeFocusAttemptKey) != _activeFocusAttemptJson ||

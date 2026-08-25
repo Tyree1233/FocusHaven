@@ -194,6 +194,71 @@ void main() {
     expect(timer.isRunning, isFalse);
   });
 
+  test('cold start restores an explicitly completed timer', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1500,
+      'secondsRemaining': 0,
+      'totalSessionSeconds': 1500,
+      'sessionType': SessionType.focus.index,
+      'isComplete': true,
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.sessionType, SessionType.focus);
+    expect(timer.secondsRemaining, 0);
+    expect(timer.totalSessionSeconds, 1500);
+    expect(timer.isComplete, isTrue);
+    expect(timer.isRunning, isFalse);
+    expect(timer.hasPendingResume, isFalse);
+
+    timer.beginNextSession();
+
+    expect(timer.sessionType, SessionType.shortBreak);
+    expect(timer.secondsRemaining, 5 * 60);
+    expect(timer.isComplete, isFalse);
+  });
+
+  test('legacy zero-second storage migrates to completed state', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1500,
+      'secondsRemaining': 0,
+      'totalSessionSeconds': 1500,
+      'sessionType': SessionType.focus.index,
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.secondsRemaining, 0);
+    expect(timer.isComplete, isTrue);
+    expect(timer.isRunning, isFalse);
+    expect(timer.hasPendingResume, isFalse);
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool('isComplete'), isTrue);
+    expect(preferences.getInt('secondsRemaining'), 0);
+    expect(preferences.containsKey('timerEndsAt'), isFalse);
+  });
+
+  test('incompatible completion metadata is repaired on startup', () async {
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 1500,
+      'secondsRemaining': 600,
+      'totalSessionSeconds': 1500,
+      'sessionType': SessionType.focus.index,
+      'isComplete': true,
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+
+    expect(timer.secondsRemaining, 600);
+    expect(timer.isComplete, isFalse);
+    expect(timer.isRunning, isFalse);
+
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getBool('isComplete'), isFalse);
+  });
+
   test('stale next-session callbacks publish one transition', () async {
     SharedPreferences.setMockInitialValues({
       'focusSeconds': 1,
