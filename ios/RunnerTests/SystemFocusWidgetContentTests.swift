@@ -171,6 +171,114 @@ final class SystemFocusWidgetContentTests: XCTestCase {
     XCTAssertEqual(SystemFocusWidgetContent.compactDurationText(7_199), "2h")
   }
 
+  func testLiveActivityStateIsTextFreeCodableAndBounded() throws {
+    var privateSnapshot = snapshot(
+      activity: "running",
+      secondsRemaining: 120,
+      endsAt: Self.utcText(now.addingTimeInterval(83))
+    )
+    privateSnapshot["task"] = "Private launch plan"
+    privateSnapshot["journal"] = "Private reflection"
+    let content = try XCTUnwrap(
+      SystemFocusWidgetContent.fromSnapshot(privateSnapshot, now: now)
+    )
+    let state = SystemFocusLiveActivityState(content: content)
+    let encoded = try JSONEncoder().encode(state)
+    let decoded = try JSONDecoder().decode(SystemFocusLiveActivityState.self, from: encoded)
+
+    XCTAssertEqual(decoded, state)
+    XCTAssertLessThan(encoded.count, 4_096)
+    let payload = try XCTUnwrap(String(data: encoded, encoding: .utf8))
+    XCTAssertFalse(payload.contains("Private launch plan"))
+    XCTAssertFalse(payload.contains("Private reflection"))
+    XCTAssertEqual(state.staleDate, content.endsAt)
+    XCTAssertTrue(state.widgetContent().availableActions.isEmpty)
+  }
+
+  func testLiveActivityPolicyStartsOnlyRunningStateAndEndsTerminalState() {
+    XCTAssertEqual(
+      SystemFocusLiveActivityPolicy.operation(
+        for: .running,
+        hasExistingActivity: false,
+        activitiesEnabled: true
+      ),
+      .start
+    )
+    XCTAssertEqual(
+      SystemFocusLiveActivityPolicy.operation(
+        for: .running,
+        hasExistingActivity: true,
+        activitiesEnabled: true
+      ),
+      .update
+    )
+    for activity in [SystemFocusWidgetActivity.paused, .pendingResume] {
+      XCTAssertEqual(
+        SystemFocusLiveActivityPolicy.operation(
+          for: activity,
+          hasExistingActivity: false,
+          activitiesEnabled: true
+        ),
+        .ignore
+      )
+      XCTAssertEqual(
+        SystemFocusLiveActivityPolicy.operation(
+          for: activity,
+          hasExistingActivity: true,
+          activitiesEnabled: true
+        ),
+        .update
+      )
+    }
+    XCTAssertEqual(
+      SystemFocusLiveActivityPolicy.operation(
+        for: .completed,
+        hasExistingActivity: true,
+        activitiesEnabled: true
+      ),
+      .endWithFinalState
+    )
+    XCTAssertEqual(
+      SystemFocusLiveActivityPolicy.operation(
+        for: .ready,
+        hasExistingActivity: true,
+        activitiesEnabled: true
+      ),
+      .endImmediately
+    )
+    XCTAssertEqual(
+      SystemFocusLiveActivityPolicy.operation(
+        for: .running,
+        hasExistingActivity: true,
+        activitiesEnabled: false
+      ),
+      .endImmediately
+    )
+  }
+
+  func testStaleRunningLiveActivitySettlesToHonestCompletion() throws {
+    let content = try XCTUnwrap(
+      SystemFocusWidgetContent.fromSnapshot(
+        snapshot(
+          activity: "running",
+          secondsRemaining: 120,
+          endsAt: Self.utcText(now.addingTimeInterval(83))
+        ),
+        now: now
+      )
+    )
+    let stale = SystemFocusLiveActivityState(content: content).widgetContent(isStale: true)
+
+    XCTAssertEqual(stale.activity, .completed)
+    XCTAssertEqual(stale.secondsRemaining, 0)
+    XCTAssertEqual(stale.progress, 1)
+    XCTAssertNil(stale.endsAt)
+    XCTAssertEqual(
+      stale.accessibilitySummary,
+      "Focus. Session complete. 0 seconds remaining. 100 percent complete."
+    )
+  }
+
   func testUnavailableSharedDefaultsFailClosed() {
     let store = SystemFocusSnapshotStore(defaults: nil)
 

@@ -22,6 +22,15 @@ remaining time, and bounded progress are available at a glance without putting
 task, journal, queue, mood, coaching, history, or account content on a locked
 device. The iOS 15 Home Screen widget and its existing medium-size private
 controls remain unchanged.
+When a focus timer is actively running on iOS 16.1 or later, FocusHaven may
+also start one system Live Activity. Its Lock Screen banner and complete
+Dynamic Island presentation show only the validated session kind, calm state,
+remaining time, deadline, and bounded progress. Paused and pending-resume
+snapshots can update an existing surface but never create a new interruption;
+ready state removes it immediately, completion ends it with final state, and a
+system-disabled Live Activity is dismissed. The payload remains below
+ActivityKit's four-kilobyte boundary and carries no command capability or
+user-authored content. All Live Activity regions are intentionally read-only.
 
 Android system-focus surfaces now adapt without weakening their private command
 contract. The home-screen widget selects a compact layout when either launcher
@@ -118,8 +127,8 @@ exact rendered state permits them. Each link carries a rotating private
 capability, enters one app-group command inbox, and is rechecked against the
 current snapshot before Flutter applies its stale, replay, and advertised-action
 gates. Synchronization waits for timer restoration; the iOS 16 Lock Screen
-families are read-only, and Live Activity commands remain disabled until their
-separately authorized transport exists. A paired Apple Watch receives only the
+families and iOS 16.1 Live Activity/Dynamic Island presentation are read-only,
+and Live Activity commands remain disabled. A paired Apple Watch receives only the
 latest bounded, text-free timer snapshot through WatchConnectivity. Its
 companion shows the current focus or
 break, calm state, progress, and a live local countdown. It offers only the

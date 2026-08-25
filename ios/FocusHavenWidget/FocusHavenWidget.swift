@@ -1,3 +1,4 @@
+import ActivityKit
 import SwiftUI
 import WidgetKit
 
@@ -378,7 +379,6 @@ struct FocusHavenWidgetView: View {
   }
 }
 
-@main
 struct FocusHavenFocusWidget: Widget {
   private static var supportedWidgetFamilies: [WidgetFamily] {
     var families: [WidgetFamily] = [.systemSmall, .systemMedium]
@@ -402,5 +402,156 @@ struct FocusHavenFocusWidget: Widget {
     .configurationDisplayName("FocusHaven Timer")
     .description("See your current private focus or break timer on the Home or Lock Screen.")
     .supportedFamilies(Self.supportedWidgetFamilies)
+  }
+}
+
+@available(iOSApplicationExtension 16.1, *)
+private func focusHavenLiveActivityIsStale(
+  _ context: ActivityViewContext<FocusHavenLiveActivityAttributes>
+) -> Bool {
+  if #available(iOSApplicationExtension 16.2, *) {
+    return context.isStale
+  }
+  return false
+}
+
+@available(iOSApplicationExtension 16.1, *)
+private struct FocusHavenLiveActivityLockScreenView: View {
+  let context: ActivityViewContext<FocusHavenLiveActivityAttributes>
+
+  private var content: SystemFocusWidgetContent {
+    context.state.widgetContent(isStale: focusHavenLiveActivityIsStale(context))
+  }
+
+  var body: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      HStack(spacing: 6) {
+        Label(content.session.title, systemImage: Self.icon(for: content.session))
+          .font(.caption.weight(.semibold))
+        Spacer(minLength: 8)
+        Text(content.activity.title)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+      }
+      HStack(alignment: .firstTextBaseline) {
+        liveTimer(content, font: .title2.bold())
+        Spacer(minLength: 8)
+        Text("FocusHaven")
+          .font(.caption2.weight(.semibold))
+          .foregroundStyle(.secondary)
+      }
+      ProgressView(value: content.progress)
+        .tint(.cyan)
+    }
+    .padding(16)
+    .accessibilityElement(children: .ignore)
+    .accessibilityLabel(content.accessibilitySummary)
+  }
+
+  @ViewBuilder
+  private func liveTimer(_ content: SystemFocusWidgetContent, font: Font) -> some View {
+    if let deadline = content.endsAt, !focusHavenLiveActivityIsStale(context) {
+      Text(deadline, style: .timer)
+        .font(font.monospacedDigit())
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+    } else {
+      Text(content.clockText)
+        .font(font.monospacedDigit())
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+    }
+  }
+
+  static func icon(for session: SystemFocusWidgetSession) -> String {
+    switch session {
+    case .focus: return "timer"
+    case .shortBreak: return "cup.and.saucer.fill"
+    case .longBreak: return "moon.stars.fill"
+    }
+  }
+}
+
+@available(iOSApplicationExtension 16.1, *)
+private struct FocusHavenDynamicIslandTimer: View {
+  let context: ActivityViewContext<FocusHavenLiveActivityAttributes>
+  let compact: Bool
+
+  private var content: SystemFocusWidgetContent {
+    context.state.widgetContent(isStale: focusHavenLiveActivityIsStale(context))
+  }
+
+  var body: some View {
+    Group {
+      if let deadline = content.endsAt, !focusHavenLiveActivityIsStale(context) {
+        Text(deadline, style: .timer)
+      } else {
+        Text(compact ? content.compactDurationText : content.clockText)
+      }
+    }
+    .font(compact ? .caption2.monospacedDigit().bold() : .headline.monospacedDigit().bold())
+    .lineLimit(1)
+    .minimumScaleFactor(0.65)
+    .accessibilityHidden(true)
+  }
+}
+
+@available(iOSApplicationExtension 16.1, *)
+struct FocusHavenLiveActivity: Widget {
+  var body: some WidgetConfiguration {
+    ActivityConfiguration(for: FocusHavenLiveActivityAttributes.self) { context in
+      FocusHavenLiveActivityLockScreenView(context: context)
+        .activityBackgroundTint(Color(red: 0.08, green: 0.13, blue: 0.23))
+        .activitySystemActionForegroundColor(.white)
+    } dynamicIsland: { context in
+      let content = context.state.widgetContent(
+        isStale: focusHavenLiveActivityIsStale(context)
+      )
+      return DynamicIsland {
+        DynamicIslandExpandedRegion(.leading) {
+          Label(
+            content.session.title,
+            systemImage: FocusHavenLiveActivityLockScreenView.icon(for: content.session)
+          )
+          .font(.caption.weight(.semibold))
+          .lineLimit(1)
+        }
+        DynamicIslandExpandedRegion(.trailing) {
+          FocusHavenDynamicIslandTimer(context: context, compact: false)
+        }
+        DynamicIslandExpandedRegion(.center) {
+          Text(content.activity.title)
+            .font(.caption)
+            .lineLimit(1)
+        }
+        DynamicIslandExpandedRegion(.bottom) {
+          ProgressView(value: content.progress)
+            .tint(.cyan)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(content.accessibilitySummary)
+        }
+      } compactLeading: {
+        Image(systemName: FocusHavenLiveActivityLockScreenView.icon(for: content.session))
+          .accessibilityHidden(true)
+      } compactTrailing: {
+        FocusHavenDynamicIslandTimer(context: context, compact: true)
+      } minimal: {
+        Image(systemName: FocusHavenLiveActivityLockScreenView.icon(for: content.session))
+          .accessibilityLabel(content.accessibilitySummary)
+      }
+      .keylineTint(.cyan)
+    }
+  }
+}
+
+@main
+struct FocusHavenWidgetBundle: WidgetBundle {
+  @WidgetBundleBuilder
+  var body: some Widget {
+    FocusHavenFocusWidget()
+    if #available(iOSApplicationExtension 16.1, *) {
+      FocusHavenLiveActivity()
+    }
   }
 }

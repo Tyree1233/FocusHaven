@@ -22,7 +22,7 @@ FocusHaven can optionally use calendar access for Haven Window suggestions. It r
 
 On supported Apple devices, Focus Shield uses Apple's Family Controls and Managed Settings frameworks. Your selected applications, categories, and web domains are represented by opaque system tokens that remain in Apple system storage and FocusHaven's private on-device storage. They are not sent to Flutter, Firebase, OpenAI, or an advertising service.
 
-FocusHaven's widgets, Live Activity, Apple Watch app, and Wear OS app receive only a bounded timer snapshot: session type and activity, remaining and total seconds, timestamps needed to render the timer, and a rotating private command capability. These surfaces do not receive your task, journal, mood, queue, parked thoughts, coaching conversation, or focus history.
+FocusHaven's widgets, Live Activity, Apple Watch app, and Wear OS app receive only a bounded timer snapshot: session type and activity, remaining and total seconds, and timestamps needed to render the timer. Interactive Home Screen, Apple Watch, and Wear OS surfaces also receive a rotating private command capability. The iPhone Lock Screen widget, Live Activity, and Dynamic Island are read-only and receive no command capability. None of these surfaces receive your task, journal, mood, queue, parked thoughts, coaching conversation, or focus history.
 
 ## Focus Coach and optional enhanced AI coaching
 

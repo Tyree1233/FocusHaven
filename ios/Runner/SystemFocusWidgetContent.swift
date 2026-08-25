@@ -1,6 +1,10 @@
 import Foundation
 
-enum SystemFocusWidgetSession: String, CaseIterable {
+#if canImport(ActivityKit)
+  import ActivityKit
+#endif
+
+enum SystemFocusWidgetSession: String, CaseIterable, Codable, Hashable {
   case focus
   case shortBreak
   case longBreak
@@ -14,7 +18,7 @@ enum SystemFocusWidgetSession: String, CaseIterable {
   }
 }
 
-enum SystemFocusWidgetActivity: String, CaseIterable {
+enum SystemFocusWidgetActivity: String, CaseIterable, Codable, Hashable {
   case ready
   case running
   case paused
@@ -247,3 +251,88 @@ struct SystemFocusWidgetContent: Equatable {
     }
   }
 }
+
+/// Bounded, text-free state shared by the iPhone Live Activity and Dynamic Island.
+struct SystemFocusLiveActivityState: Codable, Equatable, Hashable {
+  let session: SystemFocusWidgetSession
+  let activity: SystemFocusWidgetActivity
+  let secondsRemaining: Int
+  let totalSessionSeconds: Int
+  let snapshotGeneratedAt: String
+  let endsAt: Date?
+
+  init(content: SystemFocusWidgetContent) {
+    session = content.session
+    activity = content.activity
+    secondsRemaining = content.secondsRemaining
+    totalSessionSeconds = content.totalSessionSeconds
+    snapshotGeneratedAt = content.snapshotGeneratedAt
+    endsAt = content.endsAt
+  }
+
+  var staleDate: Date? {
+    activity == .running ? endsAt : nil
+  }
+
+  func widgetContent(isStale: Bool = false) -> SystemFocusWidgetContent {
+    if isStale && activity == .running {
+      return SystemFocusWidgetContent(
+        session: session,
+        activity: .completed,
+        secondsRemaining: 0,
+        totalSessionSeconds: totalSessionSeconds,
+        snapshotGeneratedAt: snapshotGeneratedAt,
+        endsAt: nil,
+        availableActions: []
+      )
+    }
+    return SystemFocusWidgetContent(
+      session: session,
+      activity: activity,
+      secondsRemaining: secondsRemaining,
+      totalSessionSeconds: totalSessionSeconds,
+      snapshotGeneratedAt: snapshotGeneratedAt,
+      endsAt: endsAt,
+      availableActions: []
+    )
+  }
+}
+
+enum SystemFocusLiveActivityOperation: Equatable {
+  case ignore
+  case start
+  case update
+  case endImmediately
+  case endWithFinalState
+}
+
+enum SystemFocusLiveActivityPolicy {
+  static func operation(
+    for activity: SystemFocusWidgetActivity,
+    hasExistingActivity: Bool,
+    activitiesEnabled: Bool
+  ) -> SystemFocusLiveActivityOperation {
+    guard activitiesEnabled else {
+      return hasExistingActivity ? .endImmediately : .ignore
+    }
+    switch activity {
+    case .running:
+      return hasExistingActivity ? .update : .start
+    case .paused, .pendingResume:
+      return hasExistingActivity ? .update : .ignore
+    case .completed:
+      return hasExistingActivity ? .endWithFinalState : .ignore
+    case .ready:
+      return hasExistingActivity ? .endImmediately : .ignore
+    }
+  }
+}
+
+#if canImport(ActivityKit)
+  @available(iOS 16.1, *)
+  struct FocusHavenLiveActivityAttributes: ActivityAttributes {
+    typealias ContentState = SystemFocusLiveActivityState
+
+    let schemaVersion: Int
+  }
+#endif

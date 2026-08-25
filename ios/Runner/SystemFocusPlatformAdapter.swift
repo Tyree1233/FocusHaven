@@ -7,16 +7,25 @@ final class SystemFocusPlatformAdapter {
   private let store: SystemFocusSnapshotStore
   private let pendingCommands: SystemFocusPendingCommandStore
   private let watchPublisher: SystemFocusWatchPublishing
+  private let liveActivityPublisher: SystemFocusLiveActivityPublishing
   private var channel: FlutterMethodChannel?
 
   init(
     store: SystemFocusSnapshotStore = SystemFocusSnapshotStore(),
     pendingCommands: SystemFocusPendingCommandStore = SystemFocusPendingCommandStore(),
-    watchPublisher: SystemFocusWatchPublishing = SystemFocusWatchConnectivityBridge()
+    watchPublisher: SystemFocusWatchPublishing = SystemFocusWatchConnectivityBridge(),
+    liveActivityPublisher: SystemFocusLiveActivityPublishing? = nil
   ) {
     self.store = store
     self.pendingCommands = pendingCommands
     self.watchPublisher = watchPublisher
+    if let liveActivityPublisher {
+      self.liveActivityPublisher = liveActivityPublisher
+    } else if #available(iOS 16.1, *) {
+      self.liveActivityPublisher = SystemFocusLiveActivityController()
+    } else {
+      self.liveActivityPublisher = SystemFocusUnavailableLiveActivityController()
+    }
   }
 
   func install(binaryMessenger: FlutterBinaryMessenger) {
@@ -61,6 +70,7 @@ final class SystemFocusPlatformAdapter {
         }
         if let snapshot = self.store.load() {
           self.watchPublisher.publish(snapshot: snapshot)
+          self.liveActivityPublisher.publish(snapshot: snapshot)
         }
         WidgetCenter.shared.reloadTimelines(ofKind: SystemFocusSnapshotStore.widgetKind)
         result(nil)

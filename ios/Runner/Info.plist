@@ -53,6 +53,8 @@
 	<string>FocusHaven reads only event time boundaries to suggest an optional focus window. It never creates or changes calendar events.</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>FocusHaven reads only event time boundaries to suggest an optional focus window. It never creates or changes calendar events.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

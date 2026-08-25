@@ -44,6 +44,7 @@
 		A13400000000000000000002 /* HavenWindowNativeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13400000000000000000012 /* HavenWindowNativeController.swift */; };
 		A13400000000000000000003 /* HavenWindowPlatformAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13400000000000000000013 /* HavenWindowPlatformAdapter.swift */; };
 		A13400000000000000000004 /* HavenWindowAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13400000000000000000014 /* HavenWindowAvailabilityTests.swift */; };
+		A18300000000000000000001 /* SystemFocusLiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18300000000000000000011 /* SystemFocusLiveActivityController.swift */; };
 		A12000000000000000000060 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000061 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -152,6 +153,7 @@
 		A13400000000000000000012 /* HavenWindowNativeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenWindowNativeController.swift; sourceTree = "<group>"; };
 		A13400000000000000000013 /* HavenWindowPlatformAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenWindowPlatformAdapter.swift; sourceTree = "<group>"; };
 		A13400000000000000000014 /* HavenWindowAvailabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenWindowAvailabilityTests.swift; sourceTree = "<group>"; };
+		A18300000000000000000011 /* SystemFocusLiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemFocusLiveActivityController.swift; sourceTree = "<group>"; };
 		CD7D0BCC06E1135355B657D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A12000000000000000000061 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -252,6 +254,7 @@
 				A11700000000000000000011 /* SystemFocusSnapshotStore.swift */,
 				A11700000000000000000012 /* SystemFocusPlatformAdapter.swift */,
 				A11800000000000000000011 /* SystemFocusWidgetContent.swift */,
+				A18300000000000000000011 /* SystemFocusLiveActivityController.swift */,
 				A11900000000000000000011 /* SystemFocusWidgetCommandPolicy.swift */,
 				A11900000000000000000012 /* SystemFocusPendingCommandStore.swift */,
 				A12000000000000000000011 /* SystemFocusWatchSnapshot.swift */,
@@ -528,6 +531,7 @@
 				A11700000000000000000001 /* SystemFocusSnapshotStore.swift in Sources */,
 				A11700000000000000000002 /* SystemFocusPlatformAdapter.swift in Sources */,
 				A11800000000000000000001 /* SystemFocusWidgetContent.swift in Sources */,
+				A18300000000000000000001 /* SystemFocusLiveActivityController.swift in Sources */,
 				A11900000000000000000001 /* SystemFocusWidgetCommandPolicy.swift in Sources */,
 				A11900000000000000000002 /* SystemFocusPendingCommandStore.swift in Sources */,
 				A12000000000000000000001 /* SystemFocusWatchSnapshot.swift in Sources */,
