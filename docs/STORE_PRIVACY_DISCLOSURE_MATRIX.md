@@ -19,15 +19,18 @@ coaching.
 FocusHaven is **not yet ready for public store submission**. The following
 items are release blockers rather than documentation suggestions:
 
-1. **Equivalent Apple login:** the iOS app offers Google Sign-In for the
-   primary FocusHaven account. Before App Store submission, it must add an
-   equivalent login option satisfying App Review Guideline 4.8 (normally Sign
-   in with Apple), unless Apple confirms a listed exception applies.
-2. **Complete account deletion:** deleting the cloud backup is not account
-   deletion. Before either store submission, FocusHaven must provide an
-   in-app way to delete the Firebase Authentication account and its associated
-   Firestore data. Google Play also requires a functional external deletion
-   resource that works after uninstall and is entered in Play Console.
+1. **Apple login activation:** the source now offers Firebase's native Apple
+   provider as an equivalent option on supported Apple devices and declares the
+   Sign in with Apple capability. Before App Store submission, the developer
+   must complete Apple Developer enrollment, enable and configure the provider
+   in Firebase, regenerate distribution provisioning, and pass signed-device
+   and end-to-end authentication tests.
+2. **Account-deletion deployment:** the source now includes a confirmed in-app
+   deletion flow, protected callable cleanup, and public external deletion
+   resource. Before either store submission, the callable must be deployed and
+   in-app Google/Apple deletion plus the external request process must pass
+   production-project validation. The external URL must then be entered in
+   Play Console.
 3. **Family Controls distribution approval:** shipping Focus Shield on Apple
    platforms requires the production Family Controls entitlement and any
    approval, provisioning, and review material Apple requires.
@@ -36,11 +39,13 @@ items are release blockers rather than documentation suggestions:
    and app-content forms. Repository tests cannot complete or validate those
    external forms.
 
-The current in-app **Delete cloud backup** action removes only the
-`focusBackup` field in the signed-in user's Firestore document. It deliberately
-leaves the Firebase Authentication identity and document shell intact. Until
-the full deletion feature ships, a user may request full account deletion using
-the privacy-policy contact address.
+The narrower in-app **Delete cloud backup** action still removes only the
+`focusBackup` field and leaves the account intact. The separate **Delete
+account** action requires provider reauthentication and invokes the protected
+`deleteFocusHavenAccount` callable. That callable atomically removes the
+complete user document and every bounded account-specific quota record before
+deleting the Firebase Authentication user. It preserves content-free aggregate
+service limits. The app claims success only after the callable confirms it.
 
 ## Shipped permission and entitlement inventory
 
@@ -83,11 +88,12 @@ Advertising Identifier or App Tracking Transparency framework.
 | Calendar assistance | Busy event start/end boundaries and derived open windows | Optional | On-device only; not included in cloud backup or coaching | Deny/revoke calendar access or leave Haven Window off |
 | Focus Shield | Opaque Family Controls selections and coarse authorization/protection state | Optional | Apple system stores and app-private device storage | Disable Focus Shield, change selection, or revoke authorization |
 | System widgets and watches | Session type, activity, remaining/total seconds, generated/deadline timestamps, and rotating command capability | Optional surface | App group, app-private preferences, or paired-device transport | Remove the widget/companion app; reset or stop the timer |
-| Anonymous authentication | Firebase Authentication user ID, IP address, Firebase/user-agent metadata, app identifier, and security metadata | Automatic when Firebase is available | Google Firebase Authentication according to the configured project and Firebase terms | Full account deletion is a pre-submission blocker; contact is the interim request path |
-| Google sign-in | Name, email address, Google/federated identifier, Firebase user ID, authentication tokens handled by the SDK, IP and service metadata | Optional | Google Sign-In and Firebase Authentication | Sign out/revoke provider access; full FocusHaven account deletion is still required before release |
+| Anonymous authentication | Firebase Authentication user ID, IP address, Firebase/user-agent metadata, app identifier, and security metadata | Automatic when Firebase is available | Google Firebase Authentication according to the configured project and Firebase terms | Guests do not receive signed-in cloud-backup storage; signing into a provider replaces the guest session, and confirmed signed-in account deletion returns the app to a fresh guest identity |
+| Google sign-in | Name, email address, Google/federated identifier, Firebase user ID, authentication tokens handled by the SDK, IP and service metadata | Optional | Google Sign-In and Firebase Authentication | Sign out; confirmed account deletion reauthenticates before removing the Firebase identity and associated FocusHaven cloud data |
+| Apple sign-in | Apple/federated identifier, authentication credentials, and optional name, email, or private relay address | Optional on supported Apple devices after production activation | Apple and Firebase Authentication | Sign out; confirmed account deletion reauthenticates and revokes Apple authorization when an authorization code is available |
 | Cloud backup | Focus duration settings; completed-session count; current focus task; daily goal; completed-session timestamps, durations, and optional task; focus-event start/end timestamps, planned/focused durations, pause count, resume flag, outcome, and optional session-fit rating | Optional and user initiated | `users/{uid}.focusBackup` in Cloud Firestore until deletion or replacement | Delete cloud backup in app; restore/replace backup; full account deletion must also remove associated data |
 | Enhanced AI coaching | Current message; up to 12 recent coaching messages; optional current focus task, profile, next queue task, and recent mood; focus minutes, daily goal, queue and parked-thought counts, and timer-running state | Optional, off by default, request initiated | Firebase callable function and OpenAI Responses API; `store: false`; provider abuse-monitoring retention may still apply as described in the privacy policy | Keep enhanced coaching off, turn it off, or clear local coaching history |
-| Enhanced-coaching quota | SHA-256 hash of Firebase UID as part of a monthly document ID; UTC month; used count; update time | Only for enhanced coaching | Private Firestore quota collection | Removed under the complete account-deletion workflow that must ship before submission, except any clearly disclosed legitimate retention |
+| Enhanced-coaching quota | SHA-256 hash of Firebase UID as part of a monthly document ID; UTC month; used count; update time | Only for enhanced coaching | Private Firestore quota collection | Account-specific records are removed by confirmed account deletion; content-free global monthly limits remain |
 | App Check | Firebase user agent and platform integrity/attestation token | Automatic for protected Firebase calls | Firebase App Check and the platform attestation provider | Required to protect the backend; no advertising use |
 | Purchases | Product identifier, purchase status, transaction/purchase identifier and restore result supplied by Apple or Google | Optional | Store provider; recognized entitlement is stored locally | Store purchase controls and restore flow |
 | Privacy-safe diagnostics | Closed technical event code and coarse error kind in debug builds; bounded function log fields for provider/quota failures | Operational | Client release logging is disabled; function logs follow the diagnostics policy | No user-content fields are accepted; platform diagnostic settings remain under OS/provider control |
@@ -152,9 +158,9 @@ Security answers supported by the current implementation:
 - Firestore rules restrict `users/{uid}` to that non-anonymous owner and deny
   all other client paths;
 - no data is sold or used for advertising; and
-- the app does not yet qualify for the Play account-deletion declaration,
-  because it lacks both full in-app account deletion and the external deletion
-  resource.
+- the source includes both in-app deletion and the public external deletion
+  resource, but the Play declaration remains blocked until the callable and
+  external verification process pass production-project validation.
 
 On-device-only data is outside Google Play's collection definition. Calendar
 boundaries, Focus Shield selections, and text-free system-surface snapshots are
@@ -184,6 +190,8 @@ Review notes should make these boundaries easy to verify:
 ## Official references used for this audit
 
 - [Apple App Review Guidelines](https://developer.apple.com/app-store/review/guidelines/)
+- [Apple — Offering account deletion in your app](https://developer.apple.com/support/offering-account-deletion-in-your-app/)
+- [Apple — Handling account deletions and revoking Sign in with Apple tokens](https://developer.apple.com/documentation/technotes/tn3194-handling-account-deletions-and-revoking-tokens-for-sign-in-with-apple)
 - [Apple App Privacy Details](https://developer.apple.com/app-store/app-privacy-details/)
 - [Apple App Store Connect — Manage App Privacy](https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/)
 - [Google Play User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311)
@@ -191,6 +199,7 @@ Review notes should make these boundaries easy to verify:
 - [Google Play Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469)
 - [Firebase Android data-disclosure guidance](https://firebase.google.com/docs/android/play-data-disclosure)
 - [Firebase Apple data-collection guidance](https://firebase.google.com/docs/ios/app-store-data-collection)
+- [Firebase Flutter federated authentication](https://firebase.google.com/docs/auth/flutter/federated-auth)
 
 This matrix must be reviewed whenever a permission, entitlement, SDK, backend
 field, authentication provider, purchase path, diagnostic path, or remote data

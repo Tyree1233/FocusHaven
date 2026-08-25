@@ -78,6 +78,118 @@ void main() {
     expect(service.signInError, isNull);
   });
 
+  test(
+    'Apple sign-in uses the native Firebase provider when supported',
+    () async {
+      final backend = _FakeAuthBackend();
+      final service = AuthService(
+        authBackend: backend,
+        googleAuthBackend: _FakeGoogleAuthBackend(null),
+        appleSignInSupported: true,
+      );
+      addTearDown(() => cleanUp(service, backend));
+      await service.initialized;
+
+      await service.signInWithApple();
+
+      expect(backend.providerSignInCalls, 1);
+      expect(backend.lastProvider?.providerId, 'apple.com');
+      expect(service.signInError, isNull);
+    },
+  );
+
+  test('Apple sign-in stays unavailable on unsupported platforms', () async {
+    final backend = _FakeAuthBackend();
+    final service = AuthService(
+      authBackend: backend,
+      googleAuthBackend: _FakeGoogleAuthBackend(null),
+      appleSignInSupported: false,
+    );
+    addTearDown(() => cleanUp(service, backend));
+    await service.initialized;
+
+    await service.signInWithApple();
+
+    expect(backend.providerSignInCalls, 0);
+    expect(
+      service.signInError,
+      'Sign in with Apple is unavailable on this device.',
+    );
+  });
+
+  test(
+    'Google accounts reauthenticate before destructive account work',
+    () async {
+      final backend = _FakeAuthBackend(
+        currentUser: _FakeUser(),
+        currentProviderIds: const {'google.com'},
+      );
+      final googleBackend = _FakeGoogleAuthBackend(
+        const GoogleAuthTokens(idToken: 'fresh-google-token'),
+      );
+      final service = AuthService(
+        authBackend: backend,
+        googleAuthBackend: googleBackend,
+      );
+      addTearDown(() => cleanUp(service, backend));
+      await service.initialized;
+
+      final result = await service.reauthenticateForAccountDeletion();
+
+      expect(result.status, AccountReauthenticationStatus.verified);
+      expect(googleBackend.authenticationCalls, 1);
+      expect(backend.credentialReauthenticationCalls, 1);
+      expect(backend.lastCredential?.providerId, 'google.com');
+    },
+  );
+
+  test(
+    'Apple reauthentication returns a revocable authorization code',
+    () async {
+      final backend = _FakeAuthBackend(
+        currentUser: _FakeUser(),
+        currentProviderIds: const {'apple.com'},
+      )..appleAuthorizationCode = 'fresh-apple-code';
+      final service = AuthService(
+        authBackend: backend,
+        googleAuthBackend: _FakeGoogleAuthBackend(null),
+      );
+      addTearDown(() => cleanUp(service, backend));
+      await service.initialized;
+
+      final result = await service.reauthenticateForAccountDeletion();
+      await service.revokeAppleAuthorization(result.appleAuthorizationCode!);
+
+      expect(result.status, AccountReauthenticationStatus.verified);
+      expect(backend.providerReauthenticationCalls, 1);
+      expect(backend.lastProvider?.providerId, 'apple.com');
+      expect(backend.revokedAuthorizationCode, 'fresh-apple-code');
+    },
+  );
+
+  test(
+    'Apple account deletion fails closed without a revocation code',
+    () async {
+      final backend = _FakeAuthBackend(
+        currentUser: _FakeUser(),
+        currentProviderIds: const {'apple.com'},
+      );
+      final service = AuthService(
+        authBackend: backend,
+        googleAuthBackend: _FakeGoogleAuthBackend(null),
+      );
+      addTearDown(() => cleanUp(service, backend));
+      await service.initialized;
+
+      final result = await service.reauthenticateForAccountDeletion();
+
+      expect(result.status, AccountReauthenticationStatus.unavailable);
+      expect(result.appleAuthorizationCode, isNull);
+      expect(backend.providerReauthenticationCalls, 1);
+      expect(backend.revokedAuthorizationCode, isNull);
+    },
+  );
+
   test('sign out clears errors and restores the guest session', () async {
     final backend = _FakeAuthBackend();
     final service = AuthService(
@@ -174,7 +286,10 @@ void main() {
 }
 
 final class _FakeAuthBackend implements AuthBackend {
-  _FakeAuthBackend({this.currentUser});
+  _FakeAuthBackend({
+    this.currentUser,
+    this.currentProviderIds = const <String>{},
+  });
 
   final StreamController<User?> _authStates = StreamController<User?>.broadcast(
     sync: true,
@@ -183,10 +298,19 @@ final class _FakeAuthBackend implements AuthBackend {
   @override
   User? currentUser;
 
+  @override
+  final Set<String> currentProviderIds;
+
   int anonymousSignInCalls = 0;
   int credentialSignInCalls = 0;
+  int providerSignInCalls = 0;
+  int credentialReauthenticationCalls = 0;
+  int providerReauthenticationCalls = 0;
   int signOutCalls = 0;
   AuthCredential? lastCredential;
+  AuthProvider? lastProvider;
+  String? appleAuthorizationCode;
+  String? revokedAuthorizationCode;
   bool shouldFailSignOut = false;
 
   bool get hasStateListener => _authStates.hasListener;
@@ -206,6 +330,33 @@ final class _FakeAuthBackend implements AuthBackend {
     credentialSignInCalls += 1;
     lastCredential = credential;
     return null;
+  }
+
+  @override
+  Future<UserCredential?> signInWithProvider(AuthProvider provider) async {
+    providerSignInCalls += 1;
+    lastProvider = provider;
+    return null;
+  }
+
+  @override
+  Future<void> reauthenticateWithCredential(AuthCredential credential) async {
+    credentialReauthenticationCalls += 1;
+    lastCredential = credential;
+  }
+
+  @override
+  Future<String?> reauthenticateWithProvider(AuthProvider provider) async {
+    providerReauthenticationCalls += 1;
+    lastProvider = provider;
+    return appleAuthorizationCode;
+  }
+
+  @override
+  Future<void> revokeTokenWithAuthorizationCode(
+    String authorizationCode,
+  ) async {
+    revokedAuthorizationCode = authorizationCode;
   }
 
   @override

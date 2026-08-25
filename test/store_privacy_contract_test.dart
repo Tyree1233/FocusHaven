@@ -60,6 +60,7 @@ void main() {
 
     expect(iosEntitlements, contains('com.apple.developer.family-controls'));
     expect(iosEntitlements, contains('group.com.focushaven.app'));
+    expect(iosEntitlements, contains('com.apple.developer.applesignin'));
   });
 
   test('dependencies keep analytics advertising and crash SDKs out', () {
@@ -133,20 +134,30 @@ void main() {
       'Firebase App Check',
       'reads only busy event start and end times',
       'opaque system tokens',
+      'Continue with Apple',
+      'Delete account',
+      'account-deletion page',
     ]) {
       expect(policy, contains(statement));
     }
 
     expect(matrix, contains('not yet ready for public store submission'));
-    expect(matrix, contains('Equivalent Apple login'));
-    expect(matrix, contains('Complete account deletion'));
+    expect(matrix, contains('Apple login activation'));
+    expect(matrix, contains('Account-deletion deployment'));
     expect(matrix, contains('Family Controls distribution approval'));
-    expect(matrix, contains('does not yet qualify'));
+    expect(matrix, contains('deleteFocusHavenAccount'));
+    expect(matrix, contains('production-project validation'));
 
     final accountSheet = _read('lib/widgets/account_sheet.dart');
     expect(accountSheet, contains('Sign in with Google'));
+    expect(accountSheet, contains('Continue with Apple'));
     expect(accountSheet, contains('Delete cloud backup'));
-    expect(accountSheet, isNot(contains("Text('Delete account')")));
+    expect(accountSheet, contains("Text('Delete account')"));
+
+    final deletionPage = _read('docs/ACCOUNT_DELETION.md');
+    expect(deletionPage, contains('Delete your account in the app'));
+    expect(deletionPage, contains('Request deletion without the app'));
+    expect(deletionPage, contains('Never send a password'));
   });
 }
 

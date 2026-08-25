@@ -624,16 +624,21 @@ store-transition testing; restoring an existing purchase remains available.
 
 ## Privacy
 
-FocusHaven can be used without Google sign-in. Optional cloud data can be
-deleted from the account controls, and local data can be removed from the app.
+FocusHaven can be used without Google or Apple sign-in. Optional cloud data can
+be deleted from the account controls, the complete signed-in account can be
+deleted after provider reauthentication, and local data can be removed
+separately from the app.
 Focus-event history is bounded and excludes task names, journal text, mood
 labels, and other user-authored content. It stays on the device unless the user
 explicitly includes local FocusHaven data in an optional cloud backup.
 See the [FocusHaven Privacy Policy](https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html)
 for details. Store disclosure work is tracked in the source-backed
 [store privacy and permission matrix](docs/STORE_PRIVACY_DISCLOSURE_MATRIX.md),
-including the current pre-submission blockers for equivalent Apple login and
-complete in-app/external account deletion. The repository also defines an
+including the remaining activation and production-verification gates for Apple
+login and complete in-app/external account deletion. The implementation and public
+[account-deletion resource](docs/ACCOUNT_DELETION.md) now exist, while Apple
+provider activation, callable deployment, and production end-to-end validation
+remain explicit pre-submission gates. The repository also defines an
 enforceable [privacy-safe diagnostics policy](docs/DIAGNOSTICS_POLICY.md):
 release clients do not include a third-party crash-reporting SDK or upload
 app-owned crash reports, and developer/function diagnostics are restricted to

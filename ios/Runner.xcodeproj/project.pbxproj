@@ -393,6 +393,11 @@
 						DevelopmentTeam = J3QFMX6H2P;
 						LastSwiftMigration = 1100;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.SignInWithApple = {
+								enabled = 1;
+							};
+						};
 					};
 					A11800000000000000000040 = {
 						CreatedOnToolsVersion = 26.6;

@@ -1,6 +1,7 @@
 "use strict";
 
 const PRIVATE_DIAGNOSTIC_EVENT = Object.freeze({
+  ACCOUNT_DELETION: "account.deletion",
   QUOTA_RESERVATION: "coach.quota_reservation",
   GLOBAL_QUOTA: "coach.global_quota",
   PROVIDER_REQUEST: "coach.provider_request",
@@ -40,7 +41,10 @@ function buildPrivateDiagnostic(event, details = {}) {
   }
 
   const payload = {diagnosticEvent: event};
-  if (event === PRIVATE_DIAGNOSTIC_EVENT.QUOTA_RESERVATION) {
+  if (
+    event === PRIVATE_DIAGNOSTIC_EVENT.ACCOUNT_DELETION ||
+    event === PRIVATE_DIAGNOSTIC_EVENT.QUOTA_RESERVATION
+  ) {
     payload.errorKind = classifyPrivateError(details.error);
   }
   if (event === PRIVATE_DIAGNOSTIC_EVENT.GLOBAL_QUOTA) {

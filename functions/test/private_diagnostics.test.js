@@ -29,6 +29,23 @@ test("quota diagnostics expose only event and coarse error kind", () => {
   assert.doesNotMatch(encoded, /private|account|uid|request/i);
 });
 
+test("account deletion diagnostics expose no account data", () => {
+  const error = new Error("account@example.com private-user-id");
+  error.uid = "private-user-id";
+  error.email = "account@example.com";
+
+  const payload = buildPrivateDiagnostic(
+    PRIVATE_DIAGNOSTIC_EVENT.ACCOUNT_DELETION,
+    {error},
+  );
+
+  assert.deepEqual(payload, {
+    diagnosticEvent: "account.deletion",
+    errorKind: "other",
+  });
+  assert.doesNotMatch(JSON.stringify(payload), /email|uid|private-user/i);
+});
+
 test("unknown errors never copy attacker-controlled properties", () => {
   const privateError = {
     message: "journal reflection",

@@ -1,0 +1,136 @@
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
+
+import 'auth_service.dart';
+import 'privacy_safe_diagnostics.dart';
+
+abstract interface class AccountDeletionBackend {
+  Future<void> deleteCurrentAccount();
+}
+
+final class AccountDeletionFunctionException implements Exception {
+  const AccountDeletionFunctionException(this.code);
+
+  final String code;
+}
+
+final class FirebaseAccountDeletionBackend implements AccountDeletionBackend {
+  FirebaseAccountDeletionBackend({
+    FirebaseFunctions? functions,
+    this.functionName = 'deleteFocusHavenAccount',
+    this.timeout = const Duration(seconds: 30),
+  }) : _functions =
+           functions ?? FirebaseFunctions.instanceFor(region: 'us-central1');
+
+  final FirebaseFunctions _functions;
+  final String functionName;
+  final Duration timeout;
+
+  @override
+  Future<void> deleteCurrentAccount() async {
+    final callable = _functions.httpsCallable(
+      functionName,
+      options: HttpsCallableOptions(
+        timeout: timeout,
+        limitedUseAppCheckToken: true,
+      ),
+    );
+    try {
+      final response = await callable.call<Object?>(const <String, Object?>{});
+      final data = response.data;
+      if (data is! Map || data['deleted'] != true) {
+        throw const FormatException('Invalid account-deletion response.');
+      }
+    } on FirebaseFunctionsException catch (error) {
+      throw AccountDeletionFunctionException(error.code);
+    }
+  }
+}
+
+enum AccountDeletionStatus {
+  deleted,
+  notSignedIn,
+  reauthenticationCancelled,
+  reauthenticationUnavailable,
+  unsupportedProvider,
+  unavailable,
+}
+
+@immutable
+final class AccountDeletionResult {
+  const AccountDeletionResult(this.status);
+
+  final AccountDeletionStatus status;
+
+  bool get deleted => status == AccountDeletionStatus.deleted;
+
+  String get message => switch (status) {
+    AccountDeletionStatus.deleted =>
+      'Your FocusHaven account and associated cloud data were deleted. '
+          'Your local focus data remains on this device.',
+    AccountDeletionStatus.notSignedIn =>
+      'There is no signed-in FocusHaven account to delete.',
+    AccountDeletionStatus.reauthenticationCancelled =>
+      'Account deletion was cancelled before your identity was verified.',
+    AccountDeletionStatus.reauthenticationUnavailable =>
+      'FocusHaven could not verify your identity. Please sign in again and retry.',
+    AccountDeletionStatus.unsupportedProvider =>
+      'This account cannot be verified in the app yet. Use the account-deletion page for help.',
+    AccountDeletionStatus.unavailable =>
+      'Your account was not confirmed as deleted. Please try again before removing the app.',
+  };
+}
+
+class AccountDeletionService {
+  AccountDeletionService({
+    required this.authService,
+    AccountDeletionBackend? backend,
+  }) : _backend = backend ?? FirebaseAccountDeletionBackend();
+
+  final AuthService authService;
+  final AccountDeletionBackend _backend;
+
+  Future<AccountDeletionResult> deleteAccount() async {
+    if (!authService.isSignedIn) {
+      return const AccountDeletionResult(AccountDeletionStatus.notSignedIn);
+    }
+
+    final reauthentication = await authService
+        .reauthenticateForAccountDeletion();
+    switch (reauthentication.status) {
+      case AccountReauthenticationStatus.cancelled:
+        return const AccountDeletionResult(
+          AccountDeletionStatus.reauthenticationCancelled,
+        );
+      case AccountReauthenticationStatus.unauthenticated:
+        return const AccountDeletionResult(AccountDeletionStatus.notSignedIn);
+      case AccountReauthenticationStatus.unsupportedProvider:
+        return const AccountDeletionResult(
+          AccountDeletionStatus.unsupportedProvider,
+        );
+      case AccountReauthenticationStatus.unavailable:
+        return const AccountDeletionResult(
+          AccountDeletionStatus.reauthenticationUnavailable,
+        );
+      case AccountReauthenticationStatus.verified:
+        break;
+    }
+
+    try {
+      final appleAuthorizationCode = reauthentication.appleAuthorizationCode
+          ?.trim();
+      if (appleAuthorizationCode != null && appleAuthorizationCode.isNotEmpty) {
+        await authService.revokeAppleAuthorization(appleAuthorizationCode);
+      }
+      await _backend.deleteCurrentAccount();
+      await authService.establishGuestAfterAccountDeletion();
+      return const AccountDeletionResult(AccountDeletionStatus.deleted);
+    } catch (error) {
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.accountDeletion,
+        error: error,
+      );
+      return const AccountDeletionResult(AccountDeletionStatus.unavailable);
+    }
+  }
+}

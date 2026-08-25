@@ -9,8 +9,13 @@ import 'privacy_safe_diagnostics.dart';
 abstract interface class AuthBackend {
   Stream<User?> authStateChanges();
   User? get currentUser;
+  Set<String> get currentProviderIds;
   Future<void> signInAnonymously();
   Future<UserCredential?> signInWithCredential(AuthCredential credential);
+  Future<UserCredential?> signInWithProvider(AuthProvider provider);
+  Future<void> reauthenticateWithCredential(AuthCredential credential);
+  Future<String?> reauthenticateWithProvider(AuthProvider provider);
+  Future<void> revokeTokenWithAuthorizationCode(String authorizationCode);
   Future<void> signOut();
 }
 
@@ -27,6 +32,13 @@ final class FirebaseAuthBackend implements AuthBackend {
   User? get currentUser => _firebaseAuth.currentUser;
 
   @override
+  Set<String> get currentProviderIds =>
+      _firebaseAuth.currentUser?.providerData
+          .map((provider) => provider.providerId)
+          .toSet() ??
+      const <String>{};
+
+  @override
   Future<void> signInAnonymously() async {
     await _firebaseAuth.signInAnonymously();
   }
@@ -34,6 +46,33 @@ final class FirebaseAuthBackend implements AuthBackend {
   @override
   Future<UserCredential?> signInWithCredential(AuthCredential credential) =>
       _firebaseAuth.signInWithCredential(credential);
+
+  @override
+  Future<UserCredential?> signInWithProvider(AuthProvider provider) =>
+      _firebaseAuth.signInWithProvider(provider);
+
+  @override
+  Future<void> reauthenticateWithCredential(AuthCredential credential) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      throw StateError('No authenticated account is available.');
+    }
+    await user.reauthenticateWithCredential(credential);
+  }
+
+  @override
+  Future<String?> reauthenticateWithProvider(AuthProvider provider) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      throw StateError('No authenticated account is available.');
+    }
+    final credential = await user.reauthenticateWithProvider(provider);
+    return credential.additionalUserInfo?.authorizationCode;
+  }
+
+  @override
+  Future<void> revokeTokenWithAuthorizationCode(String authorizationCode) =>
+      _firebaseAuth.revokeTokenWithAuthorizationCode(authorizationCode);
 
   @override
   Future<void> signOut() => _firebaseAuth.signOut();
@@ -49,6 +88,43 @@ final class GoogleAuthTokens {
 
 abstract interface class GoogleAuthBackend {
   Future<GoogleAuthTokens?> authenticate();
+}
+
+enum AccountReauthenticationStatus {
+  verified,
+  cancelled,
+  unauthenticated,
+  unsupportedProvider,
+  unavailable,
+}
+
+@immutable
+final class AccountReauthenticationResult {
+  const AccountReauthenticationResult._(
+    this.status, {
+    this.appleAuthorizationCode,
+  });
+
+  const AccountReauthenticationResult.verified({String? appleAuthorizationCode})
+    : this._(
+        AccountReauthenticationStatus.verified,
+        appleAuthorizationCode: appleAuthorizationCode,
+      );
+
+  const AccountReauthenticationResult.cancelled()
+    : this._(AccountReauthenticationStatus.cancelled);
+
+  const AccountReauthenticationResult.unauthenticated()
+    : this._(AccountReauthenticationStatus.unauthenticated);
+
+  const AccountReauthenticationResult.unsupportedProvider()
+    : this._(AccountReauthenticationStatus.unsupportedProvider);
+
+  const AccountReauthenticationResult.unavailable()
+    : this._(AccountReauthenticationStatus.unavailable);
+
+  final AccountReauthenticationStatus status;
+  final String? appleAuthorizationCode;
 }
 
 final class GoogleSignInBackend implements GoogleAuthBackend {
@@ -75,6 +151,7 @@ class AuthService extends ChangeNotifier {
   bool _isDisposed = false;
   final AuthBackend? authBackend;
   final GoogleAuthBackend? googleAuthBackend;
+  final bool? appleSignInSupported;
 
   AuthBackend? _defaultAuthBackend;
   GoogleAuthBackend? _defaultGoogleAuthBackend;
@@ -85,7 +162,11 @@ class AuthService extends ChangeNotifier {
   bool get isSignedIn => user != null && !user!.isAnonymous;
   String get displayName => user?.displayName ?? user?.email ?? 'Guest';
 
-  AuthService({this.authBackend, this.googleAuthBackend}) {
+  AuthService({
+    this.authBackend,
+    this.googleAuthBackend,
+    this.appleSignInSupported,
+  }) {
     initialized = _initialize();
   }
 
@@ -166,6 +247,128 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  bool get supportsAppleSignIn =>
+      appleSignInSupported ??
+      (!kIsWeb &&
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS));
+
+  Future<UserCredential?> signInWithApple() async {
+    if (_isDisposed) return null;
+    if (!supportsAppleSignIn) {
+      _setSignInError('Sign in with Apple is unavailable on this device.');
+      return null;
+    }
+    try {
+      _setSignInError(null);
+      return await _resolvedAuthBackend.signInWithProvider(AppleAuthProvider());
+    } catch (error) {
+      if (_isProviderCancellation(error)) {
+        _setSignInError(
+          'Apple sign-in was closed before an account was selected.',
+        );
+        PrivacySafeDiagnostics.report(
+          FocusHavenDiagnosticEvent.appleSignInCancelled,
+        );
+        return null;
+      }
+      _setSignInError(
+        error is FirebaseAuthException
+            ? (error.message ?? error.code)
+            : 'Apple sign-in could not start: ${error.runtimeType}',
+      );
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.appleSignIn,
+        error: error,
+      );
+      return null;
+    }
+  }
+
+  Future<AccountReauthenticationResult>
+  reauthenticateForAccountDeletion() async {
+    if (_isDisposed) {
+      return const AccountReauthenticationResult.unavailable();
+    }
+    final backend = _resolvedAuthBackend;
+    final currentUser = backend.currentUser;
+    if (currentUser == null || currentUser.isAnonymous) {
+      return const AccountReauthenticationResult.unauthenticated();
+    }
+
+    try {
+      final providerIds = backend.currentProviderIds;
+      if (providerIds.contains('apple.com')) {
+        final authorizationCode = (await backend.reauthenticateWithProvider(
+          AppleAuthProvider(),
+        ))?.trim();
+        if (authorizationCode == null || authorizationCode.isEmpty) {
+          PrivacySafeDiagnostics.report(
+            FocusHavenDiagnosticEvent.accountReauthentication,
+            error: StateError(
+              'Apple reauthentication did not provide a revocation code.',
+            ),
+          );
+          return const AccountReauthenticationResult.unavailable();
+        }
+        return AccountReauthenticationResult.verified(
+          appleAuthorizationCode: authorizationCode,
+        );
+      }
+      if (providerIds.contains('google.com')) {
+        final googleAuth = await _resolvedGoogleAuthBackend.authenticate();
+        if (googleAuth == null) {
+          return const AccountReauthenticationResult.cancelled();
+        }
+        await backend.reauthenticateWithCredential(
+          GoogleAuthProvider.credential(
+            accessToken: googleAuth.accessToken,
+            idToken: googleAuth.idToken,
+          ),
+        );
+        return const AccountReauthenticationResult.verified();
+      }
+      return const AccountReauthenticationResult.unsupportedProvider();
+    } catch (error) {
+      if (_isProviderCancellation(error)) {
+        return const AccountReauthenticationResult.cancelled();
+      }
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.accountReauthentication,
+        error: error,
+      );
+      return const AccountReauthenticationResult.unavailable();
+    }
+  }
+
+  Future<void> revokeAppleAuthorization(String authorizationCode) async {
+    if (_isDisposed) throw StateError('Authentication is unavailable.');
+    if (authorizationCode.trim().isEmpty) {
+      throw ArgumentError.value(
+        authorizationCode,
+        'authorizationCode',
+        'An Apple authorization code is required.',
+      );
+    }
+    await _resolvedAuthBackend.revokeTokenWithAuthorizationCode(
+      authorizationCode,
+    );
+  }
+
+  Future<void> establishGuestAfterAccountDeletion() async {
+    if (_isDisposed) return;
+    try {
+      await _resolvedAuthBackend.signOut();
+    } catch (error) {
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.accountDeletionSessionReset,
+        error: error,
+      );
+    }
+    if (_isDisposed) return;
+    await signInAnonymouslyIfNeeded();
+  }
+
   Future<void> signOut() async {
     if (_isDisposed) return;
     _setSignInError(null);
@@ -193,6 +396,16 @@ class AuthService extends ChangeNotifier {
   GoogleAuthBackend get _resolvedGoogleAuthBackend =>
       googleAuthBackend ??
       (_defaultGoogleAuthBackend ??= GoogleSignInBackend());
+
+  static bool _isProviderCancellation(Object error) {
+    if (error is! FirebaseAuthException) return false;
+    return const <String>{
+      'canceled',
+      'cancelled',
+      'popup-closed-by-user',
+      'web-context-cancelled',
+    }.contains(error.code);
+  }
 
   void _setSignInError(String? error) {
     if (_isDisposed || _signInError == error) return;

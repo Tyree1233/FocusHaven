@@ -9,12 +9,19 @@ import 'package:focushaven/services/auth_service.dart';
 import 'package:focushaven/widgets/account_sheet.dart';
 
 class _FakeAuthService extends AuthService {
-  _FakeAuthService({required this.signedIn, this.name = 'Guest', this.error});
+  _FakeAuthService({
+    required this.signedIn,
+    this.name = 'Guest',
+    this.error,
+    this.appleSupported = false,
+  });
 
   final bool signedIn;
   final String name;
   final String? error;
+  final bool appleSupported;
   var signInCalls = 0;
+  var appleSignInCalls = 0;
   var signOutCalls = 0;
   Completer<UserCredential?>? pendingSignIn;
   Completer<void>? pendingSignOut;
@@ -29,12 +36,23 @@ class _FakeAuthService extends AuthService {
   String? get signInError => error;
 
   @override
+  bool get supportsAppleSignIn => appleSupported;
+
+  @override
   Future<UserCredential?> signInWithGoogle() async {
     signInCalls += 1;
     final pending = pendingSignIn;
     if (pending != null) {
       return pending.future;
     }
+    return null;
+  }
+
+  @override
+  Future<UserCredential?> signInWithApple() async {
+    appleSignInCalls += 1;
+    final pending = pendingSignIn;
+    if (pending != null) return pending.future;
     return null;
   }
 
@@ -49,6 +67,7 @@ class _FakeAuthService extends AuthService {
 }
 
 class _ActionLog {
+  var deleteAccountCalls = 0;
   var deleteCloudCalls = 0;
   var deleteLocalCalls = 0;
   var openProCalls = 0;
@@ -56,6 +75,10 @@ class _ActionLog {
   var openAppearanceCalls = 0;
   var openPrivacyCalls = 0;
   Completer<void>? pendingDeleteLocal;
+
+  Future<void> deleteAccount() async {
+    deleteAccountCalls += 1;
+  }
 
   Future<void> deleteCloud() async {
     deleteCloudCalls += 1;
@@ -93,6 +116,7 @@ Widget _app(_FakeAuthService auth, _ActionLog actions) {
       theme: ThemeData.dark(),
       home: Scaffold(
         body: AccountSheet(
+          deleteAccount: actions.deleteAccount,
           deleteCloudBackup: actions.deleteCloud,
           deleteLocalData: actions.deleteLocal,
           openPro: actions.openPro,
@@ -134,7 +158,9 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Sign in with Google'), findsOneWidget);
+    expect(find.text('Continue with Apple'), findsNothing);
     expect(find.text('Delete cloud backup'), findsNothing);
+    expect(find.text('Delete account'), findsNothing);
 
     final signInButton = tester.widget<FilledButton>(
       find.widgetWithText(FilledButton, 'Sign in with Google'),
@@ -162,6 +188,25 @@ void main() {
     expect(actions.openAppearanceCalls, 1);
     expect(actions.openPrivacyCalls, 1);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('offers Apple as an equivalent option on supported devices', (
+    tester,
+  ) async {
+    final auth = _FakeAuthService(signedIn: false, appleSupported: true);
+    final actions = _ActionLog();
+
+    await tester.pumpWidget(_app(auth, actions));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Continue with Apple'), findsOneWidget);
+    expect(find.text('Sign in with Google'), findsOneWidget);
+
+    await tester.tap(find.text('Continue with Apple'));
+    await tester.pumpAndSettle();
+
+    expect(auth.appleSignInCalls, 1);
+    expect(auth.signInCalls, 0);
   });
 
   testWidgets('serializes account actions and contains callback failures', (
@@ -263,6 +308,7 @@ void main() {
       expect(find.text('Sign out'), findsOneWidget);
       expect(find.text('Sign in with Google'), findsNothing);
       expect(find.text('Delete cloud backup'), findsOneWidget);
+      expect(find.text('Delete account'), findsOneWidget);
 
       final signOutButton = tester.widget<OutlinedButton>(
         find.widgetWithText(OutlinedButton, 'Sign out'),
@@ -271,9 +317,12 @@ void main() {
       await tester.pumpAndSettle();
       _invokeTextButton(tester, 'Delete cloud backup');
       await tester.pumpAndSettle();
+      _invokeTextButton(tester, 'Delete account');
+      await tester.pumpAndSettle();
 
       expect(auth.signOutCalls, 1);
       expect(actions.deleteCloudCalls, 1);
+      expect(actions.deleteAccountCalls, 1);
       expect(tester.takeException(), isNull);
     },
   );

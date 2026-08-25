@@ -10,6 +10,7 @@ import '../models/haven_plan.dart';
 import '../models/haven_window_suggestion.dart';
 import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
+import '../services/account_deletion_service.dart';
 import '../services/coaching_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/journal_service.dart';
@@ -335,6 +336,33 @@ class TimerScreen extends riverpod.ConsumerWidget {
     Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
   }
 
+  Future<void> _confirmDeleteAccount(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+  ) async {
+    if (!_canOpenOverlay(context)) return;
+    final confirmed = await ConfirmationDialog.show(
+      context,
+      title: 'Delete FocusHaven account?',
+      message:
+          'This permanently deletes your FocusHaven sign-in, cloud backup, and account-specific enhanced-coaching usage records. Your local focus data and store purchase history will stay on this device or with the store. You may be asked to sign in again to verify the request.',
+      cancelLabel: 'Keep my account',
+      confirmLabel: 'Delete account',
+      isDestructive: true,
+    );
+    if (!confirmed || !context.mounted) return;
+
+    final result = await ref
+        .read(accountDeletionServiceProvider)
+        .deleteAccount();
+    if (!context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    if (result.status == AccountDeletionStatus.deleted) {
+      Navigator.of(context).pop();
+    }
+    messenger.showSnackBar(SnackBar(content: Text(result.message)));
+  }
+
   Future<void> _showReminderSheet(BuildContext context) async {
     if (!_canOpenOverlay(context)) return;
     await showModalBottomSheet<void>(
@@ -359,6 +387,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) => AccountSheet(
+        deleteAccount: () => _confirmDeleteAccount(sheetContext, ref),
         deleteCloudBackup: () => _confirmDeleteCloudBackup(sheetContext, ref),
         deleteLocalData: () => _confirmDeleteLocalData(sheetContext, ref),
         openPro: () => _showProSheet(sheetContext),

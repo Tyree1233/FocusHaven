@@ -7,6 +7,7 @@ typedef AccountSheetAction = Future<void> Function();
 
 class AccountSheet extends riverpod.ConsumerStatefulWidget {
   const AccountSheet({
+    required this.deleteAccount,
     required this.deleteCloudBackup,
     required this.deleteLocalData,
     required this.openPro,
@@ -16,6 +17,7 @@ class AccountSheet extends riverpod.ConsumerStatefulWidget {
     super.key,
   });
 
+  final AccountSheetAction deleteAccount;
   final AccountSheetAction deleteCloudBackup;
   final AccountSheetAction deleteLocalData;
   final AccountSheetAction openPro;
@@ -37,6 +39,9 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authStateProvider);
+    final supportsAppleSignIn = ref.watch(
+      authServiceProvider.select((auth) => auth.supportsAppleSignIn),
+    );
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -117,16 +122,50 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                     _authActionInProgress ? 'Signing out…' : 'Sign out',
                   ),
                 )
-              else
-                FilledButton.icon(
-                  onPressed: _isActionInProgress ? null : _signIn,
-                  icon: const Icon(Icons.login),
-                  label: Text(
-                    _authActionInProgress
-                        ? 'Signing in…'
-                        : 'Sign in with Google',
+              else ...[
+                if (supportsAppleSignIn) ...[
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      disabledBackgroundColor: Colors.white38,
+                      disabledForegroundColor: Colors.black54,
+                      minimumSize: const Size.fromHeight(48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: _isActionInProgress ? null : _signInWithApple,
+                    icon: const Icon(Icons.apple),
+                    label: Text(
+                      _authActionInProgress
+                          ? 'Signing in…'
+                          : 'Continue with Apple',
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                ],
+                if (supportsAppleSignIn)
+                  OutlinedButton.icon(
+                    onPressed: _isActionInProgress ? null : _signInWithGoogle,
+                    icon: const Icon(Icons.login),
+                    label: Text(
+                      _authActionInProgress
+                          ? 'Signing in…'
+                          : 'Sign in with Google',
+                    ),
+                  )
+                else
+                  FilledButton.icon(
+                    onPressed: _isActionInProgress ? null : _signInWithGoogle,
+                    icon: const Icon(Icons.login),
+                    label: Text(
+                      _authActionInProgress
+                          ? 'Signing in…'
+                          : 'Sign in with Google',
+                    ),
+                  ),
+              ],
               if (authState.isSignedIn)
                 TextButton.icon(
                   onPressed: _isActionInProgress
@@ -134,6 +173,17 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                       : () => _runSheetAction(widget.deleteCloudBackup),
                   icon: const Icon(Icons.delete_outline),
                   label: const Text('Delete cloud backup'),
+                ),
+              if (authState.isSignedIn)
+                TextButton.icon(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  onPressed: _isActionInProgress
+                      ? null
+                      : () => _runSheetAction(widget.deleteAccount),
+                  icon: const Icon(Icons.person_remove_outlined),
+                  label: const Text('Delete account'),
                 ),
               TextButton.icon(
                 onPressed: _isActionInProgress
@@ -209,10 +259,16 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _signIn() async {
+  Future<void> _signInWithGoogle() =>
+      _signIn(() => ref.read(authServiceProvider).signInWithGoogle());
+
+  Future<void> _signInWithApple() =>
+      _signIn(() => ref.read(authServiceProvider).signInWithApple());
+
+  Future<void> _signIn(Future<Object?> Function() authenticate) async {
     if (!_beginAuthAction()) return;
     try {
-      final result = await ref.read(authServiceProvider).signInWithGoogle();
+      final result = await authenticate();
       if (!mounted) return;
 
       if (result != null) {

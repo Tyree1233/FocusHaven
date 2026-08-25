@@ -23,6 +23,13 @@ function quotaDocumentId(uid, period) {
   return `${userHash}-${period}`;
 }
 
+function quotaDocumentPrefix(uid) {
+  if (typeof uid !== "string" || uid.length === 0) {
+    throw new TypeError("An authenticated user ID is required.");
+  }
+  return `${createHash("sha256").update(uid).digest("base64url")}-`;
+}
+
 function globalQuotaDocumentId(period) {
   return `global-${period}`;
 }
@@ -138,5 +145,6 @@ module.exports = {
   consumeRemoteCoachingQuota,
   globalQuotaDocumentId,
   quotaDocumentId,
+  quotaDocumentPrefix,
   utcMonthKey,
 };

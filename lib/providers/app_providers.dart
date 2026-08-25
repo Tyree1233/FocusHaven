@@ -18,6 +18,7 @@ import '../models/journal_entry.dart';
 import '../models/parked_thought.dart';
 import '../models/pro_entitlement.dart';
 import '../models/system_focus_snapshot.dart';
+import '../services/account_deletion_service.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/coaching_service.dart';
@@ -186,6 +187,11 @@ final reminderStateProvider = Provider<ReminderState>((ref) {
 final authServiceProvider = ChangeNotifierProvider<AuthService>(
   (ref) => AuthService(),
   name: 'authServiceProvider',
+);
+
+final accountDeletionServiceProvider = Provider<AccountDeletionService>(
+  (ref) => AccountDeletionService(authService: ref.watch(authServiceProvider)),
+  name: 'accountDeletionServiceProvider',
 );
 
 final focusForecastServiceProvider = Provider<FocusForecastService>(
