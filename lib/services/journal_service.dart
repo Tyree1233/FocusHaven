@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/journal_entry.dart';
+import 'privacy_safe_diagnostics.dart';
 
 class JournalService extends ChangeNotifier {
   static const _storageKey = 'journalEntries';
@@ -187,7 +188,10 @@ class JournalService extends ChangeNotifier {
     } on TypeError {
       await _removeCorruptedStorage();
     } catch (error) {
-      debugPrint('Journal entries could not be loaded: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.journalLoad,
+        error: error,
+      );
     }
   }
 
@@ -218,7 +222,10 @@ class JournalService extends ChangeNotifier {
       final preferences = await SharedPreferences.getInstance();
       await preferences.remove(_storageKey);
     } catch (error) {
-      debugPrint('Corrupted journal storage could not be removed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.journalCorruptCleanup,
+        error: error,
+      );
     }
   }
 

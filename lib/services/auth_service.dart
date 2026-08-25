@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'privacy_safe_diagnostics.dart';
+
 abstract interface class AuthBackend {
   Stream<User?> authStateChanges();
   User? get currentUser;
@@ -102,7 +104,10 @@ class AuthService extends ChangeNotifier {
         },
         onError: (Object error) {
           if (!_isDisposed) {
-            debugPrint('Authentication state stream failed: $error');
+            PrivacySafeDiagnostics.report(
+              FocusHavenDiagnosticEvent.authenticationStream,
+              error: error,
+            );
           }
         },
       );
@@ -134,8 +139,8 @@ class AuthService extends ChangeNotifier {
         _setSignInError(
           'Google sign-in was closed before an account was selected.',
         );
-        debugPrint(
-          'Google sign-in was cancelled before an account was selected.',
+        PrivacySafeDiagnostics.report(
+          FocusHavenDiagnosticEvent.googleSignInCancelled,
         );
         return null;
       }
@@ -153,7 +158,10 @@ class AuthService extends ChangeNotifier {
             ? (error.message ?? error.code)
             : 'Google sign-in could not start: ${error.runtimeType}',
       );
-      debugPrint('Google sign-in failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.googleSignIn,
+        error: error,
+      );
       return null;
     }
   }
@@ -165,7 +173,10 @@ class AuthService extends ChangeNotifier {
       final backend = _resolvedAuthBackend;
       await backend.signOut();
     } catch (error, stackTrace) {
-      debugPrint('Sign-out failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.signOut,
+        error: error,
+      );
       Error.throwWithStackTrace(
         StateError('FocusHaven could not sign out of this account.'),
         stackTrace,

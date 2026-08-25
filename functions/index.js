@@ -19,6 +19,10 @@ const {
 } = require("./coaching");
 const { evaluateRemoteCoachingAccess } = require("./remote_coaching_policy");
 const { consumeRemoteCoachingQuota } = require("./remote_coaching_quota");
+const {
+  PRIVATE_DIAGNOSTIC_EVENT,
+  buildPrivateDiagnostic,
+} = require("./private_diagnostics");
 
 if (getApps().length === 0) initializeApp();
 const firestore = getFirestore();
@@ -86,8 +90,10 @@ exports.focusCoach = onCall(
       });
     } catch (error) {
       logger.error("Focus Coach quota reservation failed.", {
-        authenticated: true,
-        errorType: error?.constructor?.name ?? "UnknownError",
+        ...buildPrivateDiagnostic(
+          PRIVATE_DIAGNOSTIC_EVENT.QUOTA_RESERVATION,
+          {error},
+        ),
       });
       throw new HttpsError(
         "unavailable",
@@ -97,7 +103,10 @@ exports.focusCoach = onCall(
     if (!quota.allowed) {
       if (quota.reason === "global-limit") {
         logger.warn("Focus Coach global monthly limit reached.", {
-          period: quota.period,
+          ...buildPrivateDiagnostic(
+            PRIVATE_DIAGNOSTIC_EVENT.GLOBAL_QUOTA,
+            {period: quota.period},
+          ),
         });
         throw new HttpsError(
           "resource-exhausted",
@@ -145,9 +154,10 @@ exports.focusCoach = onCall(
     } catch (error) {
       const status = Number.isInteger(error?.status) ? error.status : null;
       logger.error("Focus Coach provider request failed.", {
-        authenticated: true,
-        providerStatus: status,
-        providerRequestId: error?.request_id ?? null,
+        ...buildPrivateDiagnostic(
+          PRIVATE_DIAGNOSTIC_EVENT.PROVIDER_REQUEST,
+          {status},
+        ),
       });
       throw new HttpsError(
         status === 429 ? "resource-exhausted" : "unavailable",

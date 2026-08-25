@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/coaching_message.dart';
+import 'privacy_safe_diagnostics.dart';
 
 class CoachingContext {
   const CoachingContext({
@@ -1060,7 +1061,10 @@ class CoachingService extends ChangeNotifier {
       if (!userMessageCommitted) _messages = previousMessages;
       _isResponding = false;
       _errorMessage = 'Your coach could not respond right now. Please retry.';
-      debugPrint('Focus coach response failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.coachResponse,
+        error: error,
+      );
       _notifyConversationChanged();
       return false;
     }
@@ -1081,7 +1085,10 @@ class CoachingService extends ChangeNotifier {
       if (_isDisposed) return false;
       _isResponding = false;
       _errorMessage = 'Your coach could not respond right now. Please retry.';
-      debugPrint('Focus coach response retry failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.coachResponseRetry,
+        error: error,
+      );
       _notifyConversationChanged();
       return false;
     }
@@ -1150,7 +1157,10 @@ class CoachingService extends ChangeNotifier {
       } catch (error) {
         if (_isDisposed) return false;
         _reportEnhancedPreferenceSaveFailure();
-        debugPrint('Enhanced coaching preference could not be saved: $error');
+        PrivacySafeDiagnostics.report(
+          FocusHavenDiagnosticEvent.coachEnhancedPreferenceSave,
+          error: error,
+        );
         return false;
       }
       if (_isDisposed) return false;
@@ -1191,7 +1201,10 @@ class CoachingService extends ChangeNotifier {
       _errorMessage =
           'Your private coaching data could not be completely cleared. '
           'Please retry.';
-      debugPrint('Private coaching cleanup failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.coachPrivateCleanup,
+        error: error,
+      );
       notifyListeners();
       return false;
     } finally {
@@ -1206,15 +1219,10 @@ class CoachingService extends ChangeNotifier {
     final conversationCleared = await _removePrivateValue(
       preferences,
       _storageKey,
-      'conversation',
     );
     final enhancedPreferenceCleared =
         !includeEnhancedPreference ||
-        await _removePrivateValue(
-          preferences,
-          _enhancedCoachingKey,
-          'enhanced coaching preference',
-        );
+        await _removePrivateValue(preferences, _enhancedCoachingKey);
     if (_isDisposed) return false;
 
     final conversationChanged =
@@ -1258,30 +1266,18 @@ class CoachingService extends ChangeNotifier {
             _enhancedResponder != null && savedEnhancedPreference;
         if (_enhancedCoachingEnabled) notifyListeners();
       } else if (savedEnhancedPreference != null) {
-        await _removeInvalidStoredValue(
-          preferences,
-          _enhancedCoachingKey,
-          'enhanced coaching preference',
-        );
+        await _removeInvalidStoredValue(preferences, _enhancedCoachingKey);
       }
       final savedValue = preferences.get(_storageKey);
       if (savedValue == null) return;
       if (savedValue is! String) {
-        await _removeInvalidStoredValue(
-          preferences,
-          _storageKey,
-          'conversation',
-        );
+        await _removeInvalidStoredValue(preferences, _storageKey);
         return;
       }
 
       final decoded = jsonDecode(savedValue);
       if (decoded is! List) {
-        await _removeInvalidStoredValue(
-          preferences,
-          _storageKey,
-          'conversation',
-        );
+        await _removeInvalidStoredValue(preferences, _storageKey);
         return;
       }
       final loadedMessages = <CoachingMessage>[];
@@ -1314,15 +1310,11 @@ class CoachingService extends ChangeNotifier {
         _messages.map((message) => message.toJson()).toList(),
       );
       if (_messages.isEmpty) {
-        await _removeInvalidStoredValue(
-          preferences,
-          _storageKey,
-          'conversation',
-        );
+        await _removeInvalidStoredValue(preferences, _storageKey);
       } else if (normalizedStorage != savedValue) {
         final repaired = await _saveConversation(preferences, _messages);
         if (!repaired) {
-          _reportStorageRepairFailure('conversation');
+          _reportStorageRepairFailure();
         }
       }
       if (_isDisposed || _messages.isEmpty) return;
@@ -1332,7 +1324,10 @@ class CoachingService extends ChangeNotifier {
     } on TypeError {
       await _removeCorruptedStorage();
     } catch (error) {
-      debugPrint('Focus coach conversation could not be loaded: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.coachConversationLoad,
+        error: error,
+      );
     }
   }
 
@@ -1375,41 +1370,45 @@ class CoachingService extends ChangeNotifier {
     if (_isDisposed) return;
     try {
       final preferences = await SharedPreferences.getInstance();
-      await _removeInvalidStoredValue(preferences, _storageKey, 'conversation');
+      await _removeInvalidStoredValue(preferences, _storageKey);
     } catch (error) {
-      debugPrint('Corrupted coach storage could not be removed: $error');
-      _reportStorageRepairFailure('conversation');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.coachCorruptCleanup,
+        error: error,
+      );
+      _reportStorageRepairFailure();
     }
   }
 
   Future<void> _removeInvalidStoredValue(
     SharedPreferences preferences,
     String key,
-    String description,
   ) async {
-    final removed = await _removePrivateValue(preferences, key, description);
-    if (!removed) _reportStorageRepairFailure(description);
+    final removed = await _removePrivateValue(preferences, key);
+    if (!removed) _reportStorageRepairFailure();
   }
 
   Future<bool> _removePrivateValue(
     SharedPreferences preferences,
     String key,
-    String description,
   ) async {
     try {
       return await _removePreference(preferences, key);
     } catch (error) {
-      debugPrint('Private coach $description could not be removed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.coachPreferenceCleanup,
+        error: error,
+      );
       return false;
     }
   }
 
-  void _reportStorageRepairFailure(String description) {
+  void _reportStorageRepairFailure() {
     if (_isDisposed) return;
     _errorMessage =
         'Your private coaching data could not be completely repaired. '
         'Please clear it and retry.';
-    debugPrint('Private coach $description repair was not committed.');
+    PrivacySafeDiagnostics.report(FocusHavenDiagnosticEvent.coachStorageRepair);
     notifyListeners();
   }
 

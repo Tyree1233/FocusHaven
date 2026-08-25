@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import 'privacy_safe_diagnostics.dart';
+
 @immutable
 final class CloudSyncIdentity {
   const CloudSyncIdentity({required this.uid, required this.isAnonymous});
@@ -111,7 +113,10 @@ class CloudSyncService {
       await _resolvedBackend.saveBackup(identity.uid, safeBackup);
       return true;
     } catch (error) {
-      debugPrint('Cloud backup upload failed: ${error.runtimeType}');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.cloudBackupUpload,
+        error: error,
+      );
       return false;
     }
   }
@@ -140,7 +145,10 @@ class CloudSyncService {
       }
       return CloudBackupFetchResult.found(safeBackup);
     } catch (error) {
-      debugPrint('Cloud backup download failed: ${error.runtimeType}');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.cloudBackupDownload,
+        error: error,
+      );
       return const CloudBackupFetchResult.unavailable();
     }
   }
@@ -153,7 +161,10 @@ class CloudSyncService {
       await _resolvedBackend.deleteBackup(identity.uid);
       return true;
     } catch (error) {
-      debugPrint('Cloud backup deletion failed: ${error.runtimeType}');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.cloudBackupDelete,
+        error: error,
+      );
       return false;
     }
   }

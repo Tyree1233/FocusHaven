@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'privacy_safe_diagnostics.dart';
+
 class FocusProfileService extends ChangeNotifier {
   static const _profileKey = 'focusProfile';
   static const _maximumFocusTypeLength = 80;
@@ -71,7 +73,10 @@ class FocusProfileService extends ChangeNotifier {
         }
       }
     } catch (error) {
-      debugPrint('Focus profile could not be loaded: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.focusProfileLoad,
+        error: error,
+      );
     }
     if (!_isDisposed) notifyListeners();
   }

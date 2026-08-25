@@ -14,6 +14,7 @@ import 'services/focus_profile_service.dart';
 import 'services/focus_queue_service.dart';
 import 'services/journal_service.dart';
 import 'services/notification_service.dart';
+import 'services/privacy_safe_diagnostics.dart';
 import 'services/remote_coaching_responder.dart';
 import 'services/reminder_service.dart';
 import 'services/theme_service.dart';
@@ -33,7 +34,10 @@ Future<void> main() async {
   try {
     remoteCoachingReady = await initializeRemoteCoachingAppCheck();
   } catch (error) {
-    debugPrint('Remote coaching App Check setup failed: $error');
+    PrivacySafeDiagnostics.report(
+      FocusHavenDiagnosticEvent.remoteCoachingAppCheckSetup,
+      error: error,
+    );
   }
 
   final showOnboarding = await shouldShowOnboarding();

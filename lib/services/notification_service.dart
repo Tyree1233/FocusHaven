@@ -6,6 +6,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'haven_window_hold_service.dart';
+import 'privacy_safe_diagnostics.dart';
 
 abstract interface class ReminderNotificationClient {
   Future<bool> requestPermissions();
@@ -207,7 +208,10 @@ class NotificationService
     try {
       await _gateway.initialize();
     } catch (error) {
-      debugPrint('Notification setup failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.notificationInitialize,
+        error: error,
+      );
     }
   }
 
@@ -218,7 +222,10 @@ class NotificationService
     try {
       return await _gateway.requestPermissions();
     } catch (error) {
-      debugPrint('Notification permission request failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.notificationPermission,
+        error: error,
+      );
       return false;
     }
   }
@@ -241,7 +248,10 @@ class NotificationService
         body: body,
       );
     } catch (error) {
-      debugPrint('Notification display failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.notificationDisplay,
+        error: error,
+      );
     }
   }
 
@@ -283,9 +293,15 @@ class NotificationService
       try {
         await cancelDailyReminder();
       } catch (cleanupError) {
-        debugPrint('Partial reminder cleanup failed: $cleanupError');
+        PrivacySafeDiagnostics.report(
+          FocusHavenDiagnosticEvent.notificationPartialReminderCleanup,
+          error: cleanupError,
+        );
       }
-      debugPrint('Scheduled focus reminder setup failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.notificationDailyReminderSchedule,
+        error: error,
+      );
       return false;
     }
   }
@@ -321,7 +337,10 @@ class NotificationService
       );
       return true;
     } catch (error) {
-      debugPrint('Haven Window reminder setup failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.notificationHavenWindowSchedule,
+        error: error,
+      );
       return false;
     }
   }

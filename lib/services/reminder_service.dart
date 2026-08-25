@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'notification_service.dart';
+import 'privacy_safe_diagnostics.dart';
 
 class ReminderService extends ChangeNotifier {
   static const _enabledKey = 'dailyReminderEnabled';
@@ -105,7 +106,10 @@ class ReminderService extends ChangeNotifier {
 
       if (hasSavedState) await _savePreferences(preferences);
     } catch (error) {
-      debugPrint('Reminder preferences could not be loaded: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.reminderPreferencesLoad,
+        error: error,
+      );
     }
     _notifyListenersSafely();
   }

@@ -1,6 +1,6 @@
 # FocusHaven Privacy Policy
 
-**Effective date: August 15, 2026**
+**Effective date: August 24, 2026**
 
 FocusHaven is a focus timer and wellbeing companion created by Tyree Jones. This policy explains what information FocusHaven uses and why.
 
@@ -41,6 +41,14 @@ If you choose to back up or restore your data while signed in, FocusHaven stores
 ## Notifications
 
 FocusHaven asks for notification permission only to send device-local reminders and session-completion messages. Notifications are generated on your device and are not used for advertising.
+
+## Operational diagnostics
+
+The released FocusHaven client does not include a third-party crash-reporting SDK and does not upload app-owned crash reports. Developer builds may print a stable technical event code and a coarse error category for local debugging. FocusHaven’s diagnostic boundary excludes exception messages, stack traces, user content, account or device identifiers, tokens, timestamps, URLs, request IDs, and arbitrary metadata, and the app does not retain or transmit that debug output.
+
+The private enhanced-coaching function uses limited structured operational logs. FocusHaven’s application-defined log fields may contain an allowlisted event code, a coarse error category, an HTTP failure status, or a UTC quota month. Those fields do not deliberately include coaching prompts or replies, account identifiers, authentication state, provider request IDs, exception messages, or stack traces. The platform provider may separately create service, system-crash, or diagnostic records according to its infrastructure and your device or platform settings.
+
+The detailed engineering boundary is documented in the [FocusHaven Privacy-Safe Diagnostics Policy](https://tyree1233.github.io/FocusHaven/DIAGNOSTICS_POLICY.html).
 
 ## Purchases
 

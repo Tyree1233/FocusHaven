@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'privacy_safe_diagnostics.dart';
+
 enum FocusHavenTheme {
   twilight,
   calmBlue,
@@ -128,7 +130,10 @@ class ThemeService extends ChangeNotifier {
         }
       }
     } catch (error) {
-      debugPrint('Appearance preference could not be loaded: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.appearancePreferenceLoad,
+        error: error,
+      );
     }
     if (!_isDisposed) notifyListeners();
   }

@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/haven_window_hold.dart';
 import '../models/haven_window_suggestion.dart';
+import 'privacy_safe_diagnostics.dart';
 
 abstract interface class HavenWindowReminderClient {
   Future<bool> requestPermissions();
@@ -152,10 +153,16 @@ class HavenWindowHoldService extends ChangeNotifier
           if (!_isDisposed) _hold = const HavenWindowHold.empty();
         } catch (cleanupError) {
           _hasPendingCleanup = true;
-          debugPrint('Haven Window reminder cleanup failed: $cleanupError');
+          PrivacySafeDiagnostics.report(
+            FocusHavenDiagnosticEvent.havenWindowReminderCleanup,
+            error: cleanupError,
+          );
         }
       }
-      debugPrint('Haven Window could not be held: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.havenWindowHold,
+        error: error,
+      );
       return false;
     } finally {
       _isUpdating = false;
@@ -181,7 +188,10 @@ class HavenWindowHoldService extends ChangeNotifier
       _hold = const HavenWindowHold.empty();
       return true;
     } catch (error) {
-      debugPrint('Haven Window hold could not be released: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.havenWindowRelease,
+        error: error,
+      );
       return false;
     } finally {
       _isUpdating = false;
@@ -252,7 +262,10 @@ class HavenWindowHoldService extends ChangeNotifier
         await _discardSavedState(preferences);
       }
     } catch (error) {
-      debugPrint('Haven Window hold could not be loaded: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.havenWindowLoad,
+        error: error,
+      );
     }
     _notifyListenersSafely();
   }
@@ -315,7 +328,10 @@ class HavenWindowHoldService extends ChangeNotifier
       _hasPendingCleanup = false;
     } catch (error) {
       _hasPendingCleanup = true;
-      debugPrint('Haven Window expiration cleanup failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.havenWindowExpirationCleanup,
+        error: error,
+      );
     }
     _isUpdating = false;
     if (!_isDisposed) {
@@ -330,7 +346,10 @@ class HavenWindowHoldService extends ChangeNotifier
       _hasPendingCleanup = false;
     } catch (error) {
       _hasPendingCleanup = true;
-      debugPrint('Haven Window invalid hold cleanup failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.havenWindowInvalidCleanup,
+        error: error,
+      );
     }
   }
 
@@ -348,7 +367,10 @@ class HavenWindowHoldService extends ChangeNotifier
       await _clear(preferences);
       _hasPendingCleanup = false;
     } catch (error) {
-      debugPrint('Haven Window pending cleanup failed: $error');
+      PrivacySafeDiagnostics.report(
+        FocusHavenDiagnosticEvent.havenWindowPendingCleanup,
+        error: error,
+      );
     } finally {
       _isUpdating = false;
       _notifyListenersSafely();
