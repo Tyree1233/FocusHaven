@@ -10,7 +10,6 @@ import '../models/haven_plan.dart';
 import '../models/haven_window_suggestion.dart';
 import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
-import '../services/account_deletion_service.dart';
 import '../services/coaching_service.dart';
 import '../services/focus_queue_service.dart';
 import '../services/journal_service.dart';
@@ -357,7 +356,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         .deleteAccount();
     if (!context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
-    if (result.status == AccountDeletionStatus.deleted) {
+    if (result.deleted) {
       Navigator.of(context).pop();
     }
     messenger.showSnackBar(SnackBar(content: Text(result.message)));

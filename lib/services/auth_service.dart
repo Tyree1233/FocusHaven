@@ -103,13 +103,17 @@ final class AccountReauthenticationResult {
   const AccountReauthenticationResult._(
     this.status, {
     this.appleAuthorizationCode,
+    this.requiresManualAppleRevocation = false,
   });
 
-  const AccountReauthenticationResult.verified({String? appleAuthorizationCode})
-    : this._(
-        AccountReauthenticationStatus.verified,
-        appleAuthorizationCode: appleAuthorizationCode,
-      );
+  const AccountReauthenticationResult.verified({
+    String? appleAuthorizationCode,
+    bool requiresManualAppleRevocation = false,
+  }) : this._(
+         AccountReauthenticationStatus.verified,
+         appleAuthorizationCode: appleAuthorizationCode,
+         requiresManualAppleRevocation: requiresManualAppleRevocation,
+       );
 
   const AccountReauthenticationResult.cancelled()
     : this._(AccountReauthenticationStatus.cancelled);
@@ -125,6 +129,7 @@ final class AccountReauthenticationResult {
 
   final AccountReauthenticationStatus status;
   final String? appleAuthorizationCode;
+  final bool requiresManualAppleRevocation;
 }
 
 final class GoogleSignInBackend implements GoogleAuthBackend {
@@ -303,13 +308,9 @@ class AuthService extends ChangeNotifier {
           AppleAuthProvider(),
         ))?.trim();
         if (authorizationCode == null || authorizationCode.isEmpty) {
-          PrivacySafeDiagnostics.report(
-            FocusHavenDiagnosticEvent.accountReauthentication,
-            error: StateError(
-              'Apple reauthentication did not provide a revocation code.',
-            ),
+          return const AccountReauthenticationResult.verified(
+            requiresManualAppleRevocation: true,
           );
-          return const AccountReauthenticationResult.unavailable();
         }
         return AccountReauthenticationResult.verified(
           appleAuthorizationCode: authorizationCode,

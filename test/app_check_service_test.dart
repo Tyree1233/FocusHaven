@@ -3,27 +3,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/services/app_check_service.dart';
 
 void main() {
-  test('ordinary builds do not initialize App Check', () async {
-    final backend = _RecordingAppCheckBackend();
+  test(
+    'ordinary builds initialize App Check for protected account work',
+    () async {
+      final backend = _RecordingAppCheckBackend();
 
-    final initialized = await initializeRemoteCoachingAppCheck(
-      remoteCoachingEnabled: false,
-      isWeb: true,
-      useDebugProviders: false,
-      webSiteKey: '',
-      backend: backend,
-    );
+      final initialized = await initializeProtectedFirebaseAppCheck(
+        isWeb: false,
+        useDebugProviders: false,
+        backend: backend,
+      );
 
-    expect(initialized, isFalse);
-    expect(backend.calls, 0);
-  });
+      expect(initialized, isTrue);
+      expect(backend.calls, 1);
+      expect(backend.lastUseDebugProviders, isFalse);
+      expect(backend.lastIsWeb, isFalse);
+    },
+  );
 
-  test('enabled release web builds require a site key', () async {
+  test('release web builds require a site key', () async {
     final backend = _RecordingAppCheckBackend();
 
     await expectLater(
-      initializeRemoteCoachingAppCheck(
-        remoteCoachingEnabled: true,
+      initializeProtectedFirebaseAppCheck(
         isWeb: true,
         useDebugProviders: false,
         webSiteKey: '   ',
@@ -40,11 +42,10 @@ void main() {
     expect(backend.calls, 0);
   });
 
-  test('enabled release web builds normalize the configured key', () async {
+  test('release web builds normalize the configured key', () async {
     final backend = _RecordingAppCheckBackend();
 
-    final initialized = await initializeRemoteCoachingAppCheck(
-      remoteCoachingEnabled: true,
+    final initialized = await initializeProtectedFirebaseAppCheck(
       isWeb: true,
       useDebugProviders: false,
       webSiteKey: '  public-site-key  ',
@@ -61,8 +62,7 @@ void main() {
   test('debug web builds use debug attestation without a site key', () async {
     final backend = _RecordingAppCheckBackend();
 
-    final initialized = await initializeRemoteCoachingAppCheck(
-      remoteCoachingEnabled: true,
+    final initialized = await initializeProtectedFirebaseAppCheck(
       isWeb: true,
       useDebugProviders: true,
       webSiteKey: '',
@@ -76,11 +76,10 @@ void main() {
     expect(backend.lastWebSiteKey, isNull);
   });
 
-  test('enabled native release builds use production attestation', () async {
+  test('native release builds use production attestation', () async {
     final backend = _RecordingAppCheckBackend();
 
-    final initialized = await initializeRemoteCoachingAppCheck(
-      remoteCoachingEnabled: true,
+    final initialized = await initializeProtectedFirebaseAppCheck(
       isWeb: false,
       useDebugProviders: false,
       webSiteKey: '',
@@ -98,8 +97,7 @@ void main() {
     final backend = _RecordingAppCheckBackend(error: StateError('unavailable'));
 
     await expectLater(
-      initializeRemoteCoachingAppCheck(
-        remoteCoachingEnabled: true,
+      initializeProtectedFirebaseAppCheck(
         isWeb: false,
         useDebugProviders: false,
         backend: backend,

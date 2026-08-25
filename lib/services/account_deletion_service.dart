@@ -49,6 +49,7 @@ final class FirebaseAccountDeletionBackend implements AccountDeletionBackend {
 
 enum AccountDeletionStatus {
   deleted,
+  deletedAppleRevocationRequired,
   notSignedIn,
   reauthenticationCancelled,
   reauthenticationUnavailable,
@@ -62,12 +63,19 @@ final class AccountDeletionResult {
 
   final AccountDeletionStatus status;
 
-  bool get deleted => status == AccountDeletionStatus.deleted;
+  bool get deleted =>
+      status == AccountDeletionStatus.deleted ||
+      status == AccountDeletionStatus.deletedAppleRevocationRequired;
 
   String get message => switch (status) {
     AccountDeletionStatus.deleted =>
       'Your FocusHaven account and associated cloud data were deleted. '
           'Your local focus data remains on this device.',
+    AccountDeletionStatus.deletedAppleRevocationRequired =>
+      'Your FocusHaven account and associated cloud data were deleted. '
+          'Apple authorization could not be revoked automatically. In your '
+          'Apple Account settings, stop using Sign in with Apple for '
+          'FocusHaven. Your local focus data remains on this device.',
     AccountDeletionStatus.notSignedIn =>
       'There is no signed-in FocusHaven account to delete.',
     AccountDeletionStatus.reauthenticationCancelled =>
@@ -116,15 +124,30 @@ class AccountDeletionService {
         break;
     }
 
-    try {
-      final appleAuthorizationCode = reauthentication.appleAuthorizationCode
-          ?.trim();
-      if (appleAuthorizationCode != null && appleAuthorizationCode.isNotEmpty) {
+    var requiresManualAppleRevocation =
+        reauthentication.requiresManualAppleRevocation;
+    final appleAuthorizationCode = reauthentication.appleAuthorizationCode
+        ?.trim();
+    if (appleAuthorizationCode != null && appleAuthorizationCode.isNotEmpty) {
+      try {
         await authService.revokeAppleAuthorization(appleAuthorizationCode);
+      } catch (error) {
+        requiresManualAppleRevocation = true;
+        PrivacySafeDiagnostics.report(
+          FocusHavenDiagnosticEvent.accountAppleRevocation,
+          error: error,
+        );
       }
+    }
+
+    try {
       await _backend.deleteCurrentAccount();
       await authService.establishGuestAfterAccountDeletion();
-      return const AccountDeletionResult(AccountDeletionStatus.deleted);
+      return AccountDeletionResult(
+        requiresManualAppleRevocation
+            ? AccountDeletionStatus.deletedAppleRevocationRequired
+            : AccountDeletionStatus.deleted,
+      );
     } catch (error) {
       PrivacySafeDiagnostics.report(
         FocusHavenDiagnosticEvent.accountDeletion,

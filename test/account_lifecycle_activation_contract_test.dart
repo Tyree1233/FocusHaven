@@ -1,0 +1,93 @@
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('protected Firebase initialization is independent of coaching', () {
+    final appCheck = _read('lib/services/app_check_service.dart');
+    final main = _read('lib/main.dart');
+
+    expect(appCheck, contains('initializeProtectedFirebaseAppCheck'));
+    expect(appCheck, isNot(contains('remoteCoachingEnabled')));
+    expect(main, contains('await initializeProtectedFirebaseAppCheck()'));
+    expect(
+      main,
+      contains('protectedFirebaseReady && FeatureFlags.remoteCoachingEnabled'),
+    );
+  });
+
+  test('sensitive callables explicitly reject App Check replay', () {
+    final functions = _read('functions/index.js');
+    final policy = _read('functions/app_check_policy.js');
+
+    expect(
+      RegExp(r'consumeAppCheckToken:\s*true').allMatches(functions).length,
+      2,
+    );
+    expect(
+      RegExp(
+        r'evaluateAppCheckReplay\(request\.app\)',
+      ).allMatches(functions).length,
+      2,
+    );
+    expect(policy, contains('appContext?.alreadyConsumed === true'));
+    expect(policy, contains('failed-precondition'));
+  });
+
+  test('Apple revocation fallback cannot block verified deletion', () {
+    final auth = _read('lib/services/auth_service.dart');
+    final deletion = _read('lib/services/account_deletion_service.dart');
+    final publicPage = _read('docs/ACCOUNT_DELETION.md');
+
+    expect(auth, contains('requiresManualAppleRevocation: true'));
+    expect(deletion, contains('deletedAppleRevocationRequired'));
+    expect(deletion, contains('await _backend.deleteCurrentAccount()'));
+    expect(publicPage, contains('does not block the verified account'));
+    expect(publicPage, contains('Stop Using'));
+  });
+
+  test('production runbook pins scope and contains no secret values', () {
+    final runbook = _read('docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md');
+
+    for (final required in <String>[
+      'focushaven-68c59',
+      'deleteFocusHavenAccount',
+      'us-central1',
+      'J3QFMX6H2P',
+      'com.focushaven.app',
+      'functions:deleteFocusHavenAccount',
+      '--project focushaven-68c59',
+      'explicit approval',
+      'Firebase App Check Token Verifier',
+      'request.app.alreadyConsumed === true',
+      'no production console change',
+    ]) {
+      expect(runbook, contains(required));
+    }
+
+    expect(
+      RegExp(r'^firebase deploy\s*$', multiLine: true).hasMatch(runbook),
+      isFalse,
+      reason: 'An unscoped production deploy must never enter the runbook.',
+    );
+    expect(
+      RegExp(
+        r'^firebase deploy --only functions\s*$',
+        multiLine: true,
+      ).hasMatch(runbook),
+      isFalse,
+      reason: 'All-functions deployment is outside this activation scope.',
+    );
+    for (final forbidden in <String>[
+      'BEGIN PRIVATE KEY',
+      'OPENAI_API_KEY=',
+      'FIREBASE_TOKEN=',
+      'authorization_code=',
+      'refresh_token=',
+    ]) {
+      expect(runbook, isNot(contains(forbidden)));
+    }
+  });
+}
+
+String _read(String path) => File(path).readAsStringSync();

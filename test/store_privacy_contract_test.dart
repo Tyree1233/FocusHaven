@@ -158,6 +158,15 @@ void main() {
     expect(deletionPage, contains('Delete your account in the app'));
     expect(deletionPage, contains('Request deletion without the app'));
     expect(deletionPage, contains('Never send a password'));
+    expect(deletionPage, contains('does not block the verified account'));
+    expect(deletionPage, contains('Stop Using'));
+
+    final activationRunbook = _read(
+      'docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md',
+    );
+    expect(activationRunbook, contains('functions:deleteFocusHavenAccount'));
+    expect(activationRunbook, contains('--project focushaven-68c59'));
+    expect(matrix, contains('account-lifecycle production activation runbook'));
   });
 }
 

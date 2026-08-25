@@ -137,6 +137,7 @@ void main() {
       final result = await service.reauthenticateForAccountDeletion();
 
       expect(result.status, AccountReauthenticationStatus.verified);
+      expect(result.requiresManualAppleRevocation, isFalse);
       expect(googleBackend.authenticationCalls, 1);
       expect(backend.credentialReauthenticationCalls, 1);
       expect(backend.lastCredential?.providerId, 'google.com');
@@ -168,7 +169,7 @@ void main() {
   );
 
   test(
-    'Apple account deletion fails closed without a revocation code',
+    'Apple reauthentication stays verified without a revocation code',
     () async {
       final backend = _FakeAuthBackend(
         currentUser: _FakeUser(),
@@ -183,8 +184,9 @@ void main() {
 
       final result = await service.reauthenticateForAccountDeletion();
 
-      expect(result.status, AccountReauthenticationStatus.unavailable);
+      expect(result.status, AccountReauthenticationStatus.verified);
       expect(result.appleAuthorizationCode, isNull);
+      expect(result.requiresManualAppleRevocation, isTrue);
       expect(backend.providerReauthenticationCalls, 1);
       expect(backend.revokedAuthorizationCode, isNull);
     },

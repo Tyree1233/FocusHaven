@@ -13,6 +13,7 @@ const { HttpsError, onCall } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
 const OpenAI = require("openai");
 
+const { evaluateAppCheckReplay } = require("./app_check_policy");
 const {
   SYSTEM_INSTRUCTIONS,
   buildModelInput,
@@ -63,6 +64,10 @@ exports.deleteFocusHavenAccount = onCall(
     consumeAppCheckToken: true,
   },
   async (request) => {
+    const replayFailure = evaluateAppCheckReplay(request.app);
+    if (replayFailure) {
+      throw new HttpsError(replayFailure.code, replayFailure.message);
+    }
     const accessFailure = evaluateAccountDeletionAccess({
       authContext: request.auth,
     });
@@ -119,6 +124,10 @@ exports.focusCoach = onCall(
     consumeAppCheckToken: true,
   },
   async (request) => {
+    const replayFailure = evaluateAppCheckReplay(request.app);
+    if (replayFailure) {
+      throw new HttpsError(replayFailure.code, replayFailure.message);
+    }
     const accessFailure = evaluateRemoteCoachingAccess({
       authenticated: Boolean(request.auth),
       claims: request.auth?.token ?? null,

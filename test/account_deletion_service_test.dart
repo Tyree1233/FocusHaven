@@ -39,6 +39,53 @@ void main() {
     expect(auth.guestResetCalls, 1);
   });
 
+  test(
+    'missing Apple revocation code does not block verified deletion',
+    () async {
+      final auth = _FakeAuthService(
+        signedIn: true,
+        reauthentication: const AccountReauthenticationResult.verified(
+          requiresManualAppleRevocation: true,
+        ),
+      );
+      final backend = _FakeAccountDeletionBackend();
+      final service = AccountDeletionService(
+        authService: auth,
+        backend: backend,
+      );
+
+      final result = await service.deleteAccount();
+
+      expect(
+        result.status,
+        AccountDeletionStatus.deletedAppleRevocationRequired,
+      );
+      expect(result.deleted, isTrue);
+      expect(result.message, contains('Apple Account settings'));
+      expect(backend.deleteCalls, 1);
+      expect(auth.guestResetCalls, 1);
+    },
+  );
+
+  test('Apple revocation failure still fulfills verified deletion', () async {
+    final auth = _FakeAuthService(
+      signedIn: true,
+      reauthentication: const AccountReauthenticationResult.verified(
+        appleAuthorizationCode: 'apple-authorization-code',
+      ),
+    )..shouldFailRevocation = true;
+    final backend = _FakeAccountDeletionBackend();
+    final service = AccountDeletionService(authService: auth, backend: backend);
+
+    final result = await service.deleteAccount();
+
+    expect(result.status, AccountDeletionStatus.deletedAppleRevocationRequired);
+    expect(result.deleted, isTrue);
+    expect(auth.revokedAuthorizationCode, 'apple-authorization-code');
+    expect(backend.deleteCalls, 1);
+    expect(auth.guestResetCalls, 1);
+  });
+
   test('cancelled verification cannot delete anything', () async {
     final auth = _FakeAuthService(
       signedIn: true,
@@ -106,6 +153,7 @@ final class _FakeAuthService extends AuthService {
   final bool signedIn;
   final AccountReauthenticationResult reauthentication;
   String? revokedAuthorizationCode;
+  bool shouldFailRevocation = false;
   int guestResetCalls = 0;
 
   @override
@@ -118,6 +166,7 @@ final class _FakeAuthService extends AuthService {
   @override
   Future<void> revokeAppleAuthorization(String authorizationCode) async {
     revokedAuthorizationCode = authorizationCode;
+    if (shouldFailRevocation) throw StateError('Apple revocation unavailable');
   }
 
   @override

@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 /// journal or coaching text, account identifiers, timer state, timestamps, or
 /// any other user-derived value.
 enum FocusHavenDiagnosticEvent {
-  remoteCoachingAppCheckSetup('remote_coaching.app_check_setup'),
+  protectedFirebaseAppCheckSetup('firebase.app_check_setup'),
   focusProfileLoad('focus_profile.load'),
   reminderPreferencesLoad('reminder_preferences.load'),
   journalLoad('journal.load'),
@@ -19,6 +19,7 @@ enum FocusHavenDiagnosticEvent {
   appleSignInCancelled('authentication.apple_sign_in_cancelled'),
   appleSignIn('authentication.apple_sign_in'),
   accountReauthentication('authentication.account_reauthentication'),
+  accountAppleRevocation('authentication.account_apple_revocation'),
   accountDeletion('authentication.account_deletion'),
   accountDeletionSessionReset('authentication.account_deletion_session_reset'),
   signOut('authentication.sign_out'),

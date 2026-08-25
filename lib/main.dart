@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
     show ConsumerWidget, ProviderScope, WidgetRef;
 
+import 'config/feature_flags.dart';
 import 'firebase_options.dart';
 import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
@@ -30,15 +31,17 @@ Future<void> main() async {
   await notificationService.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  var remoteCoachingReady = false;
+  var protectedFirebaseReady = false;
   try {
-    remoteCoachingReady = await initializeRemoteCoachingAppCheck();
+    protectedFirebaseReady = await initializeProtectedFirebaseAppCheck();
   } catch (error) {
     PrivacySafeDiagnostics.report(
-      FocusHavenDiagnosticEvent.remoteCoachingAppCheckSetup,
+      FocusHavenDiagnosticEvent.protectedFirebaseAppCheckSetup,
       error: error,
     );
   }
+  final remoteCoachingReady =
+      protectedFirebaseReady && FeatureFlags.remoteCoachingEnabled;
 
   final showOnboarding = await shouldShowOnboarding();
   final authService = AuthService();

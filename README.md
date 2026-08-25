@@ -407,6 +407,13 @@ DeviceCheck fallback in Apple releases, and reCAPTCHA v3 on web. Debug builds
 use Firebase debug providers; register their generated tokens only for trusted
 development devices and never distribute a debug build.
 
+App Check initialization is not tied to the enhanced-coaching feature flag.
+Every supported build initializes the platform provider after Firebase so the
+protected account-deletion callable is also covered when enhanced coaching is
+off. A release web build requires `FIREBASE_APP_CHECK_WEB_SITE_KEY`; if
+attestation cannot initialize, protected Firebase actions fail honestly while
+the rest of the app remains available.
+
 Private coaching history is also commit-checked before it is treated as saved.
 If local storage rejects the user's message, FocusHaven rolls the unsaved text
 back, does not invoke either coach, and reports that the response could not be
@@ -639,6 +646,12 @@ login and complete in-app/external account deletion. The implementation and publ
 [account-deletion resource](docs/ACCOUNT_DELETION.md) now exist, while Apple
 provider activation, callable deployment, and production end-to-end validation
 remain explicit pre-submission gates. The repository also defines an
+ordered, no-secrets
+[account-lifecycle production activation runbook](docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md)
+that pins every Firebase command to project `focushaven-68c59` and limits the
+first callable deployment to `deleteFocusHavenAccount`. No production action
+in that runbook is considered complete without explicit approval and captured
+evidence. The repository also defines an
 enforceable [privacy-safe diagnostics policy](docs/DIAGNOSTICS_POLICY.md):
 release clients do not include a third-party crash-reporting SDK or upload
 app-owned crash reports, and developer/function diagnostics are restricted to

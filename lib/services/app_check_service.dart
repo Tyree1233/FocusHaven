@@ -40,19 +40,16 @@ final class FirebaseAppCheckBackend implements AppCheckBackend {
   }
 }
 
-Future<bool> initializeRemoteCoachingAppCheck({
-  bool remoteCoachingEnabled = FeatureFlags.remoteCoachingEnabled,
+Future<bool> initializeProtectedFirebaseAppCheck({
   bool isWeb = kIsWeb,
   bool useDebugProviders = kDebugMode,
   String webSiteKey = FeatureFlags.firebaseAppCheckWebSiteKey,
   AppCheckBackend? backend,
 }) async {
-  if (!remoteCoachingEnabled) return false;
-
   final normalizedWebSiteKey = webSiteKey.trim();
   if (isWeb && !useDebugProviders && normalizedWebSiteKey.isEmpty) {
     throw StateError(
-      'FIREBASE_APP_CHECK_WEB_SITE_KEY is required for remote coaching on web.',
+      'FIREBASE_APP_CHECK_WEB_SITE_KEY is required for protected Firebase calls on web.',
     );
   }
 

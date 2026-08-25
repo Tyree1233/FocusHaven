@@ -27,6 +27,15 @@ data remains on that device unless you separately choose **Delete local data**.
 Aggregate monthly service-limit records do not identify an account and are not
 removed as part of an individual request.
 
+For an Apple account, FocusHaven also attempts to revoke the Sign in with Apple
+authorization. If Apple does not provide a revocable code or automatic
+revocation fails, that condition does not block the verified account and cloud
+data deletion. FocusHaven confirms the deletion and asks you to finish the
+provider cleanup manually: on iPhone or iPad, open **Settings**, tap your name,
+tap **Sign in with Apple**, choose FocusHaven, then choose **Delete** and
+**Stop Using**. Apple documents the same control in
+[Manage your apps with Sign in with Apple](https://support.apple.com/102571).
+
 ## Request deletion without the app
 
 If you uninstalled FocusHaven or cannot access the in-app control, email
