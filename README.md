@@ -195,6 +195,15 @@ state arrives, a bounded one-second input cooldown keeps a repeated tap from
 falling through to the newly rendered action in the same button position. It
 carries no task, reflection, mood, history, coach, or account data. macOS, web,
 and every unsupported platform remain dormant.
+The same exact schema-v2 snapshot now feeds a private Wear OS Tile and a
+user-selected watch-face complication data source. A background Data Layer
+listener validates and stores only the newest snapshot in app-private storage,
+then requests bounded system-surface refreshes. The Tile shows the current
+session, calm state, and remaining time; the complication supports short-text
+and ranged-progress slots with a system-rendered live deadline. Both surfaces
+are deliberately read-only and open the full Watch app for any timer action.
+They never receive a command token or private task, journal, mood, queue,
+coaching, history, or account content.
 
 The Living Lantern turns only the current timer state and bounded, text-free
 focus events into one ephemeral companion state. The dashboard presents the

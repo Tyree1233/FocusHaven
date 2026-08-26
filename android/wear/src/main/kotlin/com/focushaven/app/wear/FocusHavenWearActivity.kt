@@ -13,9 +13,7 @@ import android.widget.TextView
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
-import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.DataMap
-import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
@@ -30,6 +28,7 @@ class FocusHavenWearActivity :
     private lateinit var dataClient: DataClient
     private lateinit var messageClient: MessageClient
     private lateinit var commandSender: SystemFocusWearCommandSender
+    private lateinit var snapshotStore: SystemFocusWearSnapshotStore
     private val commandCooldown =
         SystemFocusWearCommandCooldown(SystemClock::elapsedRealtime)
     private var snapshot: SystemFocusWearSnapshot? = null
@@ -59,6 +58,8 @@ class FocusHavenWearActivity :
         dataClient = Wearable.getDataClient(this)
         messageClient = Wearable.getMessageClient(this)
         commandSender = SystemFocusWearCommandSender(this)
+        snapshotStore = SystemFocusWearSnapshotStore(this)
+        snapshot = snapshotStore.read()
         render()
     }
 
@@ -86,7 +87,7 @@ class FocusHavenWearActivity :
         var latest = snapshot
         for (event in dataEvents) {
             if (event.type != DataEvent.TYPE_CHANGED) continue
-            val candidate = snapshotFrom(event.dataItem) ?: continue
+            val candidate = SystemFocusWearSnapshotData.from(event.dataItem) ?: continue
             if (latest == null || candidate.generatedAt > latest.generatedAt) latest = candidate
         }
         latest?.let(::accept)
@@ -117,7 +118,7 @@ class FocusHavenWearActivity :
                 try {
                     var latest = snapshot
                     for (item in items) {
-                        val candidate = snapshotFrom(item) ?: continue
+                        val candidate = SystemFocusWearSnapshotData.from(item) ?: continue
                         if (latest == null || candidate.generatedAt > latest.generatedAt) {
                             latest = candidate
                         }
@@ -130,15 +131,6 @@ class FocusHavenWearActivity :
             .addOnFailureListener {
                 if (snapshot == null) render()
             }
-    }
-
-    private fun snapshotFrom(item: DataItem): SystemFocusWearSnapshot? {
-        if (item.uri.path != SNAPSHOT_PATH) return null
-        val data = DataMapItem.fromDataItem(item).dataMap
-        if (data.keySet() != SystemFocusWearSnapshot.WIRE_KEYS) return null
-        return SystemFocusWearSnapshot.fromWireMap(
-            data.keySet().associateWith { key -> data.get(key) },
-        )
     }
 
     private fun decodeAcknowledgement(bytes: ByteArray): SystemFocusWearAcknowledgement? {
@@ -160,6 +152,8 @@ class FocusHavenWearActivity :
                 val settledCommand = isNewSnapshot && commandState != CommandState.IDLE
                 snapshot = value
                 if (isNewSnapshot) {
+                    snapshotStore.save(value)
+                    SystemFocusWearSurfaceUpdater.request(this)
                     clearCommandState()
                     if (settledCommand) startCommandCooldown()
                 }
@@ -384,7 +378,6 @@ class FocusHavenWearActivity :
         )
 
     companion object {
-        const val SNAPSHOT_PATH = "/focus_haven/system_focus/snapshot/v2"
         private const val RECEIPT_TIMEOUT_MILLIS = 8_000L
         private const val COMMAND_COMPLETION_TIMEOUT_MILLIS = 12_000L
         internal const val COMMAND_INPUT_COOLDOWN_MILLIS = 1_000L

@@ -19,5 +19,46 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".SystemFocusWearSnapshotListenerService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data
+                    android:host="*"
+                    android:path="/focus_haven/system_focus/snapshot/v2"
+                    android:scheme="wear" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".SystemFocusWearTileService"
+            android:description="@string/tile_description"
+            android:exported="true"
+            android:icon="@drawable/ic_focus_haven_wear"
+            android:label="@string/tile_label"
+            android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
+            <intent-filter>
+                <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".SystemFocusWearComplicationDataSourceService"
+            android:exported="true"
+            android:icon="@drawable/ic_focus_haven_wear"
+            android:label="@string/complication_label"
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER">
+            <intent-filter>
+                <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST" />
+            </intent-filter>
+            <meta-data
+                android:name="android.support.wearable.complications.SUPPORTED_TYPES"
+                android:value="SHORT_TEXT,RANGED_VALUE" />
+            <meta-data
+                android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS"
+                android:value="0" />
+        </service>
     </application>
 </manifest>

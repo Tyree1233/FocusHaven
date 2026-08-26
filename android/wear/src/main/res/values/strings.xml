@@ -5,6 +5,9 @@
     <string name="session_focus">Focus</string>
     <string name="session_short_break">Short break</string>
     <string name="session_long_break">Long break</string>
+    <string name="session_focus_short">Focus</string>
+    <string name="session_short_break_short">Short</string>
+    <string name="session_long_break_short">Long</string>
     <string name="activity_ready">Ready when you are</string>
     <string name="activity_running">Steady focus</string>
     <string name="activity_paused">Paused without pressure</string>
@@ -48,4 +51,11 @@
     <string name="command_rejected">That state changed. Syncing the latest timer.</string>
     <string name="command_unavailable">Phone unavailable. Your timer was not changed.</string>
     <string name="command_needs_phone">Open FocusHaven on your phone to finish.</string>
+    <string name="tile_label">Focus timer</string>
+    <string name="tile_description">Private timer state from FocusHaven</string>
+    <string name="tile_title">FocusHaven</string>
+    <string name="tile_sync_required">Open FocusHaven to sync</string>
+    <string name="tile_open_app">Open app</string>
+    <string name="complication_label">Focus timer</string>
+    <string name="complication_description">%1$s. %2$s. %3$s remaining.</string>
 </resources>
