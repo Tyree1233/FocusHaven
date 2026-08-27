@@ -167,6 +167,27 @@ void main() {
     expect(activationRunbook, contains('functions:deleteFocusHavenAccount'));
     expect(activationRunbook, contains('--project focushaven-68c59'));
     expect(matrix, contains('account-lifecycle production activation runbook'));
+
+    for (final archiveCheckedDisclosure in <String>[
+      'Archive-checked Apple App Privacy answers',
+      'd37f57281159ff7e8b0d80e970d243fc2ae3c04d',
+      '32d98bfe74fd1947c6b53a1b7d534fde3fe5ba0b7e090c5afd7866e0654600dd',
+      'Contact Info — Phone Number',
+      'Location — Coarse Location',
+      'Usage Data — Other Usage Data',
+      'Diagnostics — Crash Data',
+      'Diagnostics — Performance Data',
+      'Diagnostics — Other Diagnostic Data',
+      'does not include Firebase Analytics',
+      'sets its tracking value to false',
+    ]) {
+      expect(
+        matrix,
+        contains(archiveCheckedDisclosure),
+        reason:
+            '$archiveCheckedDisclosure is required by the exact candidate audit.',
+      );
+    }
   });
 }
 

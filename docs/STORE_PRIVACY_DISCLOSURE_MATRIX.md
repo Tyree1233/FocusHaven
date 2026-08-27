@@ -1,6 +1,6 @@
 # FocusHaven Store Privacy and Permission Disclosure Matrix
 
-**Audit date: August 25, 2026**
+**Audit date: August 27, 2026**
 
 This document is the source-backed working record for FocusHaven's Apple App
 Store privacy answers, Google Play Data safety answers, permission explanations,
@@ -104,33 +104,50 @@ FocusHaven has no advertising SDK, analytics SDK, third-party client crash
 reporter, contact upload, location collection, photo/media upload, voice capture,
 or sale of personal data.
 
-## Preliminary Apple App Privacy answers
+## Archive-checked Apple App Privacy answers
 
 The conservative answer to **Data Collection** is **Yes**. The following is the
-working label for the current code. All listed purposes are **App
-Functionality**; none is used for third-party advertising, developer
+working label for the exact Apple-validated `1.0.0 (1)` candidate at commit
+`d37f57281159ff7e8b0d80e970d243fc2ae3c04d` (IPA SHA-256
+`32d98bfe74fd1947c6b53a1b7d534fde3fe5ba0b7e090c5afd7866e0654600dd`).
+The archive contains 39 third-party privacy manifests. Every manifest that
+declares tracking sets its tracking value to false, every collected-data entry
+sets its tracking value to false, and no tracking domain is declared.
+
+The table combines FocusHaven's application flows with the collected-data
+entries embedded in the exact archive. **App Functionality** is the primary
+purpose. Where Google or Firebase's embedded manifest also declares
+**Analytics**, that purpose must remain in the store answer even though
+FocusHaven does not include Firebase Analytics or another developer analytics
+SDK. Nothing is used for third-party advertising, developer
 advertising/marketing, or tracking.
 
 | Apple data type | Collected? | Linked to identity? | Why |
 | --- | --- | --- | --- |
 | Contact Info — Name | Optional | Yes | Google Sign-In / Firebase Authentication |
 | Contact Info — Email Address | Optional | Yes | Google Sign-In / Firebase Authentication |
-| Identifiers — User ID | Yes | Yes | Anonymous or signed-in Firebase Authentication account; Firestore and function requests |
-| Identifiers — Device ID | Conservatively Yes | Potentially | App Check attestation and Firebase service identifiers; confirm against the exact submitted Firebase SDK privacy manifests |
+| Contact Info — Phone Number | SDK-declared | Yes | Google Sign-In's archive privacy manifest declares phone number for App Functionality; FocusHaven does not request a phone-number scope or expose a phone-number field |
+| Location — Coarse Location | SDK-declared | Yes | Google Sign-In's archive privacy manifest declares coarse location for App Functionality; FocusHaven does not request device location permission |
+| Identifiers — User ID | Yes | Yes | Anonymous or signed-in Firebase Authentication account; Google Sign-In; Firestore and function requests; App Functionality, with Google Sign-In also declaring Analytics |
+| Identifiers — Device ID | SDK-declared | Yes | Google Sign-In and reCAPTCHA Enterprise archive privacy manifests; security, integrity, App Functionality, and the SDK-declared Analytics purpose |
 | User Content — Other User Content | Optional | Yes when authenticated | Focus tasks and session content in cloud backup; messages and selected context in enhanced coaching |
-| Usage Data — Product Interaction | Optional | Yes when backed up | Session history, duration, timer outcomes, and goal progress stored in cloud backup |
+| Usage Data — Product Interaction | Yes | Yes | Optional backed-up session activity plus reCAPTCHA Enterprise's App Functionality declaration |
+| Usage Data — Other Usage Data | SDK-declared | Yes | Google Sign-In's archive privacy manifest declares other usage data for Analytics |
+| Other Data | SDK-declared | Yes | Google Sign-In's archive privacy manifest declares other data types for App Functionality and Analytics |
 | Purchases — Purchase History | Optional | Yes through store account | Product and transaction status used to recognize/restore Pro |
-| Diagnostics | No app-owned client diagnostics collection | Not applicable | No Crashlytics or other client crash reporter; Apple/Google/Firebase infrastructure may independently process service metadata |
+| Diagnostics — Crash Data | SDK-declared | Yes | reCAPTCHA Enterprise declares crash data for App Functionality; FocusHaven does not include Crashlytics or another app-owned client crash reporter |
+| Diagnostics — Performance Data | SDK-declared | Yes | reCAPTCHA Enterprise declares performance data for App Functionality |
+| Diagnostics — Other Diagnostic Data | SDK-declared | No | Firebase Authentication, Firestore, Firestore Internal, and Installations declare other diagnostic data for Analytics |
 
 On-device calendar boundaries, Family Controls selections, journal entries,
 queue items, parked thoughts, and local coaching messages are not collected for
 the Apple label unless they enter an optional transmitted flow described above.
 FocusHaven does not track users.
 
-Before entering these answers, compare the archive's aggregated
-`PrivacyInfo.xcprivacy` reports with the then-current Firebase, Google Sign-In,
-and in-app-purchase SDK disclosures. App Store Connect requires answers to
-cover every third-party partner integrated into every platform for the app.
+These answers must be re-audited if the submitted binary differs from the
+fingerprint above. App Store Connect answers must cover every third-party
+partner integrated into every platform for the app, not only the data fields
+FocusHaven accesses directly.
 
 ## Preliminary Google Play Data safety answers
 
