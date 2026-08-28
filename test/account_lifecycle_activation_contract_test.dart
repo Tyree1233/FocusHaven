@@ -6,6 +6,7 @@ void main() {
   test('protected Firebase initialization is independent of coaching', () {
     final appCheck = _read('lib/services/app_check_service.dart');
     final main = _read('lib/main.dart');
+    final runnerEntitlements = _read('ios/Runner/Runner.entitlements');
 
     expect(appCheck, contains('initializeProtectedFirebaseAppCheck'));
     expect(appCheck, contains('ReCaptchaEnterpriseProvider'));
@@ -20,6 +21,11 @@ void main() {
     );
     expect(appCheck, isNot(contains('remoteCoachingEnabled')));
     expect(main, contains('await initializeProtectedFirebaseAppCheck()'));
+    expect(
+      runnerEntitlements,
+      contains('com.apple.developer.devicecheck.appattest-environment'),
+    );
+    expect(runnerEntitlements, contains('<string>production</string>'));
     expect(
       main,
       contains('protectedFirebaseReady && FeatureFlags.remoteCoachingEnabled'),
@@ -76,6 +82,7 @@ void main() {
       'Firebase Hosting remains undeployed',
       'Gate 3 deployment completed on August 28, 2026',
       'No App Store build was delivered',
+      'App Attest entitlement is pinned to the production environment',
     ]) {
       expect(runbook, contains(required));
     }

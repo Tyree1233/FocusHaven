@@ -107,7 +107,10 @@ After explicit approval, in Firebase Console > App Check for project
 
 1. Register the Android app for Play Integrity using the actual release-signing
    certificate configuration.
-2. Register the Apple app for App Attest with DeviceCheck fallback.
+2. Register the Apple app for App Attest with DeviceCheck fallback. Confirm the
+   Runner target declares
+   `com.apple.developer.devicecheck.appattest-environment=production`; Firebase
+   App Check does not accept App Attest tokens from the sandbox environment.
 3. Register the web app with its production reCAPTCHA Enterprise site key.
    Supply that public site key to release web builds only through
    `FIREBASE_APP_CHECK_WEB_SITE_KEY`; do not commit it as a source default.
@@ -259,6 +262,8 @@ configuration checkpoints for the pinned production identities above:
   material is held outside the repository; this document records no key value.
 - Android App Check registration uses Play Integrity.
 - Apple App Check registration uses App Attest with DeviceCheck fallback.
+- The Runner App Attest entitlement is pinned to the production environment;
+  watchOS and WidgetKit extension entitlements do not request App Attest.
 - Web App Check registration uses reCAPTCHA Enterprise.
 - The default second-generation Functions compute service account,
   `791775983697-compute@developer.gserviceaccount.com`, has the dedicated
@@ -288,6 +293,8 @@ claim the remaining activation gates. In particular:
 
 - App Check enforcement remains disabled at the product level; the deployed
   callable retains its source-bound token enforcement and replay rejection;
+- a new signed Apple production candidate must be archived and validated after
+  the production App Attest entitlement correction before Gate 4 runs;
 - remote coaching remains disabled; this activation runbook did not deploy,
   enable, invoke, or modify `focusCoach`;
 - Gates 4 and 5 production canaries have not run;

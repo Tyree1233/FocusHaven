@@ -74,6 +74,26 @@ void main() {
     expect(widgetEntitlements, contains(appGroupId));
     expect(snapshotStore, contains(appGroupId));
     expect(runnerEntitlements, contains('com.apple.developer.family-controls'));
+    expect(
+      _plistString(
+        runnerEntitlements,
+        'com.apple.developer.devicecheck.appattest-environment',
+      ),
+      'production',
+    );
+
+    for (final extensionEntitlements in <String>[
+      widgetEntitlements,
+      watchEntitlements,
+      watchWidgetEntitlements,
+    ]) {
+      expect(
+        extensionEntitlements,
+        isNot(
+          contains('com.apple.developer.devicecheck.appattest-environment'),
+        ),
+      );
+    }
 
     for (final source in <String>[
       runnerEntitlements,

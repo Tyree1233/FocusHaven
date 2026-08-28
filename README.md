@@ -463,7 +463,9 @@ trusted development devices and never distribute a debug build.
 App Check initialization is not tied to the enhanced-coaching feature flag.
 Every supported build initializes the platform provider after Firebase so the
 protected account-deletion callable is also covered when enhanced coaching is
-off. A release web build requires `FIREBASE_APP_CHECK_WEB_SITE_KEY`; if
+off. The iOS Runner App Attest entitlement is pinned to the production
+environment; the watch and widget extensions do not request that entitlement.
+A release web build requires `FIREBASE_APP_CHECK_WEB_SITE_KEY`; if
 attestation cannot initialize, protected Firebase actions fail honestly while
 the rest of the app remains available.
 
