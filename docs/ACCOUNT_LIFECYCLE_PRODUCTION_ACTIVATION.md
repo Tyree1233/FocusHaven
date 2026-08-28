@@ -106,8 +106,8 @@ After explicit approval, in Firebase Console > App Check for project
 1. Register the Android app for Play Integrity using the actual release-signing
    certificate configuration.
 2. Register the Apple app for App Attest with DeviceCheck fallback.
-3. Register the web app with its production reCAPTCHA v3 site key. Supply that
-   public site key to release web builds only through
+3. Register the web app with its production reCAPTCHA Enterprise site key.
+   Supply that public site key to release web builds only through
    `FIREBASE_APP_CHECK_WEB_SITE_KEY`; do not commit it as a source default.
 4. Register debug tokens only for named trusted development installations.
    Remove stale debug tokens and never use a debug provider in a release build.

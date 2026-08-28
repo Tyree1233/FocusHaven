@@ -8,6 +8,16 @@ void main() {
     final main = _read('lib/main.dart');
 
     expect(appCheck, contains('initializeProtectedFirebaseAppCheck'));
+    expect(appCheck, contains('ReCaptchaEnterpriseProvider'));
+    expect(
+      appCheck,
+      isNot(
+        contains(
+          'ReCaptchaV3'
+          'Provider',
+        ),
+      ),
+    );
     expect(appCheck, isNot(contains('remoteCoachingEnabled')));
     expect(main, contains('await initializeProtectedFirebaseAppCheck()'));
     expect(

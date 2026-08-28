@@ -27,7 +27,7 @@ final class FirebaseAppCheckBackend implements AppCheckBackend {
         ? null
         : useDebugProviders
         ? WebDebugProvider()
-        : ReCaptchaV3Provider(webSiteKey!);
+        : ReCaptchaEnterpriseProvider(webSiteKey!);
     return _appCheck.activate(
       providerWeb: webProvider,
       providerAndroid: useDebugProviders

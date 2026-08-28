@@ -453,9 +453,9 @@ Normal builds keep the enhanced-coaching interface hidden so the local coach
 remains accurate when the paid backend has not been deployed. Before producing
 an enabled build, register the Android, Apple, and web apps under Firebase
 App Check. FocusHaven uses Play Integrity in Android releases, App Attest with
-DeviceCheck fallback in Apple releases, and reCAPTCHA v3 on web. Debug builds
-use Firebase debug providers; register their generated tokens only for trusted
-development devices and never distribute a debug build.
+DeviceCheck fallback in Apple releases, and reCAPTCHA Enterprise on web. Debug
+builds use Firebase debug providers; register their generated tokens only for
+trusted development devices and never distribute a debug build.
 
 App Check initialization is not tied to the enhanced-coaching feature flag.
 Every supported build initializes the platform provider after Firebase so the
@@ -463,6 +463,12 @@ protected account-deletion callable is also covered when enhanced coaching is
 off. A release web build requires `FIREBASE_APP_CHECK_WEB_SITE_KEY`; if
 attestation cannot initialize, protected Firebase actions fail honestly while
 the rest of the app remains available.
+
+The Firebase CLI is pinned to project `focushaven-68c59` through
+`.firebaserc`. Firebase Hosting serves the release output from `build/web` and
+rewrites application routes to `/index.html`. Keeping this configuration in
+source does not deploy the site; a production Hosting deployment remains a
+separate, explicitly authorized release action.
 
 Private coaching history is also commit-checked before it is treated as saved.
 If local storage rejects the user's message, FocusHaven rolls the unsaved text
@@ -537,7 +543,7 @@ and quotas are available, enable the interface at build time:
 ```sh
 flutter build web --release \
   --dart-define=ENABLE_REMOTE_COACHING=true \
-  --dart-define=FIREBASE_APP_CHECK_WEB_SITE_KEY=your-recaptcha-v3-site-key
+  --dart-define=FIREBASE_APP_CHECK_WEB_SITE_KEY=your-recaptcha-enterprise-site-key
 flutter build appbundle --release --dart-define=ENABLE_REMOTE_COACHING=true
 ```
 
