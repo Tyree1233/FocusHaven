@@ -83,6 +83,13 @@ void main() {
       'Gate 3 deployment completed on August 28, 2026',
       'No App Store build was delivered',
       'App Attest entitlement is pinned to the production environment',
+      '1df910c1f2b3d36965393fa767850e6f885f5982',
+      '951c01fda19c97a354766f6f8190b2c75509c9776571791bb91f26e0b414e633',
+      'Validation completed with warnings',
+      'operator-observed Xcode Organizer evidence',
+      'FirebaseFirestoreInternal.framework',
+      'RecaptchaEnterpriseSDK.framework',
+      'absl.framework',
     ]) {
       expect(runbook, contains(required));
     }
@@ -111,71 +118,78 @@ void main() {
     }
   });
 
-  test(
-    'production runbook matches the committed Firebase activation boundary',
-    () {
-      final aliases = _read('.firebaserc');
-      final runbook = _read('docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md');
+  test('production runbook matches the committed Firebase activation boundary', () {
+    final aliases = _read('.firebaserc');
+    final runbook = _read('docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md');
 
-      expect(aliases, contains('"default": "focushaven-68c59"'));
-      expect(runbook, contains('`focushaven-68c59` through `.firebaserc`'));
-      expect(
-        runbook,
-        isNot(contains('repository intentionally has no `.firebaserc`')),
-      );
+    expect(aliases, contains('"default": "focushaven-68c59"'));
+    expect(runbook, contains('`focushaven-68c59` through `.firebaserc`'));
+    expect(
+      runbook,
+      isNot(contains('repository intentionally has no `.firebaserc`')),
+    );
 
-      for (final completedCheckpoint in <String>[
-        'Firebase Authentication Apple provider is enabled',
-        'Android App Check registration uses Play Integrity',
-        'Apple App Check registration uses App Attest with DeviceCheck fallback',
-        'Web App Check registration uses reCAPTCHA Enterprise',
-        '`791775983697-compute@developer.gserviceaccount.com`',
-        '`roles/firebaseappcheck.tokenVerifier`',
-        'binding was independently',
-        'verified in the project IAM principal and role views',
-        '`focusCoach` as deployed',
-        '`ACTIVE` in `us-central1`',
-        '`REMOTE_COACHING_ENABLED=false`',
-        '`deleteFocusHavenAccount` is `ACTIVE`',
-        'second-generation Node.js 22',
-        '`c70d264102396b9666f59b8db7459582964bc9dd`',
-        '`maxInstances=10`',
-        '`focusCoach` remained byte-for-byte identical',
-      ]) {
-        expect(runbook, contains(completedCheckpoint));
-      }
+    for (final completedCheckpoint in <String>[
+      'Firebase Authentication Apple provider is enabled',
+      'Android App Check registration uses Play Integrity',
+      'Apple App Check registration uses App Attest with DeviceCheck fallback',
+      'Web App Check registration uses reCAPTCHA Enterprise',
+      '`791775983697-compute@developer.gserviceaccount.com`',
+      '`roles/firebaseappcheck.tokenVerifier`',
+      'binding was independently',
+      'verified in the project IAM principal and role views',
+      '`focusCoach` as deployed',
+      '`ACTIVE` in `us-central1`',
+      '`REMOTE_COACHING_ENABLED=false`',
+      '`deleteFocusHavenAccount` is `ACTIVE`',
+      'second-generation Node.js 22',
+      '`c70d264102396b9666f59b8db7459582964bc9dd`',
+      '`maxInstances=10`',
+      '`focusCoach` remained byte-for-byte identical',
+      'production App Attest candidate has been archived',
+      'distribution-exported, and Apple-validated',
+      'satisfying only the candidate',
+      'prerequisite for Gate 4',
+    ]) {
+      expect(runbook, contains(completedCheckpoint));
+    }
 
-      for (final pendingBoundary in <String>[
-        'App Check enforcement remains disabled',
-        'remote coaching remains disabled',
-        'this activation runbook did not deploy,',
-        'enable, invoke, or modify `focusCoach`',
-        'production canaries have not run',
-        'no callable invocation was performed',
-        'no store release has occurred',
-      ]) {
-        expect(runbook, contains(pendingBoundary));
-      }
+    for (final pendingBoundary in <String>[
+      'App Check enforcement remains disabled',
+      'remote coaching remains disabled',
+      'this activation runbook did not deploy,',
+      'enable, invoke, or modify `focusCoach`',
+      'production canaries have not run',
+      'no callable invocation was performed',
+      'no store release has occurred',
+    ]) {
+      expect(runbook, contains(pendingBoundary));
+    }
 
-      expect(
-        runbook,
-        isNot(
-          contains(
-            'remote coaching remains disabled and has not been deployed',
-          ),
+    expect(
+      runbook,
+      isNot(
+        contains('remote coaching remains disabled and has not been deployed'),
+      ),
+    );
+    expect(
+      runbook,
+      isNot(
+        contains(
+          'a new signed Apple production candidate must be archived and validated',
         ),
-      );
-      expect(runbook, isNot(contains('role has not been granted or')));
-      expect(
-        runbook,
-        isNot(
-          contains(
-            '`deleteFocusHavenAccount` has not been deployed by this activation runbook',
-          ),
+      ),
+    );
+    expect(runbook, isNot(contains('role has not been granted or')));
+    expect(
+      runbook,
+      isNot(
+        contains(
+          '`deleteFocusHavenAccount` has not been deployed by this activation runbook',
         ),
-      );
-    },
-  );
+      ),
+    );
+  });
 }
 
 String _read(String path) => File(path).readAsStringSync();

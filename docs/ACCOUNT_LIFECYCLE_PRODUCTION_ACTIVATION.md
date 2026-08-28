@@ -283,8 +283,16 @@ configuration checkpoints for the pinned production identities above:
   second-generation Node.js 22 callable in `us-central1` under the verified
   compute service account. Before/after inventory confirmed that `focusCoach`
   remained byte-for-byte identical and that no other function was created.
-- The controlled 1.0.0 (1) Apple archive passed App Store validation with
-  non-blocking third-party framework symbol warnings.
+- The production App Attest correction is pinned to clean commit
+  `1df910c1f2b3d36965393fa767850e6f885f5982`. Its controlled 1.0.0 (1)
+  distribution export has SHA-256
+  `951c01fda19c97a354766f6f8190b2c75509c9776571791bb91f26e0b414e633`.
+- On August 28, 2026, operator-observed Xcode Organizer evidence confirmed
+  that exact candidate completed Apple's validation-only workflow with the
+  result `Validation completed with warnings`. The only warnings were missing
+  dSYMs for the third-party
+  `FirebaseFirestoreInternal.framework`, `RecaptchaEnterpriseSDK.framework`,
+  and `absl.framework` binaries; they did not block validation.
 - No App Store build was delivered, no TestFlight release was created, and
   nothing was submitted for review.
 
@@ -293,8 +301,9 @@ claim the remaining activation gates. In particular:
 
 - App Check enforcement remains disabled at the product level; the deployed
   callable retains its source-bound token enforcement and replay rejection;
-- a new signed Apple production candidate must be archived and validated after
-  the production App Attest entitlement correction before Gate 4 runs;
+- the signed production App Attest candidate has been archived, locally
+  distribution-exported, and Apple-validated, satisfying only the candidate
+  prerequisite for Gate 4; Gate 4 itself has not run;
 - remote coaching remains disabled; this activation runbook did not deploy,
   enable, invoke, or modify `focusCoach`;
 - Gates 4 and 5 production canaries have not run;

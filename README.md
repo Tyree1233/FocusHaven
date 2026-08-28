@@ -469,6 +469,18 @@ A release web build requires `FIREBASE_APP_CHECK_WEB_SITE_KEY`; if
 attestation cannot initialize, protected Firebase actions fail honestly while
 the rest of the app remains available.
 
+The production App Attest correction is represented by clean commit
+`1df910c1f2b3d36965393fa767850e6f885f5982`. Its controlled 1.0.0 (1)
+distribution export has SHA-256
+`951c01fda19c97a354766f6f8190b2c75509c9776571791bb91f26e0b414e633` and
+completed Apple's validation-only workflow on August 28, 2026. Validation
+was operator-observed in Xcode Organizer as completed with non-blocking
+missing-dSYM warnings for the third-party
+`FirebaseFirestoreInternal.framework`, `RecaptchaEnterpriseSDK.framework`,
+and `absl.framework` binaries. No App Store build was delivered, no TestFlight
+content was created or released, nothing was submitted for review, and the
+Gate 4 production canary remains pending.
+
 The Firebase CLI is pinned to project `focushaven-68c59` through
 `.firebaserc`. Firebase Hosting serves the release output from `build/web` and
 rewrites application routes to `/index.html`. Keeping this configuration in
