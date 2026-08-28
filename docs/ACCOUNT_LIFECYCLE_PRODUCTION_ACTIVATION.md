@@ -241,6 +241,10 @@ configuration checkpoints for the pinned production identities above:
   `firebase.json` defines the matching Hosting site, `build/web` public
   directory, and single-page application rewrite.
 - Firebase Hosting remains undeployed.
+- A read-only production function inventory recorded `focusCoach` as deployed
+  and `ACTIVE` in `us-central1`, with `REMOTE_COACHING_ENABLED=false`. This
+  account-lifecycle activation work did not deploy, enable, invoke, or modify
+  that function.
 - The controlled 1.0.0 (1) Apple archive passed App Store validation with
   non-blocking third-party framework symbol warnings.
 - No App Store build was delivered, no TestFlight release was created, and
@@ -253,7 +257,8 @@ claim the remaining activation gates. In particular:
   independently verified for the deletion function's compute service account;
 - App Check enforcement remains disabled;
 - `deleteFocusHavenAccount` has not been deployed by this activation runbook;
-- remote coaching remains disabled and has not been deployed;
+- remote coaching remains disabled; this activation runbook did not deploy,
+  enable, invoke, or modify `focusCoach`;
 - the non-destructive and destructive production canaries have not run; and
 - no store release has occurred.
 

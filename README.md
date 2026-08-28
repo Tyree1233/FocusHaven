@@ -450,9 +450,12 @@ server's explicit monthly-quota reason is shown as allowance exhaustion;
 provider capacity failures remain temporary-service notices.
 
 Normal builds keep the enhanced-coaching interface hidden so the local coach
-remains accurate when the paid backend has not been deployed. Before producing
-an enabled build, register the Android, Apple, and web apps under Firebase
-App Check. FocusHaven uses Play Integrity in Android releases, App Attest with
+remains accurate whether the paid backend is absent or deployed with its
+server-side switch disabled. A deployed callable does not make enhanced
+coaching available: the client release flag, server enablement gate, App Check,
+verified entitlement, and quota checks must all pass. Before producing an
+enabled build, register the Android, Apple, and web apps under Firebase App
+Check. FocusHaven uses Play Integrity in Android releases, App Attest with
 DeviceCheck fallback in Apple releases, and reCAPTCHA Enterprise on web. Debug
 builds use Firebase debug providers; register their generated tokens only for
 trusted development devices and never distribute a debug build.

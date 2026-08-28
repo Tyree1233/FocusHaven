@@ -121,6 +121,9 @@ void main() {
         'Android App Check registration uses Play Integrity',
         'Apple App Check registration uses App Attest with DeviceCheck fallback',
         'Web App Check registration uses reCAPTCHA Enterprise',
+        '`focusCoach` as deployed',
+        '`ACTIVE` in `us-central1`',
+        '`REMOTE_COACHING_ENABLED=false`',
       ]) {
         expect(runbook, contains(completedCheckpoint));
       }
@@ -129,12 +132,23 @@ void main() {
         'role has not been granted or',
         'App Check enforcement remains disabled',
         '`deleteFocusHavenAccount` has not been deployed',
-        'remote coaching remains disabled and has not been deployed',
+        'remote coaching remains disabled',
+        'this activation runbook did not deploy,',
+        'enable, invoke, or modify `focusCoach`',
         'production canaries have not run',
         'no store release has occurred',
       ]) {
         expect(runbook, contains(pendingBoundary));
       }
+
+      expect(
+        runbook,
+        isNot(
+          contains(
+            'remote coaching remains disabled and has not been deployed',
+          ),
+        ),
+      );
     },
   );
 }
