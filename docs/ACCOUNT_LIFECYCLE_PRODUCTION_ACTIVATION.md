@@ -24,9 +24,11 @@ in this file, a terminal transcript, a screenshot, Git, or CI output.
 | Watch bundle ID | `com.focushaven.app.watchkitapp` |
 | Firebase Apple return URL | `https://focushaven-68c59.firebaseapp.com/__/auth/handler` |
 
-The repository intentionally has no `.firebaserc`. Every Firebase command in
-this runbook therefore carries `--project focushaven-68c59`; an implicit active
-project is never accepted as evidence.
+The repository pins the Firebase CLI default project alias to
+`focushaven-68c59` through `.firebaserc`. Production commands in this runbook
+still carry `--project focushaven-68c59` so their scope is explicit in operator
+evidence. The committed alias is a guardrail, not a substitute for checking the
+displayed project before any production write.
 
 ## Gate 0 — source and operator preflight (read only)
 
@@ -226,6 +228,36 @@ For the initial rollout:
 
 ## Activation status
 
-As of August 24, 2026, this repository defines and verifies the source contract,
-but no production console change, role grant, function deployment, destructive
-canary, or store release is claimed by this document.
+As of August 27, 2026, operator-recorded console evidence establishes these
+configuration checkpoints for the pinned production identities above:
+
+- Sign in with Apple is configured for the FocusHaven iPhone App ID and the
+  Firebase Authentication Apple provider is enabled. Its dedicated private-key
+  material is held outside the repository; this document records no key value.
+- Android App Check registration uses Play Integrity.
+- Apple App Check registration uses App Attest with DeviceCheck fallback.
+- Web App Check registration uses reCAPTCHA Enterprise.
+- `.firebaserc` pins the Firebase CLI alias to `focushaven-68c59`, while
+  `firebase.json` defines the matching Hosting site, `build/web` public
+  directory, and single-page application rewrite.
+- Firebase Hosting remains undeployed.
+- The controlled 1.0.0 (1) Apple archive passed App Store validation with
+  non-blocking third-party framework symbol warnings.
+- No App Store build was delivered, no TestFlight release was created, and
+  nothing was submitted for review.
+
+These checkpoints record completed configuration; they do not authorize or
+claim the remaining activation gates. In particular:
+
+- the **Firebase App Check Token Verifier** role has not been granted or
+  independently verified for the deletion function's compute service account;
+- App Check enforcement remains disabled;
+- `deleteFocusHavenAccount` has not been deployed by this activation runbook;
+- remote coaching remains disabled and has not been deployed;
+- the non-destructive and destructive production canaries have not run; and
+- no store release has occurred.
+
+Any later console state can drift from this dated checkpoint. Re-run the
+read-only identity checks and capture fresh redacted evidence before advancing
+to Gate 3. No private key, site key, token, account identifier, or other secret
+is stored in this status record.

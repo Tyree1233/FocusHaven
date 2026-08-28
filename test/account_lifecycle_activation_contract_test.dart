@@ -70,7 +70,11 @@ void main() {
       'explicit approval',
       'Firebase App Check Token Verifier',
       'request.app.alreadyConsumed === true',
-      'no production console change',
+      'The repository pins the Firebase CLI default project alias',
+      'operator-recorded console evidence',
+      'App Check enforcement remains disabled',
+      'Firebase Hosting remains undeployed',
+      'No App Store build was delivered',
     ]) {
       expect(runbook, contains(required));
     }
@@ -98,6 +102,41 @@ void main() {
       expect(runbook, isNot(contains(forbidden)));
     }
   });
+
+  test(
+    'production runbook matches the committed Firebase activation boundary',
+    () {
+      final aliases = _read('.firebaserc');
+      final runbook = _read('docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md');
+
+      expect(aliases, contains('"default": "focushaven-68c59"'));
+      expect(runbook, contains('`focushaven-68c59` through `.firebaserc`'));
+      expect(
+        runbook,
+        isNot(contains('repository intentionally has no `.firebaserc`')),
+      );
+
+      for (final completedCheckpoint in <String>[
+        'Firebase Authentication Apple provider is enabled',
+        'Android App Check registration uses Play Integrity',
+        'Apple App Check registration uses App Attest with DeviceCheck fallback',
+        'Web App Check registration uses reCAPTCHA Enterprise',
+      ]) {
+        expect(runbook, contains(completedCheckpoint));
+      }
+
+      for (final pendingBoundary in <String>[
+        'role has not been granted or',
+        'App Check enforcement remains disabled',
+        '`deleteFocusHavenAccount` has not been deployed',
+        'remote coaching remains disabled and has not been deployed',
+        'production canaries have not run',
+        'no store release has occurred',
+      ]) {
+        expect(runbook, contains(pendingBoundary));
+      }
+    },
+  );
 }
 
 String _read(String path) => File(path).readAsStringSync();
