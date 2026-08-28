@@ -228,7 +228,7 @@ For the initial rollout:
 
 ## Activation status
 
-As of August 27, 2026, operator-recorded console evidence establishes these
+As of August 28, 2026, operator-recorded console evidence establishes these
 configuration checkpoints for the pinned production identities above:
 
 - Sign in with Apple is configured for the FocusHaven iPhone App ID and the
@@ -237,6 +237,11 @@ configuration checkpoints for the pinned production identities above:
 - Android App Check registration uses Play Integrity.
 - Apple App Check registration uses App Attest with DeviceCheck fallback.
 - Web App Check registration uses reCAPTCHA Enterprise.
+- The default second-generation Functions compute service account,
+  `791775983697-compute@developer.gserviceaccount.com`, has the dedicated
+  **Firebase App Check Token Verifier** role
+  (`roles/firebaseappcheck.tokenVerifier`). The binding was independently
+  verified in the project IAM principal and role views.
 - `.firebaserc` pins the Firebase CLI alias to `focushaven-68c59`, while
   `firebase.json` defines the matching Hosting site, `build/web` public
   directory, and single-page application rewrite.
@@ -253,8 +258,6 @@ configuration checkpoints for the pinned production identities above:
 These checkpoints record completed configuration; they do not authorize or
 claim the remaining activation gates. In particular:
 
-- the **Firebase App Check Token Verifier** role has not been granted or
-  independently verified for the deletion function's compute service account;
 - App Check enforcement remains disabled;
 - `deleteFocusHavenAccount` has not been deployed by this activation runbook;
 - remote coaching remains disabled; this activation runbook did not deploy,

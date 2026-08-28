@@ -700,11 +700,12 @@ explicitly includes local FocusHaven data in an optional cloud backup.
 See the [FocusHaven Privacy Policy](https://tyree1233.github.io/FocusHaven/PRIVACY_POLICY.html)
 for details. Store disclosure work is tracked in the source-backed
 [store privacy and permission matrix](docs/STORE_PRIVACY_DISCLOSURE_MATRIX.md),
-including the remaining activation and production-verification gates for Apple
-login and complete in-app/external account deletion. The implementation and public
+including the remaining deployment and production-verification gates for complete
+in-app/external account deletion. The implementation and public
 [account-deletion resource](docs/ACCOUNT_DELETION.md) now exist, while Apple
-provider activation, callable deployment, and production end-to-end validation
-remain explicit pre-submission gates. The repository also defines an
+provider activation and the App Check verifier-role prerequisite are complete;
+callable deployment and production end-to-end validation remain explicit
+pre-submission gates. The repository also defines an
 ordered, no-secrets
 [account-lifecycle production activation runbook](docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md)
 that pins every Firebase command to project `focushaven-68c59` and limits the

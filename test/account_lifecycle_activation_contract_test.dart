@@ -121,6 +121,10 @@ void main() {
         'Android App Check registration uses Play Integrity',
         'Apple App Check registration uses App Attest with DeviceCheck fallback',
         'Web App Check registration uses reCAPTCHA Enterprise',
+        '`791775983697-compute@developer.gserviceaccount.com`',
+        '`roles/firebaseappcheck.tokenVerifier`',
+        'binding was independently',
+        'verified in the project IAM principal and role views',
         '`focusCoach` as deployed',
         '`ACTIVE` in `us-central1`',
         '`REMOTE_COACHING_ENABLED=false`',
@@ -129,7 +133,6 @@ void main() {
       }
 
       for (final pendingBoundary in <String>[
-        'role has not been granted or',
         'App Check enforcement remains disabled',
         '`deleteFocusHavenAccount` has not been deployed',
         'remote coaching remains disabled',
@@ -149,6 +152,7 @@ void main() {
           ),
         ),
       );
+      expect(runbook, isNot(contains('role has not been granted or')));
     },
   );
 }
