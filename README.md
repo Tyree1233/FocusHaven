@@ -704,13 +704,14 @@ including the remaining deployment and production-verification gates for complet
 in-app/external account deletion. The implementation and public
 [account-deletion resource](docs/ACCOUNT_DELETION.md) now exist, while Apple
 provider activation and the App Check verifier-role prerequisite are complete;
-callable deployment and production end-to-end validation remain explicit
-pre-submission gates. The repository also defines an
+the scoped deletion callable is deployed, and the non-destructive and
+destructive production canaries remain explicit pre-submission gates. The
+repository also defines an
 ordered, no-secrets
 [account-lifecycle production activation runbook](docs/ACCOUNT_LIFECYCLE_PRODUCTION_ACTIVATION.md)
-that pins every Firebase command to project `focushaven-68c59` and limits the
-first callable deployment to `deleteFocusHavenAccount`. No production action
-in that runbook is considered complete without explicit approval and captured
+that pins every Firebase command to project `focushaven-68c59`, records the
+completed single-function deployment of `deleteFocusHavenAccount`, and keeps
+each later production gate behind separate explicit approval and captured
 evidence. The repository also defines an
 enforceable [privacy-safe diagnostics policy](docs/DIAGNOSTICS_POLICY.md):
 release clients do not include a third-party crash-reporting SDK or upload

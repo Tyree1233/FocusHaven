@@ -154,6 +154,29 @@ Functions revision using the Google Cloud console, or redeploy the last known
 good tagged source with the same exact function/project scope. Do not delete
 the callable while released clients depend on it.
 
+### Recorded Gate 3 completion
+
+Gate 3 deployment completed on August 28, 2026, under a separate explicit
+authorization. The exact scoped command above ran from clean commit
+`c70d264102396b9666f59b8db7459582964bc9dd` and created only
+`deleteFocusHavenAccount` in project `focushaven-68c59`. Read-only before/after
+inventory established that:
+
+- `deleteFocusHavenAccount` is `ACTIVE` as a second-generation Node.js 22
+  callable in `us-central1` under
+  `791775983697-compute@developer.gserviceaccount.com`;
+- its deployed limits remain 30 seconds, 256 MB, 1 CPU, 20 concurrency, and
+  `maxInstances=10`;
+- `focusCoach` remained byte-for-byte identical in the before/after Firebase
+  inventory and `REMOTE_COACHING_ENABLED=false`;
+- no third function was created; and
+- no callable invocation, canary, Hosting deployment, IAM mutation, App Check
+  product-enforcement change, provider or credential change, or remote-coaching
+  change was performed.
+
+This completion record proves the scoped deployment only. It does not authorize
+or satisfy Gate 4, Gate 5, Gate 6, or any store release action.
+
 ## Gate 4 — non-destructive canary
 
 Before deleting any test identity:
@@ -250,6 +273,11 @@ configuration checkpoints for the pinned production identities above:
   and `ACTIVE` in `us-central1`, with `REMOTE_COACHING_ENABLED=false`. This
   account-lifecycle activation work did not deploy, enable, invoke, or modify
   that function.
+- Gate 3 deployed only `deleteFocusHavenAccount` from clean commit
+  `c70d264102396b9666f59b8db7459582964bc9dd`. It is `ACTIVE` as a
+  second-generation Node.js 22 callable in `us-central1` under the verified
+  compute service account. Before/after inventory confirmed that `focusCoach`
+  remained byte-for-byte identical and that no other function was created.
 - The controlled 1.0.0 (1) Apple archive passed App Store validation with
   non-blocking third-party framework symbol warnings.
 - No App Store build was delivered, no TestFlight release was created, and
@@ -258,14 +286,15 @@ configuration checkpoints for the pinned production identities above:
 These checkpoints record completed configuration; they do not authorize or
 claim the remaining activation gates. In particular:
 
-- App Check enforcement remains disabled;
-- `deleteFocusHavenAccount` has not been deployed by this activation runbook;
+- App Check enforcement remains disabled at the product level; the deployed
+  callable retains its source-bound token enforcement and replay rejection;
 - remote coaching remains disabled; this activation runbook did not deploy,
   enable, invoke, or modify `focusCoach`;
-- the non-destructive and destructive production canaries have not run; and
+- Gates 4 and 5 production canaries have not run;
+- no callable invocation was performed; and
 - no store release has occurred.
 
 Any later console state can drift from this dated checkpoint. Re-run the
 read-only identity checks and capture fresh redacted evidence before advancing
-to Gate 3. No private key, site key, token, account identifier, or other secret
+to Gate 4. No private key, site key, token, account identifier, or other secret
 is stored in this status record.

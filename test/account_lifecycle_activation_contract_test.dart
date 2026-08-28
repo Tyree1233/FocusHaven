@@ -74,6 +74,7 @@ void main() {
       'operator-recorded console evidence',
       'App Check enforcement remains disabled',
       'Firebase Hosting remains undeployed',
+      'Gate 3 deployment completed on August 28, 2026',
       'No App Store build was delivered',
     ]) {
       expect(runbook, contains(required));
@@ -128,17 +129,22 @@ void main() {
         '`focusCoach` as deployed',
         '`ACTIVE` in `us-central1`',
         '`REMOTE_COACHING_ENABLED=false`',
+        '`deleteFocusHavenAccount` is `ACTIVE`',
+        'second-generation Node.js 22',
+        '`c70d264102396b9666f59b8db7459582964bc9dd`',
+        '`maxInstances=10`',
+        '`focusCoach` remained byte-for-byte identical',
       ]) {
         expect(runbook, contains(completedCheckpoint));
       }
 
       for (final pendingBoundary in <String>[
         'App Check enforcement remains disabled',
-        '`deleteFocusHavenAccount` has not been deployed',
         'remote coaching remains disabled',
         'this activation runbook did not deploy,',
         'enable, invoke, or modify `focusCoach`',
         'production canaries have not run',
+        'no callable invocation was performed',
         'no store release has occurred',
       ]) {
         expect(runbook, contains(pendingBoundary));
@@ -153,6 +159,14 @@ void main() {
         ),
       );
       expect(runbook, isNot(contains('role has not been granted or')));
+      expect(
+        runbook,
+        isNot(
+          contains(
+            '`deleteFocusHavenAccount` has not been deployed by this activation runbook',
+          ),
+        ),
+      );
     },
   );
 }
