@@ -58,8 +58,9 @@ The typed Phase 210 implementation lives in separate, testable layers:
   current state, availability, argument bounds, and confirmation policy;
 - `lib/services/haven_action_engine.dart` prevents proposal replay and delegates
   accepted operations to `TimerService` or `FocusQueueService`;
-- `lib/widgets/haven_action_sheet.dart` provides a visible review step and an
-  exact confirmation step for saved queue edits.
+- `lib/widgets/haven_action_sheet.dart` provides a visible and accessible
+  review announcement, an explicit **Change request** path, keyboard review,
+  and an exact confirmation step for saved queue edits.
 
 The timer screen exposes the typed surface as **Haven actions**. It performs no
 speech recognition, requests no microphone access, and calls no remote model.
@@ -217,6 +218,12 @@ Phase 210 is complete only when:
 - all mutations route through existing services;
 - unsupported and ambiguous requests make no state change;
 - stale and replayed proposals are rejected;
+- the review surface announces the exact interpretation, effect, risk, and
+  available choices as one live region;
+- changing a request preserves the typed text, mutates nothing, and returns
+  keyboard focus to the input;
+- every execution attempt settles the visible proposal, including a stale
+  rejection, so a consumed proposal cannot remain available for another tap;
 - widget, watch, and native-surface command authorization remains unchanged;
 - the current store privacy boundary remains accurate.
 

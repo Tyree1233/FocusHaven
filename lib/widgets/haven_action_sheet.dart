@@ -26,6 +26,7 @@ class HavenActionSheet extends StatefulWidget {
 
 class _HavenActionSheetState extends State<HavenActionSheet> {
   final TextEditingController _controller = TextEditingController();
+  final FocusNode _inputFocusNode = FocusNode();
   late final HavenActionInterpreter _interpreter;
   late final HavenActionExecutor _executor;
   late final HavenActionEngine _engine;
@@ -48,6 +49,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
   @override
   void dispose() {
     _controller.dispose();
+    _inputFocusNode.dispose();
     super.dispose();
   }
 
@@ -80,6 +82,20 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
       _proposal = decision.allowed ? proposal : null;
       _message = decision.allowed ? null : decision.message;
     });
+    if (decision.allowed) {
+      _inputFocusNode.unfocus();
+    }
+  }
+
+  void _changeRequest() {
+    if (_busy) return;
+    setState(() {
+      _proposal = null;
+      _message = null;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _inputFocusNode.requestFocus();
+    });
   }
 
   Future<void> _execute() async {
@@ -94,7 +110,8 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
     setState(() {
       _busy = false;
       _message = result.message;
-      if (result.executed) _proposal = null;
+      _proposal = null;
+      if (result.executed) _controller.clear();
     });
   }
 
@@ -161,6 +178,8 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
             TextField(
               key: const ValueKey('havenActionInput'),
               controller: _controller,
+              focusNode: _inputFocusNode,
+              autofocus: true,
               enabled: !_busy,
               maxLength: HavenActionInterpreter.maxInputLength,
               minLines: 1,
@@ -204,38 +223,52 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
             ],
             if (proposal != null) ...[
               const SizedBox(height: 18),
-              Card(
-                key: const ValueKey('havenActionProposal'),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        proposal.interpretation,
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w700,
-                        ),
+              Semantics(
+                container: true,
+                liveRegion: true,
+                label: _proposalSemanticsLabel(proposal),
+                child: ExcludeSemantics(
+                  child: Card(
+                    key: const ValueKey('havenActionProposal'),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            proposal.interpretation,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            proposal.effect,
+                            style: const TextStyle(height: 1.35),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            _riskLabel(proposal.risk),
+                            style: TextStyle(
+                              color: colors.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        proposal.effect,
-                        style: const TextStyle(height: 1.35),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        _riskLabel(proposal.risk),
-                        style: TextStyle(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 10),
+              OutlinedButton.icon(
+                key: const ValueKey('changeHavenAction'),
+                onPressed: _busy ? null : _changeRequest,
+                icon: const Icon(Icons.edit_outlined),
+                label: const Text('Change request'),
+              ),
+              const SizedBox(height: 8),
               FilledButton(
                 key: const ValueKey('executeHavenAction'),
                 onPressed: _busy ? null : _execute,
@@ -261,6 +294,14 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
         ),
       ),
     );
+  }
+
+  String _proposalSemanticsLabel(HavenActionProposal proposal) {
+    final nextStep = proposal.confirmationRequired
+        ? 'Confirmation is required. Choose Confirm exact action to continue, or Change request to edit.'
+        : 'Choose Run reviewed action to continue, or Change request to edit.';
+    return 'Reviewed Haven action. ${proposal.interpretation}. '
+        '${proposal.effect} ${_riskLabel(proposal.risk)}. $nextStep';
   }
 
   String _riskLabel(HavenActionRisk risk) => switch (risk) {

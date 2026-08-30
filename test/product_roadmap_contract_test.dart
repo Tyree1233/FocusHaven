@@ -66,6 +66,8 @@ void main() {
     expect(readme, contains('The current runtime remains microphone-free'));
     expect(readme, contains('typed Haven Action Engine'));
     expect(readme, contains('stores no raw command history'));
+    expect(readme, contains('announced as one accessible summary'));
+    expect(readme, contains('every consumed proposal disappears'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -89,6 +91,9 @@ void main() {
       'lib/services/haven_action_policy.dart',
       'lib/services/haven_action_engine.dart',
       'exact confirmation step for saved queue edits',
+      'accessible review announcement',
+      'explicit **Change request** path',
+      'every execution attempt settles the visible proposal',
     ]) {
       expect(architecture, contains(required));
     }
@@ -136,6 +141,7 @@ void main() {
       'does not satisfy a destructive confirmation',
       'Voice may open the dedicated screen',
       'store privacy and data-safety answers updated',
+      'That is input and confirmation hardening, not microphone or speech implementation',
     ]) {
       expect(policy, contains(required));
     }

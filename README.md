@@ -619,6 +619,10 @@ visual confirmation; stale and replayed proposals fail closed; and mutations
 remain owned by the existing timer and queue services. This surface stores no
 raw command history and adds no microphone permission, speech dependency,
 remote-model call, Firebase operation, or developer command path.
+Its review card is announced as one accessible summary of the interpretation,
+effect, risk, and available choices. Keyboard submission and **Change request**
+keep the typed path editable, while every consumed proposal disappears after
+success or rejection so it cannot remain available for another tap.
 
 ## Architecture
 

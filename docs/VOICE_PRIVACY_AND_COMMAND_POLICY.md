@@ -7,6 +7,11 @@ FocusHaven currently declares no Android `RECORD_AUDIO` permission, no iOS
 document does not change that boundary. It defines the conditions that must be
 met before a later release may add Voice-to-Coach or safe voice commands.
 
+The Phase 210 typed prerequisite now includes an accessible review
+announcement, keyboard submission, an editable **Change request** path, and a
+settled proposal lifecycle after both successful and rejected execution. That
+is input and confirmation hardening, not microphone or speech implementation.
+
 ## Experience boundary
 
 Voice will be an optional input method, not an autonomous assistant.
@@ -155,6 +160,6 @@ Voice-to-Coach cannot ship until the release branch includes:
 - a support path for deleting any saved transcript through existing local
   coaching deletion controls.
 
-Safe voice commands additionally require the completed Phase 210 typed action engine,
-ambiguity tests, confirmation binding, stale/replay protection, and negative
-tests for every navigation-only and forbidden category.
+Safe voice commands additionally require the completed Phase 210 typed action
+engine, ambiguity tests, confirmation binding, stale/replay protection, and
+negative tests for every navigation-only and forbidden category.

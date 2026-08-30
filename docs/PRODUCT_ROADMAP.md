@@ -106,11 +106,16 @@ Exit criteria:
   actions;
 - no remote model is required to understand the initial command set.
 
-Status: implemented. The timer screen now exposes a local typed action sheet;
+Status: implemented at `a734f31`, with review-surface accessibility hardening
+in the following local checkpoint. The timer screen exposes a typed action sheet;
 the interpreter, policy, executor, confirmation, and receipt contracts are
 separate; and focused tests cover ambiguity, protected actions, stale state,
 exact confirmation, bounded add-time, and proposal replay. Phase 210 adds no
 microphone permission, speech dependency, remote model call, or backend action.
+The review surface also announces the exact interpretation, effect, risk, and
+available choices; supports keyboard review and an explicit editable
+**Change request** path; remains usable with large text on a narrow surface;
+and removes every consumed proposal after success or rejection.
 
 ### Phase 211 — Voice-to-Coach
 
