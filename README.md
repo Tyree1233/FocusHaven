@@ -594,6 +594,24 @@ with OpenAI's current [API data controls](https://developers.openai.com/api/docs
 - User-controlled deletion of local data and cloud backups
 - Subscription-aware FocusHaven Pro foundation with legacy purchase restoration
 
+## Future product roadmap
+
+FocusHaven's future AI, voice, adaptive-focus, system-assistant, soundscape,
+and Haven expansion work is deliberately separated from the shipped feature
+list above. The authoritative planning and safety contracts are:
+
+- [Product roadmap](docs/PRODUCT_ROADMAP.md) — current status, delivery order,
+  and release gates
+- [Haven AI and Action architecture](docs/HAVEN_AI_ACTION_ARCHITECTURE.md) —
+  the typed-first proposal, policy, confirmation, and execution boundary
+- [Voice privacy and command policy](docs/VOICE_PRIVACY_AND_COMMAND_POLICY.md) —
+  tap-to-talk, transcript handling, confirmation, and forbidden actions
+
+These documents do not add microphone access or claim that voice and general
+AI orchestration are already implemented. The current runtime remains
+microphone-free, local Focus Coach remains the default, and enhanced remote
+coaching remains separately gated and disabled.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.
