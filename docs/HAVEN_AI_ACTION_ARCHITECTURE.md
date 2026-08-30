@@ -1,8 +1,8 @@
 # Haven AI and Action Architecture
 
-Status: Phase 209 design contract; not yet a runtime implementation
+Status: Phase 210 typed runtime implemented; voice remains future work
 
-The Haven Action Engine will be the single policy boundary between a human
+The Haven Action Engine is the single policy boundary between a human
 request and an existing FocusHaven service. It exists so typed input, future
 voice transcripts, local coaching, optional enhanced coaching, widgets,
 watches, and system assistants cannot invent different authorization rules.
@@ -45,9 +45,30 @@ Existing FocusHaven services remain authoritative. The engine proposes a call;
 it does not duplicate timer rules, write preferences directly, manufacture
 widget commands, or mutate Riverpod state behind a service.
 
+## Phase 210 runtime boundary
+
+The typed Phase 210 implementation lives in separate, testable layers:
+
+- `lib/models/haven_action.dart` defines versioned proposals, typed arguments,
+  state preconditions, exact confirmations, and text-free receipts;
+- `lib/services/haven_action_interpreter.dart` recognizes the initial bounded
+  grammar locally and rejects ambiguous, unsupported, protected, or oversized
+  input without creating a proposal;
+- `lib/services/haven_action_policy.dart` independently rechecks freshness,
+  current state, availability, argument bounds, and confirmation policy;
+- `lib/services/haven_action_engine.dart` prevents proposal replay and delegates
+  accepted operations to `TimerService` or `FocusQueueService`;
+- `lib/widgets/haven_action_sheet.dart` provides a visible review step and an
+  exact confirmation step for saved queue edits.
+
+The timer screen exposes the typed surface as **Haven actions**. It performs no
+speech recognition, requests no microphone access, and calls no remote model.
+Opening Queue, Haven Plan, Smart Reset, local Coach, or settings goes through
+the existing screens. Protected actions remain unavailable from this engine.
+
 ## Proposal contract
 
-A future `HavenActionProposal` should be versioned and contain only the minimum
+A `HavenActionProposal` is versioned and contains only the minimum
 fields needed to review one proposed action:
 
 - schema version and random proposal ID;
@@ -112,9 +133,9 @@ modify IAM, change a provider or credential, alter remote configuration, enable
 enhanced coaching, deliver a store build, create TestFlight content, or submit
 an app for review.
 
-## Initial Phase 210 allowlist
+## Phase 210 allowlist
 
-The first typed engine should stay deliberately small:
+The first typed engine stays deliberately small:
 
 - read current timer status;
 - start a ready focus or break session;
@@ -198,3 +219,6 @@ Phase 210 is complete only when:
 - stale and replayed proposals are rejected;
 - widget, watch, and native-surface command authorization remains unchanged;
 - the current store privacy boundary remains accurate.
+
+The repository implementation and focused tests now satisfy these criteria.
+This completion does not authorize Phase 211 microphone or speech work.

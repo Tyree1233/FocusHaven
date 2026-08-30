@@ -1,8 +1,8 @@
 # FocusHaven Product Roadmap
 
-Status: planning contract, not a shipped-feature claim
+Status: living product contract; Phase 210 typed actions are implemented
 Roadmap baseline: August 30, 2026
-Source baseline: `375dc45` (`Record production App Attest validation checkpoint`)
+Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
 This roadmap defines how FocusHaven grows from a private focus timer into a
 calm, local-first focus companion. It records what already exists, what has only
@@ -49,8 +49,9 @@ Every future phase must preserve these rules:
 
 | Experience | Status | Current truth | Next outcome |
 | --- | --- | --- | --- |
-| Core timer and recovery | Shipped | Focus and break sessions, persistence, pause/resume/reset/add-time, completion, and recovery are implemented. | Become the sole authority behind the future Haven Action Engine. |
-| Focus Queue | Shipped | Local task ordering, editing, completion, and restoration exist. | Accept bounded, confirmed action proposals without exposing arbitrary text to native system surfaces. |
+| Core timer and recovery | Shipped | Focus and break sessions, persistence, pause/resume/reset/add-time, completion, and recovery are implemented. | Remain the sole authority behind Haven actions and future assistant inputs. |
+| Haven Action Engine | Shipped | Typed local requests become versioned proposals with explanation, state checks, exact confirmation where required, replay protection, and service-owned execution. | Remain the shared policy boundary for later voice and system-assistant inputs. |
+| Focus Queue | Shipped | Local task ordering, editing, completion, restoration, and one confirmed typed draft action exist. | Expand only through bounded, independently confirmed proposals. |
 | Living Lantern | Shipped | A compassionate, ephemeral timer companion is derived locally without health loss or scoring. | Join the unified Haven Loop without adding pressure mechanics. |
 | Haven Journey and Focus Garden | Partial | Lantern, campsite, cabin, garden, and sanctuary stages are locally derived and cannot regress. | Add more restorative scenes and reflection-driven personalization without levels, locks, or public ranks. |
 | Haven Plan | Partial | Energy, available time, queue state, and text-free focus events produce a transparent local session preview. | Expand into a goal-to-plan workflow whose proposals require acceptance. |
@@ -87,6 +88,8 @@ Exit criteria:
   direct voice execution;
 - no runtime permission, dependency, manifest, provider, or deployment changes.
 
+Status: complete at `8b27408`.
+
 ### Phase 210 — Haven Action Engine, typed input first
 
 Implement a local, deterministic action proposal and policy layer. Typed
@@ -102,6 +105,12 @@ Exit criteria:
 - unit and widget tests cover ambiguous, stale, duplicate, and unavailable
   actions;
 - no remote model is required to understand the initial command set.
+
+Status: implemented. The timer screen now exposes a local typed action sheet;
+the interpreter, policy, executor, confirmation, and receipt contracts are
+separate; and focused tests cover ambiguity, protected actions, stale state,
+exact confirmation, bounded add-time, and proposal replay. Phase 210 adds no
+microphone permission, speech dependency, remote model call, or backend action.
 
 ### Phase 211 — Voice-to-Coach
 

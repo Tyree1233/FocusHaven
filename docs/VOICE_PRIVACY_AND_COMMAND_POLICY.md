@@ -1,6 +1,6 @@
 # Voice Privacy and Command Policy
 
-Status: future-feature policy; voice is **not implemented** in Phase 209
+Status: future-feature policy; voice is **not implemented** through Phase 210
 
 FocusHaven currently declares no Android `RECORD_AUDIO` permission, no iOS
 `NSMicrophoneUsageDescription`, and no speech-recognition dependency. This
@@ -155,6 +155,6 @@ Voice-to-Coach cannot ship until the release branch includes:
 - a support path for deleting any saved transcript through existing local
   coaching deletion controls.
 
-Safe voice commands additionally require the Phase 210 typed action engine,
+Safe voice commands additionally require the completed Phase 210 typed action engine,
 ambiguity tests, confirmation binding, stale/replay protection, and negative
 tests for every navigation-only and forbidden category.

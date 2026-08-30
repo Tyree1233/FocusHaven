@@ -612,6 +612,14 @@ AI orchestration are already implemented. The current runtime remains
 microphone-free, local Focus Coach remains the default, and enhanced remote
 coaching remains separately gated and disabled.
 
+Phase 210 now ships the first **typed Haven Action Engine**. From the timer
+screen, **Haven actions** can locally review one bounded timer, navigation, or
+Focus Queue request before execution. Stateful queue edits require an exact
+visual confirmation; stale and replayed proposals fail closed; and mutations
+remain owned by the existing timer and queue services. This surface stores no
+raw command history and adds no microphone permission, speech dependency,
+remote-model call, Firebase operation, or developer command path.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

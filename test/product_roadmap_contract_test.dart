@@ -20,6 +20,7 @@ void main() {
 
     for (final currentExperience in <String>[
       '| Focus Queue | Shipped |',
+      '| Haven Action Engine | Shipped |',
       '| Living Lantern | Shipped |',
       '| Smart Reset | Shipped |',
       '| Haven Rhythm | Shipped |',
@@ -63,6 +64,8 @@ void main() {
     expect(readme, contains('docs/HAVEN_AI_ACTION_ARCHITECTURE.md'));
     expect(readme, contains('docs/VOICE_PRIVACY_AND_COMMAND_POLICY.md'));
     expect(readme, contains('The current runtime remains microphone-free'));
+    expect(readme, contains('typed Haven Action Engine'));
+    expect(readme, contains('stores no raw command history'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -81,6 +84,11 @@ void main() {
       'confirmation binds to the exact proposal ID',
       'typed input exercises the engine without a microphone or remote model',
       'all mutations route through existing services',
+      'Phase 210 typed runtime implemented',
+      'lib/services/haven_action_interpreter.dart',
+      'lib/services/haven_action_policy.dart',
+      'lib/services/haven_action_engine.dart',
+      'exact confirmation step for saved queue edits',
     ]) {
       expect(architecture, contains(required));
     }
@@ -116,7 +124,7 @@ void main() {
     final pubspec = _read('pubspec.yaml');
 
     for (final required in <String>[
-      'voice is **not implemented** in Phase 209',
+      'voice is **not implemented** through Phase 210',
       'explicit **tap-to-talk**',
       'There is no always-listening mode',
       'keeps no raw-audio history',
@@ -135,12 +143,12 @@ void main() {
     expect(
       androidManifest,
       isNot(contains('android.permission.RECORD_AUDIO')),
-      reason: 'Phase 209 must not introduce Android microphone access.',
+      reason: 'Phase 210 must not introduce Android microphone access.',
     );
     expect(
       iosInfo,
       isNot(contains('NSMicrophoneUsageDescription')),
-      reason: 'Phase 209 must not introduce iOS microphone access.',
+      reason: 'Phase 210 must not introduce iOS microphone access.',
     );
 
     for (final speechDependency in <String>[

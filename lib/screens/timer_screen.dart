@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models/focus_milestone.dart';
 import '../models/focus_session.dart';
 import '../models/haven_plan.dart';
+import '../models/haven_action.dart';
 import '../models/haven_window_suggestion.dart';
 import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
@@ -32,6 +33,7 @@ import '../widgets/focus_session_reflection_card.dart';
 import '../widgets/focus_shield_card.dart';
 import '../widgets/guided_breathing_sheet.dart';
 import '../widgets/haven_plan_sheet.dart';
+import '../widgets/haven_action_sheet.dart';
 import '../widgets/haven_journey_card.dart';
 import '../widgets/haven_rhythm_card.dart';
 import '../widgets/haven_window_card.dart';
@@ -841,6 +843,42 @@ class TimerScreen extends riverpod.ConsumerWidget {
     );
   }
 
+  Future<void> _showHavenActionSheet(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+    TimerService timer,
+  ) async {
+    if (!_canOpenOverlay(context)) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) => HavenActionSheet(
+        timerService: timer,
+        focusQueueService: ref.read(focusQueueServiceProvider),
+        onOpenSurface: (surface) async {
+          if (!context.mounted) return;
+          switch (surface) {
+            case HavenActionSurface.focusQueue:
+              return _showFocusQueueSheet(context, timer, ref);
+            case HavenActionSurface.havenPlan:
+              return _showHavenPlanSheet(context, timer);
+            case HavenActionSurface.smartReset:
+              if (!timer.canOfferSmartReset) return;
+              return _resetTimer(context, ref, timer);
+            case HavenActionSurface.localCoach:
+              return _showCoachingSheet(context, ref);
+            case HavenActionSurface.settings:
+              return _showAccountSheet(context, ref);
+          }
+        },
+      ),
+    );
+  }
+
   Future<bool> _requestHavenWindowAccess(
     BuildContext context,
     riverpod.WidgetRef ref,
@@ -1013,6 +1051,12 @@ class TimerScreen extends riverpod.ConsumerWidget {
       appBar: AppBar(
         title: const Text('FocusHaven'),
         actions: [
+          IconButton(
+            key: const ValueKey('openHavenActions'),
+            icon: const Icon(Icons.bolt_outlined),
+            tooltip: 'Haven actions',
+            onPressed: () => _showHavenActionSheet(context, ref, timer),
+          ),
           IconButton(
             icon: const Icon(Icons.self_improvement_outlined),
             tooltip: 'Mindful pause',

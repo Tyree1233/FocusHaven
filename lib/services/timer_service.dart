@@ -335,6 +335,35 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _saveToPrefs();
   }
 
+  /// Adds time to an active or paused session without changing its saved
+  /// default duration. Invalid requests fail closed instead of being clamped.
+  bool addTime(Duration duration) {
+    final additionalSeconds = duration.inSeconds;
+    if (additionalSeconds <= 0 ||
+        _isComplete ||
+        _hasPendingResume ||
+        (!_isRunning &&
+            _activeFocusStartedAt == null &&
+            _secondsRemaining >= _totalSessionSeconds) ||
+        _totalSessionSeconds + additionalSeconds > _maxSessionSeconds) {
+      return false;
+    }
+
+    _secondsRemaining += additionalSeconds;
+    _totalSessionSeconds += additionalSeconds;
+    if (_activeFocusPlannedSeconds != null) {
+      _activeFocusPlannedSeconds =
+          _activeFocusPlannedSeconds! + additionalSeconds;
+    }
+    final endsAt = _endsAt;
+    if (_isRunning && endsAt != null) {
+      _endsAt = endsAt.add(Duration(seconds: additionalSeconds));
+    }
+    notifyListeners();
+    _saveToPrefs();
+    return true;
+  }
+
   void reset() => _reset(FocusEventOutcome.reset);
 
   void startSmartReset(int restartDurationSeconds) {
