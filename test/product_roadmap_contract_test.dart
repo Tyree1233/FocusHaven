@@ -83,6 +83,9 @@ void main() {
     expect(readme, contains('task-decision-to-reflection'));
     expect(readme, contains('take the break without answering'));
     expect(readme, contains('stale callbacks'));
+    expect(readme, contains('reflection-to-Rhythm'));
+    expect(readme, contains('nothing changed automatically'));
+    expect(readme, contains('Unanswered, stale, duplicate, or mismatched'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -139,6 +142,16 @@ void main() {
       'stale callback, replay after the next session',
       'fails closed instead of rewriting later history',
       'copies no task text or reflection content',
+      'Phase 215C reflection-to-Rhythm connection',
+      '`HavenRhythmService` accepts the exact current `FocusCompletionIdentity`',
+      'belongs to the newest event, appears exactly once',
+      '`HavenRhythmReflectionConnection` is ephemeral',
+      'one reflection is not yet a pattern',
+      'recent recovery signals still carry more weight',
+      'The connection persists no second reflection, task text, derived insight',
+      'It has no button and no execution authority',
+      'Nothing changed automatically',
+      'Forecast, Smart Reset, Journey, and coaching remain separate',
     ]) {
       expect(architecture, contains(required));
     }

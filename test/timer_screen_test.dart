@@ -30,6 +30,7 @@ import 'package:focushaven/widgets/haven_plan_sheet.dart';
 import 'package:focushaven/widgets/haven_planner_sheet.dart';
 import 'package:focushaven/widgets/haven_journey_card.dart';
 import 'package:focushaven/widgets/haven_rhythm_card.dart';
+import 'package:focushaven/widgets/haven_rhythm_reflection_connection_card.dart';
 import 'package:focushaven/widgets/haven_window_card.dart';
 import 'package:focushaven/widgets/living_lantern_card.dart';
 import 'package:focushaven/widgets/smart_reset_sheet.dart';
@@ -1272,6 +1273,16 @@ void main() {
       FocusSessionFit.aboutRight,
     );
     expect(find.textContaining('Saved privately'), findsOneWidget);
+    expect(find.byType(HavenRhythmReflectionConnectionCard), findsOneWidget);
+    expect(
+      find.text('One reflection is a beginning, not a pattern'),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('Nothing changed automatically'),
+      findsOneWidget,
+    );
+    expect(timer.totalSessionSeconds, 1);
 
     final takeBreak = find.widgetWithText(FilledButton, 'Take a break');
     await tester.ensureVisible(takeBreak);
@@ -1281,6 +1292,7 @@ void main() {
 
     expect(timer.sessionType, SessionType.shortBreak);
     expect(find.byType(FocusSessionReflectionCard), findsNothing);
+    expect(find.byType(HavenRhythmReflectionConnectionCard), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

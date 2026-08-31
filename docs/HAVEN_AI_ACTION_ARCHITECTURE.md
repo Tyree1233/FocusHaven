@@ -359,3 +359,26 @@ This connection copies no task text or reflection content and adds no new
 permission, dependency, account requirement, network call, remote AI, backend,
 deployment, calendar access, or coaching authority. Rhythm, Forecast, Smart
 Reset, Journey, and coaching remain separate later Phase 215 connections.
+
+## Phase 215C reflection-to-Rhythm connection
+
+Phase 215C adds one advisory connection from a saved text-free fit to the
+existing local Haven Rhythm engine. `HavenRhythmService` accepts the exact
+current `FocusCompletionIdentity` and bounded `FocusEvent` history, then fails
+closed unless that identity belongs to the newest event, appears exactly once,
+and already owns a session-fit reflection.
+
+The resulting `HavenRhythmReflectionConnection` is ephemeral. It explains one
+of three honest states: one reflection is not yet a pattern, repeated
+reflections contribute to the current local Rhythm observation, or recent
+recovery signals still carry more weight. The timer screen renders this
+explanation directly below the existing reflection controls only while the
+exact completed Focus session remains current.
+
+The connection persists no second reflection, task text, derived insight,
+score, or raw content. It has no button and no execution authority. It never
+changes a timer duration, selects a break, accepts a suggested pace, schedules
+work, or contacts local or remote coaching. The visible boundary says
+**Nothing changed automatically** and keeps the next session as an explicit
+user choice. Forecast, Smart Reset, Journey, and coaching remain separate later
+Phase 215 connections.

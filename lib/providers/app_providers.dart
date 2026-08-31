@@ -569,6 +569,28 @@ final havenRhythmInsightProvider = Provider<HavenRhythmInsight>((ref) {
       .createInsight(recentEvents: events);
 }, name: 'havenRhythmInsightProvider');
 
+/// Explains how the reflection on the exact current completed Focus session
+/// relates to Haven Rhythm. The connection is ephemeral and advisory only.
+final havenRhythmReflectionConnectionProvider =
+    Provider<HavenRhythmReflectionConnection?>((ref) {
+      final session = ref.watch(timerSessionStateProvider);
+      if (session.sessionType != SessionType.focus ||
+          !session.isComplete ||
+          session.completedFocusSessionFit == null) {
+        return null;
+      }
+
+      final completion = ref.read(timerServiceProvider).completedFocusIdentity;
+      if (completion == null) return null;
+
+      return ref
+          .watch(havenRhythmServiceProvider)
+          .createReflectionConnection(
+            completion: completion,
+            recentEvents: ref.watch(timerFocusEventsProvider),
+          );
+    }, name: 'havenRhythmReflectionConnectionProvider');
+
 /// Rebuilds the lantern from current timer controls and private text-free
 /// events. The result is local, ephemeral, informational, and non-punitive.
 final livingLanternStateProvider = Provider<LivingLanternState>((ref) {

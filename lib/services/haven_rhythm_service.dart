@@ -14,6 +14,60 @@ class HavenRhythmService {
   static const _minimumPatternSignals = 3;
   static const _focusOptions = <int>[5, 10, 15, 25, 45, 60, 90];
 
+  HavenRhythmReflectionConnection? createReflectionConnection({
+    required FocusCompletionIdentity completion,
+    required List<FocusEvent> recentEvents,
+  }) {
+    final ordered = [...recentEvents]
+      ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
+    if (ordered.isEmpty || ordered.first.completionIdentity != completion) {
+      return null;
+    }
+
+    final matches = ordered
+        .where((event) => event.completionIdentity == completion)
+        .toList(growable: false);
+    if (matches.length != 1 || matches.single.sessionFit == null) return null;
+
+    final selectedFit = matches.single.sessionFit!;
+    final insight = createInsight(recentEvents: recentEvents);
+    final kind = switch (insight.kind) {
+      HavenRhythmKind.gentlerPace ||
+      HavenRhythmKind.sustainablePace ||
+      HavenRhythmKind.roomToGrow ||
+      HavenRhythmKind.variablePace =>
+        HavenRhythmReflectionConnectionKind.reflectionPattern,
+      HavenRhythmKind.gentleReturn =>
+        HavenRhythmReflectionConnectionKind.recoveryLeads,
+      HavenRhythmKind.learning || HavenRhythmKind.completionPattern =>
+        HavenRhythmReflectionConnectionKind.learning,
+    };
+
+    final (headline, detail) = switch (kind) {
+      HavenRhythmReflectionConnectionKind.learning => (
+        'One reflection is a beginning, not a pattern',
+        'Haven Rhythm will wait for repeated private signals before describing a pace.',
+      ),
+      HavenRhythmReflectionConnectionKind.reflectionPattern => (
+        'Your private Rhythm has new evidence',
+        'This reflection contributed to the current local observation: “${insight.headline}”',
+      ),
+      HavenRhythmReflectionConnectionKind.recoveryLeads => (
+        'Your reflection was saved; recovery still leads',
+        'Recent reset signals currently carry more weight than pace suggestions. This reflection can contribute when a repeated pattern forms.',
+      ),
+    };
+
+    return HavenRhythmReflectionConnection(
+      kind: kind,
+      completion: completion,
+      selectedFit: selectedFit,
+      insight: insight,
+      headline: headline,
+      detail: detail,
+    );
+  }
+
   HavenRhythmInsight createInsight({required List<FocusEvent> recentEvents}) {
     final recent = [...recentEvents]
       ..sort((a, b) => b.endedAt.compareTo(a.endedAt));

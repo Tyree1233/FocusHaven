@@ -672,6 +672,16 @@ to the exact completed attempt, and rejects stale callbacks rather than
 rewriting a later session. No task text, reflection copy, remote model call,
 account, permission, backend, or deployment is added.
 
+Phase 215C adds the next bounded **reflection-to-Rhythm** connection. After a
+person saves a text-free session-fit reflection, an informational card explains
+whether that exact completion is only a beginning, contributes to a repeated
+local pattern, or remains secondary to recent recovery signals. The card is
+rebuilt from the existing private focus-event history, stores nothing new, and
+disappears outside that exact completed Focus boundary. It offers no control
+and states that nothing changed automatically; the next session remains the
+person's choice. Unanswered, stale, duplicate, or mismatched completion
+evidence fails closed and shows no connection.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

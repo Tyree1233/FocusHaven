@@ -221,6 +221,116 @@ void main() {
     expect(insight.headline, isNot(contains('sustainable')));
   });
 
+  test('connects one exact current reflection without inventing a pattern', () {
+    final current = event(
+      outcome: FocusEventOutcome.completed,
+      sessionFit: FocusSessionFit.aboutRight,
+    );
+
+    final connection = service.createReflectionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: [current],
+    );
+
+    expect(connection, isNotNull);
+    expect(connection!.kind, HavenRhythmReflectionConnectionKind.learning);
+    expect(connection.selectedFit, FocusSessionFit.aboutRight);
+    expect(connection.completion, current.completionIdentity);
+    expect(connection.usesRepeatedReflections, isFalse);
+    expect(connection.headline, contains('not a pattern'));
+  });
+
+  test('connects repeated reflections to the current Rhythm evidence', () {
+    final current = event(
+      outcome: FocusEventOutcome.completed,
+      sessionFit: FocusSessionFit.tooMuch,
+    );
+    final prior = event(
+      outcome: FocusEventOutcome.completed,
+      ageMinutes: 30,
+      sessionFit: FocusSessionFit.tooMuch,
+    );
+
+    final connection = service.createReflectionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: [prior, current],
+    );
+
+    expect(connection, isNotNull);
+    expect(
+      connection!.kind,
+      HavenRhythmReflectionConnectionKind.reflectionPattern,
+    );
+    expect(connection.insight.kind, HavenRhythmKind.gentlerPace);
+    expect(connection.usesRepeatedReflections, isTrue);
+    expect(connection.detail, contains(connection.insight.headline));
+  });
+
+  test('keeps recovery evidence ahead of one current reflection', () {
+    final current = event(
+      outcome: FocusEventOutcome.completed,
+      sessionFit: FocusSessionFit.couldDoMore,
+    );
+    final recentReset = event(
+      outcome: FocusEventOutcome.reset,
+      focusedMinutes: 5,
+      ageMinutes: 1,
+    );
+    final discardedResume = event(
+      outcome: FocusEventOutcome.discardedResume,
+      focusedMinutes: 5,
+      ageMinutes: 2,
+    );
+
+    final connection = service.createReflectionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: [recentReset, current, discardedResume],
+    );
+
+    expect(connection, isNotNull);
+    expect(connection!.kind, HavenRhythmReflectionConnectionKind.recoveryLeads);
+    expect(connection.insight.kind, HavenRhythmKind.gentleReturn);
+    expect(connection.detail, contains('reset signals'));
+  });
+
+  test(
+    'fails closed for unanswered, stale, or duplicate completion evidence',
+    () {
+      final current = event(
+        outcome: FocusEventOutcome.completed,
+        sessionFit: FocusSessionFit.aboutRight,
+      );
+      final older = event(
+        outcome: FocusEventOutcome.completed,
+        ageMinutes: 30,
+        sessionFit: FocusSessionFit.tooMuch,
+      );
+      final unanswered = event(outcome: FocusEventOutcome.completed);
+
+      expect(
+        service.createReflectionConnection(
+          completion: unanswered.completionIdentity!,
+          recentEvents: [unanswered],
+        ),
+        isNull,
+      );
+      expect(
+        service.createReflectionConnection(
+          completion: older.completionIdentity!,
+          recentEvents: [older, current],
+        ),
+        isNull,
+      );
+      expect(
+        service.createReflectionConnection(
+          completion: current.completionIdentity!,
+          recentEvents: [current, current],
+        ),
+        isNull,
+      );
+    },
+  );
+
   test(
     'Riverpod derives the current ephemeral insight from event snapshots',
     () {
