@@ -26,6 +26,7 @@ import 'package:focushaven/widgets/focus_forecast_card.dart';
 import 'package:focushaven/widgets/focus_shield_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
+import 'package:focushaven/widgets/haven_planner_sheet.dart';
 import 'package:focushaven/widgets/haven_journey_card.dart';
 import 'package:focushaven/widgets/haven_rhythm_card.dart';
 import 'package:focushaven/widgets/haven_window_card.dart';
@@ -220,6 +221,8 @@ void main() {
     expect(find.text('25 MINUTES'), findsOneWidget);
     expect(find.text('Begin focus'), findsOneWidget);
     expect(find.text('Open focus queue'), findsOneWidget);
+    expect(find.text('Plan a goal'), findsOneWidget);
+    expect(find.byKey(const ValueKey('open-haven-ai-planner')), findsOneWidget);
     expect(find.text('Plan my next session'), findsOneWidget);
     expect(find.byType(LivingLanternCard), findsOneWidget);
     expect(find.text('LIVING LANTERN · READY'), findsOneWidget);
@@ -648,6 +651,43 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey('open-haven-plan')), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('opens a local Haven planner draft without changing the timer', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+
+    await tester.pumpWidget(_app(timer));
+    await tester.pump();
+
+    final planner = find.byKey(const ValueKey('open-haven-ai-planner'));
+    await tester.ensureVisible(planner);
+    await tester.pumpAndSettle();
+    await tester.tap(planner);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(HavenPlannerSheet), findsOneWidget);
+    expect(
+      find.text('Local planner foundation • no remote AI'),
+      findsOneWidget,
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('havenPlannerGoal')),
+      'Prepare a careful launch checklist',
+    );
+    await tester.tap(find.byKey(const ValueKey('createHavenPlannerDraft')));
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('havenPlannerProposalContext')),
+      findsOneWidget,
+    );
+    expect(find.text('Review each item'), findsOneWidget);
+    expect(timer.isRunning, isFalse);
+    expect(timer.secondsRemaining, 25 * 60);
+    expect(timer.totalSessionSeconds, 25 * 60);
     expect(tester.takeException(), isNull);
   });
 

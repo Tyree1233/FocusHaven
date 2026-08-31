@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 213 Safe Voice Commands is implemented
+Status: living product contract; Phase 214A local planner foundation is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -63,7 +63,7 @@ Every future phase must preserve these rules:
 | Focus Shield | Foundation shipped | iPhone has a consent-based adapter; Android truthfully reports unsupported. | Improve supported-platform reliability and guidance without pretending cross-platform enforcement exists. |
 | Local Focus Coach | Shipped | Private local coaching remains the default and offline fallback. | Receive structured context and optional typed or voice transcripts through a common input boundary. |
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
-| Haven AI planner | Planned | There is no general AI orchestration or goal decomposition engine. | Convert an explicit goal into explainable task, session, and schedule proposals. |
+| Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
@@ -185,6 +185,19 @@ Exit criteria:
 - remote processing is separately disclosed and opted into;
 - no calendar write, queue replacement, or timer start occurs from generated
   text alone.
+
+Status: Phase 214A local foundation implemented in the current source. **Plan a
+goal** creates a deterministic, local-only, non-persistent proposal from the
+explicit goal and time choices. The review identifies its inputs, assumptions,
+medium uncertainty, and affected local data. Every task, session suggestion,
+and free-time suggestion has its own **Accept**, **Edit** where supported, or
+**Reject** choice. Nothing mutates until all items are settled and the exact
+accepted queue list is confirmed. Each accepted task then becomes a fresh
+state-bound `HavenActionProposal` and is executed by the existing Focus Queue
+owner; the planner never writes the queue directly. Session and free-time
+suggestions are informational, the timer remains unchanged, and no calendar is
+read or written. Remote AI drafting, calendar proposals, and automatic plan
+execution remain planned rather than shipped.
 
 ### Phase 215 — Unified Haven Loop
 

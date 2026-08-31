@@ -263,3 +263,36 @@ The Phase 213 source and focused tests now satisfy these criteria. Fresh native
 builds, real-device voice-command acceptance, accessibility checks, and final
 store disclosures remain release work; this source milestone is not a claim
 that the feature is present in an already validated store candidate.
+
+## Phase 214A local planner foundation
+
+Phase 214A introduces a planner proposal, not an autonomous agent. The
+deterministic `HavenPlannerService` receives only the goal, available minutes,
+and preferred focus size the person explicitly enters. It makes no network
+request, persists no goal or proposal, reads no calendar, and changes no timer
+or queue state while drafting. Its versioned proposal discloses:
+
+- the exact normalized inputs;
+- bounded assumptions and an explicit uncertainty level and explanation;
+- the local data that could be affected;
+- possible Focus Queue tasks;
+- one informational session-size suggestion; and
+- one informational, calendar-free free-time suggestion.
+
+The `HavenPlannerSheet` requires every item to be settled independently with
+**Accept**, **Edit** where supported, or **Reject**. Accepting an informational
+suggestion records no state change. Accepted or edited queue tasks are shown
+again as one exact list before the person confirms. `HavenPlannerActionService`
+then creates one fresh `HavenActionProposal` per reviewed task because each
+successful queue insertion changes the queue revision. Every proposal still
+passes through `HavenActionInterpreter`, `HavenActionPolicy`, exact
+`HavenActionConfirmation`, `HavenActionEngine`, and the owning
+`FocusQueueService`. The planner never writes queue storage directly and gains
+no timer, calendar, account, purchase, permission, deployment, or store
+authority.
+
+The local foundation is intentionally useful without an account, network,
+subscription, remote model, new permission, or backend change. A future remote
+planner may draft richer possibilities only after a separate disclosure and
+opt-in; its output must return to this same item-by-item local review and action
+boundary. It cannot convert generated text into automatic execution.

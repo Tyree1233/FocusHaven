@@ -637,6 +637,19 @@ state, expiry, argument bounds, protected-action rejection, exact confirmation,
 and replay protection. Local Coach output and system intents are rejected as
 proposal sources; general AI orchestration remains future work.
 
+Phase 214A adds the first **local Haven planner foundation**. From the Focus
+timer, **Plan a goal** turns only the goal and time the person enters into an
+ephemeral, explainable draft. The draft lists its inputs, assumptions,
+uncertainty, and affected local data, then requires an independent
+**Accept**, **Edit**, or **Reject** choice for every possible task, session-size
+suggestion, and free-time suggestion. Nothing changes while the draft is being
+reviewed. Exact accepted queue items require one final visual confirmation and
+are added one at a time through fresh state-bound Haven Action proposals and
+the existing Focus Queue service. The planner never starts or reconfigures the
+timer, reads or writes a calendar, replaces the queue, persists the goal, or
+contacts remote AI. Remote goal decomposition remains future, separately
+disclosed, opt-in work.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

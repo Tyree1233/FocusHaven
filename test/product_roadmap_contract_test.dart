@@ -30,6 +30,7 @@ void main() {
       '| Haven Window | Foundation shipped |',
       '| Focus Shield | Foundation shipped |',
       '| Enhanced remote coach | Foundation shipped, disabled |',
+      '| Haven AI planner | Foundation shipped |',
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
     ]) {
@@ -41,7 +42,6 @@ void main() {
     }
 
     for (final futureExperience in <String>[
-      '| Haven AI planner | Planned |',
       '| Siri, Shortcuts, and Android App Actions | Planned |',
       '| Soundscapes and focus environments | Planned |',
       '| Haven Rooms and body doubling | Deferred |',
@@ -71,6 +71,11 @@ void main() {
     expect(readme, contains('Safe Voice Commands'));
     expect(readme, contains('Review action'));
     expect(readme, contains('Run reviewed action'));
+    expect(readme, contains('local Haven planner foundation'));
+    expect(readme, contains('Plan a goal'));
+    expect(readme, contains('Accept'));
+    expect(readme, contains('Edit'));
+    expect(readme, contains('Reject'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -101,6 +106,13 @@ void main() {
       '`typed` and `voiceTranscript` sources',
       '`localCoach` and `systemIntent`',
       'tap **Review action**, inspect the proposal',
+      'Phase 214A local planner foundation',
+      'HavenPlannerService',
+      'HavenPlannerSheet',
+      'HavenPlannerActionService',
+      'one fresh `HavenActionProposal` per reviewed task',
+      'The planner never writes queue storage directly',
+      'no timer, calendar, account, purchase, permission, deployment, or store authority',
     ]) {
       expect(architecture, contains(required));
     }

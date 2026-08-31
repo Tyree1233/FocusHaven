@@ -29,6 +29,7 @@ import '../services/focus_shield_service.dart';
 import '../services/focus_shield_platform_bridge.dart';
 import '../services/haven_journey_service.dart';
 import '../services/haven_plan_service.dart';
+import '../services/haven_planner_service.dart';
 import '../services/haven_rhythm_service.dart';
 import '../services/haven_window_hold_service.dart';
 import '../services/haven_window_service.dart';
@@ -244,6 +245,13 @@ final havenJourneyServiceProvider = Provider<HavenJourneyService>(
 final havenPlanServiceProvider = Provider<HavenPlanService>(
   (ref) => const HavenPlanService(),
   name: 'havenPlanServiceProvider',
+);
+
+/// Local-only, ephemeral planner drafting. The service has no persistence,
+/// remote-model dependency, or execution authority.
+final havenPlannerServiceProvider = Provider<HavenPlannerService>(
+  (ref) => HavenPlannerService(),
+  name: 'havenPlannerServiceProvider',
 );
 
 final havenRhythmServiceProvider = Provider<HavenRhythmService>(

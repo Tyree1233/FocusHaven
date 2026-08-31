@@ -33,6 +33,7 @@ import '../widgets/focus_session_reflection_card.dart';
 import '../widgets/focus_shield_card.dart';
 import '../widgets/guided_breathing_sheet.dart';
 import '../widgets/haven_plan_sheet.dart';
+import '../widgets/haven_planner_sheet.dart';
 import '../widgets/haven_action_sheet.dart';
 import '../widgets/haven_journey_card.dart';
 import '../widgets/haven_rhythm_card.dart';
@@ -546,6 +547,27 @@ class TimerScreen extends riverpod.ConsumerWidget {
         content: Text(
           'Haven Plan started: ${plan.focusMinutes} minutes of focus.',
         ),
+      ),
+    );
+  }
+
+  Future<void> _showHavenPlannerSheet(
+    BuildContext context,
+    riverpod.WidgetRef ref,
+    TimerService timer,
+  ) async {
+    if (!_canOpenOverlay(context)) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) => HavenPlannerSheet(
+        timerService: timer,
+        focusQueueService: ref.read(focusQueueServiceProvider),
+        plannerService: ref.read(havenPlannerServiceProvider),
       ),
     );
   }
@@ -1165,6 +1187,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                 ? 'Open focus queue'
                                 : 'Focus queue • $queueRemaining',
                           ),
+                        ),
+                        TextButton.icon(
+                          key: const ValueKey('open-haven-ai-planner'),
+                          onPressed: () =>
+                              _showHavenPlannerSheet(context, ref, timer),
+                          icon: const Icon(Icons.route_outlined, size: 18),
+                          label: const Text('Plan a goal'),
                         ),
                         if (timer.canStartHavenPlan)
                           TextButton.icon(
