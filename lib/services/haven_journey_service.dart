@@ -1,3 +1,4 @@
+import '../models/focus_event.dart';
 import '../models/haven_journey_state.dart';
 
 /// Derives a durable-feeling Haven place from an existing cumulative signal.
@@ -13,6 +14,57 @@ class HavenJourneyService {
   static const _cabinSessions = 4;
   static const _gardenSessions = 10;
   static const _sanctuarySessions = 25;
+
+  HavenJourneyCompletionConnection? createCompletionConnection({
+    required FocusCompletionIdentity completion,
+    required List<FocusEvent> recentEvents,
+    required HavenJourneyState journey,
+  }) {
+    final ordered = [...recentEvents]
+      ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
+    if (ordered.isEmpty || ordered.first.completionIdentity != completion) {
+      return null;
+    }
+
+    final matches = ordered
+        .where((event) => event.completionIdentity == completion)
+        .toList(growable: false);
+    if (matches.length != 1 || journey.supportingSessionCount < 1) return null;
+
+    final verifiedCurrent = createState(
+      completedFocusSessions: journey.supportingSessionCount,
+    );
+    if (verifiedCurrent.place != journey.place ||
+        verifiedCurrent.headline != journey.headline ||
+        verifiedCurrent.detail != journey.detail) {
+      return null;
+    }
+
+    final previous = createState(
+      completedFocusSessions: journey.supportingSessionCount - 1,
+    );
+    final changedPlace = previous.place != journey.place;
+    final (headline, detail) = changedPlace
+        ? (
+            'This completed Focus session opened a new Haven place',
+            'Your private Journey now rests at ${_placeLabel(journey.place)}. The change comes only from the existing cumulative completion count.',
+          )
+        : (
+            'This completed Focus session belongs in your Haven',
+            'Your private Journey remains at ${_placeLabel(journey.place)}. Every completed Focus session is kept equally, without a score or streak requirement.',
+          );
+
+    return HavenJourneyCompletionConnection(
+      kind: changedPlace
+          ? HavenJourneyCompletionConnectionKind.placeChanged
+          : HavenJourneyCompletionConnectionKind.placeHeld,
+      completion: completion,
+      previousPlace: previous.place,
+      currentPlace: journey.place,
+      headline: headline,
+      detail: detail,
+    );
+  }
 
   HavenJourneyState createState({required int completedFocusSessions}) {
     if (completedFocusSessions < 0) {
@@ -68,4 +120,12 @@ class HavenJourneyService {
       supportingSessionCount: 0,
     );
   }
+
+  static String _placeLabel(HavenJourneyPlace place) => switch (place) {
+    HavenJourneyPlace.lantern => 'the lantern',
+    HavenJourneyPlace.campsite => 'the campsite',
+    HavenJourneyPlace.cabin => 'the quiet cabin',
+    HavenJourneyPlace.garden => 'the gentle garden',
+    HavenJourneyPlace.sanctuary => 'the sanctuary',
+  };
 }

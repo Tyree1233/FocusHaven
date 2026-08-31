@@ -438,3 +438,35 @@ Smart Reset remains available. Recovery never completes, reorders, renames, or
 removes queue work and adds no persistence key, network call, remote AI,
 permission, dependency, backend, deployment, calendar access, or reflection
 copy. Journey and coaching remain separate later Phase 215 connections.
+
+## Phase 215F completion-to-Journey continuity
+
+Phase 215F adds a read-only explanation between the exact current completed
+Focus attempt and the existing cumulative Haven Journey. The connection is not
+a new Journey owner. `HavenJourneyService` remains responsible for deriving a
+lantern, campsite, cabin, garden, or sanctuary solely from the timer's existing
+cumulative completed-Focus count.
+
+The service accepts the current `FocusCompletionIdentity`, bounded text-free
+focus events, and the already-derived `HavenJourneyState`. It requires that
+identity to belong to the newest event and appear exactly once. It also
+re-derives the current place, headline, and detail from the supplied cumulative
+count. Empty, stale, duplicate, zero-count, unresolved-loop, or inconsistent
+evidence fails closed and produces no card.
+
+For valid evidence, the service derives the immediately previous place from
+`supportingSessionCount - 1`. If the place is unchanged, the card explains that
+this completion is kept equally inside the current Haven. If the existing
+threshold was crossed, it names only the newly current place. Both outcomes
+are informational; neither adds a milestone, adapts the timer, changes a task,
+or grants Journey mutation authority.
+
+`HavenJourneyCompletionConnection` contains only the text-free completion
+identity, previous and current place enums, connection kind, and explanatory
+copy. It contains no task title, queue ID, reflection, transcript, authored
+content, account data, score, or new persisted state. The card has no button,
+network, coaching, timer, or queue surface and appears only after a pending
+linked-task outcome is settled. It says **This advisory changed nothing
+automatically** and that Journey remains private, cumulative, and free of
+scores or streak pressure. Local-coach context remains separate later Phase
+215 work.

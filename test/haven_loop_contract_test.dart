@@ -27,6 +27,7 @@ void main() {
     expect(screen, contains('haven-loop-resolution-required'));
     expect(screen, contains('completedFocusIdentity'));
     expect(screen, contains('reflectOnCompletedFocus'));
+    expect(screen, contains('HavenJourneyCompletionConnectionCard'));
     expect(screen, contains('preservesSelectedTask: recoveryTicket != null'));
     expect(screen, contains('recovery continued without a task link'));
     expect(

@@ -1,4 +1,35 @@
+import 'focus_event.dart';
+
 enum HavenJourneyPlace { lantern, campsite, cabin, garden, sanctuary }
+
+enum HavenJourneyCompletionConnectionKind { placeHeld, placeChanged }
+
+/// One ephemeral explanation of how the exact current completion relates to
+/// the already-derived Haven Journey.
+///
+/// It contains only text-free completion identity and cumulative place state.
+/// Task titles, queue identifiers, reflections, and authored content are
+/// deliberately absent.
+class HavenJourneyCompletionConnection {
+  const HavenJourneyCompletionConnection({
+    required this.kind,
+    required this.completion,
+    required this.previousPlace,
+    required this.currentPlace,
+    required this.headline,
+    required this.detail,
+  });
+
+  final HavenJourneyCompletionConnectionKind kind;
+  final FocusCompletionIdentity completion;
+  final HavenJourneyPlace previousPlace;
+  final HavenJourneyPlace currentPlace;
+  final String headline;
+  final String detail;
+
+  bool get enteredNewPlace =>
+      kind == HavenJourneyCompletionConnectionKind.placeChanged;
+}
 
 /// One calm, local interpretation of the Haven the person has built.
 ///

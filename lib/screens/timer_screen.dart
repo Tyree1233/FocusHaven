@@ -37,6 +37,7 @@ import '../widgets/haven_plan_sheet.dart';
 import '../widgets/haven_planner_sheet.dart';
 import '../widgets/haven_action_sheet.dart';
 import '../widgets/haven_journey_card.dart';
+import '../widgets/haven_journey_completion_connection_card.dart';
 import '../widgets/haven_loop_completion_card.dart';
 import '../widgets/haven_rhythm_card.dart';
 import '../widgets/haven_rhythm_reflection_connection_card.dart';
@@ -1077,6 +1078,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final focusHistory = ref.watch(timerFocusHistoryProvider);
     final summary = ref.watch(timerSummaryStateProvider);
     final havenJourney = ref.watch(havenJourneyStateProvider);
+    final journeyCompletion = ref.watch(
+      havenJourneyCompletionConnectionProvider,
+    );
     final havenRhythm = ref.watch(havenRhythmInsightProvider);
     final rhythmReflection = ref.watch(havenRhythmReflectionConnectionProvider);
     final forecastReflection = ref.watch(
@@ -1371,6 +1375,12 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                   const SizedBox(height: 12),
                                   FocusForecastReflectionConnectionCard(
                                     connection: forecastReflection,
+                                  ),
+                                ],
+                                if (journeyCompletion != null) ...[
+                                  const SizedBox(height: 12),
+                                  HavenJourneyCompletionConnectionCard(
+                                    connection: journeyCompletion,
                                   ),
                                 ],
                                 const SizedBox(height: 14),

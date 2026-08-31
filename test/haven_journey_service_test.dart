@@ -1,12 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/models/haven_journey_state.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/haven_journey_service.dart';
 
 void main() {
   const service = HavenJourneyService();
+
+  FocusEvent completedEvent({int ageMinutes = 0}) {
+    final endedAt = DateTime.utc(
+      2026,
+      8,
+      31,
+      12,
+    ).subtract(Duration(minutes: ageMinutes));
+    return FocusEvent(
+      startedAt: endedAt.subtract(const Duration(minutes: 25)),
+      endedAt: endedAt,
+      plannedDurationSeconds: 1500,
+      focusedDurationSeconds: 1500,
+      pauseCount: 0,
+      didResume: false,
+      outcome: FocusEventOutcome.completed,
+    );
+  }
 
   test('starts with one whole lantern instead of an empty score', () {
     final journey = service.createState(completedFocusSessions: 0);
@@ -94,6 +113,77 @@ void main() {
     expect(
       () => service.createState(completedFocusSessions: -1),
       throwsArgumentError,
+    );
+  });
+
+  test('connects the exact current completion to a new place boundary', () {
+    final current = completedEvent();
+    final journey = service.createState(completedFocusSessions: 4);
+
+    final connection = service.createCompletionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: [current],
+      journey: journey,
+    );
+
+    expect(connection, isNotNull);
+    expect(connection!.kind, HavenJourneyCompletionConnectionKind.placeChanged);
+    expect(connection.previousPlace, HavenJourneyPlace.campsite);
+    expect(connection.currentPlace, HavenJourneyPlace.cabin);
+    expect(connection.completion, current.completionIdentity);
+    expect(connection.detail, contains('existing cumulative completion count'));
+  });
+
+  test('keeps an equal completion inside the current non-scoring place', () {
+    final current = completedEvent();
+
+    final connection = service.createCompletionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: [current],
+      journey: service.createState(completedFocusSessions: 5),
+    );
+
+    expect(connection, isNotNull);
+    expect(connection!.kind, HavenJourneyCompletionConnectionKind.placeHeld);
+    expect(connection.previousPlace, HavenJourneyPlace.cabin);
+    expect(connection.currentPlace, HavenJourneyPlace.cabin);
+    expect(connection.detail, contains('without a score or streak'));
+  });
+
+  test('fails closed for stale, duplicate, or inconsistent evidence', () {
+    final current = completedEvent();
+    final older = completedEvent(ageMinutes: 30);
+    final journey = service.createState(completedFocusSessions: 5);
+    const inconsistent = HavenJourneyState(
+      place: HavenJourneyPlace.garden,
+      headline: 'Not the derived headline',
+      detail: 'Not the derived detail',
+      supportingSessionCount: 5,
+    );
+
+    expect(
+      service.createCompletionConnection(
+        completion: older.completionIdentity!,
+        recentEvents: [older, current],
+        journey: journey,
+      ),
+      isNull,
+    );
+    expect(
+      service.createCompletionConnection(
+        completion: current.completionIdentity!,
+        recentEvents: [current, current],
+        journey: journey,
+      ),
+      isNull,
+    );
+    expect(
+      service.createCompletionConnection(
+        completion: current.completionIdentity!,
+        recentEvents: [current],
+        journey: inconsistent,
+      ),
+      isNull,
     );
   });
 

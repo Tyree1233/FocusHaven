@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215E linked Smart Reset continuity is implemented
+Status: living product contract; Phase 215F completion-to-Journey continuity is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -53,7 +53,7 @@ Every future phase must preserve these rules:
 | Haven Action Engine | Shipped | Typed requests and reviewed voice transcripts become versioned proposals with explanation, state checks, exact confirmation where required, replay protection, and service-owned execution. | Remain the shared policy boundary for later planner and system-assistant inputs. |
 | Focus Queue | Shipped | Local task ordering, editing, completion, restoration, and one confirmed typed draft action exist. | Expand only through bounded, independently confirmed proposals. |
 | Living Lantern | Shipped | A compassionate, ephemeral timer companion is derived locally without health loss or scoring. | Join the unified Haven Loop without adding pressure mechanics. |
-| Haven Journey and Focus Garden | Partial | Lantern, campsite, cabin, garden, and sanctuary stages are locally derived and cannot regress. | Add more restorative scenes and reflection-driven personalization without levels, locks, or public ranks. |
+| Haven Journey and Focus Garden | Partial | Lantern, campsite, cabin, garden, and sanctuary stages are locally derived and cannot regress. One exact completed Focus session can now explain whether the cumulative Journey kept its place or crossed an existing boundary. | Add more restorative scenes and reflection-driven personalization without levels, locks, or public ranks. |
 | Haven Plan | Partial | Energy, available time, queue state, and text-free focus events produce a transparent local session preview. | Expand into a goal-to-plan workflow whose proposals require acceptance. |
 | Smart Reset | Shipped | Interrupted attempts can receive a smaller, private restart suggestion. | Become one explicit recovery action available to typed and voice proposals. |
 | Reflection and session fit | Shipped | Optional text-free feedback can describe whether a session was too much, about right, or could be longer. | Feed an explainable Adaptive Focus Engine. |
@@ -64,7 +64,7 @@ Every future phase must preserve these rules:
 | Local Focus Coach | Shipped | Private local coaching remains the default and offline fallback. | Receive structured context and optional typed or voice transcripts through a common input boundary. |
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
-| Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, and Forecast context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add Journey and local-coach context one bounded, reviewable connection at a time. |
+| Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, and Journey context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add local-coach context as one bounded, reviewable connection. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
@@ -206,10 +206,11 @@ Connect Plan, focus, reflection, Rhythm, Forecast, Smart Reset, Journey, and
 local coaching into one calm lifecycle without turning the dashboard into a
 checklist or streak pressure system.
 
-Status: Phase 215E linked Smart Reset continuity implemented in the current
+Status: Phase 215F completion-to-Journey continuity implemented in the current
 source, building on the Phase 215A local Plan-to-Focus loop, Phase 215B
 task-decision-to-reflection connection, Phase 215C reflection-to-Rhythm
-connection, and Phase 215D reflection-to-Forecast connection.
+connection, Phase 215D reflection-to-Forecast connection, and Phase 215E
+linked Smart Reset continuity.
 An explicit queue selection stores only the active queue-item ID and delegates
 the visible intention to the existing timer owner. The queue remains the sole
 owner of task text, ordering, and completion. The timer remains the sole owner
@@ -268,12 +269,28 @@ other mismatch fails closed and gains no queue authority. The selected item is
 never completed, reordered, renamed, or removed by recovery. Ordinary unlinked
 Smart Reset remains available and makes no queue-continuity claim.
 
-Phases 215A through 215E do not infer success from elapsed time, auto-complete
+Phase 215F connects the exact current completed Focus attempt to the existing
+cumulative Haven Journey only after any linked task decision is settled.
+`HavenJourneyService` requires the newest `FocusCompletionIdentity` to appear
+exactly once in bounded text-free event history and independently re-derives
+the supplied Journey state from its cumulative count. Stale, duplicate,
+unresolved, or inconsistent evidence returns no connection.
+
+The ephemeral card explains either that the completion is kept equally inside
+the current place or that the established cumulative count crossed an existing
+lantern, campsite, cabin, garden, or sanctuary boundary. It does not create a
+new milestone, progress bar, score, streak, task outcome, or Journey mutation.
+It stores no task title, queue ID, reflection, transcript, event copy, or
+second Journey state; has no control; and disappears with the exact completed
+Focus boundary. The visible statement says **This advisory changed nothing
+automatically** and that Journey remains private, cumulative, and free of
+scores or streak pressure.
+
+Phases 215A through 215F do not infer success from elapsed time, auto-complete
 work, select a break, copy task text or reflection content into a connection,
 contact local or remote coaching, read or write a calendar, or add an account,
-permission, dependency, backend, or deployment. Journey and coach connections
-remain later Phase 215 work and must keep the same explicit, service-owned
-boundary.
+permission, dependency, backend, or deployment. Local-coach context remains
+later Phase 215 work and must keep the same explicit, service-owned boundary.
 
 ### Phase 216 — Adaptive Focus Engine
 

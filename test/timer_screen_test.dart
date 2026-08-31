@@ -30,6 +30,7 @@ import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
 import 'package:focushaven/widgets/haven_planner_sheet.dart';
 import 'package:focushaven/widgets/haven_journey_card.dart';
+import 'package:focushaven/widgets/haven_journey_completion_connection_card.dart';
 import 'package:focushaven/widgets/haven_rhythm_card.dart';
 import 'package:focushaven/widgets/haven_rhythm_reflection_connection_card.dart';
 import 'package:focushaven/widgets/haven_window_card.dart';
@@ -1412,6 +1413,7 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(900, 1600));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       SharedPreferences.setMockInitialValues({
+        'completedFocusSessions': 1,
         'focusQueue': jsonEncode([
           {
             'id': 'linked-task',
@@ -1473,6 +1475,7 @@ void main() {
         findsNothing,
       );
       expect(find.byType(FocusSessionReflectionCard), findsOneWidget);
+      expect(find.byType(HavenJourneyCompletionConnectionCard), findsOneWidget);
       expect(queue.items.single.id, 'linked-task');
       expect(queue.completedItems, isEmpty);
       expect(timer.focusTask, isEmpty);
@@ -1495,6 +1498,7 @@ void main() {
     await tester.binding.setSurfaceSize(const Size(900, 1600));
     addTearDown(() => tester.binding.setSurfaceSize(null));
     SharedPreferences.setMockInitialValues({
+      'completedFocusSessions': 1,
       'focusQueue': jsonEncode([
         {
           'id': 'linked-task',
@@ -1539,6 +1543,7 @@ void main() {
     expect(queue.items, isEmpty);
     expect(queue.completedItems.single.id, 'linked-task');
     expect(find.byType(FocusSessionReflectionCard), findsOneWidget);
+    expect(find.byType(HavenJourneyCompletionConnectionCard), findsOneWidget);
     expect(timer.completedFocusSessionFit, isNull);
 
     final takeBreak = find.widgetWithText(FilledButton, 'Take a break');
@@ -1549,6 +1554,7 @@ void main() {
     expect(timer.sessionType, SessionType.shortBreak);
     expect(timer.recentFocusEvents.single.sessionFit, isNull);
     expect(find.byType(FocusSessionReflectionCard), findsNothing);
+    expect(find.byType(HavenJourneyCompletionConnectionCard), findsNothing);
     expect(tester.takeException(), isNull);
   });
 }

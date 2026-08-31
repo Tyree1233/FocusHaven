@@ -705,6 +705,18 @@ renamed, removed, completed, superseded, replayed, or mismatched ticket fails
 closed without changing the queue; ordinary unlinked Smart Reset remains
 available.
 
+Phase 215F adds one read-only **completion-to-Journey** connection after the
+linked task decision is settled. The exact newest `FocusCompletionIdentity`
+must appear once in the bounded text-free event history, and the visible
+Journey state must match the existing cumulative completion count. The card
+then explains either that this completion belongs equally inside the current
+Haven place or that the existing count crossed one of Journey's established
+place boundaries. It stores no task title, queue ID, reflection, transcript,
+or second Journey state; it has no button and disappears outside that exact
+completed Focus boundary. Stale, duplicate, unresolved, or inconsistent
+evidence fails closed. This advisory changes nothing automatically, and Haven
+Journey remains private, cumulative, and free of scores or streak pressure.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

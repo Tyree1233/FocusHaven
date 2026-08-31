@@ -89,6 +89,9 @@ void main() {
     expect(readme, contains('reflection-to-Forecast'));
     expect(readme, contains('does not change'));
     expect(readme, contains('possible window is not a rule'));
+    expect(readme, contains('completion-to-Journey'));
+    expect(readme, contains('stores no task title, queue ID, reflection'));
+    expect(readme, contains('free of scores or streak pressure'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -180,6 +183,15 @@ void main() {
       'Ordinary unlinked Smart Reset remains available',
       'adds no persistence key, network call, remote AI, permission, dependency, backend, deployment, calendar access',
       'Journey and coaching remain separate',
+      'Phase 215F completion-to-Journey continuity',
+      '`HavenJourneyService` remains responsible for deriving',
+      'identity to belong to the newest event and appear exactly once',
+      '`supportingSessionCount - 1`',
+      '`HavenJourneyCompletionConnection` contains only the text-free completion',
+      'contains no task title, queue ID, reflection, transcript, authored content',
+      'This advisory changed nothing automatically',
+      'free of scores or streak pressure',
+      'Local-coach context remains separate',
     ]) {
       expect(architecture, contains(required));
     }

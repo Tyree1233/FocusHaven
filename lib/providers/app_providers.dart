@@ -517,6 +517,32 @@ final havenJourneyStateProvider = Provider<HavenJourneyState>((ref) {
       .createState(completedFocusSessions: completedSessions);
 }, name: 'havenJourneyStateProvider');
 
+/// Explains how the exact current completed Focus session relates to the
+/// existing cumulative Haven Journey. The connection is ephemeral, text-free,
+/// and hidden until any linked task decision has been settled.
+final havenJourneyCompletionConnectionProvider =
+    Provider<HavenJourneyCompletionConnection?>((ref) {
+      final session = ref.watch(timerSessionStateProvider);
+      final havenLoop = ref.watch(havenLoopStateProvider);
+      if (session.sessionType != SessionType.focus ||
+          !session.isComplete ||
+          !havenLoop.isInitialized ||
+          havenLoop.canResolveCompletion) {
+        return null;
+      }
+
+      final completion = ref.read(timerServiceProvider).completedFocusIdentity;
+      if (completion == null) return null;
+
+      return ref
+          .watch(havenJourneyServiceProvider)
+          .createCompletionConnection(
+            completion: completion,
+            recentEvents: ref.watch(timerFocusEventsProvider),
+            journey: ref.watch(havenJourneyStateProvider),
+          );
+    }, name: 'havenJourneyCompletionConnectionProvider');
+
 /// Immutable history snapshot that changes only when sessions are added,
 /// restored, or cleared—not on every countdown tick.
 final timerFocusHistoryProvider = Provider<List<FocusSession>>((ref) {
