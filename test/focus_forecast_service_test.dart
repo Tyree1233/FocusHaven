@@ -13,6 +13,7 @@ void main() {
     required int startHour,
     int ageDays = 0,
     FocusEventOutcome outcome = FocusEventOutcome.completed,
+    FocusSessionFit? sessionFit,
     bool deviceLocal = false,
   }) {
     final localOrUtcStart = deviceLocal
@@ -28,6 +29,7 @@ void main() {
       pauseCount: 0,
       didResume: false,
       outcome: outcome,
+      sessionFit: sessionFit,
     );
   }
 
@@ -153,6 +155,137 @@ void main() {
     expect(insight.window, FocusForecastWindow.evening);
     expect(insight.signalCount, 30);
     expect(insight.evidence, contains('16 of 30'));
+  });
+
+  test('connects one exact reflection without inventing a forecast', () {
+    final current = event(startHour: 9, sessionFit: FocusSessionFit.aboutRight);
+
+    final connection = service.createReflectionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: [current],
+      localize: (value) => value,
+    );
+
+    expect(connection, isNotNull);
+    expect(connection!.kind, FocusForecastReflectionConnectionKind.learning);
+    expect(connection.selectedFit, FocusSessionFit.aboutRight);
+    expect(connection.completion, current.completionIdentity);
+    expect(connection.forecast.kind, FocusForecastKind.learning);
+    expect(connection.headline, contains('does not create'));
+  });
+
+  test('explains when the exact completion aligns with a possible window', () {
+    final current = event(
+      startHour: 9,
+      sessionFit: FocusSessionFit.couldDoMore,
+    );
+    final events = [
+      current,
+      event(startHour: 9, ageDays: 1),
+      event(startHour: 10, ageDays: 2),
+      event(startHour: 11, ageDays: 3),
+      event(startHour: 14, ageDays: 4),
+      event(startHour: 18, ageDays: 5),
+    ];
+
+    final connection = service.createReflectionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: events,
+      localize: (value) => value,
+    );
+
+    expect(
+      connection!.kind,
+      FocusForecastReflectionConnectionKind.alignsWithPossibleWindow,
+    );
+    expect(connection.alignsWithPossibleWindow, isTrue);
+    expect(connection.completedWindow, FocusForecastWindow.morning);
+    expect(connection.forecast.window, FocusForecastWindow.morning);
+    expect(connection.detail, contains('adds context, not proof'));
+  });
+
+  test(
+    'keeps an out-of-window reflection valid without rewriting forecast',
+    () {
+      final current = event(startHour: 18, sessionFit: FocusSessionFit.tooMuch);
+      final events = [
+        current,
+        event(startHour: 9, ageDays: 1),
+        event(startHour: 9, ageDays: 2),
+        event(startHour: 10, ageDays: 3),
+        event(startHour: 11, ageDays: 4),
+        event(startHour: 14, ageDays: 5),
+      ];
+
+      final connection = service.createReflectionConnection(
+        completion: current.completionIdentity!,
+        recentEvents: events,
+        localize: (value) => value,
+      );
+
+      expect(
+        connection!.kind,
+        FocusForecastReflectionConnectionKind.outsidePossibleWindow,
+      );
+      expect(connection.completedWindow, FocusForecastWindow.evening);
+      expect(connection.forecast.window, FocusForecastWindow.morning);
+      expect(connection.detail, contains('remains valid'));
+    },
+  );
+
+  test('keeps mixed completed timing flexible after a reflection', () {
+    final current = event(startHour: 9, sessionFit: FocusSessionFit.aboutRight);
+    final connection = service.createReflectionConnection(
+      completion: current.completionIdentity!,
+      recentEvents: [
+        current,
+        event(startHour: 10, ageDays: 1),
+        event(startHour: 11, ageDays: 2),
+        event(startHour: 18, ageDays: 3),
+        event(startHour: 19, ageDays: 4),
+        event(startHour: 20, ageDays: 5),
+      ],
+      localize: (value) => value,
+    );
+
+    expect(
+      connection!.kind,
+      FocusForecastReflectionConnectionKind.flexibleTiming,
+    );
+    expect(connection.forecast.kind, FocusForecastKind.flexible);
+    expect(connection.detail, contains('does not rank'));
+  });
+
+  test('fails closed for unanswered, stale, or duplicate evidence', () {
+    final current = event(startHour: 9, sessionFit: FocusSessionFit.aboutRight);
+    final older = event(
+      startHour: 10,
+      ageDays: 1,
+      sessionFit: FocusSessionFit.tooMuch,
+    );
+    final unanswered = event(startHour: 9);
+
+    expect(
+      service.createReflectionConnection(
+        completion: unanswered.completionIdentity!,
+        recentEvents: [unanswered],
+      ),
+      isNull,
+    );
+    expect(
+      service.createReflectionConnection(
+        completion: older.completionIdentity!,
+        recentEvents: [older, current],
+      ),
+      isNull,
+    );
+    expect(
+      service.createReflectionConnection(
+        completion: current.completionIdentity!,
+        recentEvents: [current, current],
+      ),
+      isNull,
+    );
   });
 
   test(

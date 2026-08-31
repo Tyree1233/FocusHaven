@@ -682,6 +682,16 @@ and states that nothing changed automatically; the next session remains the
 person's choice. Unanswered, stale, duplicate, or mismatched completion
 evidence fails closed and shows no connection.
 
+Phase 215D adds a separate **reflection-to-Forecast** connection. The exact
+current text-free reflection is matched to the existing local Focus Forecast,
+then a second informational card explains whether Forecast is still learning,
+the completion sits inside or outside a possible timing window, or recent
+timing remains flexible. The saved fit adds context only: it does not change
+Forecast's completed-session timing rules, score a time, schedule work, adapt
+the timer, or override current energy and availability. The connection is
+ephemeral, has no button, states that a possible window is not a rule, and
+fails closed for unanswered, stale, duplicate, or mismatched evidence.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

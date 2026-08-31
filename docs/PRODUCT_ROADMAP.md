@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215C reflection-to-Rhythm connection is implemented
+Status: living product contract; Phase 215D reflection-to-Forecast connection is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -206,9 +206,10 @@ Connect Plan, focus, reflection, Rhythm, Forecast, Smart Reset, Journey, and
 local coaching into one calm lifecycle without turning the dashboard into a
 checklist or streak pressure system.
 
-Status: Phase 215C reflection-to-Rhythm connection implemented in the current
-source, building on the Phase 215A local Plan-to-Focus loop and Phase 215B
-task-decision-to-reflection connection.
+Status: Phase 215D reflection-to-Forecast connection implemented in the
+current source, building on the Phase 215A local Plan-to-Focus loop, Phase 215B
+task-decision-to-reflection connection, and Phase 215C reflection-to-Rhythm
+connection.
 An explicit queue selection stores only the active queue-item ID and delegates
 the visible intention to the existing timer owner. The queue remains the sole
 owner of task text, ordering, and completion. The timer remains the sole owner
@@ -241,12 +242,22 @@ automatically, and disappears when the exact completed Focus boundary ends.
 Unanswered, stale, duplicate, or mismatched completion evidence returns no
 connection.
 
-Phases 215A through 215C do not infer success from elapsed time, auto-complete work,
-start a timer, select a break, copy task text or reflection content, contact
-local or remote coaching, read or write a calendar, or add an account,
-permission, dependency, backend, or deployment. Forecast, Smart Reset, Journey,
-and coach connections remain later Phase 215 work and must keep the same
-explicit, service-owned boundary.
+Phase 215D independently connects the same exact saved fit to the existing
+local Focus Forecast. `FocusForecastService` continues to infer timing only
+from completed-session start times; the reflection cannot change its minimum
+evidence, dominance, or local-time rules. The ephemeral explanation says
+whether Forecast is still learning, the exact completion falls inside or
+outside a possible window, or recent timing remains flexible. It has no
+control, never ranks a best time, and states both **Nothing changed
+automatically** and **A possible window is not a rule**. Current energy and
+real-life availability continue to lead.
+
+Phases 215A through 215D do not infer success from elapsed time, auto-complete
+work, start a timer, select a break, copy task text or reflection content,
+contact local or remote coaching, read or write a calendar, or add an account,
+permission, dependency, backend, or deployment. Smart Reset, Journey, and
+coach connections remain later Phase 215 work and must keep the same explicit,
+service-owned boundary.
 
 ### Phase 216 — Adaptive Focus Engine
 

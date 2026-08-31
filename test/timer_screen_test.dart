@@ -24,6 +24,7 @@ import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
 import 'package:focushaven/widgets/focus_forecast_card.dart';
+import 'package:focushaven/widgets/focus_forecast_reflection_connection_card.dart';
 import 'package:focushaven/widgets/focus_shield_card.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:focushaven/widgets/haven_plan_sheet.dart';
@@ -1274,12 +1275,15 @@ void main() {
     );
     expect(find.textContaining('Saved privately'), findsOneWidget);
     expect(find.byType(HavenRhythmReflectionConnectionCard), findsOneWidget);
+    expect(find.byType(FocusForecastReflectionConnectionCard), findsOneWidget);
     expect(
       find.text('One reflection is a beginning, not a pattern'),
       findsOneWidget,
     );
     expect(
-      find.textContaining('Nothing changed automatically'),
+      find.text(
+        'Nothing changed automatically. Your next session remains your choice.',
+      ),
       findsOneWidget,
     );
     expect(timer.totalSessionSeconds, 1);
@@ -1293,6 +1297,7 @@ void main() {
     expect(timer.sessionType, SessionType.shortBreak);
     expect(find.byType(FocusSessionReflectionCard), findsNothing);
     expect(find.byType(HavenRhythmReflectionConnectionCard), findsNothing);
+    expect(find.byType(FocusForecastReflectionConnectionCard), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

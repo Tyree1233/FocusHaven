@@ -382,3 +382,32 @@ work, or contacts local or remote coaching. The visible boundary says
 **Nothing changed automatically** and keeps the next session as an explicit
 user choice. Forecast, Smart Reset, Journey, and coaching remain separate later
 Phase 215 connections.
+
+## Phase 215D reflection-to-Forecast connection
+
+Phase 215D adds a second, independent advisory connection from the exact saved
+text-free fit to the existing local Focus Forecast. `FocusForecastService`
+accepts the exact current `FocusCompletionIdentity` and bounded `FocusEvent`
+history, then fails closed unless that identity belongs to the newest event,
+appears exactly once, and already owns a session-fit reflection.
+
+The service first rebuilds the ordinary `FocusForecast` without changing any
+forecast rule. The resulting ephemeral
+`FocusForecastReflectionConnection` explains one of four honest states: one
+reflection cannot create a timing pattern, the completion sits inside a
+possible window, it sits outside that possible window, or timing remains
+flexible. A saved fit adds context to a completion; it is never treated as
+proof that a time is good, bad, productive, or guaranteed.
+
+The timer screen renders this explanation after the existing reflection and
+Rhythm connection only while the exact completed Focus boundary remains
+current. The card has no button and no execution authority. It cannot change
+Forecast's minimum evidence or dominance rules, rank a best time, schedule
+work, start or adapt a timer, select a break, create a notification, contact
+coaching, or read a calendar. It persists no second reflection, task text,
+forecast, connection, score, or raw content. The visible boundary says
+**Nothing changed automatically** and **A possible window is not a rule**;
+current energy, recovery needs, and real-life availability continue to lead.
+
+Smart Reset, Journey, and coaching remain separate later Phase 215
+connections.

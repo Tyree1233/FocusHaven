@@ -14,6 +14,68 @@ class FocusForecastService {
   static const _minimumWindowSignals = 3;
   static const _minimumWindowShare = 0.5;
 
+  FocusForecastReflectionConnection? createReflectionConnection({
+    required FocusCompletionIdentity completion,
+    required List<FocusEvent> recentEvents,
+    DateTime Function(DateTime utcTime)? localize,
+  }) {
+    final ordered = [...recentEvents]
+      ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
+    if (ordered.isEmpty || ordered.first.completionIdentity != completion) {
+      return null;
+    }
+
+    final matches = ordered
+        .where((event) => event.completionIdentity == completion)
+        .toList(growable: false);
+    if (matches.length != 1 || matches.single.sessionFit == null) return null;
+
+    final current = matches.single;
+    final toLocal = localize ?? _defaultLocalize;
+    final completedWindow = _windowForHour(
+      toLocal(current.startedAt.toUtc()).hour,
+    );
+    final forecast = createForecast(
+      recentEvents: recentEvents,
+      localize: toLocal,
+    );
+
+    final (kind, headline, detail) = switch (forecast.kind) {
+      FocusForecastKind.learning => (
+        FocusForecastReflectionConnectionKind.learning,
+        'One reflection does not create a timing pattern',
+        'Focus Forecast is still learning from completed-session timing. Your saved fit adds private context without turning this one session into a prediction.',
+      ),
+      FocusForecastKind.flexible => (
+        FocusForecastReflectionConnectionKind.flexibleTiming,
+        'Your timing still looks flexible',
+        'Recent completions move across the day. This saved fit does not rank one time above your current energy or real-life availability.',
+      ),
+      FocusForecastKind.emergingWindow
+          when forecast.window == completedWindow =>
+        (
+          FocusForecastReflectionConnectionKind.alignsWithPossibleWindow,
+          'This completion sits inside a possible focus window',
+          'Its completed timing already contributes to the local observation. Your saved fit adds context, not proof that this time will always work.',
+        ),
+      FocusForecastKind.emergingWindow => (
+        FocusForecastReflectionConnectionKind.outsidePossibleWindow,
+        'One session can sit outside a possible window',
+        'Your saved fit remains valid even when this completion happened at another time. Focus Forecast is an observation, not a rule.',
+      ),
+    };
+
+    return FocusForecastReflectionConnection(
+      kind: kind,
+      completion: completion,
+      selectedFit: current.sessionFit!,
+      forecast: forecast,
+      completedWindow: completedWindow,
+      headline: headline,
+      detail: detail,
+    );
+  }
+
   FocusForecast createForecast({
     required List<FocusEvent> recentEvents,
     DateTime Function(DateTime utcTime)? localize,

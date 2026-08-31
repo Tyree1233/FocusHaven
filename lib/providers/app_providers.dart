@@ -542,6 +542,28 @@ final focusForecastProvider = Provider<FocusForecast>((ref) {
       .createForecast(recentEvents: events);
 }, name: 'focusForecastProvider');
 
+/// Explains how the reflection on the exact current completed Focus session
+/// relates to Focus Forecast. The connection is ephemeral and advisory only.
+final focusForecastReflectionConnectionProvider =
+    Provider<FocusForecastReflectionConnection?>((ref) {
+      final session = ref.watch(timerSessionStateProvider);
+      if (session.sessionType != SessionType.focus ||
+          !session.isComplete ||
+          session.completedFocusSessionFit == null) {
+        return null;
+      }
+
+      final completion = ref.read(timerServiceProvider).completedFocusIdentity;
+      if (completion == null) return null;
+
+      return ref
+          .watch(focusForecastServiceProvider)
+          .createReflectionConnection(
+            completion: completion,
+            recentEvents: ref.watch(timerFocusEventsProvider),
+          );
+    }, name: 'focusForecastReflectionConnectionProvider');
+
 /// Combines only a cautious forecast and redacted busy-time boundaries into
 /// one optional opening. The result cannot create calendar events or control
 /// the timer.

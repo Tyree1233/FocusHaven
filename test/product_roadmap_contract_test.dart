@@ -86,6 +86,9 @@ void main() {
     expect(readme, contains('reflection-to-Rhythm'));
     expect(readme, contains('nothing changed automatically'));
     expect(readme, contains('Unanswered, stale, duplicate, or mismatched'));
+    expect(readme, contains('reflection-to-Forecast'));
+    expect(readme, contains('does not change'));
+    expect(readme, contains('possible window is not a rule'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -152,6 +155,19 @@ void main() {
       'It has no button and no execution authority',
       'Nothing changed automatically',
       'Forecast, Smart Reset, Journey, and coaching remain separate',
+      'Phase 215D reflection-to-Forecast connection',
+      '`FocusForecastService`',
+      '`FocusForecastReflectionConnection`',
+      'one reflection cannot create a timing pattern',
+      'inside a possible window',
+      'outside that possible window',
+      'timing remains flexible',
+      'never treated as proof that a time is good, bad, productive, or guaranteed',
+      'cannot change Forecast\'s minimum evidence or dominance rules',
+      'rank a best time',
+      'A possible window is not a rule',
+      'current energy, recovery needs, and real-life availability continue to lead',
+      'Smart Reset, Journey, and coaching remain separate',
     ]) {
       expect(architecture, contains(required));
     }
