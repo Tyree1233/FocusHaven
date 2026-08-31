@@ -167,7 +167,19 @@ void main() {
       'rank a best time',
       'A possible window is not a rule',
       'current energy, recovery needs, and real-life availability continue to lead',
-      'Smart Reset, Journey, and coaching remain separate',
+      'Phase 215E linked Smart Reset continuity',
+      '`HavenLoopRecoveryTicket`',
+      'exact active queue-item ID still owns the current Focus intention',
+      'stores no task title, goal, reflection, transcript, coaching content',
+      'The sheet receives only a boolean continuity disclosure',
+      '**Restart smaller**',
+      '**Reset without restarting**',
+      '**Keep this session**',
+      'consumed exactly once',
+      'supersession, replay, or any mismatch returns false',
+      'Ordinary unlinked Smart Reset remains available',
+      'adds no persistence key, network call, remote AI, permission, dependency, backend, deployment, calendar access',
+      'Journey and coaching remain separate',
     ]) {
       expect(architecture, contains(required));
     }

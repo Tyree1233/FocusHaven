@@ -5,9 +5,14 @@ import '../models/smart_reset_plan.dart';
 enum SmartResetChoice { restart, reset, keep }
 
 class SmartResetSheet extends StatefulWidget {
-  const SmartResetSheet({required this.plan, super.key});
+  const SmartResetSheet({
+    required this.plan,
+    this.preservesSelectedTask = false,
+    super.key,
+  });
 
   final SmartResetPlan plan;
+  final bool preservesSelectedTask;
 
   @override
   State<SmartResetSheet> createState() => _SmartResetSheetState();
@@ -125,6 +130,23 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
                 ),
               ],
             ),
+            if (widget.preservesSelectedTask) ...[
+              const SizedBox(height: 12),
+              const Row(
+                key: ValueKey('smart-reset-linked-task-boundary'),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.link_rounded, size: 17, color: Colors.white60),
+                  SizedBox(width: 7),
+                  Expanded(
+                    child: Text(
+                      'Your selected queue item stays linked only while it remains active and unchanged. No task text is copied into Smart Reset.',
+                      style: TextStyle(color: Colors.white60, fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             FilledButton.icon(
               key: const ValueKey('smart-reset-restart'),

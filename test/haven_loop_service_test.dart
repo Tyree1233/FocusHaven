@@ -206,4 +206,96 @@ void main() {
     expect(owned.loop.state.selectedItemId, second.id);
     expect(owned.timer.focusTask, second.title);
   });
+
+  test(
+    'a smaller Smart Reset preserves the exact reviewed queue link',
+    () async {
+      final owned = await services();
+      await owned.queue.add('Prepare the launch brief');
+      final item = owned.queue.items.single;
+      await owned.loop.selectQueueItem(item);
+      owned.timer.start();
+      owned.timer.pause();
+
+      final ticket = owned.loop.beginSmartResetRecovery();
+      expect(ticket, isNotNull);
+
+      owned.timer.startSmartReset(10 * 60);
+
+      expect(owned.loop.finishSmartResetRecovery(ticket!), isTrue);
+      expect(owned.loop.state.selectedItemId, item.id);
+      expect(owned.timer.focusTask, item.title);
+      expect(owned.timer.isRunning, isTrue);
+      expect(owned.timer.totalSessionSeconds, 10 * 60);
+      expect(owned.loop.finishSmartResetRecovery(ticket), isFalse);
+    },
+  );
+
+  test('keeping or resetting preserves only an unchanged queue link', () async {
+    final kept = await services();
+    await kept.queue.add('Keep this exact task');
+    final keptItem = kept.queue.items.single;
+    await kept.loop.selectQueueItem(keptItem);
+    kept.timer.start();
+    kept.timer.pause();
+
+    final keepTicket = kept.loop.beginSmartResetRecovery();
+    expect(keepTicket, isNotNull);
+    kept.timer.start();
+    expect(kept.loop.finishSmartResetRecovery(keepTicket!), isTrue);
+    expect(kept.loop.state.selectedItemId, keptItem.id);
+
+    kept.timer.pause();
+    final resetTicket = kept.loop.beginSmartResetRecovery();
+    expect(resetTicket, isNotNull);
+    kept.timer.reset();
+    expect(kept.loop.finishSmartResetRecovery(resetTicket!), isTrue);
+    expect(kept.loop.state.selectedItemId, keptItem.id);
+    expect(kept.timer.focusTask, keptItem.title);
+    expect(kept.timer.isRunning, isFalse);
+  });
+
+  test(
+    'changed queue ownership invalidates recovery without mutation',
+    () async {
+      final owned = await services();
+      await owned.queue.add('Prepare the launch brief');
+      final item = owned.queue.items.single;
+      await owned.loop.selectQueueItem(item);
+      owned.timer.start();
+      owned.timer.pause();
+
+      final ticket = owned.loop.beginSmartResetRecovery();
+      expect(ticket, isNotNull);
+
+      await owned.queue.rename(item.id, 'Prepare the revised launch brief');
+      owned.timer.startSmartReset(10 * 60);
+
+      expect(owned.loop.finishSmartResetRecovery(ticket!), isFalse);
+      expect(owned.loop.state.hasSelectedTask, isFalse);
+      expect(
+        owned.queue.items.single.title,
+        'Prepare the revised launch brief',
+      );
+      expect(owned.queue.completedItems, isEmpty);
+      expect(owned.timer.focusTask, 'Prepare the launch brief');
+    },
+  );
+
+  test('a newer recovery ticket supersedes an older one', () async {
+    final owned = await services();
+    await owned.queue.add('Prepare the launch brief');
+    await owned.loop.selectQueueItem(owned.queue.items.single);
+    owned.timer.start();
+    owned.timer.pause();
+
+    final first = owned.loop.beginSmartResetRecovery();
+    final second = owned.loop.beginSmartResetRecovery();
+
+    expect(first, isNotNull);
+    expect(second, isNotNull);
+    expect(owned.loop.finishSmartResetRecovery(first!), isFalse);
+    expect(owned.loop.finishSmartResetRecovery(second!), isTrue);
+    expect(owned.loop.finishSmartResetRecovery(second), isFalse);
+  });
 }

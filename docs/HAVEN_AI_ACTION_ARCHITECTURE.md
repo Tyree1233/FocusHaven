@@ -411,3 +411,30 @@ current energy, recovery needs, and real-life availability continue to lead.
 
 Smart Reset, Journey, and coaching remain separate later Phase 215
 connections.
+
+## Phase 215E linked Smart Reset continuity
+
+Phase 215E connects one interrupted Plan-to-Focus link to the existing Smart
+Reset surface without giving recovery any task authority. After the timer
+pauses for the existing review sheet, `HavenLoopService` may issue one opaque,
+ephemeral `HavenLoopRecoveryTicket`. A ticket exists only when the exact active
+queue-item ID still owns the current Focus intention and the timer can offer
+Smart Reset. It stores no task title, goal, reflection, transcript, coaching
+content, timing history, or second copy of queue state.
+
+The sheet receives only a boolean continuity disclosure, never the queue item
+or its text. It explains that the selected item stays linked only while it
+remains active and unchanged and that Smart Reset receives no task text. The
+person still chooses **Restart smaller**, **Reset without restarting**, or
+**Keep this session**. `TimerService` remains the sole owner of those timer
+transitions; only the existing explicit restart choice starts a smaller timer.
+
+After the choice, the opaque ticket is consumed exactly once and
+`HavenLoopService` rechecks the saved ID against both owners. Rename, removal,
+completion, manual intention change, session change, supersession, replay, or
+any mismatch returns false and gains no queue mutation authority. A failed
+continuity check is disclosed without exposing the task. Ordinary unlinked
+Smart Reset remains available. Recovery never completes, reorders, renames, or
+removes queue work and adds no persistence key, network call, remote AI,
+permission, dependency, backend, deployment, calendar access, or reflection
+copy. Journey and coaching remain separate later Phase 215 connections.

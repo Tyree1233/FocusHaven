@@ -9,6 +9,18 @@ import 'timer_service.dart';
 
 enum HavenLoopResolution { completed, keptForLater, unavailable }
 
+/// An opaque, single-use capability for one reviewed Smart Reset transition.
+///
+/// It contains only the selected queue-item identity. Task text remains owned
+/// by [FocusQueueService] and is revalidated through the owning services when
+/// the capability is consumed.
+final class HavenLoopRecoveryTicket {
+  const HavenLoopRecoveryTicket._(this._generation, this._selectedItemId);
+
+  final int _generation;
+  final String _selectedItemId;
+}
+
 /// Coordinates one explicitly selected queue item with the existing timer.
 ///
 /// Only the queue-item ID is stored. The queue remains the source of task text,
@@ -32,10 +44,46 @@ class HavenLoopService extends ChangeNotifier {
   HavenLoopState _state = const HavenLoopState.empty();
   bool _isDisposed = false;
   bool _hasLoaded = false;
+  int _nextRecoveryGeneration = 0;
+  int? _activeRecoveryGeneration;
 
   late final Future<void> initialized;
 
   HavenLoopState get state => _state;
+
+  /// Begins one fail-closed Smart Reset continuity check.
+  ///
+  /// No capability is issued unless the exact selected queue item still owns
+  /// the current Focus intention and the timer can currently offer recovery.
+  HavenLoopRecoveryTicket? beginSmartResetRecovery() {
+    if (_isDisposed ||
+        !_hasLoaded ||
+        !_timer.canOfferSmartReset ||
+        !_selectionMatchesOwners()) {
+      return null;
+    }
+    final selectedItemId = _selectedItemId;
+    if (selectedItemId == null) return null;
+
+    final generation = ++_nextRecoveryGeneration;
+    _activeRecoveryGeneration = generation;
+    return HavenLoopRecoveryTicket._(generation, selectedItemId);
+  }
+
+  /// Consumes one Smart Reset continuity check after the explicit choice.
+  ///
+  /// A stale, superseded, replayed, renamed, removed, completed, or otherwise
+  /// mismatched selection returns false and gains no queue mutation authority.
+  bool finishSmartResetRecovery(HavenLoopRecoveryTicket ticket) {
+    if (_isDisposed || _activeRecoveryGeneration != ticket._generation) {
+      return false;
+    }
+    _activeRecoveryGeneration = null;
+    final preserved =
+        _selectedItemId == ticket._selectedItemId && _selectionMatchesOwners();
+    _refreshState();
+    return preserved;
+  }
 
   Future<bool> selectQueueItem(FocusQueueItem item) async {
     await initialized;
@@ -43,6 +91,7 @@ class HavenLoopService extends ChangeNotifier {
     final current = _activeItem(item.id);
     if (current == null || current.title != item.title) return false;
 
+    _invalidateRecovery();
     _selectedItemId = current.id;
     _timer.setFocusTask(current.title);
     await _saveSelection();
@@ -60,6 +109,7 @@ class HavenLoopService extends ChangeNotifier {
   Future<void> setManualFocusTask(String task) async {
     await initialized;
     if (_isDisposed) return;
+    _invalidateRecovery();
     await _clearSelection();
     _timer.setFocusTask(task);
     _refreshState();
@@ -94,6 +144,7 @@ class HavenLoopService extends ChangeNotifier {
   Future<void> clearLocalData() async {
     await initialized;
     if (_isDisposed) return;
+    _invalidateRecovery();
     _selectedItemId = null;
     final preferences = await SharedPreferences.getInstance();
     await preferences.remove(storageKey);
@@ -142,6 +193,7 @@ class HavenLoopService extends ChangeNotifier {
   void _reconcile() {
     if (!_hasLoaded || _isDisposed) return;
     if (!_selectionMatchesOwners()) {
+      _invalidateRecovery();
       final invalidatedId = _selectedItemId;
       _selectedItemId = null;
       unawaited(_removeStoredSelectionIfUnchanged(invalidatedId));
@@ -160,6 +212,7 @@ class HavenLoopService extends ChangeNotifier {
   }
 
   Future<void> _clearSelection() async {
+    _invalidateRecovery();
     _selectedItemId = null;
     await _removeStoredSelection();
   }
@@ -190,9 +243,14 @@ class HavenLoopService extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _invalidateRecovery() {
+    _activeRecoveryGeneration = null;
+  }
+
   @override
   void dispose() {
     _isDisposed = true;
+    _invalidateRecovery();
     _timer.removeListener(_reconcile);
     _queue.removeListener(_reconcile);
     super.dispose();

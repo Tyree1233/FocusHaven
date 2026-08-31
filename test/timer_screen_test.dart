@@ -785,6 +785,64 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Smart Reset preserves one exact linked queue item end to end', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode([
+        {
+          'id': 'linked-recovery-task',
+          'title': 'Prepare the recovery brief',
+          'isComplete': false,
+        },
+      ]),
+      HavenLoopService.storageKey: 'linked-recovery-task',
+    });
+    final timer = await _createTimer(tester);
+    final queue = FocusQueueService();
+    await queue.initialized;
+    timer.setFocusTask('Prepare the recovery brief');
+    timer.start();
+
+    await tester.pumpWidget(
+      _app(timer, havenQueue: queue.items, focusQueueService: queue),
+    );
+    await tester.pump();
+
+    final reset = find.byTooltip('Reset timer');
+    await tester.ensureVisible(reset);
+    await tester.pumpAndSettle();
+    await tester.tap(reset);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SmartResetSheet), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('smart-reset-linked-task-boundary')),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('No task text is copied into Smart Reset'),
+      findsOneWidget,
+    );
+
+    final restart = find.byKey(const ValueKey('smart-reset-restart'));
+    await tester.ensureVisible(restart);
+    await tester.pumpAndSettle();
+    await tester.tap(restart);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SmartResetSheet), findsNothing);
+    expect(timer.isRunning, isTrue);
+    expect(timer.focusTask, 'Prepare the recovery brief');
+    expect(queue.items.single.id, 'linked-recovery-task');
+    expect(queue.completedItems, isEmpty);
+    expect(
+      find.byKey(const ValueKey('haven-loop-linked-task')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('keeping a running session resumes it after Smart Reset', (
     tester,
   ) async {

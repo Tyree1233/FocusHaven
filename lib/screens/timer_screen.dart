@@ -218,6 +218,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (wasRunning) timer.pause();
     if (!timer.canOfferSmartReset) return;
 
+    final havenLoop = ref.read(havenLoopServiceProvider);
+    final recoveryTicket = havenLoop.beginSmartResetRecovery();
+
     final plan = ref
         .read(smartResetServiceProvider)
         .createPlan(
@@ -232,9 +235,18 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) => SmartResetSheet(plan: plan),
+      builder: (_) => SmartResetSheet(
+        plan: plan,
+        preservesSelectedTask: recoveryTicket != null,
+      ),
     );
-    if (!context.mounted || !timer.canOfferSmartReset) return;
+    if (!context.mounted) return;
+    if (!timer.canOfferSmartReset) {
+      if (recoveryTicket != null) {
+        havenLoop.finishSmartResetRecovery(recoveryTicket);
+      }
+      return;
+    }
 
     switch (choice) {
       case SmartResetChoice.restart:
@@ -247,6 +259,19 @@ class TimerScreen extends riverpod.ConsumerWidget {
       case null:
         if (wasRunning) timer.start();
         break;
+    }
+
+    final preserved = recoveryTicket == null
+        ? null
+        : havenLoop.finishSmartResetRecovery(recoveryTicket);
+    if (preserved == false && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'The queue item changed, so recovery continued without a task link.',
+          ),
+        ),
+      );
     }
   }
 

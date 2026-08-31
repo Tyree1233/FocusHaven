@@ -692,6 +692,19 @@ the timer, or override current energy and availability. The connection is
 ephemeral, has no button, states that a possible window is not a rule, and
 fails closed for unanswered, stale, duplicate, or mismatched evidence.
 
+Phase 215E connects an interrupted linked Focus attempt to the existing
+**Smart Reset** recovery choice without creating another task or recovery
+store. When the exact active queue identity still matches the timer intention,
+HavenLoop issues one ephemeral, single-use recovery ticket containing only the
+queue-item ID. The recovery sheet says that the link is preserved only while
+the item remains active and unchanged; no task text enters the Smart Reset
+plan. **Restart smaller**, **Reset without restarting**, and **Keep this
+session** remain explicit user choices owned by the timer. After the choice,
+the ticket is consumed and the queue and timer owners are checked again. A
+renamed, removed, completed, superseded, replayed, or mismatched ticket fails
+closed without changing the queue; ordinary unlinked Smart Reset remains
+available.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate
