@@ -9,6 +9,7 @@ import '../models/focus_forecast.dart';
 import '../models/focus_shield_state.dart';
 import '../models/focus_session.dart';
 import '../models/haven_journey_state.dart';
+import '../models/haven_loop_state.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_rhythm_insight.dart';
 import '../models/haven_window_hold.dart';
@@ -28,6 +29,7 @@ import '../services/focus_queue_service.dart';
 import '../services/focus_shield_service.dart';
 import '../services/focus_shield_platform_bridge.dart';
 import '../services/haven_journey_service.dart';
+import '../services/haven_loop_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_planner_service.dart';
 import '../services/haven_rhythm_service.dart';
@@ -209,6 +211,21 @@ final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(
 final focusQueueServiceProvider = ChangeNotifierProvider<FocusQueueService>(
   (ref) => FocusQueueService(),
   name: 'focusQueueServiceProvider',
+);
+
+final havenLoopServiceProvider = ChangeNotifierProvider<HavenLoopService>(
+  (ref) => HavenLoopService(
+    timerService: ref.read(timerServiceProvider),
+    focusQueueService: ref.read(focusQueueServiceProvider),
+  ),
+  name: 'havenLoopServiceProvider',
+);
+
+/// The local Plan-to-Focus link. Task text continues to come from the queue;
+/// this state retains only the reviewed queue-item identity and lifecycle.
+final havenLoopStateProvider = Provider<HavenLoopState>(
+  (ref) => ref.watch(havenLoopServiceProvider).state,
+  name: 'havenLoopStateProvider',
 );
 
 final focusShieldServiceProvider = Provider<FocusShieldService>(

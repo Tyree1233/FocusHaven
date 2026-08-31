@@ -17,6 +17,7 @@ import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/coaching_service.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
+import 'package:focushaven/services/haven_loop_service.dart';
 import 'package:focushaven/services/haven_window_platform_bridge.dart';
 import 'package:focushaven/services/haven_window_hold_service.dart';
 import 'package:focushaven/services/timer_service.dart';
@@ -50,6 +51,7 @@ Widget _app(
   Future<bool> Function(Uri uri)? openExternalUrl,
   Future<void> Function(String text)? writeClipboard,
   List<FocusQueueItem> havenQueue = const [],
+  FocusQueueService? focusQueueService,
   HavenJourneyState? journeyState,
   HavenRhythmInsight? rhythmInsight,
   FocusForecast? forecast,
@@ -76,6 +78,8 @@ Widget _app(
         completedItems: const [],
         completedToday: 0,
       )),
+      if (focusQueueService != null)
+        focusQueueServiceProvider.overrideWith((ref) => focusQueueService),
       if (rhythmInsight != null)
         havenRhythmInsightProvider.overrideWithValue(rhythmInsight),
       if (journeyState != null)
@@ -616,7 +620,18 @@ void main() {
   testWidgets('starts an accepted Haven Plan with its queued task', (
     tester,
   ) async {
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode([
+        {
+          'id': 'plan-task',
+          'title': 'Prepare the project brief',
+          'isComplete': false,
+        },
+      ]),
+    });
     final timer = await _createTimer(tester);
+    final queue = FocusQueueService();
+    await queue.initialized;
 
     await tester.pumpWidget(
       _app(
@@ -624,6 +639,7 @@ void main() {
         havenQueue: const [
           FocusQueueItem(id: 'plan-task', title: 'Prepare the project brief'),
         ],
+        focusQueueService: queue,
       ),
     );
     await tester.pump();
@@ -646,6 +662,10 @@ void main() {
     expect(timer.isRunning, isTrue);
     expect(timer.totalSessionSeconds, 10 * 60);
     expect(timer.focusTask, 'Prepare the project brief');
+    expect(
+      find.byKey(const ValueKey('haven-loop-linked-task')),
+      findsOneWidget,
+    );
     expect(
       find.text('Haven Plan started: 10 minutes of focus.'),
       findsOneWidget,
@@ -1310,4 +1330,72 @@ void main() {
     expect(find.text(expectedDate), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'requires an explicit linked-task outcome before leaving completed focus',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(900, 1600));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      SharedPreferences.setMockInitialValues({
+        'focusQueue': jsonEncode([
+          {
+            'id': 'linked-task',
+            'title': 'Prepare the launch brief',
+            'isComplete': false,
+          },
+        ]),
+        'focusTask': 'Prepare the launch brief',
+        'secondsRemaining': 0,
+        'totalSessionSeconds': 1500,
+        'sessionType': SessionType.focus.index,
+        'isComplete': true,
+        HavenLoopService.storageKey: 'linked-task',
+      });
+      final timer = TimerService();
+      final queue = FocusQueueService();
+      await Future.wait([timer.initialized, queue.initialized]);
+
+      await tester.pumpWidget(
+        _app(timer, havenQueue: queue.items, focusQueueService: queue),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('haven-loop-completion-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('haven-loop-resolution-required')),
+        findsOneWidget,
+      );
+      final takeBreak = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Take a break'),
+      );
+      expect(takeBreak.onPressed, isNull);
+
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('haven-loop-keep-for-later')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('haven-loop-keep-for-later')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('haven-loop-completion-card')),
+        findsNothing,
+      );
+      expect(queue.items.single.id, 'linked-task');
+      expect(queue.completedItems, isEmpty);
+      expect(timer.focusTask, isEmpty);
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, 'Take a break'),
+            )
+            .onPressed,
+        isNotNull,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

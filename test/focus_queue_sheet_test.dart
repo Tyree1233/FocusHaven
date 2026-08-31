@@ -21,7 +21,7 @@ Widget _app(
       theme: ThemeData.dark(),
       home: Scaffold(
         body: FocusQueueSheet(
-          onTaskSelected: (_) {},
+          onTaskSelected: (_) async => true,
           onEditTask: onEditTask ?? (_) async {},
           onShowCompleted: () {},
           addTask: addTask,

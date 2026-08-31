@@ -650,6 +650,18 @@ timer, reads or writes a calendar, replaces the queue, persists the goal, or
 contacts remote AI. Remote goal decomposition remains future, separately
 disclosed, opt-in work.
 
+Phase 215A connects that reviewed planning work to one **local Plan-to-Focus
+loop**. Choosing an existing Focus Queue task links only its exact local item
+identity to the Focus timer; the queue remains the owner of task text and task
+completion, while the timer remains the owner of session state. After a linked
+Focus session completes, FocusHaven waits for the person to choose **Mark task
+complete** or **Keep for later** before offering the next session. A renamed,
+removed, completed, or otherwise mismatched task fails closed and is never
+changed automatically. Cold-start restoration also withholds the next-session
+control until the saved-link check finishes. Manual intention edits clear the
+link, and no goal, task text, transcript, reflection, calendar data, remote
+model call, account, or new permission is added by this loop.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

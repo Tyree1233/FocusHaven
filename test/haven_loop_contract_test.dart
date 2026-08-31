@@ -1,0 +1,28 @@
+import 'dart:io';
+
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('Plan-to-Focus loop keeps ownership local and explicit', () {
+    final service = File(
+      'lib/services/haven_loop_service.dart',
+    ).readAsStringSync();
+    final screen = File('lib/screens/timer_screen.dart').readAsStringSync();
+    final card = File(
+      'lib/widgets/haven_loop_completion_card.dart',
+    ).readAsStringSync();
+
+    expect(service, contains("'havenLoopSelectedQueueItemId'"));
+    expect(service, contains('_queue.toggle(item.id)'));
+    expect(service, contains("_timer.setFocusTask('')"));
+    expect(service, isNot(contains('firebase')));
+    expect(service, isNot(contains('http')));
+    expect(service, isNot(contains('calendar')));
+    expect(screen, contains('!havenLoop.isInitialized'));
+    expect(screen, contains('haven-loop-restoring'));
+    expect(screen, contains('haven-loop-resolution-required'));
+    expect(card, contains('FocusHaven never completes it automatically.'));
+    expect(card, contains('Mark task complete'));
+    expect(card, contains('Keep for later'));
+  });
+}

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import '../services/focus_queue_service.dart';
 
-typedef FocusQueueTaskSelected = void Function(String title);
+typedef FocusQueueTaskSelected = Future<bool> Function(FocusQueueItem item);
 typedef FocusQueueTaskEditor = Future<void> Function(FocusQueueItem item);
 typedef FocusQueueTitleAction = Future<void> Function(String title);
 typedef FocusQueueItemAction = Future<void> Function(String id);
@@ -130,10 +130,21 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
     }
   }
 
-  void _selectTask(FocusQueueItem item) {
-    if (_busyItemIds.contains(item.id)) return;
-    widget.onTaskSelected(item.title);
-    Navigator.pop(context);
+  Future<void> _selectTask(FocusQueueItem item) async {
+    if (!_beginItemAction(item.id)) return;
+    try {
+      final selected = await widget.onTaskSelected(item);
+      if (!mounted) return;
+      if (selected) {
+        Navigator.pop(context);
+      } else {
+        _showActionFailure('That task changed, so it was not selected.');
+      }
+    } catch (_) {
+      _showActionFailure('Task could not be selected. Please try again.');
+    } finally {
+      _finishItemAction(item.id);
+    }
   }
 
   @override

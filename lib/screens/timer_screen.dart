@@ -36,6 +36,7 @@ import '../widgets/haven_plan_sheet.dart';
 import '../widgets/haven_planner_sheet.dart';
 import '../widgets/haven_action_sheet.dart';
 import '../widgets/haven_journey_card.dart';
+import '../widgets/haven_loop_completion_card.dart';
 import '../widgets/haven_rhythm_card.dart';
 import '../widgets/haven_window_card.dart';
 import '../widgets/journal_entry_dialog.dart';
@@ -308,6 +309,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final journal = ref.read(journalServiceProvider);
     final coach = ref.read(coachingServiceProvider);
     final focusQueue = ref.read(focusQueueServiceProvider);
+    final havenLoop = ref.read(havenLoopServiceProvider);
     final profile = ref.read(focusProfileServiceProvider);
     final themes = ref.read(themeServiceProvider);
     final confirmed = await ConfirmationDialog.show(
@@ -325,6 +327,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!coachingCleared) {
       throw StateError('Private coaching data was not completely cleared.');
     }
+    await havenLoop.clearLocalData();
     final preferences = await SharedPreferences.getInstance();
     await Future.wait([
       timer.clearLocalData(),
@@ -490,9 +493,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
       clearLabel: 'Clear',
       maxLength: 80,
     );
-    if (task != null) {
-      timer.setFocusTask(task);
-    }
+    if (task == null || !context.mounted) return;
+    final container = riverpod.ProviderScope.containerOf(context);
+    await container.read(havenLoopServiceProvider).setManualFocusTask(task);
   }
 
   Future<void> _showFocusQueueSheet(
@@ -509,7 +512,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) => FocusQueueSheet(
-        onTaskSelected: timer.setFocusTask,
+        onTaskSelected: ref.read(havenLoopServiceProvider).selectQueueItem,
         onEditTask: (item) => _editFocusQueueTask(
           sheetContext,
           ref.read(focusQueueServiceProvider),
@@ -523,6 +526,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   Future<void> _showHavenPlanSheet(
     BuildContext context,
     TimerService timer,
+    riverpod.WidgetRef ref,
   ) async {
     if (!_canOpenOverlay(context) || !timer.canStartHavenPlan) {
       return;
@@ -539,7 +543,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (plan == null || !context.mounted) return;
     if (!timer.canStartHavenPlan) return;
 
-    if (plan.queueItemId != null) timer.setFocusTask(plan.taskTitle);
+    final queueItemId = plan.queueItemId;
+    if (queueItemId != null) {
+      final selected = await ref
+          .read(havenLoopServiceProvider)
+          .selectQueueItemById(queueItemId);
+      if (!selected || !context.mounted) return;
+    }
     timer.setCustomMinutes(plan.focusMinutes);
     timer.start();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -888,7 +898,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
             case HavenActionSurface.focusQueue:
               return _showFocusQueueSheet(context, timer, ref);
             case HavenActionSurface.havenPlan:
-              return _showHavenPlanSheet(context, timer);
+              return _showHavenPlanSheet(context, timer, ref);
             case HavenActionSurface.smartReset:
               if (!timer.canOfferSmartReset) return;
               return _resetTimer(context, ref, timer);
@@ -1035,6 +1045,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
     final timer = ref.read(timerServiceProvider);
     final session = ref.watch(timerSessionStateProvider);
+    final havenLoop = ref.watch(havenLoopStateProvider);
     final focusHistory = ref.watch(timerFocusHistoryProvider);
     final summary = ref.watch(timerSummaryStateProvider);
     final havenJourney = ref.watch(havenJourneyStateProvider);
@@ -1175,6 +1186,18 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        if (havenLoop.hasSelectedTask &&
+                            !session.isComplete) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            'Linked to Focus Queue • you keep control',
+                            key: const ValueKey('haven-loop-linked-task'),
+                            style: TextStyle(
+                              color: sessionColor.withValues(alpha: 0.85),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                         TextButton.icon(
                           onPressed: () =>
                               _showFocusQueueSheet(context, timer, ref),
@@ -1199,7 +1222,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           TextButton.icon(
                             key: const ValueKey('open-haven-plan'),
                             onPressed: () =>
-                                _showHavenPlanSheet(context, timer),
+                                _showHavenPlanSheet(context, timer, ref),
                             icon: const Icon(
                               Icons.auto_awesome_outlined,
                               size: 18,
@@ -1288,9 +1311,26 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                 onSelected: timer.reflectOnCompletedFocus,
                               ),
                               const SizedBox(height: 14),
+                              if (havenLoop.canResolveCompletion &&
+                                  havenLoop.selectedItem != null) ...[
+                                HavenLoopCompletionCard(
+                                  taskTitle: havenLoop.selectedItem!.title,
+                                  onMarkComplete: ref
+                                      .read(havenLoopServiceProvider)
+                                      .markSelectedTaskComplete,
+                                  onKeepForLater: ref
+                                      .read(havenLoopServiceProvider)
+                                      .keepSelectedTaskForLater,
+                                ),
+                                const SizedBox(height: 14),
+                              ],
                             ],
                             FilledButton.icon(
-                              onPressed: () => _beginNextSession(timer),
+                              onPressed:
+                                  !havenLoop.isInitialized ||
+                                      havenLoop.canResolveCompletion
+                                  ? null
+                                  : () => _beginNextSession(timer),
                               icon: const Icon(Icons.arrow_forward),
                               label: Text(
                                 session.sessionType == SessionType.focus
@@ -1303,6 +1343,28 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                 minimumSize: const Size(210, 54),
                               ),
                             ),
+                            if (!havenLoop.isInitialized)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8),
+                                child: Text(
+                                  'Checking for a linked Focus Queue task…',
+                                  key: ValueKey('haven-loop-restoring'),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              )
+                            else if (havenLoop.canResolveCompletion)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8),
+                                child: Text(
+                                  'Choose the task outcome above before moving on.',
+                                  key: ValueKey(
+                                    'haven-loop-resolution-required',
+                                  ),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
                           ],
                         )
                       else

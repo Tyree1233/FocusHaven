@@ -31,6 +31,7 @@ void main() {
       '| Focus Shield | Foundation shipped |',
       '| Enhanced remote coach | Foundation shipped, disabled |',
       '| Haven AI planner | Foundation shipped |',
+      '| Unified Haven Loop | Foundation shipped |',
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
     ]) {
@@ -76,6 +77,9 @@ void main() {
     expect(readme, contains('Accept'));
     expect(readme, contains('Edit'));
     expect(readme, contains('Reject'));
+    expect(readme, contains('local Plan-to-Focus loop'));
+    expect(readme, contains('Mark task complete'));
+    expect(readme, contains('Keep for later'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -113,6 +117,16 @@ void main() {
       'one fresh `HavenActionProposal` per reviewed task',
       'The planner never writes queue storage directly',
       'no timer, calendar, account, purchase, permission, deployment, or store authority',
+      'Phase 215A local Plan-to-Focus loop',
+      'persists only `havenLoopSelectedQueueItemId`',
+      'Task text, ordering, and completion remain owned by `FocusQueueService`',
+      'session type, intention, countdown, and completion remain owned by `TimerService`',
+      'A completed linked Focus session is not proof that the task itself is done',
+      '**Mark task complete**',
+      '**Keep for later**',
+      'Restoration also fails closed',
+      'a cold-start race cannot bypass a pending task decision',
+      'adds no network call, remote AI, permission, account requirement, backend, or deployment',
     ]) {
       expect(architecture, contains(required));
     }

@@ -296,3 +296,37 @@ subscription, remote model, new permission, or backend change. A future remote
 planner may draft richer possibilities only after a separate disclosure and
 opt-in; its output must return to this same item-by-item local review and action
 boundary. It cannot convert generated text into automatic execution.
+
+## Phase 215A local Plan-to-Focus loop
+
+Phase 215A connects one reviewed active Focus Queue item to one Focus session
+without creating a second task store or an autonomous workflow. The
+`HavenLoopService` persists only `havenLoopSelectedQueueItemId`. Task text,
+ordering, and completion remain owned by `FocusQueueService`; session type,
+intention, countdown, and completion remain owned by `TimerService`.
+
+Selection is explicit. A queue item chosen directly, or an accepted planner
+task chosen by its exact ID, may become the current Focus intention. A manual
+intention edit deliberately clears that identity link. A rename, removal,
+prior completion, session change, or title mismatch also invalidates the link
+without altering either owner. This makes stale state fail closed rather than
+guessing which work the person meant.
+
+A completed linked Focus session is not proof that the task itself is done.
+The timer screen therefore exposes exactly two visible outcomes and withholds
+the next-session control until one is chosen:
+
+- **Mark task complete** delegates the exact item ID to the existing queue
+  toggle, then consumes the link.
+- **Keep for later** leaves the queue item active and consumes the link.
+
+Both outcomes clear only the timer intention after the explicit decision. The
+link cannot complete a task on elapsed time, replay a consumed decision, or
+operate on a changed item. It stores no goal, task text, transcript,
+reflection, coaching content, calendar data, or raw session history and adds no
+network call, remote AI, permission, account requirement, backend, or
+deployment. Restoration also fails closed: a completed timer withholds its
+next-session control until the saved-link check finishes, so a cold-start race
+cannot bypass a pending task decision. Later Phase 215 connections must remain
+independently reviewable and preserve these service-ownership and fail-closed
+rules.
