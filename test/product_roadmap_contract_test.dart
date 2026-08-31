@@ -30,6 +30,7 @@ void main() {
       '| Haven Window | Foundation shipped |',
       '| Focus Shield | Foundation shipped |',
       '| Enhanced remote coach | Foundation shipped, disabled |',
+      '| Voice-to-Coach | Shipped |',
     ]) {
       expect(
         roadmap,
@@ -40,7 +41,6 @@ void main() {
 
     for (final futureExperience in <String>[
       '| Haven AI planner | Planned |',
-      '| Voice-to-Coach | Planned |',
       '| Safe voice commands | Planned |',
       '| Siri, Shortcuts, and Android App Actions | Planned |',
       '| Soundscapes and focus environments | Planned |',
@@ -56,14 +56,14 @@ void main() {
       );
     }
 
-    for (var phase = 209; phase <= 218; phase += 1) {
+    for (var phase = 209; phase <= 219; phase += 1) {
       expect(roadmap, contains('Phase $phase'));
     }
 
     expect(readme, contains('docs/PRODUCT_ROADMAP.md'));
     expect(readme, contains('docs/HAVEN_AI_ACTION_ARCHITECTURE.md'));
     expect(readme, contains('docs/VOICE_PRIVACY_AND_COMMAND_POLICY.md'));
-    expect(readme, contains('The current runtime remains microphone-free'));
+    expect(readme, contains('explicit tap-to-talk Voice-to-Coach'));
     expect(readme, contains('typed Haven Action Engine'));
     expect(readme, contains('stores no raw command history'));
     expect(readme, contains('announced as one accessible summary'));
@@ -120,57 +120,67 @@ void main() {
     }
   });
 
-  test('voice policy preserves the current no-microphone runtime boundary', () {
-    final policy = _normalize(
-      _read('docs/VOICE_PRIVACY_AND_COMMAND_POLICY.md'),
-    );
-    final androidManifest = _read('android/app/src/main/AndroidManifest.xml');
-    final iosInfo = _read('ios/Runner/Info.plist');
-    final pubspec = _read('pubspec.yaml');
+  test(
+    'voice policy preserves the explicit transcript-only runtime boundary',
+    () {
+      final policy = _normalize(
+        _read('docs/VOICE_PRIVACY_AND_COMMAND_POLICY.md'),
+      );
+      final androidManifest = _read('android/app/src/main/AndroidManifest.xml');
+      final iosInfo = _read('ios/Runner/Info.plist');
+      final pubspec = _read('pubspec.yaml');
 
-    for (final required in <String>[
-      'voice is **not implemented** through Phase 210',
-      'explicit **tap-to-talk**',
-      'There is no always-listening mode',
-      'keeps no raw-audio history',
-      'editable transcript',
-      'On-device recognition is preferred',
-      'Choosing voice does not choose remote AI',
-      'Voice receives no authority beyond typed input',
-      'A spoken “yes” alone',
-      'does not satisfy a destructive confirmation',
-      'Voice may open the dedicated screen',
-      'store privacy and data-safety answers updated',
-      'That is input and confirmation hardening, not microphone or speech implementation',
-    ]) {
-      expect(policy, contains(required));
-    }
+      for (final required in <String>[
+        'Voice-to-Coach is implemented in Phase 212',
+        'explicit **tap-to-talk**',
+        'There is no always-listening mode',
+        'keeps no raw-audio history',
+        'editable transcript',
+        "requests the operating system's standard speech recognizer",
+        'does not claim that recognition is always local',
+        'Choosing voice does not choose remote AI',
+        'Voice receives no authority beyond typed input',
+        'A spoken “yes” alone',
+        'does not satisfy a destructive confirmation',
+        'Voice may open the dedicated screen',
+        'store privacy and data-safety answers updated',
+        'Nothing is sent to Focus Coach until the user taps **Send**',
+        'Safe voice commands remain unimplemented',
+      ]) {
+        expect(policy, contains(required));
+      }
 
-    expect(
-      androidManifest,
-      isNot(contains('android.permission.RECORD_AUDIO')),
-      reason: 'Phase 210 must not introduce Android microphone access.',
-    );
-    expect(
-      iosInfo,
-      isNot(contains('NSMicrophoneUsageDescription')),
-      reason: 'Phase 210 must not introduce iOS microphone access.',
-    );
-
-    for (final speechDependency in <String>[
-      'speech_to_text',
-      'record',
-      'flutter_sound',
-      'audio_waveforms',
-    ]) {
+      expect(
+        androidManifest,
+        contains('android.permission.RECORD_AUDIO'),
+        reason: 'Phase 212 requires scoped Android microphone access.',
+      );
+      expect(
+        iosInfo,
+        contains('NSMicrophoneUsageDescription'),
+        reason: 'Phase 212 requires an honest iOS microphone purpose.',
+      );
+      expect(iosInfo, contains('NSSpeechRecognitionUsageDescription'));
       expect(
         pubspec,
-        isNot(matches(RegExp('^\\s*$speechDependency\\s*:', multiLine: true))),
-        reason:
-            '$speechDependency belongs to a separately reviewed voice phase.',
+        matches(RegExp(r'^\s*speech_to_text\s*:', multiLine: true)),
       );
-    }
-  });
+
+      for (final speechDependency in <String>[
+        'record',
+        'flutter_sound',
+        'audio_waveforms',
+      ]) {
+        expect(
+          pubspec,
+          isNot(
+            matches(RegExp('^\\s*$speechDependency\\s*:', multiLine: true)),
+          ),
+          reason: '$speechDependency would add an unnecessary raw-audio path.',
+        );
+      }
+    },
+  );
 
   test('voice and AI contracts forbid protected operational actions', () {
     final architecture = _normalize(

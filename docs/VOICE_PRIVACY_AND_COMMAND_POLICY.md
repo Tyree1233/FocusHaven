@@ -1,23 +1,26 @@
 # Voice Privacy and Command Policy
 
-Status: future-feature policy; voice is **not implemented** through Phase 210
+Status: Voice-to-Coach is implemented in Phase 212; safe voice commands remain
+future work
 
-FocusHaven currently declares no Android `RECORD_AUDIO` permission, no iOS
-`NSMicrophoneUsageDescription`, and no speech-recognition dependency. This
-document does not change that boundary. It defines the conditions that must be
-met before a later release may add Voice-to-Coach or safe voice commands.
+FocusHaven now declares narrowly scoped Android microphone access, iOS
+microphone and speech-recognition purpose strings, and the `speech_to_text`
+dependency for explicit tap-to-talk coaching drafts. There is no
+always-listening mode, background capture, wake word, or raw-audio history.
+This source change still requires fresh signed binaries and store review before
+distribution because earlier validated candidates predate the new capability.
 
 The Phase 210 typed prerequisite now includes an accessible review
 announcement, keyboard submission, an editable **Change request** path, and a
 settled proposal lifecycle after both successful and rejected execution. That
-is input and confirmation hardening, not microphone or speech implementation.
+is the input and confirmation foundation. Voice-to-Coach does not route a
+transcript through that engine and grants voice no timer or queue authority.
 
 ## Experience boundary
 
-Voice will be an optional input method, not an autonomous assistant.
+Voice is an optional input method, not an autonomous assistant.
 
-- Capture begins only after an explicit **tap-to-talk** or press-and-hold
-  action.
+- Capture begins only after an explicit **tap-to-talk** action.
 - There is no always-listening mode, wake word, hidden background capture, or
   recording while the app is closed.
 - A persistent visual indicator and accessible status identify listening,
@@ -31,34 +34,38 @@ Voice will be an optional input method, not an autonomous assistant.
 
 ```text
 explicit tap -> bounded audio capture -> platform speech recognition
-             -> editable transcript -> user sends or proposes action
-             -> local coach or Haven Action Engine
+             -> editable coaching draft -> user taps Send
+             -> local Focus Coach
 ```
 
-The first implementation keeps no raw-audio history. Audio is not written to
+The implementation keeps no raw-audio history. Audio is not written to
 FocusHaven preferences, Firestore, cloud backup, coaching history, analytics,
 diagnostics, or system-focus snapshots. The recognized transcript appears for
-review before it is sent to coaching or evaluated as a command.
+review before it is sent to coaching. Nothing is sent to Focus Coach until the
+user taps **Send**. Safe voice commands remain unimplemented, so a transcript
+is not evaluated as a timer or queue command in Phase 212.
 
-On-device recognition is preferred when the operating system and language
-support it. Some platform recognizers may use a network service. FocusHaven
-must disclose the effective behavior before permission and must not claim that
-recognition is on-device when the platform cannot guarantee it. If a person
-declines network-assisted recognition, typing and local app controls remain
-available.
+Phase 212 requests the operating system's standard speech recognizer. Depending
+on the platform, device settings, language, and installed recognition services,
+recognition may happen on the device or may use the platform provider's network
+service. FocusHaven discloses that behavior before permission and does not claim
+that recognition is always local. If a person declines network-assisted
+recognition, typing and local app controls remain available.
 
 ## Permission rules
 
-1. Do not request microphone or speech-recognition access at application
-   startup.
-2. Explain the purpose immediately before the first tap-to-talk attempt.
+1. FocusHaven does not request microphone or speech-recognition access at
+   application startup.
+2. FocusHaven explains the purpose immediately before the first tap-to-talk
+   attempt.
 3. Request only the platform permissions required for that chosen feature.
 4. A denial, restriction, interruption, phone call, route change, timeout, or
    unavailable recognizer stops cleanly and changes no timer state.
 5. Do not repeatedly prompt after denial. Offer system settings only after an
    explicit user action.
-6. Adding a microphone purpose string, Android permission, speech dependency,
-   or recognition service requires a new privacy and store disclosure review.
+6. The Phase 212 microphone purpose strings, Android permission, speech
+   dependency, and recognition service require new privacy and store disclosure
+   review plus fresh platform release evidence before distribution.
 
 ## Coaching boundary
 
@@ -78,7 +85,11 @@ Voice receives no authority beyond typed input. A transcript must pass through
 the Haven Action Engine described in
 [`HAVEN_AI_ACTION_ARCHITECTURE.md`](HAVEN_AI_ACTION_ARCHITECTURE.md).
 
-### Eligible after deterministic validation
+### Eligible only in a future safe-voice-command phase
+
+The following categories are not implemented in Phase 212. They may become
+eligible only after a transcript passes the typed Haven Action Engine's same
+deterministic interpretation, freshness, policy, and review checks.
 
 - read the current timer status;
 - start a ready session;
@@ -147,19 +158,25 @@ configuration, store delivery, TestFlight, or review submission.
 - Voice suggestions use calm language and never diagnose attention, mood, or
   health.
 
-## Release gates
+## Release evidence and remaining boundary
 
-Voice-to-Coach cannot ship until the release branch includes:
+The Phase 212 source and test boundary includes:
 
 - platform-specific permission copy and denial handling;
 - an explicit no-always-listening implementation test;
 - tests proving raw audio is not persisted or uploaded by FocusHaven;
 - store privacy and data-safety answers updated for the actual recognizer;
 - disclosure of any operating-system or provider network processing;
-- fresh Android and Apple release builds and validation;
 - a support path for deleting any saved transcript through existing local
   coaching deletion controls.
 
-Safe voice commands additionally require the completed Phase 210 typed action
-engine, ambiguity tests, confirmation binding, stale/replay protection, and
-negative tests for every navigation-only and forbidden category.
+Fresh Android and Apple release builds, native permission exercises, signed
+candidate validation, final store privacy answers, and real-device
+accessibility checks are still required before a Voice-to-Coach build is
+distributed. Prior App Store and Play artifacts are not evidence for this
+changed permission and dependency boundary.
+
+Safe voice commands remain unimplemented. They additionally require the
+completed Phase 210 typed action engine, ambiguity tests, confirmation binding,
+stale/replay protection, and negative tests for every navigation-only and
+forbidden category.

@@ -62,18 +62,27 @@ void main() {
     }
   });
 
-  test('Phase 210 adds no microphone, speech, or raw-history path', () {
+  test('Voice-to-Coach stays outside Haven action authority', () {
     final sheet = _read('lib/widgets/haven_action_sheet.dart');
+    final coachingSheet = _read('lib/widgets/coaching_sheet.dart');
     final androidManifest = _read('android/app/src/main/AndroidManifest.xml');
     final iosInfo = _read('ios/Runner/Info.plist');
     final pubspec = _read('pubspec.yaml');
 
     expect(sheet, contains('Typed locally • no microphone • no remote AI'));
     expect(sheet, isNot(contains('SharedPreferences')));
-    expect(androidManifest, isNot(contains('android.permission.RECORD_AUDIO')));
-    expect(iosInfo, isNot(contains('NSMicrophoneUsageDescription')));
+    expect(sheet, isNot(contains('VoiceTranscriptionService')));
+    expect(coachingSheet, contains('VoiceTranscriptionService'));
+    expect(coachingSheet, isNot(contains('HavenActionEngine')));
+    expect(androidManifest, contains('android.permission.RECORD_AUDIO'));
+    expect(androidManifest, contains('android.speech.RecognitionService'));
+    expect(iosInfo, contains('NSMicrophoneUsageDescription'));
+    expect(iosInfo, contains('NSSpeechRecognitionUsageDescription'));
+    expect(
+      pubspec,
+      matches(RegExp(r'^\s*speech_to_text\s*:', multiLine: true)),
+    );
     for (final dependency in <String>[
-      'speech_to_text',
       'record',
       'flutter_sound',
       'audio_waveforms',

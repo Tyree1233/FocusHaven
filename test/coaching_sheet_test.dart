@@ -8,11 +8,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/coaching_service.dart';
+import 'package:focushaven/services/voice_transcription_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
 
-Widget _app(CoachingService coach, {CoachingContext? coachingContext}) {
+Widget _app(
+  CoachingService coach, {
+  CoachingContext? coachingContext,
+  VoiceTranscriptionService? voiceTranscription,
+}) {
   return ProviderScope(
-    overrides: [coachingServiceProvider.overrideWith((ref) => coach)],
+    overrides: [
+      coachingServiceProvider.overrideWith((ref) => coach),
+      if (voiceTranscription != null)
+        voiceTranscriptionServiceProvider.overrideWith(
+          (ref) => voiceTranscription,
+        ),
+    ],
     child: MaterialApp(
       theme: ThemeData.dark().copyWith(
         colorScheme: const ColorScheme.dark(
@@ -122,6 +133,162 @@ void main() {
     expect(find.text('Let’s make the first step smaller.'), findsOneWidget);
     expect(find.text('You'), findsOneWidget);
     expect(find.text('Focus Coach'), findsNWidgets(2));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('voice stays dormant until an informed tap is confirmed', (
+    tester,
+  ) async {
+    final coach = await _createCoach();
+    final adapter = _WidgetVoiceRecognitionAdapter();
+    final voice = VoiceTranscriptionService(adapter: adapter);
+
+    await tester.pumpWidget(_app(coach, voiceTranscription: voice));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('coach-voice-input')), findsOneWidget);
+    expect(adapter.initializeCalls, 0);
+    expect(adapter.listenCalls, 0);
+
+    await tester.tap(find.byKey(const ValueKey('coach-voice-input')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Use voice transcription?'), findsOneWidget);
+    expect(find.textContaining('It keeps no raw audio'), findsOneWidget);
+    expect(find.textContaining('until you tap Send'), findsOneWidget);
+    expect(adapter.initializeCalls, 0);
+
+    await tester.tap(find.byKey(const ValueKey('confirmation-cancel')));
+    await tester.pumpAndSettle();
+
+    expect(adapter.initializeCalls, 0);
+    expect(adapter.listenCalls, 0);
+  });
+
+  testWidgets('voice produces only an editable unsent coaching draft', (
+    tester,
+  ) async {
+    final responder = _RecordingResponder('One step at a time.');
+    final coach = await _createCoach(responder: responder);
+    final adapter = _WidgetVoiceRecognitionAdapter();
+    final voice = VoiceTranscriptionService(adapter: adapter);
+
+    await tester.pumpWidget(_app(coach, voiceTranscription: voice));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'Context:',
+    );
+
+    await tester.tap(find.byKey(const ValueKey('coach-voice-input')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirmation-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(adapter.initializeCalls, 1);
+    expect(adapter.listenCalls, 1);
+    expect(find.byKey(const ValueKey('coach-voice-listening')), findsOneWidget);
+    expect(responder.calls, 0);
+
+    adapter.emitResult('help me choose a small next step');
+    await tester.pump();
+
+    final input = tester.widget<TextField>(
+      find.byKey(const ValueKey('coach-message-input')),
+    );
+    expect(input.controller!.text, 'Context: help me choose a small next step');
+    expect(input.enabled, isFalse);
+    expect(responder.calls, 0);
+    expect(
+      tester
+          .widget<IconButton>(find.byKey(const ValueKey('coach-send-message')))
+          .onPressed,
+      isNull,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('coach-stop-voice')));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('coach-message-input')))
+          .enabled,
+      isTrue,
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'Context: help me choose one private next step.',
+    );
+    await tester.tap(find.byKey(const ValueKey('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(responder.calls, 1);
+    expect(
+      responder.lastMessage,
+      'Context: help me choose one private next step.',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('discard restores the exact pre-voice draft', (tester) async {
+    final coach = await _createCoach();
+    final adapter = _WidgetVoiceRecognitionAdapter();
+    final voice = VoiceTranscriptionService(adapter: adapter);
+
+    await tester.pumpWidget(_app(coach, voiceTranscription: voice));
+    await tester.pumpAndSettle();
+    const original = 'Keep this exact typed draft.';
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      original,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('coach-voice-input')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirmation-confirm')));
+    await tester.pumpAndSettle();
+    adapter.emitResult('replace it with this speech');
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('coach-discard-voice')));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('coach-message-input')))
+          .controller!
+          .text,
+      original,
+    );
+    expect(adapter.cancelCalls, 1);
+    expect(coach.messages, isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('permission denial leaves typing available', (tester) async {
+    final coach = await _createCoach();
+    final adapter = _WidgetVoiceRecognitionAdapter(
+      initializeResult: false,
+      permission: false,
+    );
+    final voice = VoiceTranscriptionService(adapter: adapter);
+
+    await tester.pumpWidget(_app(coach, voiceTranscription: voice));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('coach-voice-input')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirmation-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('coach-voice-notice')), findsOneWidget);
+    expect(find.textContaining('You can keep typing instead'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('coach-message-input')))
+          .enabled,
+      isTrue,
+    );
+    expect(coach.messages, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
@@ -954,4 +1121,60 @@ class _FallbackResponder implements CoachingResponder {
     required CoachingContext context,
     required List<CoachingMessage> conversation,
   }) => Future.error(CoachingFallbackException(reason));
+}
+
+class _WidgetVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
+  _WidgetVoiceRecognitionAdapter({
+    this.initializeResult = true,
+    this.permission = true,
+  });
+
+  final bool initializeResult;
+  final bool permission;
+  int initializeCalls = 0;
+  int listenCalls = 0;
+  int stopCalls = 0;
+  int cancelCalls = 0;
+  bool listening = false;
+  VoiceRecognitionResultCallback? _onResult;
+
+  @override
+  bool get isListening => listening;
+
+  @override
+  Future<bool> get hasPermission async => permission;
+
+  @override
+  Future<bool> initialize({
+    required VoiceRecognitionStatusCallback onStatus,
+    required VoiceRecognitionErrorCallback onError,
+  }) async {
+    initializeCalls += 1;
+    return initializeResult;
+  }
+
+  @override
+  Future<void> listen({
+    required VoiceRecognitionResultCallback onResult,
+  }) async {
+    listenCalls += 1;
+    _onResult = onResult;
+    listening = true;
+  }
+
+  @override
+  Future<void> stop() async {
+    stopCalls += 1;
+    listening = false;
+  }
+
+  @override
+  Future<void> cancel() async {
+    cancelCalls += 1;
+    listening = false;
+  }
+
+  void emitResult(String transcript) {
+    _onResult?.call(transcript, false);
+  }
 }

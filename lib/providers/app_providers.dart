@@ -45,6 +45,7 @@ import '../services/system_focus_platform_bridge.dart';
 import '../services/system_focus_surface_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
+import '../services/voice_transcription_service.dart';
 
 /// High-frequency state rendered by the countdown itself.
 ///
@@ -366,6 +367,15 @@ final coachingServiceProvider = ChangeNotifierProvider<CoachingService>(
   ),
   name: 'coachingServiceProvider',
 );
+
+/// Optional, explicit Voice-to-Coach input. The provider is lazy, and the
+/// underlying recognizer is initialized only after the user accepts the
+/// disclosure and taps the microphone control.
+final voiceTranscriptionServiceProvider =
+    ChangeNotifierProvider<VoiceTranscriptionService>(
+      (ref) => VoiceTranscriptionService(),
+      name: 'voiceTranscriptionServiceProvider',
+    );
 
 final themeServiceProvider = ChangeNotifierProvider<ThemeService>(
   (ref) => ThemeService(),

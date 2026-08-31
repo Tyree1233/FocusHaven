@@ -1,12 +1,18 @@
 # FocusHaven Store Privacy and Permission Disclosure Matrix
 
-**Audit date: August 27, 2026**
+**Audit date: August 30, 2026**
 
 This document is the source-backed working record for FocusHaven's Apple App
 Store privacy answers, Google Play Data safety answers, permission explanations,
 and review notes. It is not a substitute for the forms in App Store Connect or
 Play Console. Those forms must be rechecked against the exact binaries and SDK
 versions submitted to each store.
+
+This revision records the Phase 212 Voice-to-Coach source boundary. It does not
+claim that the new microphone permission, speech-recognition purpose, or speech
+dependency is covered by any earlier signed or store-validated artifact. Final
+answers require a new merged Android manifest, Apple archive audit, provider
+behavior review, and validated store candidates.
 
 No store answer should claim that FocusHaven collects no data. Every app launch
 creates or restores an anonymous Firebase Authentication identity, and the
@@ -57,6 +63,7 @@ service limits. The app claims success only after the callable confirms it.
 | --- | --- | --- | --- |
 | `POST_NOTIFICATIONS` | Local reminders, timer-completion notices, and one optional text-free ongoing timer with Lock Screen controls | Requested only from a reminder flow; the ongoing surface never prompts by itself | Notification content, schedules, and bounded timer snapshot remain on device |
 | `READ_CALENDAR` | Optional Haven Window suggestions | Requested only after the user chooses to review calendar access | Reads busy start/end boundaries only; titles, calendar names, notes, attendees, locations, URLs, and identifiers do not enter the model or leave the device |
+| `RECORD_AUDIO` and Android speech recognition | Optional Voice-to-Coach transcription | Requested only after an informed tap-to-talk action; no startup or background request | FocusHaven retains no raw audio. The selected system recognition service may process audio on-device or over a network and returns an editable transcript. |
 | `RECEIVE_BOOT_COMPLETED` | Restore locally scheduled reminders and reconcile an already-authorized ongoing timer after reboot | No runtime prompt | Does not collect reboot history |
 | `VIBRATE` and `WAKE_LOCK` | Local notification delivery | Indirect plugin permissions | No user data is collected for these capabilities |
 | `INTERNET` and `ACCESS_NETWORK_STATE` | Firebase authentication, optional backup, enhanced coaching, Google sign-in, and purchases | Network access follows the feature boundaries below | All application network endpoints use encrypted transport; cleartext traffic is disabled |
@@ -64,9 +71,9 @@ service limits. The app claims success only after the callable confirms it.
 | Google/Firebase service permissions and signature-scoped receiver permission | Authentication, App Check, and integrated Google services | SDK-managed | Must be re-audited from the merged release manifest for every submission |
 
 The Android source manifest does not request location, contacts, camera,
-microphone, photos/media, SMS, call logs, accessibility service, VPN, or health
-permissions. The merged release manifest is authoritative because dependencies
-may add permissions.
+photos/media, SMS, call logs, accessibility service, VPN, or health permissions.
+The merged release manifest is authoritative because dependencies may add
+permissions.
 
 ### Apple phone, widget, and Watch app
 
@@ -74,13 +81,15 @@ may add permissions.
 | --- | --- | --- | --- |
 | Calendar event access | Optional Haven Window suggestions | Requested only after the user chooses to review calendar access | EventKit's full-event authorization API is required on modern iOS, but FocusHaven reads only busy start/end boundaries and never calls calendar write APIs |
 | Notification authorization | Local reminders and timer-completion notices | Requested only from a reminder flow | Notifications are scheduled locally |
+| Microphone access | Optional Voice-to-Coach audio capture | Requested only after an informed tap-to-talk action | FocusHaven keeps no raw audio and ends capture on stop, cancel, timeout, interruption, or recognition failure |
+| Speech-recognition authorization | Convert a deliberate spoken coaching message into editable text | Requested together with the chosen Voice-to-Coach flow, never at startup | Apple's speech service may send captured voice audio to Apple servers depending on the API, language, and device capabilities; the returned transcript stays an unsent draft until Send |
 | `com.apple.developer.family-controls` | Optional Focus Shield | Authorization and selection are explicit user actions | Opaque application, category, and web-domain tokens stay in app-private storage and are never exposed to Flutter or sent off device |
 | App group `group.com.focushaven.app` | Share the bounded timer snapshot and private command capability with the widget | Active only inside FocusHaven's signed containers | Shared state excludes tasks, history, journal text, moods, and coaching content |
 | Watch connectivity | Send the bounded timer snapshot and replay-protected commands between the paired phone and Watch | Used only by the companion surfaces | Watch payloads exclude user-authored content and private selections |
 
-The iOS app does not declare camera, microphone, contacts, photos, location,
-HealthKit, or tracking usage descriptions. FocusHaven does not use the
-Advertising Identifier or App Tracking Transparency framework.
+The iOS app does not declare camera, contacts, photos, location, HealthKit, or
+tracking usage descriptions. FocusHaven does not use the Advertising Identifier
+or App Tracking Transparency framework.
 
 ## End-to-end data-flow inventory
 
@@ -88,6 +97,7 @@ Advertising Identifier or App Tracking Transparency framework.
 | --- | --- | --- | --- | --- |
 | Local focus experience | Timer settings and state, session history, goals, focus task, queue items, parked thoughts, journal reflections and moods, focus profile, appearance/onboarding settings, coaching conversation, reminder settings, and recognized Pro state | Required for the feature that stores it | App-private device storage | Delete local data, feature-specific clear controls, OS app-data clearing, or uninstall |
 | Calendar assistance | Busy event start/end boundaries and derived open windows | Optional | On-device only; not included in cloud backup or coaching | Deny/revoke calendar access or leave Haven Window off |
+| Voice-to-Coach | Bounded live voice audio and the recognized transcript | Optional, explicit tap-to-talk only | FocusHaven does not persist or upload raw audio. The OS speech service may process it on-device or over a network. The transcript remains an editable session draft and enters coaching history or the optional enhanced-coaching flow only after Send. | Deny permission and type, stop listening, edit the transcript, discard the draft, or clear sent coaching history |
 | Focus Shield | Opaque Family Controls selections and coarse authorization/protection state | Optional | Apple system stores and app-private device storage | Disable Focus Shield, change selection, or revoke authorization |
 | System widgets, Android ongoing notification, and watches | Session type, activity, remaining/total seconds, generated/deadline timestamps, and rotating command capability | Optional surface | App group, app-private preferences, local notification, or paired-device transport | Remove the widget/companion app, revoke notification access, or reset/stop the timer |
 | Anonymous authentication | Firebase Authentication user ID, IP address, Firebase/user-agent metadata, app identifier, and security metadata | Automatic when Firebase is available | Google Firebase Authentication according to the configured project and Firebase terms | Guests do not receive signed-in cloud-backup storage; signing into a provider replaces the guest session, and confirmed signed-in account deletion returns the app to a fresh guest identity |
@@ -101,8 +111,9 @@ Advertising Identifier or App Tracking Transparency framework.
 | Privacy-safe diagnostics | Closed technical event code and coarse error kind in debug builds; bounded function log fields for provider/quota failures | Operational | Client release logging is disabled; function logs follow the diagnostics policy | No user-content fields are accepted; platform diagnostic settings remain under OS/provider control |
 
 FocusHaven has no advertising SDK, analytics SDK, third-party client crash
-reporter, contact upload, location collection, photo/media upload, voice capture,
-or sale of personal data.
+reporter, contact upload, location collection, photo/media upload,
+always-listening or background voice capture, raw-audio storage, or sale of
+personal data.
 
 ## Archive-checked Apple App Privacy answers
 
@@ -110,6 +121,9 @@ The conservative answer to **Data Collection** is **Yes**. The following is the
 working label for the exact Apple-validated `1.0.0 (1)` candidate at commit
 `d37f57281159ff7e8b0d80e970d243fc2ae3c04d` (IPA SHA-256
 `32d98bfe74fd1947c6b53a1b7d534fde3fe5ba0b7e090c5afd7866e0654600dd`).
+That candidate predates Phase 212 and contains neither Voice-to-Coach nor its
+new purpose strings and dependency. It cannot be used as Apple privacy or
+release evidence for the voice-enabled source.
 The archive contains 39 third-party privacy manifests. Every manifest that
 declares tracking sets its tracking value to false, every collected-data entry
 sets its tracking value to false, and no tracking domain is declared.
@@ -139,6 +153,12 @@ advertising/marketing, or tracking.
 | Diagnostics — Performance Data | SDK-declared | Yes | reCAPTCHA Enterprise declares performance data for App Functionality |
 | Diagnostics — Other Diagnostic Data | SDK-declared | No | Firebase Authentication, Firestore, Firestore Internal, and Installations declare other diagnostic data for Analytics |
 
+A future Phase 212 archive audit must separately resolve Apple **Audio Data**
+for the exact speech-recognition path. Apple documents that
+`SFSpeechRecognizer` can send captured voice audio to Apple servers, while
+on-device-only access is different. FocusHaven does not retain raw audio, but
+that fact alone cannot replace the provider-specific App Privacy analysis.
+
 On-device calendar boundaries, Family Controls selections, journal entries,
 queue items, parked thoughts, and local coaching messages are not collected for
 the Apple label unless they enter an optional transmitted flow described above.
@@ -164,6 +184,7 @@ processor contracts, configuration, and Play definitions at submission time.
 | Personal info — User IDs | Required when Firebase is available | Anonymous UID is automatic; federated ID is optional | Authentication, security, backup, enhanced coaching |
 | App activity — App interactions / Other actions | Optional | Cloud backup only | Restore focus session history, timer outcomes, and goal progress |
 | Messages or Other user-generated content | Optional | Cloud backup and enhanced coaching | Back up a focus task; generate the requested coaching response |
+| Audio files — Voice or sound recordings | Requires final provider mapping | Voice-to-Coach only; explicit and ephemeral | Speech transcription. If the selected recognizer transmits audio off device, Google requires it in the Data safety response even when processing is ephemeral; the final form must match the exact runtime provider behavior. |
 | Device or other identifiers | Required for protected network features | SDK/App Check managed | Fraud prevention, security, and app functionality |
 | Approximate location | Requires final provider mapping | Firebase Authentication and Functions collect IP addresses; declare this if IP-derived location is processed under the current Play definition | Security, fraud prevention, and app functionality |
 | App info and performance — Diagnostics | Conservatively Yes | Firebase service metadata is automatic | Maintain service compatibility and security; no app-owned crash reporter |
@@ -197,13 +218,16 @@ Review notes should make these boundaries easy to verify:
    selection; denial leaves the timer fully usable.
 4. Enhanced coaching is off by default, clearly identifies the Firebase/OpenAI
    transfer, and falls back to the local coach.
-5. Cloud backup is separately user initiated and contains only the exact
+5. Voice-to-Coach begins only after an informed tap, has a visible bounded
+   listening state, keeps no raw audio, and leaves the transcript editable and
+   unsent until the person taps Send. Denial leaves typed coaching usable.
+6. Cloud backup is separately user initiated and contains only the exact
    fields listed in this matrix.
-6. Widget, Live Activity, Watch, and Wear OS payloads are text-free and
+7. Widget, Live Activity, Watch, and Wear OS payloads are text-free and
    replay-protected.
-7. Subscription checkout is not active. Existing lifetime-owner restoration
+8. Subscription checkout is not active. Existing lifetime-owner restoration
    remains available under the repository's purchase-transition rules.
-8. Provide App Review a fully functional guest path plus any account or
+9. Provide App Review a fully functional guest path plus any account or
    entitlement instructions needed to exercise optional features.
 
 ## Official references used for this audit
@@ -216,6 +240,8 @@ Review notes should make these boundaries easy to verify:
 - [Google Play User Data policy](https://support.google.com/googleplay/android-developer/answer/10144311)
 - [Google Play account deletion requirements](https://support.google.com/googleplay/android-developer/answer/13327111)
 - [Google Play Data safety guidance](https://support.google.com/googleplay/android-developer/answer/10787469)
+- [Apple — Asking permission to use speech recognition](https://developer.apple.com/documentation/speech/asking-permission-to-use-speech-recognition)
+- [Android — SpeechRecognizer](https://developer.android.com/reference/android/speech/SpeechRecognizer)
 - [Firebase Android data-disclosure guidance](https://firebase.google.com/docs/android/play-data-disclosure)
 - [Firebase Apple data-collection guidance](https://firebase.google.com/docs/ios/app-store-data-collection)
 - [Firebase Flutter federated authentication](https://firebase.google.com/docs/auth/flutter/federated-auth)

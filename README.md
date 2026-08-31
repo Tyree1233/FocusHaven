@@ -607,10 +607,13 @@ list above. The authoritative planning and safety contracts are:
 - [Voice privacy and command policy](docs/VOICE_PRIVACY_AND_COMMAND_POLICY.md) —
   tap-to-talk, transcript handling, confirmation, and forbidden actions
 
-These documents do not add microphone access or claim that voice and general
-AI orchestration are already implemented. The current runtime remains
-microphone-free, local Focus Coach remains the default, and enhanced remote
-coaching remains separately gated and disabled.
+Phase 212 now implements **explicit tap-to-talk Voice-to-Coach**. FocusHaven
+requests microphone and speech-recognition access only after an informed tap,
+keeps no raw-audio history, and places recognized text into an editable draft.
+The operating system or browser speech service may process audio on-device or
+over a network. Nothing is sent to Focus Coach until the person taps **Send**;
+local Focus Coach remains the default, while enhanced remote coaching remains
+separately gated and disabled.
 
 Phase 210 now ships the first **typed Haven Action Engine**. From the timer
 screen, **Haven actions** can locally review one bounded timer, navigation, or
@@ -623,6 +626,13 @@ Its review card is announced as one accessible summary of the interpretation,
 effect, risk, and available choices. Keyboard submission and **Change request**
 keep the typed path editable, while every consumed proposal disappears after
 success or rejection so it cannot remain available for another tap.
+
+Voice-to-Coach does not give speech any timer, queue, account, purchase,
+permission, Firebase, or release authority. Safe voice commands and general AI
+orchestration remain future work. Because Phase 212 adds native permissions and
+a speech dependency, fresh Android and Apple release builds, permission checks,
+store disclosures, and candidate validation are required before distribution;
+earlier validated artifacts do not cover this capability.
 
 ## Architecture
 

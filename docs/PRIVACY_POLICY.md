@@ -1,6 +1,6 @@
 # FocusHaven Privacy Policy
 
-**Effective date: August 25, 2026**
+**Effective date: August 30, 2026**
 
 FocusHaven is a focus timer and wellbeing companion created by Tyree Jones. This policy explains what information FocusHaven uses and why.
 
@@ -23,6 +23,26 @@ FocusHaven can optionally use calendar access for Haven Window suggestions. It r
 On supported Apple devices, Focus Shield uses Apple's Family Controls and Managed Settings frameworks. Your selected applications, categories, and web domains are represented by opaque system tokens that remain in Apple system storage and FocusHaven's private on-device storage. They are not sent to Flutter, Firebase, OpenAI, or an advertising service.
 
 FocusHaven's widgets, Android ongoing timer notification, Live Activity, Apple Watch app, and Wear OS app receive only a bounded timer snapshot: session type and activity, remaining and total seconds, and timestamps needed to render the timer. Interactive Android Home Screen and Lock Screen notification controls, Apple Watch, and Wear OS surfaces also receive a rotating private command identity. The iPhone Lock Screen widget, Live Activity, and Dynamic Island are read-only and receive no command capability. None of these surfaces receive your task, journal, mood, queue, parked thoughts, coaching conversation, or focus history.
+
+## Voice-to-Coach
+
+Voice-to-Coach is an optional tap-to-talk input for an editable Focus Coach
+message. FocusHaven asks for microphone and speech-recognition access only when
+you deliberately start this feature. It has no wake word, always-listening
+mode, or background capture. You can deny permission and continue typing.
+
+While the visible listening control is active, your device or browser speech
+service converts speech into text. Depending on your platform, language, and
+settings, that processing may occur on-device or over a network. FocusHaven
+does not retain raw audio, write it to app storage, include it in cloud backup,
+or send it to Firebase, OpenAI, analytics, diagnostics, or a FocusHaven server.
+
+The recognized transcript remains an editable, session-only coaching draft.
+You can stop listening, change the text, or discard it. Nothing is sent to
+Focus Coach until you tap Send. After you send it, the transcript follows the
+same local coaching-history and optional enhanced-coaching rules as a message
+you typed. Voice-to-Coach cannot control the timer, change the Focus Queue,
+delete data, make a purchase, grant permissions, or modify an account.
 
 ## Focus Coach and optional enhanced AI coaching
 

@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 210 typed actions are implemented
+Status: living product contract; Phase 212 Voice-to-Coach is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -64,7 +64,7 @@ Every future phase must preserve these rules:
 | Local Focus Coach | Shipped | Private local coaching remains the default and offline fallback. | Receive structured context and optional typed or voice transcripts through a common input boundary. |
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Planned | There is no general AI orchestration or goal decomposition engine. | Convert an explicit goal into explainable task, session, and schedule proposals. |
-| Voice-to-Coach | Planned | The current app has no microphone permission or speech dependency. | Add explicit tap-to-talk transcription with no always-listening mode and no raw-audio history. |
+| Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
 | Safe voice commands | Planned | Voice cannot currently control the timer or queue. | Route transcripts through the same typed Haven Action Engine and confirmation policy. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
@@ -107,7 +107,7 @@ Exit criteria:
 - no remote model is required to understand the initial command set.
 
 Status: implemented at `a734f31`, with review-surface accessibility hardening
-in the following local checkpoint. The timer screen exposes a typed action sheet;
+at `8000342`. The timer screen exposes a typed action sheet;
 the interpreter, policy, executor, confirmation, and receipt contracts are
 separate; and focused tests cover ambiguity, protected actions, stale state,
 exact confirmation, bounded add-time, and proposal replay. Phase 210 adds no
@@ -117,9 +117,17 @@ available choices; supports keyboard review and an explicit editable
 **Change request** path; remains usable with large text on a narrow surface;
 and removes every consumed proposal after success or rejection.
 
-### Phase 211 — Voice-to-Coach
+### Phase 211 — Action review hardening
 
-Add explicit press-and-hold or tap-to-talk transcription for coaching input.
+Harden the typed review surface before introducing another input method. Keep
+interpretation, effect, risk, confirmation, and change-request controls usable
+with screen readers, keyboards, large text, and narrow displays.
+
+Status: complete at `8000342`.
+
+### Phase 212 — Voice-to-Coach
+
+Add explicit tap-to-talk transcription for coaching input.
 Voice first fills an editable transcript; it does not execute timer actions in
 this phase.
 
@@ -131,7 +139,14 @@ Exit criteria:
 - no wake word, background capture, or raw-audio history exists;
 - store privacy disclosures and platform tests are updated before release.
 
-### Phase 212 — Safe voice commands
+Status: implemented in the current source. The recognizer initializes only
+after an informed tap, uses a bounded listening window, exposes stop and
+discard controls, keeps the transcript editable, and sends nothing until the
+person taps **Send**. Platform speech recognition may operate on-device or over
+a network. Fresh signed binaries and final store answers remain release work;
+prior validated candidates predate this permission and dependency change.
+
+### Phase 213 — Safe voice commands
 
 Route a confirmed transcript through the same Phase 210 engine. Voice gains no
 special authority and cannot call services directly.
@@ -144,7 +159,9 @@ Exit criteria:
   visual confirmation;
 - accessibility does not depend on speech recognition or spoken output.
 
-### Phase 213 — Haven AI planner
+Status: planned. Safe voice commands remain unimplemented.
+
+### Phase 214 — Haven AI planner
 
 Turn an explicit user goal into a reviewable proposal containing possible
 tasks, session sizes, queue changes, and optional free-time suggestions. The
@@ -159,31 +176,31 @@ Exit criteria:
 - no calendar write, queue replacement, or timer start occurs from generated
   text alone.
 
-### Phase 214 — Unified Haven Loop
+### Phase 215 — Unified Haven Loop
 
 Connect Plan, focus, reflection, Rhythm, Forecast, Smart Reset, Journey, and
 local coaching into one calm lifecycle without turning the dashboard into a
 checklist or streak pressure system.
 
-### Phase 215 — Adaptive Focus Engine
+### Phase 216 — Adaptive Focus Engine
 
 Offer explainable local adjustments to session length, break shape, and timing
 using bounded text-free signals. Recovery needs and explicit user choices
 override learned patterns.
 
-### Phase 216 — System assistant intents
+### Phase 217 — System assistant intents
 
 Publish the proven safe subset through Siri/App Intents, Shortcuts, and Android
 App Actions. System assistants receive bounded action parameters, not coaching
 history or arbitrary private text.
 
-### Phase 217 — Soundscapes and focus environments
+### Phase 218 — Soundscapes and focus environments
 
 Start with local, user-selected sound and predictable offline playback. Any
 future generated environment is opt-in, cost-bounded, independently moderated,
 and never required for core focus.
 
-### Phase 218 — Expanded Haven Journey and Garden
+### Phase 219 — Expanded Haven Journey and Garden
 
 Add scenes and gentle personalization based on completed sessions and explicit
 preferences. Nothing decays, locks, shames, or becomes a public comparison.

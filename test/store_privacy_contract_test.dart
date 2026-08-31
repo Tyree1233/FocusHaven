@@ -11,6 +11,7 @@ void main() {
     for (final permission in <String>[
       'android.permission.POST_NOTIFICATIONS',
       'android.permission.READ_CALENDAR',
+      'android.permission.RECORD_AUDIO',
       'android.permission.RECEIVE_BOOT_COMPLETED',
     ]) {
       expect(androidManifest, contains(permission));
@@ -21,7 +22,6 @@ void main() {
       'ACCESS_COARSE_LOCATION',
       'READ_CONTACTS',
       'CAMERA',
-      'RECORD_AUDIO',
       'READ_MEDIA_IMAGES',
       'READ_MEDIA_VIDEO',
       'READ_SMS',
@@ -37,6 +37,10 @@ void main() {
     }
 
     expect(iosInfo, contains('NSCalendarsFullAccessUsageDescription'));
+    expect(iosInfo, contains('NSMicrophoneUsageDescription'));
+    expect(iosInfo, contains('NSSpeechRecognitionUsageDescription'));
+    expect(iosInfo, contains('does not store raw audio'));
+    expect(iosInfo, contains('until you tap Send'));
     expect(
       iosInfo,
       contains('reads only event time boundaries'),
@@ -45,7 +49,6 @@ void main() {
     for (final forbidden in <String>[
       'NSUserTrackingUsageDescription',
       'NSCameraUsageDescription',
-      'NSMicrophoneUsageDescription',
       'NSContactsUsageDescription',
       'NSPhotoLibraryUsageDescription',
       'NSLocationWhenInUseUsageDescription',
@@ -137,6 +140,10 @@ void main() {
       'Continue with Apple',
       'Delete account',
       'account-deletion page',
+      'Voice-to-Coach',
+      'does not retain raw audio',
+      'on-device or over a network',
+      'until you tap Send',
     ]) {
       expect(policy, contains(statement));
     }

@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/coaching_message.dart';
 import '../providers/app_providers.dart';
 import '../services/coaching_service.dart';
+import '../services/voice_transcription_service.dart';
 import 'confirmation_dialog.dart';
 
 typedef CoachingContextBuilder = CoachingContext Function();
@@ -33,6 +36,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   final ScrollController _scrollController = ScrollController();
   bool _isSubmitting = false;
   bool _isManagingHistory = false;
+  late final VoiceTranscriptionService _voiceTranscription;
+  String _draftBeforeVoice = '';
+  String _draftPrefix = '';
+  String _lastVoiceTranscript = '';
   int _lastConversationRevision = -1;
 
   static List<String> _quickRepliesFor(List<CoachingMessage> messages) {
@@ -106,20 +113,84 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   void initState() {
     super.initState();
     _controller.addListener(_refreshDraftState);
+    _voiceTranscription = ref.read(voiceTranscriptionServiceProvider)
+      ..addListener(_syncVoiceTranscript);
   }
 
   void _refreshDraftState() {
     if (mounted) setState(() {});
   }
 
+  void _syncVoiceTranscript() {
+    if (!mounted) return;
+    final transcript = _voiceTranscription.transcript;
+    if (transcript == _lastVoiceTranscript) return;
+    _lastVoiceTranscript = transcript;
+    final separator = _draftPrefix.isEmpty || transcript.isEmpty ? '' : ' ';
+    final draft = '$_draftPrefix$separator$transcript';
+    _controller.value = TextEditingValue(
+      text: draft,
+      selection: TextSelection.collapsed(offset: draft.length),
+    );
+  }
+
   @override
   void dispose() {
+    _voiceTranscription.removeListener(_syncVoiceTranscript);
+    if (_voiceTranscription.isListening || _voiceTranscription.isBusy) {
+      unawaited(_voiceTranscription.cancel());
+    }
     _controller
       ..removeListener(_refreshDraftState)
       ..dispose();
     _inputFocusNode.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _startVoiceTranscription() async {
+    if (_isSubmitting ||
+        _isManagingHistory ||
+        _voiceTranscription.isListening ||
+        _voiceTranscription.isBusy) {
+      return;
+    }
+
+    if (!_voiceTranscription.disclosureAcknowledged) {
+      final confirmed = await ConfirmationDialog.show(
+        context,
+        title: 'Use voice transcription?',
+        message:
+            'FocusHaven uses the microphone only while you are visibly listening. It keeps no raw audio. Your device or browser speech service may process audio on-device or over a network. The transcript stays in this editable draft and is not sent to Focus Coach until you tap Send.',
+        cancelLabel: 'Keep typing',
+        confirmLabel: 'Continue to microphone',
+      );
+      if (!confirmed || !mounted) return;
+      _voiceTranscription.acknowledgeDisclosure();
+    }
+
+    _draftBeforeVoice = _controller.text;
+    _draftPrefix = _controller.text.trimRight();
+    _lastVoiceTranscript = '';
+    final started = await _voiceTranscription.start();
+    if (!started && mounted) _inputFocusNode.requestFocus();
+  }
+
+  Future<void> _stopVoiceTranscription() async {
+    await _voiceTranscription.stop();
+    if (mounted) _inputFocusNode.requestFocus();
+  }
+
+  Future<void> _discardVoiceTranscription() async {
+    await _voiceTranscription.cancel();
+    if (!mounted) return;
+    _lastVoiceTranscript = '';
+    _draftPrefix = '';
+    _controller.value = TextEditingValue(
+      text: _draftBeforeVoice,
+      selection: TextSelection.collapsed(offset: _draftBeforeVoice.length),
+    );
+    _inputFocusNode.requestFocus();
   }
 
   void _scheduleScrollToLatest() {
@@ -145,7 +216,12 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   }
 
   Future<void> _send([String? suggestedMessage]) async {
-    if (_isSubmitting || _isManagingHistory) return;
+    if (_isSubmitting ||
+        _isManagingHistory ||
+        _voiceTranscription.isListening ||
+        _voiceTranscription.isBusy) {
+      return;
+    }
     final message = (suggestedMessage ?? _controller.text).trim();
     if (message.isEmpty) return;
 
@@ -184,7 +260,12 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   }
 
   Future<void> _retryResponse() async {
-    if (_isSubmitting || _isManagingHistory) return;
+    if (_isSubmitting ||
+        _isManagingHistory ||
+        _voiceTranscription.isListening ||
+        _voiceTranscription.isBusy) {
+      return;
+    }
     setState(() => _isSubmitting = true);
     try {
       await ref
@@ -206,7 +287,12 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   }
 
   Future<void> _clearConversation() async {
-    if (_isManagingHistory || _isSubmitting) return;
+    if (_isManagingHistory ||
+        _isSubmitting ||
+        _voiceTranscription.isListening ||
+        _voiceTranscription.isBusy) {
+      return;
+    }
     setState(() => _isManagingHistory = true);
     try {
       final confirmed = await ConfirmationDialog.show(
@@ -226,7 +312,12 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   }
 
   Future<void> _setEnhancedCoachingEnabled(bool enabled) async {
-    if (_isManagingHistory || _isSubmitting) return;
+    if (_isManagingHistory ||
+        _isSubmitting ||
+        _voiceTranscription.isListening ||
+        _voiceTranscription.isBusy) {
+      return;
+    }
     setState(() => _isManagingHistory = true);
     try {
       if (enabled) {
@@ -251,6 +342,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   @override
   Widget build(BuildContext context) {
     final coachingState = ref.watch(coachingStateProvider);
+    final voiceState = ref.watch(voiceTranscriptionServiceProvider);
     if (coachingState.conversationRevision != _lastConversationRevision) {
       _lastConversationRevision = coachingState.conversationRevision;
       if (coachingState.messages.isNotEmpty || coachingState.isResponding) {
@@ -258,11 +350,13 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
       }
     }
 
-    final isBusy =
+    final isCoachBusy =
         coachingState.isResponding ||
         coachingState.isManagingPrivateData ||
         _isSubmitting ||
         _isManagingHistory;
+    final voiceBlocksSubmission = voiceState.isListening || voiceState.isBusy;
+    final isBusy = isCoachBusy || voiceBlocksSubmission;
     final isAwaitingResponseRetry = coachingState.canRetryResponse;
     final canSend =
         !isBusy &&
@@ -433,6 +527,101 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                     ),
                   ),
                 ),
+              if (voiceState.isListening || voiceState.isBusy)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Semantics(
+                    liveRegion: true,
+                    child: DecoratedBox(
+                      key: const ValueKey<String>('coach-voice-listening'),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(Icons.mic, color: primaryColor, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    voiceState.isListening
+                                        ? 'Listening… Review this editable draft before sending.'
+                                        : 'Preparing the microphone…',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Wrap(
+                                alignment: WrapAlignment.end,
+                                spacing: 4,
+                                children: [
+                                  TextButton(
+                                    key: const ValueKey<String>(
+                                      'coach-discard-voice',
+                                    ),
+                                    onPressed: voiceState.isBusy
+                                        ? null
+                                        : _discardVoiceTranscription,
+                                    child: const Text('Discard'),
+                                  ),
+                                  if (voiceState.isListening)
+                                    FilledButton.tonal(
+                                      key: const ValueKey<String>(
+                                        'coach-stop-voice',
+                                      ),
+                                      onPressed: _stopVoiceTranscription,
+                                      child: const Text('Stop'),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (voiceState.notice != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                  child: Semantics(
+                    liveRegion: true,
+                    child: DecoratedBox(
+                      key: const ValueKey<String>('coach-voice-notice'),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.errorContainer.withValues(alpha: 0.45),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.mic_off_outlined, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text(voiceState.notice!)),
+                            IconButton(
+                              key: const ValueKey<String>(
+                                'coach-dismiss-voice-notice',
+                              ),
+                              tooltip: 'Dismiss voice notice',
+                              onPressed: voiceState.dismissNotice,
+                              icon: const Icon(Icons.close),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 child: Row(
@@ -443,7 +632,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                         key: const ValueKey<String>('coach-message-input'),
                         controller: _controller,
                         focusNode: _inputFocusNode,
-                        enabled: !isBusy,
+                        enabled: !isCoachBusy && !voiceBlocksSubmission,
                         minLines: 1,
                         maxLines: 4,
                         maxLength: 800,
@@ -458,11 +647,31 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                       ),
                     ),
                     const SizedBox(width: 10),
+                    IconButton.outlined(
+                      key: const ValueKey<String>('coach-voice-input'),
+                      tooltip: voiceState.isListening
+                          ? 'Stop voice transcription'
+                          : 'Dictate coaching message',
+                      onPressed: isCoachBusy || voiceState.isBusy
+                          ? null
+                          : voiceState.isListening
+                          ? _stopVoiceTranscription
+                          : _startVoiceTranscription,
+                      icon: voiceState.isBusy
+                          ? const SizedBox.square(
+                              dimension: 19,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Icon(
+                              voiceState.isListening ? Icons.stop : Icons.mic,
+                            ),
+                    ),
+                    const SizedBox(width: 10),
                     IconButton.filled(
                       key: const ValueKey<String>('coach-send-message'),
                       tooltip: 'Send message',
                       onPressed: canSend ? _send : null,
-                      icon: isBusy
+                      icon: isCoachBusy
                           ? const SizedBox.square(
                               dimension: 19,
                               child: CircularProgressIndicator(strokeWidth: 2),
