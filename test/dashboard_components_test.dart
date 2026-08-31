@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/widgets/pro_benefit.dart';
 import 'package:focushaven/widgets/stat_card.dart';
@@ -8,6 +9,8 @@ import 'package:focushaven/widgets/timer_countdown.dart';
 
 Widget _materialApp(Widget child, {double textScale = 1}) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ThemeData.dark().copyWith(
       colorScheme: const ColorScheme.dark(primary: Color(0xFFF064B7)),
     ),
@@ -97,6 +100,41 @@ void main() {
       );
       expect(find.text('2:05'), findsOneWidget);
       expect(find.text('25 minutes'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    } finally {
+      semantics.dispose();
+    }
+  });
+
+  testWidgets('countdown semantics use singular duration forms', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            timerCountdownStateProvider.overrideWithValue((
+              secondsRemaining: 1,
+              totalSessionSeconds: 61,
+              progress: 0.5,
+            )),
+          ],
+          child: _materialApp(
+            TimerCountdown(
+              sessionColor: const Color(0xFFF064B7),
+              formatTime: (_) => '0:01',
+              durationLabel: (_) => '1 minute',
+            ),
+          ),
+        ),
+      );
+
+      final countdown = find.byKey(const ValueKey('timer-countdown-semantics'));
+      expect(
+        tester.getSemantics(countdown).value,
+        '1 second remaining of 1 minute, 1 second. 50 percent complete.',
+      );
       expect(tester.takeException(), isNull);
     } finally {
       semantics.dispose();

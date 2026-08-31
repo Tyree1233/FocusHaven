@@ -13,15 +13,6 @@ enum FocusHavenTheme {
 }
 
 extension FocusHavenThemeDetails on FocusHavenTheme {
-  String get label => switch (this) {
-    FocusHavenTheme.twilight => 'Twilight',
-    FocusHavenTheme.calmBlue => 'Calm Blue',
-    FocusHavenTheme.minimalist => 'Minimalist',
-    FocusHavenTheme.sunset => 'Sunset',
-    FocusHavenTheme.forest => 'Forest',
-    FocusHavenTheme.roseQuartz => 'Rose Quartz',
-  };
-
   Color get primary => switch (this) {
     FocusHavenTheme.twilight => const Color(0xFFF16FBA),
     FocusHavenTheme.calmBlue => const Color(0xFF7BDEED),

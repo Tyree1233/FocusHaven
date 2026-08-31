@@ -2,11 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Widget _app(OnboardingCompletionSaver saveCompletion) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     initialRoute: '/',
     routes: {
       '/': (_) => OnboardingScreen(saveCompletion: saveCompletion),

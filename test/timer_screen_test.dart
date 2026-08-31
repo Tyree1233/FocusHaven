@@ -13,6 +13,7 @@ import 'package:focushaven/models/focus_shield_state.dart';
 import 'package:focushaven/models/haven_journey_state.dart';
 import 'package:focushaven/models/haven_rhythm_insight.dart';
 import 'package:focushaven/models/haven_window_suggestion.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/timer_screen.dart';
 import 'package:focushaven/services/coaching_service.dart';
@@ -106,6 +107,8 @@ Widget _app(
         ),
     ],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark().copyWith(
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFFF16FBA),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/focus_haven_localizations.dart';
+
 const onboardingCompletionPreferenceKey = 'hasCompletedOnboarding';
 
 Future<bool> shouldShowOnboarding() async {
@@ -39,12 +41,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       final saved = await (widget.saveCompletion ?? _saveCompletion)();
       if (!mounted) return;
       if (!saved) {
-        _showMessage('FocusHaven could not save your welcome progress.');
+        _showMessage(context.l10n.onboardingSaveError);
         return;
       }
       Navigator.of(context).pushReplacementNamed('/timer');
     } catch (_) {
-      _showMessage('FocusHaven could not start right now. Please try again.');
+      if (!mounted) return;
+      _showMessage(context.l10n.onboardingStartError);
     } finally {
       if (mounted) setState(() => _isStarting = false);
     }
@@ -59,6 +62,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -75,15 +79,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
               const SizedBox(height: 36),
-              const Text(
-                'Welcome to FocusHaven',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+              Text(
+                l10n.onboardingTitle,
+                style: const TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'A calm place to focus, recharge, and stay mindful.',
+              Text(
+                l10n.onboardingSubtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.white70),
+                style: const TextStyle(fontSize: 16, color: Colors.white70),
               ),
               const SizedBox(height: 40),
               SizedBox(
@@ -96,7 +103,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     minimumSize: const Size.fromHeight(56),
                   ),
                   child: Text(
-                    _isStarting ? 'Opening FocusHaven…' : 'Begin focus',
+                    _isStarting
+                        ? l10n.onboardingOpening
+                        : l10n.onboardingBeginFocus,
                   ),
                 ),
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 import '../services/theme_service.dart';
 
@@ -18,13 +19,13 @@ class AppearanceSheet extends riverpod.ConsumerStatefulWidget {
 
 class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
   bool _selectionInProgress = false;
-  String? _selectionError;
+  bool _selectionFailed = false;
 
   Future<void> _selectTheme(FocusHavenTheme? theme) async {
     if (theme == null || _selectionInProgress) return;
     setState(() {
       _selectionInProgress = true;
-      _selectionError = null;
+      _selectionFailed = false;
     });
     try {
       final setTheme = widget.setTheme;
@@ -35,10 +36,7 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
       }
     } catch (_) {
       if (mounted) {
-        setState(() {
-          _selectionError =
-              'Appearance could not be updated. Please try again.';
-        });
+        setState(() => _selectionFailed = true);
       }
     } finally {
       if (mounted) setState(() => _selectionInProgress = false);
@@ -48,6 +46,16 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
   @override
   Widget build(BuildContext context) {
     final selectedTheme = ref.watch(selectedThemeProvider);
+    final l10n = context.l10n;
+
+    String themeLabel(FocusHavenTheme theme) => switch (theme) {
+      FocusHavenTheme.twilight => l10n.themeTwilight,
+      FocusHavenTheme.calmBlue => l10n.themeCalmBlue,
+      FocusHavenTheme.minimalist => l10n.themeMinimalist,
+      FocusHavenTheme.sunset => l10n.themeSunset,
+      FocusHavenTheme.forest => l10n.themeForest,
+      FocusHavenTheme.roseQuartz => l10n.themeRoseQuartz,
+    };
 
     return SafeArea(
       child: SizedBox(
@@ -68,7 +76,7 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
                     Row(
                       children: [
                         IconButton(
-                          tooltip: 'Back to account settings',
+                          tooltip: l10n.appearanceBackToAccountSettings,
                           onPressed: () {
                             final navigator = Navigator.of(context);
                             if (navigator.canPop()) {
@@ -80,21 +88,21 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Appearance',
+                            l10n.appearanceTitle,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Choose the atmosphere that feels best for your focus.',
-                      style: TextStyle(color: Colors.white70),
+                    Text(
+                      l10n.appearanceDescription,
+                      style: const TextStyle(color: Colors.white70),
                     ),
-                    if (_selectionError != null) ...[
+                    if (_selectionFailed) ...[
                       const SizedBox(height: 8),
                       Text(
-                        _selectionError!,
+                        l10n.appearanceUpdateError,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.error,
                         ),
@@ -105,7 +113,7 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
                       (theme) => RadioListTile<FocusHavenTheme>(
                         contentPadding: EdgeInsets.zero,
                         value: theme,
-                        title: Text(theme.label),
+                        title: Text(themeLabel(theme)),
                         secondary: CircleAvatar(backgroundColor: theme.primary),
                       ),
                     ),

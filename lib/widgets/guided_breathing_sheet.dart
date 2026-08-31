@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
+
 class GuidedBreathingSheet extends StatefulWidget {
   const GuidedBreathingSheet({super.key});
 
@@ -10,7 +12,6 @@ class GuidedBreathingSheet extends StatefulWidget {
 }
 
 class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
-  static const _phaseLabels = ['Breathe in', 'Hold gently', 'Breathe out'];
   static const _phaseDurations = [4, 4, 6];
 
   Timer? _ticker;
@@ -64,7 +65,7 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
       setState(() {
         _totalRemaining--;
         if (_phaseRemaining <= 1) {
-          _phaseIndex = (_phaseIndex + 1) % _phaseLabels.length;
+          _phaseIndex = (_phaseIndex + 1) % _phaseDurations.length;
           _phaseRemaining = _phaseDurations[_phaseIndex];
         } else {
           _phaseRemaining--;
@@ -92,7 +93,13 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     final expanded = _phaseIndex == 0 || _phaseIndex == 1;
+    final phaseLabel = switch (_phaseIndex) {
+      0 => l10n.breathingPhaseIn,
+      1 => l10n.breathingPhaseHold,
+      _ => l10n.breathingPhaseOut,
+    };
     return SafeArea(
       top: false,
       child: Padding(
@@ -110,14 +117,14 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
             ),
             const SizedBox(height: 20),
             Text(
-              'Mindful pause',
+              l10n.breathingTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Follow a calming 4–4–6 breath for one minute.',
+            Text(
+              l10n.breathingDescription,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70),
+              style: const TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 26),
             SizedBox(
@@ -136,7 +143,7 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
                   ),
                   child: Center(
                     child: Text(
-                      _isComplete ? 'Complete' : _phaseLabels[_phaseIndex],
+                      _isComplete ? l10n.breathingComplete : phaseLabel,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 20,
@@ -154,8 +161,8 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
             const SizedBox(height: 4),
             Text(
               _isComplete
-                  ? 'You made space for yourself.'
-                  : '$_phaseRemaining seconds',
+                  ? l10n.breathingCompletionMessage
+                  : l10n.durationSeconds(_phaseRemaining),
               style: const TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 22),
@@ -172,10 +179,10 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
                 ),
                 label: Text(
                   _isRunning
-                      ? 'Pause'
+                      ? l10n.actionPause
                       : _isComplete
-                      ? 'Try again'
-                      : 'Begin breathing',
+                      ? l10n.actionTryAgain
+                      : l10n.breathingBegin,
                 ),
                 style: FilledButton.styleFrom(
                   backgroundColor: colors.primary,
@@ -188,7 +195,7 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
               TextButton.icon(
                 onPressed: () => _runControl(_resetTimer),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Reset'),
+                label: Text(l10n.actionReset),
               ),
           ],
         ),

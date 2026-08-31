@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 
 /// Displays the active countdown while limiting one-second rebuilds to this
@@ -17,17 +19,15 @@ class TimerCountdown extends ConsumerWidget {
   final String Function(int seconds) formatTime;
   final String Function(int seconds) durationLabel;
 
-  String _accessibleDuration(int seconds) {
+  String _accessibleDuration(AppLocalizations l10n, int seconds) {
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     final parts = <String>[];
     if (minutes > 0) {
-      parts.add('$minutes ${minutes == 1 ? 'minute' : 'minutes'}');
+      parts.add(l10n.durationMinutes(minutes));
     }
     if (remainingSeconds > 0 || parts.isEmpty) {
-      parts.add(
-        '$remainingSeconds ${remainingSeconds == 1 ? 'second' : 'seconds'}',
-      );
+      parts.add(l10n.durationSeconds(remainingSeconds));
     }
     return parts.join(', ');
   }
@@ -37,15 +37,17 @@ class TimerCountdown extends ConsumerWidget {
     final countdown = ref.watch(timerCountdownStateProvider);
     final progress = countdown.progress.clamp(0, 1).toDouble();
     final percentComplete = (progress * 100).round();
+    final l10n = context.l10n;
 
     return Semantics(
       key: const ValueKey('timer-countdown-semantics'),
       container: true,
-      label: 'Session timer',
-      value:
-          '${_accessibleDuration(countdown.secondsRemaining)} remaining '
-          'of ${_accessibleDuration(countdown.totalSessionSeconds)}. '
-          '$percentComplete percent complete.',
+      label: l10n.timerSemanticsLabel,
+      value: l10n.timerSemanticsValue(
+        _accessibleDuration(l10n, countdown.secondsRemaining),
+        _accessibleDuration(l10n, countdown.totalSessionSeconds),
+        percentComplete,
+      ),
       child: ExcludeSemantics(
         child: LayoutBuilder(
           builder: (context, constraints) {

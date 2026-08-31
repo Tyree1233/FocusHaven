@@ -739,9 +739,16 @@ tests, plural and placeholder review, human linguistic review, speech-locale
 acceptance where applicable, and country-specific store/disclosure review.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
-Phase 215G-A adds architecture only; it does not translate private content,
-change the person's language setting, contact a translation service, deploy a
-build, or change a store listing.
+Phase 215G-B1 now moves the complete first-run onboarding, appearance picker,
+custom-duration chrome, guided breathing, and main timer accessibility
+description into that English catalog. It includes ICU duration plurals and a
+shared context accessor while preserving the exact English behavior, stored
+theme values, and timer state. The
+[extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
+remaining B2–B6 work; B1 is not a claim that the whole interface is localized.
+Neither Phase 215G-A nor B1 translates private content, changes the person's
+language setting, activates a planned locale, contacts a translation service,
+deploys a build, or changes a store listing.
 
 ## Architecture
 

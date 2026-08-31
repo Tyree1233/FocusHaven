@@ -3,5 +3,199 @@
   "appTitle": "FocusHaven",
   "@appTitle": {
     "description": "The public application name shown by the operating system and app shell."
+  },
+  "onboardingSaveError": "FocusHaven could not save your welcome progress.",
+  "@onboardingSaveError": {
+    "description": "Error shown when onboarding completion could not be saved locally."
+  },
+  "onboardingStartError": "FocusHaven could not start right now. Please try again.",
+  "@onboardingStartError": {
+    "description": "Error shown when the app cannot finish the onboarding transition."
+  },
+  "onboardingTitle": "Welcome to FocusHaven",
+  "@onboardingTitle": {
+    "description": "Primary heading on the first-run welcome screen."
+  },
+  "onboardingSubtitle": "A calm place to focus, recharge, and stay mindful.",
+  "@onboardingSubtitle": {
+    "description": "Supporting description on the first-run welcome screen."
+  },
+  "onboardingOpening": "Opening FocusHaven…",
+  "@onboardingOpening": {
+    "description": "Disabled onboarding button label while the app is opening."
+  },
+  "onboardingBeginFocus": "Begin focus",
+  "@onboardingBeginFocus": {
+    "description": "Button label that completes onboarding and opens the timer."
+  },
+  "customDurationTitle": "{session} duration",
+  "@customDurationTitle": {
+    "description": "Heading for a custom timer duration sheet.",
+    "placeholders": {
+      "session": {
+        "type": "String",
+        "example": "Focus"
+      }
+    }
+  },
+  "customDurationInstructions": "Tap a favorite or scroll minutes and seconds.",
+  "@customDurationInstructions": {
+    "description": "Instructions for choosing a custom timer duration."
+  },
+  "durationMinutesShort": "{count} min",
+  "@durationMinutesShort": {
+    "description": "Compact minute duration used in space-constrained pickers and chips.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "durationSecondsShort": "{seconds} sec",
+  "@durationSecondsShort": {
+    "description": "Compact zero-padded seconds duration used in a picker.",
+    "placeholders": {
+      "seconds": {
+        "type": "String",
+        "example": "05"
+      }
+    }
+  },
+  "customDurationSet": "Set {time}",
+  "@customDurationSet": {
+    "description": "Button label that confirms a selected custom duration.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "25:00"
+      }
+    }
+  },
+  "appearanceUpdateError": "Appearance could not be updated. Please try again.",
+  "@appearanceUpdateError": {
+    "description": "Error shown when the selected appearance cannot be saved."
+  },
+  "appearanceBackToAccountSettings": "Back to account settings",
+  "@appearanceBackToAccountSettings": {
+    "description": "Tooltip for returning from appearance to account settings."
+  },
+  "appearanceTitle": "Appearance",
+  "@appearanceTitle": {
+    "description": "Heading for the appearance selection sheet."
+  },
+  "appearanceDescription": "Choose the atmosphere that feels best for your focus.",
+  "@appearanceDescription": {
+    "description": "Supporting description for appearance selection."
+  },
+  "themeTwilight": "Twilight",
+  "@themeTwilight": {
+    "description": "Display name for the Twilight color theme."
+  },
+  "themeCalmBlue": "Calm Blue",
+  "@themeCalmBlue": {
+    "description": "Display name for the Calm Blue color theme."
+  },
+  "themeMinimalist": "Minimalist",
+  "@themeMinimalist": {
+    "description": "Display name for the Minimalist color theme."
+  },
+  "themeSunset": "Sunset",
+  "@themeSunset": {
+    "description": "Display name for the Sunset color theme."
+  },
+  "themeForest": "Forest",
+  "@themeForest": {
+    "description": "Display name for the Forest color theme."
+  },
+  "themeRoseQuartz": "Rose Quartz",
+  "@themeRoseQuartz": {
+    "description": "Display name for the Rose Quartz color theme."
+  },
+  "breathingTitle": "Mindful pause",
+  "@breathingTitle": {
+    "description": "Heading for the guided breathing sheet."
+  },
+  "breathingDescription": "Follow a calming 4–4–6 breath for one minute.",
+  "@breathingDescription": {
+    "description": "Instructions for the one-minute guided breathing exercise."
+  },
+  "breathingPhaseIn": "Breathe in",
+  "@breathingPhaseIn": {
+    "description": "Guided breathing instruction for inhaling."
+  },
+  "breathingPhaseHold": "Hold gently",
+  "@breathingPhaseHold": {
+    "description": "Guided breathing instruction for holding the breath."
+  },
+  "breathingPhaseOut": "Breathe out",
+  "@breathingPhaseOut": {
+    "description": "Guided breathing instruction for exhaling."
+  },
+  "breathingComplete": "Complete",
+  "@breathingComplete": {
+    "description": "Guided breathing status after the exercise finishes."
+  },
+  "breathingCompletionMessage": "You made space for yourself.",
+  "@breathingCompletionMessage": {
+    "description": "Supportive message after the guided breathing exercise finishes."
+  },
+  "durationSeconds": "{count, plural, =1 {1 second} other {{count} seconds}}",
+  "@durationSeconds": {
+    "description": "A duration expressed as a full number of seconds.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "durationMinutes": "{count, plural, =1 {1 minute} other {{count} minutes}}",
+  "@durationMinutes": {
+    "description": "A duration expressed as a full number of minutes.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "actionPause": "Pause",
+  "@actionPause": {
+    "description": "Generic action label for pausing an active exercise."
+  },
+  "actionTryAgain": "Try again",
+  "@actionTryAgain": {
+    "description": "Generic action label for restarting a completed exercise."
+  },
+  "breathingBegin": "Begin breathing",
+  "@breathingBegin": {
+    "description": "Action label for starting or resuming guided breathing."
+  },
+  "actionReset": "Reset",
+  "@actionReset": {
+    "description": "Generic action label for resetting a local exercise."
+  },
+  "timerSemanticsLabel": "Session timer",
+  "@timerSemanticsLabel": {
+    "description": "Screen-reader label for the main session countdown."
+  },
+  "timerSemanticsValue": "{remaining} remaining of {total}. {percent} percent complete.",
+  "@timerSemanticsValue": {
+    "description": "Screen-reader value describing remaining time, total time, and progress.",
+    "placeholders": {
+      "remaining": {
+        "type": "String",
+        "example": "2 minutes, 5 seconds"
+      },
+      "total": {
+        "type": "String",
+        "example": "25 minutes"
+      },
+      "percent": {
+        "type": "int",
+        "example": "50"
+      }
+    }
   }
 }

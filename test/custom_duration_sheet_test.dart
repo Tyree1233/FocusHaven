@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/widgets/custom_duration_sheet.dart';
 
 class _CountingNavigatorObserver extends NavigatorObserver {
@@ -18,6 +19,8 @@ Widget _launcher({
   NavigatorObserver? observer,
 }) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ThemeData.dark(),
     navigatorObservers: [?observer],
     home: Builder(

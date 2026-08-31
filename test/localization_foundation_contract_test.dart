@@ -125,9 +125,17 @@ void main() {
       expect(policy, contains(required));
     }
 
-    expect(roadmap, contains('| Global localization | Foundation shipped |'));
-    expect(roadmap, contains('Phase 215G-A foundation implemented'));
-    expect(roadmap, contains('Phase 215G-B will extract'));
+    expect(
+      roadmap,
+      contains(
+        '| Global localization | Foundation and B1 extraction shipped |',
+      ),
+    );
+    expect(
+      roadmap,
+      contains('Phase 215G-A foundation and Phase 215G-B1 core extraction'),
+    );
+    expect(roadmap, contains('remaining B2–B6 extraction slices'));
     expect(readme, contains('English as the source catalog'));
     expect(readme, contains('deliberately not advertised'));
     expect(readme, contains('docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md'));

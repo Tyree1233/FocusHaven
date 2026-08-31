@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
+
 class CustomDurationSheet extends StatefulWidget {
   const CustomDurationSheet({
     required this.sessionLabel,
@@ -93,6 +95,10 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final selectedTime =
+        '${_selectedMinutes.toString().padLeft(2, '0')}:'
+        '${_selectedSeconds.toString().padLeft(2, '0')}';
     return SafeArea(
       top: false,
       child: Padding(
@@ -110,13 +116,13 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
             ),
             const SizedBox(height: 20),
             Text(
-              '${widget.sessionLabel} duration',
+              l10n.customDurationTitle(widget.sessionLabel),
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
-            const Text(
-              'Tap a favorite or scroll minutes and seconds.',
-              style: TextStyle(color: Colors.white70),
+            Text(
+              l10n.customDurationInstructions,
+              style: const TextStyle(color: Colors.white70),
             ),
             const SizedBox(height: 18),
             Wrap(
@@ -130,7 +136,7 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
                       key: ValueKey<String>(
                         'custom-duration-favorite-$minutes',
                       ),
-                      label: Text('$minutes min'),
+                      label: Text(l10n.durationMinutesShort(minutes)),
                       selected: _selectedMinutes == minutes,
                       onSelected: _isClosing
                           ? null
@@ -155,7 +161,7 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
                       childCount: widget.maximumMinutes + 1,
                       itemBuilder: (context, index) => Center(
                         child: Text(
-                          '$index min',
+                          l10n.durationMinutesShort(index),
                           style: const TextStyle(fontSize: 22),
                         ),
                       ),
@@ -172,7 +178,9 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
                       childCount: 60,
                       itemBuilder: (context, index) => Center(
                         child: Text(
-                          '${index.toString().padLeft(2, '0')} sec',
+                          l10n.durationSecondsShort(
+                            index.toString().padLeft(2, '0'),
+                          ),
                           style: const TextStyle(fontSize: 22),
                         ),
                       ),
@@ -192,9 +200,7 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
                   foregroundColor: widget.foregroundColor,
                   minimumSize: const Size.fromHeight(54),
                 ),
-                child: Text(
-                  'Set ${_selectedMinutes.toString().padLeft(2, '0')}:${_selectedSeconds.toString().padLeft(2, '0')}',
-                ),
+                child: Text(l10n.customDurationSet(selectedTime)),
               ),
             ),
           ],
