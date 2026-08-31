@@ -662,6 +662,16 @@ control until the saved-link check finishes. Manual intention edits clear the
 link, and no goal, task text, transcript, reflection, calendar data, remote
 model call, account, or new permission is added by this loop.
 
+Phase 215B adds one bounded **task-decision-to-reflection** connection. For a
+linked Focus completion, the person first decides whether to **Mark task
+complete** or **Keep for later**. Only after that exact queue decision settles
+does FocusHaven offer the existing optional, text-free session-fit reflection.
+The person may choose a fit or take the break without answering; skipping
+stores nothing. Reflection remains owned by the timer event history, is bound
+to the exact completed attempt, and rejects stale callbacks rather than
+rewriting a later session. No task text, reflection copy, remote model call,
+account, permission, backend, or deployment is added.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

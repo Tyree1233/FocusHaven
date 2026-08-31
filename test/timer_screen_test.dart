@@ -1349,6 +1349,18 @@ void main() {
         'totalSessionSeconds': 1500,
         'sessionType': SessionType.focus.index,
         'isComplete': true,
+        'focusEvents': jsonEncode([
+          {
+            'schemaVersion': 1,
+            'startedAt': DateTime.utc(2026, 8, 31, 12).toIso8601String(),
+            'endedAt': DateTime.utc(2026, 8, 31, 12, 25).toIso8601String(),
+            'plannedDurationSeconds': 1500,
+            'focusedDurationSeconds': 1500,
+            'pauseCount': 0,
+            'didResume': false,
+            'outcome': 'completed',
+          },
+        ]),
         HavenLoopService.storageKey: 'linked-task',
       });
       final timer = TimerService();
@@ -1364,6 +1376,7 @@ void main() {
         find.byKey(const ValueKey('haven-loop-completion-card')),
         findsOneWidget,
       );
+      expect(find.byType(FocusSessionReflectionCard), findsNothing);
       expect(
         find.byKey(const ValueKey('haven-loop-resolution-required')),
         findsOneWidget,
@@ -1384,9 +1397,11 @@ void main() {
         find.byKey(const ValueKey('haven-loop-completion-card')),
         findsNothing,
       );
+      expect(find.byType(FocusSessionReflectionCard), findsOneWidget);
       expect(queue.items.single.id, 'linked-task');
       expect(queue.completedItems, isEmpty);
       expect(timer.focusTask, isEmpty);
+      expect(timer.completedFocusSessionFit, isNull);
       expect(
         tester
             .widget<FilledButton>(
@@ -1398,4 +1413,67 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('can continue after a linked task without saving a reflection', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(900, 1600));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    SharedPreferences.setMockInitialValues({
+      'focusQueue': jsonEncode([
+        {
+          'id': 'linked-task',
+          'title': 'Keep the reflection optional',
+          'isComplete': false,
+        },
+      ]),
+      'focusTask': 'Keep the reflection optional',
+      'secondsRemaining': 0,
+      'totalSessionSeconds': 1500,
+      'sessionType': SessionType.focus.index,
+      'isComplete': true,
+      'focusEvents': jsonEncode([
+        {
+          'schemaVersion': 1,
+          'startedAt': DateTime.utc(2026, 8, 31, 13).toIso8601String(),
+          'endedAt': DateTime.utc(2026, 8, 31, 13, 25).toIso8601String(),
+          'plannedDurationSeconds': 1500,
+          'focusedDurationSeconds': 1500,
+          'pauseCount': 0,
+          'didResume': false,
+          'outcome': 'completed',
+        },
+      ]),
+      HavenLoopService.storageKey: 'linked-task',
+    });
+    final timer = TimerService();
+    final queue = FocusQueueService();
+    await Future.wait([timer.initialized, queue.initialized]);
+
+    await tester.pumpWidget(
+      _app(timer, havenQueue: queue.items, focusQueueService: queue),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('haven-loop-mark-complete')),
+    );
+    await tester.tap(find.byKey(const ValueKey('haven-loop-mark-complete')));
+    await tester.pumpAndSettle();
+
+    expect(queue.items, isEmpty);
+    expect(queue.completedItems.single.id, 'linked-task');
+    expect(find.byType(FocusSessionReflectionCard), findsOneWidget);
+    expect(timer.completedFocusSessionFit, isNull);
+
+    final takeBreak = find.widgetWithText(FilledButton, 'Take a break');
+    await tester.ensureVisible(takeBreak);
+    await tester.tap(takeBreak);
+    await tester.pumpAndSettle();
+
+    expect(timer.sessionType, SessionType.shortBreak);
+    expect(timer.recentFocusEvents.single.sessionFit, isNull);
+    expect(find.byType(FocusSessionReflectionCard), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
 }

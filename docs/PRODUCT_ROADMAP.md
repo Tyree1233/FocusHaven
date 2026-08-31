@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215A local Plan-to-Focus loop is implemented
+Status: living product contract; Phase 215B task-decision-to-reflection connection is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -64,7 +64,7 @@ Every future phase must preserve these rules:
 | Local Focus Coach | Shipped | Private local coaching remains the default and offline fallback. | Receive structured context and optional typed or voice transcripts through a common input boundary. |
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
-| Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for a visible **Mark task complete** or **Keep for later** decision, while queue and timer services retain ownership. | Add reflection, Rhythm, Forecast, Smart Reset, Journey, and local-coach context one bounded, reviewable connection at a time. |
+| Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion first pauses for **Mark task complete** or **Keep for later**, then offers the existing optional text-free reflection. Queue and timer services retain ownership. | Add Rhythm, Forecast, Smart Reset, Journey, and local-coach context one bounded, reviewable connection at a time. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
@@ -206,7 +206,8 @@ Connect Plan, focus, reflection, Rhythm, Forecast, Smart Reset, Journey, and
 local coaching into one calm lifecycle without turning the dashboard into a
 checklist or streak pressure system.
 
-Status: Phase 215A local Plan-to-Focus loop implemented in the current source.
+Status: Phase 215B task-decision-to-reflection connection implemented in the
+current source, building on the Phase 215A local Plan-to-Focus loop.
 An explicit queue selection stores only the active queue-item ID and delegates
 the visible intention to the existing timer owner. The queue remains the sole
 owner of task text, ordering, and completion. The timer remains the sole owner
@@ -220,12 +221,21 @@ consumes the link and clears the timer intention. A rename, removal, prior
 completion, session change, or manual intention edit invalidates the link
 without mutating the queue. A stale or mismatched action fails closed.
 
-Phase 215A does not infer success from elapsed time, auto-complete work, start a
-timer, select a break, write reflection data, contact local or remote coaching,
-read or write a calendar, or add an account, permission, dependency, backend,
-or deployment. Reflection, Rhythm, Forecast, Smart Reset, Journey, and coach
-connections remain later Phase 215 work and must keep the same explicit,
-service-owned boundary.
+Phase 215B connects that settled task decision to the existing session-fit
+reflection without creating a second owner. While an exact linked-task outcome
+is pending, reflection stays hidden and the next-session control remains
+withheld. After **Mark task complete** or **Keep for later** succeeds, the
+existing optional, text-free reflection appears. Taking the break without a
+choice is an explicit skip and stores no reflection value. A choice is written
+only by `TimerService`, bound to the exact immutable completion identity, and a
+stale or replayed callback cannot modify a later completed attempt.
+
+Phases 215A and 215B do not infer success from elapsed time, auto-complete work,
+start a timer, select a break, copy task text or reflection content, contact
+local or remote coaching, read or write a calendar, or add an account,
+permission, dependency, backend, or deployment. Rhythm, Forecast, Smart Reset,
+Journey, and coach connections remain later Phase 215 work and must keep the
+same explicit, service-owned boundary.
 
 ### Phase 216 — Adaptive Focus Engine
 

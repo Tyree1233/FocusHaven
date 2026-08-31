@@ -33,6 +33,10 @@ void main() {
     expect(find.text('About right'), findsOneWidget);
     expect(find.text('Could do more'), findsOneWidget);
     expect(find.textContaining('Optional and text-free'), findsOneWidget);
+    expect(
+      find.textContaining('continue without a reflection'),
+      findsOneWidget,
+    );
     expect(find.textContaining('Saved privately'), findsNothing);
 
     await tester.tap(

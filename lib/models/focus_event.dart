@@ -2,6 +2,16 @@ enum FocusEventOutcome { completed, reset, changedSession, discardedResume }
 
 enum FocusSessionFit { tooMuch, aboutRight, couldDoMore }
 
+/// A bounded, text-free identity for one exact completed focus attempt.
+///
+/// This is intentionally derived from immutable event fields instead of being
+/// stored as a second piece of completion state.
+typedef FocusCompletionIdentity = ({
+  int startedAtMicrosecondsSinceEpoch,
+  int endedAtMicrosecondsSinceEpoch,
+  int plannedDurationSeconds,
+});
+
 /// A bounded, text-free record of how one focus attempt ended.
 ///
 /// Focus events intentionally exclude task names, journal text, mood labels,
@@ -37,6 +47,16 @@ class FocusEvent {
       outcome == FocusEventOutcome.discardedResume;
 
   bool get hasSessionReflection => sessionFit != null;
+
+  FocusCompletionIdentity? get completionIdentity => !wasCompleted
+      ? null
+      : (
+          startedAtMicrosecondsSinceEpoch: startedAt
+              .toUtc()
+              .microsecondsSinceEpoch,
+          endedAtMicrosecondsSinceEpoch: endedAt.toUtc().microsecondsSinceEpoch,
+          plannedDurationSeconds: plannedDurationSeconds,
+        );
 
   FocusEvent withSessionFit(FocusSessionFit value) {
     if (!wasCompleted) return this;

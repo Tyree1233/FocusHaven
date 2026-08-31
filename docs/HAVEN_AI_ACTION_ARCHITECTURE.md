@@ -330,3 +330,32 @@ next-session control until the saved-link check finishes, so a cold-start race
 cannot bypass a pending task decision. Later Phase 215 connections must remain
 independently reviewable and preserve these service-ownership and fail-closed
 rules.
+
+## Phase 215B task-decision-to-reflection connection
+
+Phase 215B adds one bounded connection after Phase 215A without creating a new
+task store, reflection store, or autonomous workflow. When a completed Focus
+session still owns an exact linked queue-item decision, the timer screen shows
+only **Mark task complete** and **Keep for later**. The existing text-free
+reflection remains hidden, and the next-session control remains withheld,
+until that queue decision settles through `HavenLoopService`.
+
+After either exact outcome succeeds, `FocusSessionReflectionCard` offers the
+existing optional session-fit choices. The person may instead take the break;
+that explicit skip stores no reflection value. `TimerService` remains the sole
+owner of focus-event history and is the only service that may attach the
+bounded fit signal. `HavenLoopService` never receives or stores reflection
+state, and `FocusQueueService` never receives it either.
+
+Each visible reflection callback closes over an immutable
+`FocusCompletionIdentity` derived from the exact completed event. Before a fit
+can be written, `TimerService` requires that identity to match the current
+completed Focus event. A stale callback, replay after the next session, or
+callback from an earlier completion therefore fails closed instead of
+rewriting later history. Repeating the same accepted fit is idempotent and does
+not create another event revision.
+
+This connection copies no task text or reflection content and adds no new
+permission, dependency, account requirement, network call, remote AI, backend,
+deployment, calendar access, or coaching authority. Rhythm, Forecast, Smart
+Reset, Journey, and coaching remain separate later Phase 215 connections.

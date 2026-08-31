@@ -945,8 +945,12 @@ void main() {
       final timer = await createTimer();
       addTearDown(timer.dispose);
       final initialRevision = timer.focusEventsRevision;
+      final completion = timer.completedFocusIdentity!;
 
-      timer.reflectOnCompletedFocus(FocusSessionFit.tooMuch);
+      expect(
+        timer.reflectOnCompletedFocus(completion, FocusSessionFit.tooMuch),
+        isTrue,
+      );
 
       expect(timer.completedFocusSessionFit, FocusSessionFit.tooMuch);
       expect(
@@ -955,7 +959,10 @@ void main() {
       );
       expect(timer.focusEventsRevision, initialRevision + 1);
 
-      timer.reflectOnCompletedFocus(FocusSessionFit.tooMuch);
+      expect(
+        timer.reflectOnCompletedFocus(completion, FocusSessionFit.tooMuch),
+        isTrue,
+      );
       expect(timer.focusEventsRevision, initialRevision + 1);
 
       await Future<void>.delayed(Duration.zero);
@@ -964,7 +971,10 @@ void main() {
       expect((saved.single as Map)['sessionFit'], 'tooMuch');
 
       timer.beginNextSession();
-      timer.reflectOnCompletedFocus(FocusSessionFit.couldDoMore);
+      expect(
+        timer.reflectOnCompletedFocus(completion, FocusSessionFit.couldDoMore),
+        isFalse,
+      );
       expect(
         timer.recentFocusEvents.single.sessionFit,
         FocusSessionFit.tooMuch,
@@ -973,6 +983,49 @@ void main() {
       expect(timer.focusEventsRevision, initialRevision + 1);
     },
   );
+
+  test('stale reflection identity cannot rewrite a later completion', () async {
+    final firstStartedAt = DateTime.now().toUtc().subtract(
+      const Duration(minutes: 1),
+    );
+    SharedPreferences.setMockInitialValues({
+      'focusSeconds': 60,
+      'secondsRemaining': 1,
+      'totalSessionSeconds': 60,
+      'sessionType': SessionType.focus.index,
+      'timerEndsAt': DateTime.now()
+          .subtract(const Duration(seconds: 2))
+          .millisecondsSinceEpoch,
+      'activeFocusAttempt': jsonEncode({
+        'startedAt': firstStartedAt.toIso8601String(),
+        'plannedDurationSeconds': 60,
+        'pauseCount': 0,
+        'didResume': false,
+      }),
+    });
+    final timer = await createTimer();
+    addTearDown(timer.dispose);
+    final firstCompletion = timer.completedFocusIdentity!;
+
+    timer.beginNextSession();
+    timer.selectSession(SessionType.focus);
+    timer.setCustomDuration(0, 1);
+    timer.start();
+    await Future<void>.delayed(const Duration(seconds: 2));
+
+    expect(timer.isComplete, isTrue);
+    final secondCompletion = timer.completedFocusIdentity!;
+    expect(secondCompletion, isNot(firstCompletion));
+    expect(
+      timer.reflectOnCompletedFocus(
+        firstCompletion,
+        FocusSessionFit.couldDoMore,
+      ),
+      isFalse,
+    );
+    expect(timer.completedFocusSessionFit, isNull);
+    expect(timer.recentFocusEvents.first.sessionFit, isNull);
+  });
 
   test(
     'repairs damaged saved focus events without losing valid signals',

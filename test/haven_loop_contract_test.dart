@@ -21,6 +21,12 @@ void main() {
     expect(screen, contains('!havenLoop.isInitialized'));
     expect(screen, contains('haven-loop-restoring'));
     expect(screen, contains('haven-loop-resolution-required'));
+    expect(screen, contains('completedFocusIdentity'));
+    expect(screen, contains('reflectOnCompletedFocus'));
+    expect(
+      screen.indexOf('HavenLoopCompletionCard'),
+      lessThan(screen.indexOf('FocusSessionReflectionCard')),
+    );
     expect(card, contains('FocusHaven never completes it automatically.'));
     expect(card, contains('Mark task complete'));
     expect(card, contains('Keep for later'));

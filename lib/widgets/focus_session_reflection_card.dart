@@ -4,8 +4,9 @@ import '../models/focus_event.dart';
 
 /// An optional, text-free reflection shown after a completed focus session.
 ///
-/// The card never blocks the break transition. Its only action is to attach a
-/// bounded fit signal to the completed private focus event.
+/// The card never blocks the break transition. Continuing without a choice is
+/// an explicit skip; choosing a chip attaches only a bounded fit signal to the
+/// completed private focus event.
 class FocusSessionReflectionCard extends StatelessWidget {
   const FocusSessionReflectionCard({
     super.key,
@@ -37,7 +38,7 @@ class FocusSessionReflectionCard extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             const Text(
-              'Optional and text-free. Your answer privately tunes future Haven Plans.',
+              'Optional and text-free. Choose one or continue without a reflection.',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white70, fontSize: 12),
             ),

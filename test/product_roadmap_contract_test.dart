@@ -80,6 +80,9 @@ void main() {
     expect(readme, contains('local Plan-to-Focus loop'));
     expect(readme, contains('Mark task complete'));
     expect(readme, contains('Keep for later'));
+    expect(readme, contains('task-decision-to-reflection'));
+    expect(readme, contains('take the break without answering'));
+    expect(readme, contains('stale callbacks'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -127,6 +130,15 @@ void main() {
       'Restoration also fails closed',
       'a cold-start race cannot bypass a pending task decision',
       'adds no network call, remote AI, permission, account requirement, backend, or deployment',
+      'Phase 215B task-decision-to-reflection connection',
+      'the next-session control remains withheld',
+      'explicit skip stores no reflection value',
+      '`TimerService` remains the sole owner of focus-event history',
+      '`HavenLoopService` never receives or stores reflection state',
+      '`FocusCompletionIdentity`',
+      'stale callback, replay after the next session',
+      'fails closed instead of rewriting later history',
+      'copies no task text or reflection content',
     ]) {
       expect(architecture, contains(required));
     }

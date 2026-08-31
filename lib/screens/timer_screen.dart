@@ -1046,6 +1046,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final timer = ref.read(timerServiceProvider);
     final session = ref.watch(timerSessionStateProvider);
     final havenLoop = ref.watch(havenLoopStateProvider);
+    final completedFocusIdentity = timer.completedFocusIdentity;
     final focusHistory = ref.watch(timerFocusHistoryProvider);
     final summary = ref.watch(timerSummaryStateProvider);
     final havenJourney = ref.watch(havenJourneyStateProvider);
@@ -1306,11 +1307,6 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         Column(
                           children: [
                             if (session.sessionType == SessionType.focus) ...[
-                              FocusSessionReflectionCard(
-                                selected: session.completedFocusSessionFit,
-                                onSelected: timer.reflectOnCompletedFocus,
-                              ),
-                              const SizedBox(height: 14),
                               if (havenLoop.canResolveCompletion &&
                                   havenLoop.selectedItem != null) ...[
                                 HavenLoopCompletionCard(
@@ -1321,6 +1317,18 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                   onKeepForLater: ref
                                       .read(havenLoopServiceProvider)
                                       .keepSelectedTaskForLater,
+                                ),
+                                const SizedBox(height: 14),
+                              ] else if (havenLoop.isInitialized &&
+                                  completedFocusIdentity != null) ...[
+                                FocusSessionReflectionCard(
+                                  selected: session.completedFocusSessionFit,
+                                  onSelected: (sessionFit) {
+                                    timer.reflectOnCompletedFocus(
+                                      completedFocusIdentity,
+                                      sessionFit,
+                                    );
+                                  },
                                 ),
                                 const SizedBox(height: 14),
                               ],

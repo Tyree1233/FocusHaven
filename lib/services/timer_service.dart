@@ -246,6 +246,15 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     return latest.wasCompleted ? latest.sessionFit : null;
   }
 
+  FocusCompletionIdentity? get completedFocusIdentity {
+    if (_sessionType != SessionType.focus ||
+        !_isComplete ||
+        _focusEvents.isEmpty) {
+      return null;
+    }
+    return _focusEvents.last.completionIdentity;
+  }
+
   Future<void> get initialized => _initialization;
   SessionType get sessionType => _sessionType;
   String get completionMessage => _completionMessage;
@@ -441,19 +450,24 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   ///
   /// Reflections are accepted only while the matching completed focus session
   /// is still on screen, so stale callbacks cannot rewrite older history.
-  void reflectOnCompletedFocus(FocusSessionFit sessionFit) {
+  bool reflectOnCompletedFocus(
+    FocusCompletionIdentity completion,
+    FocusSessionFit sessionFit,
+  ) {
     if (_sessionType != SessionType.focus ||
         !_isComplete ||
         _focusEvents.isEmpty) {
-      return;
+      return false;
     }
     final index = _focusEvents.length - 1;
     final event = _focusEvents[index];
-    if (!event.wasCompleted || event.sessionFit == sessionFit) return;
+    if (event.completionIdentity != completion) return false;
+    if (event.sessionFit == sessionFit) return true;
     _focusEvents[index] = event.withSessionFit(sessionFit);
     _focusEventsRevision++;
     notifyListeners();
     _saveToPrefs();
+    return true;
   }
 
   void resumePendingSession() {
