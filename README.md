@@ -723,6 +723,26 @@ command checks, accessibility verification, store disclosures, and candidate
 validation are required before distribution. Earlier validated artifacts do
 not cover these capabilities.
 
+## Languages and global releases
+
+FocusHaven now has a generated Flutter localization foundation, with English as
+the source catalog and the only production-supported runtime locale. Spanish,
+French, German, and Brazilian Portuguese are the planned first translation
+wave; they are deliberately not advertised by the app or stores until every
+user-visible string, accessibility label, error, permission explanation,
+notification, widget/watch surface, voice path, policy, help resource, and
+store listing required for that locale has been reviewed.
+
+Adding a locale is a release decision, not a file-copy exercise. A production
+locale must pass native and Flutter formatting checks, layout and large-text
+tests, plural and placeholder review, human linguistic review, speech-locale
+acceptance where applicable, and country-specific store/disclosure review.
+The authoritative contract is the
+[localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
+Phase 215G-A adds architecture only; it does not translate private content,
+change the person's language setting, contact a translation service, deploy a
+build, or change a store listing.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

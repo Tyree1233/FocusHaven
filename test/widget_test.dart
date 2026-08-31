@@ -6,6 +6,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/main.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
+import 'package:focushaven/l10n/focus_haven_locales.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/screens/onboarding_screen.dart';
 import 'package:focushaven/services/auth_service.dart';
@@ -34,6 +36,24 @@ void main() {
     );
     expect(find.text('Begin focus'), findsOneWidget);
     expect(find.byType(Image), findsOneWidget);
+  });
+
+  testWidgets('exposes only the complete English localization catalog', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const FocusHavenApp());
+
+    final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(materialApp.supportedLocales, FocusHavenLocales.productionLocales);
+    expect(materialApp.supportedLocales, AppLocalizations.supportedLocales);
+    expect(
+      materialApp.localizationsDelegates,
+      contains(AppLocalizations.delegate),
+    );
+
+    final appContext = tester.element(find.byType(OnboardingScreen));
+    expect(materialApp.onGenerateTitle!(appContext), 'FocusHaven');
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('begin focus saves onboarding and replaces the welcome route', (

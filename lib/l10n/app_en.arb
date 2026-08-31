@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "FocusHaven",
+  "@appTitle": {
+    "description": "The public application name shown by the operating system and app shell."
+  }
+}

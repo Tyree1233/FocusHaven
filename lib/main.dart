@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart'
 
 import 'config/feature_flags.dart';
 import 'firebase_options.dart';
+import 'l10n/app_localizations.dart';
 import 'providers/app_providers.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/timer_screen.dart';
@@ -172,7 +173,9 @@ class _FocusHavenMaterialApp extends ConsumerWidget {
     final selectedTheme = ref.watch(selectedThemeProvider);
 
     return MaterialApp(
-      title: 'FocusHaven',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,

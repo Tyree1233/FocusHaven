@@ -129,6 +129,10 @@ firebase-debug.*.log
 # Coverage
 coverage/
 
+# Generated Flutter localization sources
+/lib/l10n/app_localizations.dart
+/lib/l10n/app_localizations_*.dart
+
 # Symbols
 app.*.symbols
 
