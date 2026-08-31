@@ -41,6 +41,39 @@ void main() {
     expect(proposal.confirmationRequired, isFalse);
   });
 
+  test(
+    'creates the same bounded proposal from a reviewed voice transcript',
+    () {
+      final result = interpreter().interpret(
+        'pause',
+        state(),
+        source: HavenActionSource.voiceTranscript,
+      );
+
+      expect(result.status, HavenActionInterpretationStatus.proposed);
+      expect(result.proposal, isNotNull);
+      expect(result.proposal!.source, HavenActionSource.voiceTranscript);
+      expect(result.proposal!.kind, HavenActionKind.pauseTimer);
+      expect(result.proposal!.stateToken, state().token);
+    },
+  );
+
+  test('rejects coach and system text as action-authority sources', () {
+    for (final source in <HavenActionSource>[
+      HavenActionSource.localCoach,
+      HavenActionSource.systemIntent,
+    ]) {
+      final result = interpreter().interpret('pause', state(), source: source);
+
+      expect(result.status, HavenActionInterpretationStatus.unsupported);
+      expect(result.proposal, isNull);
+      expect(
+        result.message,
+        'That input source cannot create a Haven action proposal.',
+      );
+    }
+  });
+
   test('refuses ambiguous multi-action input', () {
     final result = interpreter().interpret(
       'pause and open Focus Queue',

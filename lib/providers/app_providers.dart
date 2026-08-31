@@ -368,9 +368,9 @@ final coachingServiceProvider = ChangeNotifierProvider<CoachingService>(
   name: 'coachingServiceProvider',
 );
 
-/// Optional, explicit Voice-to-Coach input. The provider is lazy, and the
-/// underlying recognizer is initialized only after the user accepts the
-/// disclosure and taps the microphone control.
+/// Optional, explicit voice input shared by Focus Coach and Haven actions. The
+/// provider is lazy, and the underlying recognizer is initialized only after
+/// the user accepts the disclosure and taps a microphone control.
 final voiceTranscriptionServiceProvider =
     ChangeNotifierProvider<VoiceTranscriptionService>(
       (ref) => VoiceTranscriptionService(),

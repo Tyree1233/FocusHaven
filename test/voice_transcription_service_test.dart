@@ -24,6 +24,30 @@ void main() {
     expect(adapter.listenCalls, 0);
   });
 
+  test('Coach and Haven actions require separate disclosures', () async {
+    final adapter = _FakeVoiceRecognitionAdapter();
+    final service = VoiceTranscriptionService(adapter: adapter)
+      ..acknowledgeDisclosure();
+
+    expect(service.disclosureAcknowledged, isTrue);
+    expect(
+      service.disclosureAcknowledgedFor(VoiceTranscriptionPurpose.havenAction),
+      isFalse,
+    );
+    expect(
+      await service.start(purpose: VoiceTranscriptionPurpose.havenAction),
+      isFalse,
+    );
+    expect(adapter.initializeCalls, 0);
+
+    service.acknowledgeDisclosure(VoiceTranscriptionPurpose.havenAction);
+    expect(
+      await service.start(purpose: VoiceTranscriptionPurpose.havenAction),
+      isTrue,
+    );
+    await service.cancel();
+  });
+
   test(
     'starts once, streams an in-memory transcript, and stops safely',
     () async {

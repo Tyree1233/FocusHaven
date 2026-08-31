@@ -24,9 +24,12 @@ class HavenActionPolicy {
     required HavenActionState state,
     required DateTime nowUtc,
   }) {
+    final supportedSource =
+        proposal.source == HavenActionSource.typed ||
+        proposal.source == HavenActionSource.voiceTranscript;
     if (proposal.schemaVersion != 1 ||
         proposal.id.isEmpty ||
-        proposal.source != HavenActionSource.typed ||
+        !supportedSource ||
         proposal.createdAtUtc.isAfter(proposal.expiresAtUtc)) {
       return const HavenActionPolicyDecision.rejected(
         HavenActionReason.invalidProposal,

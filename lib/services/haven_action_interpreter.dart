@@ -20,7 +20,18 @@ class HavenActionInterpreter {
   final HavenActionClock _clock;
   final HavenActionIdGenerator _idGenerator;
 
-  HavenActionInterpretation interpret(String input, HavenActionState state) {
+  HavenActionInterpretation interpret(
+    String input,
+    HavenActionState state, {
+    HavenActionSource source = HavenActionSource.typed,
+  }) {
+    if (source != HavenActionSource.typed &&
+        source != HavenActionSource.voiceTranscript) {
+      return const HavenActionInterpretation.rejected(
+        HavenActionInterpretationStatus.unsupported,
+        'That input source cannot create a Haven action proposal.',
+      );
+    }
     final normalized = input.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (normalized.isEmpty) {
       return const HavenActionInterpretation.rejected(
@@ -88,7 +99,7 @@ class HavenActionInterpreter {
       HavenActionProposal(
         schemaVersion: 1,
         id: _idGenerator(),
-        source: HavenActionSource.typed,
+        source: source,
         kind: candidate.kind,
         arguments: candidate.arguments,
         interpretation: candidate.interpretation,

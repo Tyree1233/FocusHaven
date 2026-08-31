@@ -1,9 +1,9 @@
 # Haven AI and Action Architecture
 
-Status: Phase 210 typed runtime implemented; voice remains future work
+Status: Phase 210 typed runtime and Phase 213 safe voice runtime implemented
 
 The Haven Action Engine is the single policy boundary between a human
-request and an existing FocusHaven service. It exists so typed input, future
+request and an existing FocusHaven service. It exists so typed input, reviewed
 voice transcripts, local coaching, optional enhanced coaching, widgets,
 watches, and system assistants cannot invent different authorization rules.
 
@@ -18,7 +18,7 @@ purchase, permission, Firebase, or deployment API directly.
 ## Boundary and ownership
 
 ```text
-Typed input / future voice transcript / reviewed system intent
+Typed input / editable voice transcript
                               |
                               v
                     bounded input adapter
@@ -45,7 +45,7 @@ Existing FocusHaven services remain authoritative. The engine proposes a call;
 it does not duplicate timer rules, write preferences directly, manufacture
 widget commands, or mutate Riverpod state behind a service.
 
-## Phase 210 runtime boundary
+## Phase 210 and Phase 213 runtime boundary
 
 The typed Phase 210 implementation lives in separate, testable layers:
 
@@ -60,12 +60,25 @@ The typed Phase 210 implementation lives in separate, testable layers:
   accepted operations to `TimerService` or `FocusQueueService`;
 - `lib/widgets/haven_action_sheet.dart` provides a visible and accessible
   review announcement, an explicit **Change request** path, keyboard review,
-  and an exact confirmation step for saved queue edits.
+  an informed tap-to-talk transcript path, and an exact confirmation step for
+  saved queue edits.
 
-The timer screen exposes the typed surface as **Haven actions**. It performs no
-speech recognition, requests no microphone access, and calls no remote model.
-Opening Queue, Haven Plan, Smart Reset, local Coach, or settings goes through
-the existing screens. Protected actions remain unavailable from this engine.
+The timer screen exposes the surface as **Haven actions**. Typed requests remain
+fully available. After the person accepts the voice disclosure, the same
+bounded transcription service used by Voice-to-Coach can fill an editable
+draft. Speech creates neither a proposal nor an execution: the person must stop
+or finish listening, tap **Review action**, inspect the proposal, and then use
+the visual **Run reviewed action** or **Confirm exact action** control. No
+remote model is called. Opening Queue, Haven Plan, Smart Reset, local Coach, or
+settings goes through the existing screens. Protected actions remain
+unavailable from this engine.
+
+Phase 213 safe voice runtime implemented the `voiceTranscript` provenance
+without expanding the allowlist. The interpreter and policy accept only
+`typed` and `voiceTranscript` sources. `localCoach` and `systemIntent` remain
+model values for future design work but are rejected as proposal authority.
+Editing a voice draft does not erase its voice provenance, and discarding voice
+restores the exact pre-listening typed draft.
 
 ## Proposal contract
 
@@ -134,9 +147,9 @@ modify IAM, change a provider or credential, alter remote configuration, enable
 enhanced coaching, deliver a store build, create TestFlight content, or submit
 an app for review.
 
-## Phase 210 allowlist
+## Current typed-and-voice allowlist
 
-The first typed engine stays deliberately small:
+The shared engine stays deliberately small:
 
 - read current timer status;
 - start a ready focus or break session;
@@ -208,7 +221,7 @@ not weaken that path.
 - Optional enhanced interpretation is a separate, disclosed action and sends
   only the confirmed bounded text needed for that request.
 
-## Phase 210 acceptance contract
+## Phase 210 typed acceptance contract
 
 Phase 210 is complete only when:
 
@@ -227,5 +240,26 @@ Phase 210 is complete only when:
 - widget, watch, and native-surface command authorization remains unchanged;
 - the current store privacy boundary remains accurate.
 
-The repository implementation and focused tests now satisfy these criteria.
-This completion does not authorize Phase 211 microphone or speech work.
+The repository implementation and focused tests satisfy these criteria.
+
+## Phase 213 safe voice acceptance contract
+
+Phase 213 is complete in source only when:
+
+- an informed tap is required before the shared recognizer starts;
+- the transcript remains editable and creates no proposal while listening;
+- **Review action** is a distinct user action after transcription;
+- a reviewed voice proposal displays its source and still requires the existing
+  visual run or exact-confirmation control;
+- typed and voice proposals share the same grammar, state token, expiry,
+  argument bounds, protected-action rejection, and replay policy;
+- local Coach output and system-intent text cannot create proposals;
+- discarding restores the exact typed draft and closing or backgrounding ends
+  listening through the shared transcription lifecycle;
+- no remote AI, raw-audio persistence, backend call, new permission, or direct
+  service path is introduced.
+
+The Phase 213 source and focused tests now satisfy these criteria. Fresh native
+builds, real-device voice-command acceptance, accessibility checks, and final
+store disclosures remain release work; this source milestone is not a claim
+that the feature is present in an already validated store candidate.

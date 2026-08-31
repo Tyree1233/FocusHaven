@@ -859,6 +859,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       builder: (_) => HavenActionSheet(
         timerService: timer,
         focusQueueService: ref.read(focusQueueServiceProvider),
+        voiceTranscriptionService: ref.read(voiceTranscriptionServiceProvider),
         onOpenSurface: (surface) async {
           if (!context.mounted) return;
           switch (surface) {

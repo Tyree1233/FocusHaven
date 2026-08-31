@@ -28,8 +28,11 @@ void main() {
   HavenActionProposal proposal(
     HavenActionInterpreter interpreter,
     HavenActionExecutor executor,
-    String input,
-  ) => interpreter.interpret(input, executor.snapshot()).proposal!;
+    String input, {
+    HavenActionSource source = HavenActionSource.typed,
+  }) => interpreter
+      .interpret(input, executor.snapshot(), source: source)
+      .proposal!;
 
   test('executes through the timer service and prevents replay', () async {
     final owned = await services();
@@ -49,6 +52,35 @@ void main() {
       clock: () => now,
     );
 
+    final first = await actionEngine.execute(action);
+    final second = await actionEngine.execute(action);
+
+    expect(first.executed, isTrue);
+    expect(owned.timer.isRunning, isTrue);
+    expect(second.executed, isFalse);
+    expect(second.receipt.reason, HavenActionReason.duplicateProposal);
+  });
+
+  test('voice transcripts use the same state and replay policy', () async {
+    final owned = await services();
+    final now = DateTime.utc(2026, 8, 30, 18);
+    final executor = HavenActionExecutor(
+      timer: owned.timer,
+      focusQueue: owned.queue,
+      openSurface: (_) async => true,
+    );
+    final action = proposal(
+      interpreter(now, 'voice-start-once'),
+      executor,
+      'start focus',
+      source: HavenActionSource.voiceTranscript,
+    );
+    final actionEngine = HavenActionEngine(
+      executor: executor,
+      clock: () => now,
+    );
+
+    expect(action.source, HavenActionSource.voiceTranscript);
     final first = await actionEngine.execute(action);
     final second = await actionEngine.execute(action);
 

@@ -54,9 +54,9 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>FocusHaven reads only event time boundaries to suggest an optional focus window. It never creates or changes calendar events.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>FocusHaven uses the microphone only when you tap to dictate an editable Focus Coach message. FocusHaven does not store raw audio.</string>
+	<string>FocusHaven uses the microphone only when you tap to create an editable Focus Coach or Haven action transcript. FocusHaven does not store raw audio.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>FocusHaven converts speech into an editable coaching draft only after you tap the microphone. Nothing is sent to Focus Coach until you tap Send.</string>
+	<string>FocusHaven converts speech into an editable Coach or Haven action draft only after you tap the microphone. Nothing is sent, reviewed, or run until you choose the separate on-screen control.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

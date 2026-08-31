@@ -39,8 +39,9 @@ void main() {
     expect(iosInfo, contains('NSCalendarsFullAccessUsageDescription'));
     expect(iosInfo, contains('NSMicrophoneUsageDescription'));
     expect(iosInfo, contains('NSSpeechRecognitionUsageDescription'));
+    expect(iosInfo, contains('Focus Coach or Haven action transcript'));
     expect(iosInfo, contains('does not store raw audio'));
-    expect(iosInfo, contains('until you tap Send'));
+    expect(iosInfo, contains('Nothing is sent, reviewed, or run'));
     expect(
       iosInfo,
       contains('reads only event time boundaries'),
@@ -127,8 +128,8 @@ void main() {
   });
 
   test('public policy and store matrix describe the current truth', () {
-    final policy = _read('docs/PRIVACY_POLICY.md');
-    final matrix = _read('docs/STORE_PRIVACY_DISCLOSURE_MATRIX.md');
+    final policy = _normalize(_read('docs/PRIVACY_POLICY.md'));
+    final matrix = _normalize(_read('docs/STORE_PRIVACY_DISCLOSURE_MATRIX.md'));
 
     for (final statement in <String>[
       'anonymous Firebase Authentication identity',
@@ -140,10 +141,12 @@ void main() {
       'Continue with Apple',
       'Delete account',
       'account-deletion page',
-      'Voice-to-Coach',
+      'Voice transcription for Coach and Haven actions',
       'does not retain raw audio',
       'on-device or over a network',
       'until you tap Send',
+      'until you tap Review action',
+      'visual Run reviewed action',
     ]) {
       expect(policy, contains(statement));
     }
@@ -154,6 +157,12 @@ void main() {
     expect(matrix, contains('Family Controls distribution approval'));
     expect(matrix, contains('deleteFocusHavenAccount'));
     expect(matrix, contains('production-project validation'));
+    expect(
+      matrix,
+      contains('Phase 212 Voice-to-Coach and Phase 213 Safe Voice Commands'),
+    );
+    expect(matrix, contains('unproposed until Review action'));
+    expect(matrix, contains('Run reviewed action'));
 
     final accountSheet = _read('lib/widgets/account_sheet.dart');
     expect(accountSheet, contains('Sign in with Google'));
@@ -199,3 +208,5 @@ void main() {
 }
 
 String _read(String path) => File(path).readAsStringSync();
+
+String _normalize(String value) => value.replaceAll(RegExp(r'\s+'), ' ').trim();

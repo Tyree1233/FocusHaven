@@ -15,6 +15,8 @@ enum VoiceTranscriptionStatus {
   failed,
 }
 
+enum VoiceTranscriptionPurpose { coach, havenAction }
+
 typedef VoiceRecognitionResultCallback =
     void Function(String transcript, bool isFinal);
 typedef VoiceRecognitionStatusCallback = void Function(String status);
@@ -25,7 +27,8 @@ typedef VoiceRecognitionErrorCallback =
 ///
 /// Keeping this interface smaller than the plugin API makes it possible to
 /// prove that FocusHaven requests access only after an explicit user action
-/// and that recognized text never bypasses the editable coaching draft.
+/// and that recognized text never bypasses the active surface's editable
+/// draft.
 abstract interface class VoiceRecognitionAdapter {
   bool get isListening;
 
@@ -96,11 +99,12 @@ class SpeechToTextVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
   Future<void> cancel() => _speechToText.cancel();
 }
 
-/// Session-memory-only owner for optional Voice-to-Coach transcription.
+/// Session-memory-only owner for optional FocusHaven voice transcription.
 ///
 /// This service never starts itself, stores audio, persists a transcript, or
-/// sends text to Focus Coach. Its only output is an editable in-memory draft
-/// that the coaching sheet may display after a user explicitly taps the mic.
+/// sends text to Focus Coach or the Haven Action Engine. Its only output is an
+/// editable in-memory draft that an active sheet may display after a user
+/// explicitly taps the microphone control.
 class VoiceTranscriptionService extends ChangeNotifier {
   VoiceTranscriptionService({VoiceRecognitionAdapter? adapter})
     : _adapter = adapter ?? SpeechToTextVoiceRecognitionAdapter();
@@ -112,7 +116,7 @@ class VoiceTranscriptionService extends ChangeNotifier {
   String? _notice;
   bool _isFinal = false;
   bool _isInitialized = false;
-  bool _disclosureAcknowledged = false;
+  final Set<VoiceTranscriptionPurpose> _acknowledgedDisclosures = {};
   bool _acceptPlatformCallbacks = false;
   bool _disposed = false;
   int _operationRevision = 0;
@@ -121,18 +125,28 @@ class VoiceTranscriptionService extends ChangeNotifier {
   String get transcript => _transcript;
   String? get notice => _notice;
   bool get isFinal => _isFinal;
-  bool get disclosureAcknowledged => _disclosureAcknowledged;
+  bool get disclosureAcknowledged =>
+      disclosureAcknowledgedFor(VoiceTranscriptionPurpose.coach);
   bool get isListening => _status == VoiceTranscriptionStatus.listening;
   bool get isBusy =>
       _status == VoiceTranscriptionStatus.preparing ||
       _status == VoiceTranscriptionStatus.stopping;
 
-  void acknowledgeDisclosure() {
-    _disclosureAcknowledged = true;
+  bool disclosureAcknowledgedFor(VoiceTranscriptionPurpose purpose) =>
+      _acknowledgedDisclosures.contains(purpose);
+
+  void acknowledgeDisclosure([
+    VoiceTranscriptionPurpose purpose = VoiceTranscriptionPurpose.coach,
+  ]) {
+    _acknowledgedDisclosures.add(purpose);
   }
 
-  Future<bool> start() async {
-    if (!_disclosureAcknowledged || isListening || isBusy) return false;
+  Future<bool> start({
+    VoiceTranscriptionPurpose purpose = VoiceTranscriptionPurpose.coach,
+  }) async {
+    if (!disclosureAcknowledgedFor(purpose) || isListening || isBusy) {
+      return false;
+    }
 
     final operationRevision = ++_operationRevision;
     _acceptPlatformCallbacks = true;

@@ -24,12 +24,14 @@ On supported Apple devices, Focus Shield uses Apple's Family Controls and Manage
 
 FocusHaven's widgets, Android ongoing timer notification, Live Activity, Apple Watch app, and Wear OS app receive only a bounded timer snapshot: session type and activity, remaining and total seconds, and timestamps needed to render the timer. Interactive Android Home Screen and Lock Screen notification controls, Apple Watch, and Wear OS surfaces also receive a rotating private command identity. The iPhone Lock Screen widget, Live Activity, and Dynamic Island are read-only and receive no command capability. None of these surfaces receive your task, journal, mood, queue, parked thoughts, coaching conversation, or focus history.
 
-## Voice-to-Coach
+## Voice transcription for Coach and Haven actions
 
-Voice-to-Coach is an optional tap-to-talk input for an editable Focus Coach
-message. FocusHaven asks for microphone and speech-recognition access only when
-you deliberately start this feature. It has no wake word, always-listening
-mode, or background capture. You can deny permission and continue typing.
+Voice transcription is an optional tap-to-talk input for an editable Focus
+Coach message or an editable Haven action request. FocusHaven asks for
+microphone and speech-recognition access only when you deliberately start one
+of these features. Each surface explains what happens before listening. It has
+no wake word, always-listening mode, or background capture. You can deny
+permission and continue typing or using normal app controls.
 
 While the visible listening control is active, your device or browser speech
 service converts speech into text. Depending on your platform, language, and
@@ -37,12 +39,20 @@ settings, that processing may occur on-device or over a network. FocusHaven
 does not retain raw audio, write it to app storage, include it in cloud backup,
 or send it to Firebase, OpenAI, analytics, diagnostics, or a FocusHaven server.
 
-The recognized transcript remains an editable, session-only coaching draft.
-You can stop listening, change the text, or discard it. Nothing is sent to
-Focus Coach until you tap Send. After you send it, the transcript follows the
-same local coaching-history and optional enhanced-coaching rules as a message
-you typed. Voice-to-Coach cannot control the timer, change the Focus Queue,
-delete data, make a purchase, grant permissions, or modify an account.
+For Focus Coach, the recognized transcript remains an editable, session-only
+coaching draft. Nothing is sent to Focus Coach until you tap Send. After you
+send it, the transcript follows the same local coaching-history and optional
+enhanced-coaching rules as a message you typed.
+
+For Haven actions, the transcript remains an editable, session-only action
+draft. Nothing is proposed until you tap Review action, and nothing runs until
+you inspect the source-labelled proposal and tap the separate visual Run
+reviewed action or Confirm exact action control. Typed and voice requests use
+the same limited commands, current-state checks, argument limits,
+confirmation, and replay protection. Voice cannot delete data, make a
+purchase, grant permissions, change an account, control Firebase or a release,
+or activate its own confirmation control. Discarding restores the typed draft
+that existed before listening.
 
 ## Focus Coach and optional enhanced AI coaching
 

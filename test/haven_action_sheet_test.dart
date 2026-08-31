@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/timer_service.dart';
+import 'package:focushaven/services/voice_transcription_service.dart';
 import 'package:focushaven/widgets/haven_action_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,17 +13,34 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  Future<({TimerService timer, FocusQueueService queue})> services() async {
+  Future<
+    ({
+      TimerService timer,
+      FocusQueueService queue,
+      VoiceTranscriptionService voice,
+      _HavenVoiceRecognitionAdapter adapter,
+    })
+  >
+  services() async {
     final timer = TimerService();
     final queue = FocusQueueService();
+    final adapter = _HavenVoiceRecognitionAdapter();
+    final voice = VoiceTranscriptionService(adapter: adapter);
     await Future.wait([timer.initialized, queue.initialized]);
     addTearDown(timer.dispose);
     addTearDown(queue.dispose);
-    return (timer: timer, queue: queue);
+    addTearDown(voice.dispose);
+    return (timer: timer, queue: queue, voice: voice, adapter: adapter);
   }
 
   Widget app(
-    ({TimerService timer, FocusQueueService queue}) owned, {
+    ({
+      TimerService timer,
+      FocusQueueService queue,
+      VoiceTranscriptionService voice,
+      _HavenVoiceRecognitionAdapter adapter,
+    })
+    owned, {
     double textScale = 1,
     double width = 600,
   }) => MaterialApp(
@@ -36,6 +54,7 @@ void main() {
             child: HavenActionSheet(
               timerService: owned.timer,
               focusQueueService: owned.queue,
+              voiceTranscriptionService: owned.voice,
               onOpenSurface: (_) async {},
             ),
           ),
@@ -44,7 +63,7 @@ void main() {
     ),
   );
 
-  testWidgets('shows the typed-only privacy boundary and review step', (
+  testWidgets('shows the private input boundary and typed review step', (
     tester,
   ) async {
     tester.view.devicePixelRatio = 1;
@@ -55,7 +74,7 @@ void main() {
     await tester.pumpWidget(app(owned));
 
     expect(
-      find.text('Typed locally • no microphone • no remote AI'),
+      find.text('Typed or voice transcript • local review • no remote AI'),
       findsOneWidget,
     );
     await tester.enterText(
@@ -66,6 +85,7 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const ValueKey('havenActionProposal')), findsOneWidget);
+    expect(find.text('Typed request • reviewed locally'), findsOneWidget);
     expect(find.text('Confirm exact action'), findsOneWidget);
     expect(owned.queue.items, isEmpty);
 
@@ -130,7 +150,8 @@ void main() {
 
       expect(
         find.bySemanticsLabel(
-          'Reviewed Haven action. Draft one Focus Queue item. '
+          'Reviewed Haven action. Typed request reviewed locally. '
+          'Draft one Focus Queue item. '
           'Add “Review notes” to the private Focus Queue after confirmation. '
           'Saved local edit • confirmation required. Confirmation is required. '
           'Choose Confirm exact action to continue, or Change request to edit.',
@@ -177,7 +198,11 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('reviewHavenAction')));
     await tester.pump();
     owned.timer.pause();
-    await tester.tap(find.byKey(const ValueKey('executeHavenAction')));
+
+    final execute = find.byKey(const ValueKey('executeHavenAction'));
+    await tester.ensureVisible(execute);
+    await tester.pumpAndSettle();
+    await tester.tap(execute);
     await tester.pumpAndSettle();
 
     expect(
@@ -215,10 +240,208 @@ void main() {
 
     expect(find.text('Haven actions'), findsOneWidget);
     expect(
-      find.text('Typed locally • no microphone • no remote AI'),
+      find.text('Typed or voice transcript • local review • no remote AI'),
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey('reviewHavenAction')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('voice stays dormant until the action disclosure is confirmed', (
+    tester,
+  ) async {
+    final owned = await services();
+    owned.voice.acknowledgeDisclosure();
+    await tester.pumpWidget(app(owned));
+
+    expect(find.byKey(const ValueKey('havenActionVoiceInput')), findsOneWidget);
+    expect(owned.adapter.initializeCalls, 0);
+    expect(owned.adapter.listenCalls, 0);
+
+    await tester.tap(find.byKey(const ValueKey('havenActionVoiceInput')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Use voice for Haven actions?'), findsOneWidget);
+    expect(find.textContaining('keeps no raw audio'), findsOneWidget);
+    expect(find.textContaining('Nothing is reviewed or run'), findsOneWidget);
+    expect(owned.adapter.initializeCalls, 0);
+
+    await tester.tap(find.byKey(const ValueKey('confirmation-cancel')));
+    await tester.pumpAndSettle();
+
+    expect(owned.adapter.initializeCalls, 0);
+    expect(owned.adapter.listenCalls, 0);
+    expect(owned.timer.isRunning, isFalse);
+  });
+
+  testWidgets('voice creates only an editable draft before both action gates', (
+    tester,
+  ) async {
+    final owned = await services();
+    await tester.pumpWidget(app(owned));
+
+    await tester.tap(find.byKey(const ValueKey('havenActionVoiceInput')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirmation-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(owned.adapter.listenCalls, 1);
+    expect(
+      find.byKey(const ValueKey('havenActionVoiceListening')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('havenActionProposal')), findsNothing);
+    expect(owned.timer.isRunning, isFalse);
+
+    owned.adapter.emitResult('start focus');
+    await tester.pump();
+
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const ValueKey('havenActionInput')))
+          .controller!
+          .text,
+      'start focus',
+    );
+    expect(find.byKey(const ValueKey('havenActionProposal')), findsNothing);
+    expect(owned.timer.isRunning, isFalse);
+
+    await tester.tap(find.byKey(const ValueKey('stopHavenActionVoice')));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Voice draft ready.'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('discardHavenActionVoice')),
+      findsOneWidget,
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('havenActionInput')),
+      'please start focus',
+    );
+    await tester.tap(find.byKey(const ValueKey('reviewHavenAction')));
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('havenActionProposal')), findsOneWidget);
+    expect(find.text('Voice transcript • reviewed locally'), findsOneWidget);
+    expect(owned.timer.isRunning, isFalse);
+
+    final execute = find.byKey(const ValueKey('executeHavenAction'));
+    await tester.ensureVisible(execute);
+    await tester.pumpAndSettle();
+    await tester.tap(execute);
+    await tester.pumpAndSettle();
+
+    expect(owned.timer.isRunning, isTrue);
+    expect(find.byKey(const ValueKey('havenActionProposal')), findsNothing);
+
+    owned.timer.pause();
+    await tester.pump();
+    expect(owned.timer.isRunning, isFalse);
+  });
+
+  testWidgets('discard restores the exact typed draft without a proposal', (
+    tester,
+  ) async {
+    final owned = await services();
+    await tester.pumpWidget(app(owned));
+    final input = find.byKey(const ValueKey('havenActionInput'));
+    await tester.enterText(input, 'Keep this typed draft');
+
+    await tester.tap(find.byKey(const ValueKey('havenActionVoiceInput')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirmation-confirm')));
+    await tester.pumpAndSettle();
+    owned.adapter.emitResult('pause');
+    await tester.pump();
+    expect(
+      tester.widget<TextField>(input).controller!.text,
+      'Keep this typed draft pause',
+    );
+
+    await tester.tap(find.byKey(const ValueKey('discardHavenActionVoice')));
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.widget<TextField>(input).controller!.text,
+      'Keep this typed draft',
+    );
+    expect(find.byKey(const ValueKey('havenActionProposal')), findsNothing);
+    expect(owned.timer.isRunning, isFalse);
+    expect(owned.adapter.cancelCalls, 1);
+  });
+
+  testWidgets('protected spoken words cannot create an execution control', (
+    tester,
+  ) async {
+    final owned = await services();
+    await tester.pumpWidget(app(owned));
+
+    await tester.tap(find.byKey(const ValueKey('havenActionVoiceInput')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('confirmation-confirm')));
+    await tester.pumpAndSettle();
+    owned.adapter.emitResult('delete my account');
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('stopHavenActionVoice')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('reviewHavenAction')));
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('havenActionProposal')), findsNothing);
+    expect(find.byKey(const ValueKey('executeHavenAction')), findsNothing);
+    expect(
+      find.text(
+        'That action stays in its protected screen and cannot be run here.',
+      ),
+      findsOneWidget,
+    );
+  });
+}
+
+class _HavenVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
+  int initializeCalls = 0;
+  int listenCalls = 0;
+  int stopCalls = 0;
+  int cancelCalls = 0;
+  bool listening = false;
+  VoiceRecognitionResultCallback? _onResult;
+
+  @override
+  bool get isListening => listening;
+
+  @override
+  Future<bool> get hasPermission async => true;
+
+  @override
+  Future<bool> initialize({
+    required VoiceRecognitionStatusCallback onStatus,
+    required VoiceRecognitionErrorCallback onError,
+  }) async {
+    initializeCalls += 1;
+    return true;
+  }
+
+  @override
+  Future<void> listen({
+    required VoiceRecognitionResultCallback onResult,
+  }) async {
+    listenCalls += 1;
+    _onResult = onResult;
+    listening = true;
+  }
+
+  @override
+  Future<void> stop() async {
+    stopCalls += 1;
+    listening = false;
+  }
+
+  @override
+  Future<void> cancel() async {
+    cancelCalls += 1;
+    listening = false;
+  }
+
+  void emitResult(String transcript) {
+    _onResult?.call(transcript, false);
+  }
 }

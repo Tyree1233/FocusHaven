@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 212 Voice-to-Coach is implemented
+Status: living product contract; Phase 213 Safe Voice Commands is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -50,7 +50,7 @@ Every future phase must preserve these rules:
 | Experience | Status | Current truth | Next outcome |
 | --- | --- | --- | --- |
 | Core timer and recovery | Shipped | Focus and break sessions, persistence, pause/resume/reset/add-time, completion, and recovery are implemented. | Remain the sole authority behind Haven actions and future assistant inputs. |
-| Haven Action Engine | Shipped | Typed local requests become versioned proposals with explanation, state checks, exact confirmation where required, replay protection, and service-owned execution. | Remain the shared policy boundary for later voice and system-assistant inputs. |
+| Haven Action Engine | Shipped | Typed requests and reviewed voice transcripts become versioned proposals with explanation, state checks, exact confirmation where required, replay protection, and service-owned execution. | Remain the shared policy boundary for later planner and system-assistant inputs. |
 | Focus Queue | Shipped | Local task ordering, editing, completion, restoration, and one confirmed typed draft action exist. | Expand only through bounded, independently confirmed proposals. |
 | Living Lantern | Shipped | A compassionate, ephemeral timer companion is derived locally without health loss or scoring. | Join the unified Haven Loop without adding pressure mechanics. |
 | Haven Journey and Focus Garden | Partial | Lantern, campsite, cabin, garden, and sanctuary stages are locally derived and cannot regress. | Add more restorative scenes and reflection-driven personalization without levels, locks, or public ranks. |
@@ -65,7 +65,7 @@ Every future phase must preserve these rules:
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Planned | There is no general AI orchestration or goal decomposition engine. | Convert an explicit goal into explainable task, session, and schedule proposals. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
-| Safe voice commands | Planned | Voice cannot currently control the timer or queue. | Route transcripts through the same typed Haven Action Engine and confirmation policy. |
+| Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
@@ -159,7 +159,17 @@ Exit criteria:
   visual confirmation;
 - accessibility does not depend on speech recognition or spoken output.
 
-Status: planned. Safe voice commands remain unimplemented.
+Status: implemented in the current source. The shared transcription service
+creates only an editable draft. Voice input cannot propose while listening and
+cannot execute after transcription. The person must separately tap **Review
+action**, inspect the source-labelled proposal, and then use **Run reviewed
+action** or **Confirm exact action**. Typed and voice sources share the same
+allowlist, state token, expiry, argument bounds, protected-action rejection,
+exact confirmation, and replay protection. Local Coach and system-intent text
+are rejected as proposal sources. No remote AI, backend call, direct service
+path, new dependency, or new permission was added in Phase 213. Fresh signed
+binaries, real-device acceptance, accessibility checks, and store disclosure
+review remain required before distribution.
 
 ### Phase 214 — Haven AI planner
 

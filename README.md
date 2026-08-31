@@ -615,7 +615,7 @@ over a network. Nothing is sent to Focus Coach until the person taps **Send**;
 local Focus Coach remains the default, while enhanced remote coaching remains
 separately gated and disabled.
 
-Phase 210 now ships the first **typed Haven Action Engine**. From the timer
+Phase 210 ships the first **typed Haven Action Engine**. From the timer
 screen, **Haven actions** can locally review one bounded timer, navigation, or
 Focus Queue request before execution. Stateful queue edits require an exact
 visual confirmation; stale and replayed proposals fail closed; and mutations
@@ -627,12 +627,21 @@ effect, risk, and available choices. Keyboard submission and **Change request**
 keep the typed path editable, while every consumed proposal disappears after
 success or rejection so it cannot remain available for another tap.
 
-Voice-to-Coach does not give speech any timer, queue, account, purchase,
-permission, Firebase, or release authority. Safe voice commands and general AI
-orchestration remain future work. Because Phase 212 adds native permissions and
-a speech dependency, fresh Android and Apple release builds, permission checks,
-store disclosures, and candidate validation are required before distribution;
-earlier validated artifacts do not cover this capability.
+Phase 213 now implements **Safe Voice Commands** without giving speech new
+authority. An informed tap starts the same bounded transcription service and
+fills an editable Haven action draft. Speech does not create a proposal or run
+anything: the person must separately tap **Review action**, inspect the
+source-labelled proposal, and then choose **Run reviewed action** or **Confirm
+exact action**. Typed and voice proposals share the same allowlist, current
+state, expiry, argument bounds, protected-action rejection, exact confirmation,
+and replay protection. Local Coach output and system intents are rejected as
+proposal sources; general AI orchestration remains future work.
+
+Because Phases 212 and 213 use native microphone and speech-recognition
+capabilities, fresh Android and Apple release builds, real-device permission and
+command checks, accessibility verification, store disclosures, and candidate
+validation are required before distribution. Earlier validated artifacts do
+not cover these capabilities.
 
 ## Architecture
 
