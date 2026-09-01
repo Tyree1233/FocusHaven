@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/models/focus_milestone.dart';
 import 'package:focushaven/widgets/focus_milestones_sheet.dart';
 
 Widget _app(List<FocusMilestone> milestones) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ThemeData.dark(),
     home: Scaffold(body: FocusMilestonesSheet(milestones: milestones)),
   );

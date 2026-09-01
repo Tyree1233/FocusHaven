@@ -1976,5 +1976,921 @@
       "risk": {"type": "String", "example": "Saved local edit • confirmation required"},
       "nextStep": {"type": "String", "example": "Confirmation is required."}
     }
+  },
+  "accountTitle": "Your FocusHaven account",
+  "@accountTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for accountTitle."
+  },
+  "accountCloseTooltip": "Close account settings",
+  "@accountCloseTooltip": {
+    "description": "Phase 215G-B5 source-catalog copy for accountCloseTooltip."
+  },
+  "accountSignedInAs": "Signed in as {name}",
+  "@accountSignedInAs": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignedInAs.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Tyree Jones"
+      }
+    }
+  },
+  "accountSignedOutDescription": "Sign in to protect your focus history and use cloud backup.",
+  "@accountSignedOutDescription": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignedOutDescription."
+  },
+  "accountSignedInPrivacy": "Your focus data stays on this device. FocusHaven Pro can also back it up privately to your account.",
+  "@accountSignedInPrivacy": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignedInPrivacy."
+  },
+  "accountSignedOutPrivacy": "Your focus data stays private on this device. Sign in only when you want optional cloud backup.",
+  "@accountSignedOutPrivacy": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignedOutPrivacy."
+  },
+  "accountSigningOut": "Signing out…",
+  "@accountSigningOut": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSigningOut."
+  },
+  "accountSignOut": "Sign out",
+  "@accountSignOut": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignOut."
+  },
+  "accountSigningIn": "Signing in…",
+  "@accountSigningIn": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSigningIn."
+  },
+  "accountContinueWithApple": "Continue with Apple",
+  "@accountContinueWithApple": {
+    "description": "Phase 215G-B5 source-catalog copy for accountContinueWithApple."
+  },
+  "accountSignInWithGoogle": "Sign in with Google",
+  "@accountSignInWithGoogle": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignInWithGoogle."
+  },
+  "accountDeleteCloudBackup": "Delete cloud backup",
+  "@accountDeleteCloudBackup": {
+    "description": "Phase 215G-B5 source-catalog copy for accountDeleteCloudBackup."
+  },
+  "accountDeleteAccount": "Delete account",
+  "@accountDeleteAccount": {
+    "description": "Phase 215G-B5 source-catalog copy for accountDeleteAccount."
+  },
+  "accountDeleteLocalData": "Delete local data",
+  "@accountDeleteLocalData": {
+    "description": "Phase 215G-B5 source-catalog copy for accountDeleteLocalData."
+  },
+  "accountPro": "FocusHaven Pro",
+  "@accountPro": {
+    "description": "Phase 215G-B5 source-catalog copy for accountPro."
+  },
+  "accountDiscoverProfile": "Discover your focus profile",
+  "@accountDiscoverProfile": {
+    "description": "Phase 215G-B5 source-catalog copy for accountDiscoverProfile."
+  },
+  "accountAppearance": "Appearance",
+  "@accountAppearance": {
+    "description": "Phase 215G-B5 source-catalog copy for accountAppearance."
+  },
+  "accountPrivacyPolicy": "Privacy Policy",
+  "@accountPrivacyPolicy": {
+    "description": "Phase 215G-B5 source-catalog copy for accountPrivacyPolicy."
+  },
+  "accountActionFailed": "That account action could not be completed. Please try again.",
+  "@accountActionFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for accountActionFailed."
+  },
+  "accountSignInNotCompleted": "Sign-in was not completed. Please try again.",
+  "@accountSignInNotCompleted": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignInNotCompleted."
+  },
+  "accountSignInFailed": "Sign-in could not be completed. Please try again.",
+  "@accountSignInFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignInFailed."
+  },
+  "accountSignOutFailed": "Sign-out could not be completed. Please try again.",
+  "@accountSignOutFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignOutFailed."
+  },
+  "cloudBackupSignInToBackUp": "Sign in with Google to back up your focus data",
+  "@cloudBackupSignInToBackUp": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudBackupSignInToBackUp."
+  },
+  "cloudBackupUpgradeToBackUp": "Upgrade to Pro to use cloud backup",
+  "@cloudBackupUpgradeToBackUp": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudBackupUpgradeToBackUp."
+  },
+  "cloudBackupSucceeded": "Focus data backed up securely",
+  "@cloudBackupSucceeded": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudBackupSucceeded."
+  },
+  "cloudBackupFailed": "Backup failed. Check your Firebase setup.",
+  "@cloudBackupFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudBackupFailed."
+  },
+  "cloudBackupUnavailable": "Cloud backup could not be completed right now",
+  "@cloudBackupUnavailable": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudBackupUnavailable."
+  },
+  "cloudRestoreSignIn": "Sign in with Google to restore your focus data",
+  "@cloudRestoreSignIn": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreSignIn."
+  },
+  "cloudRestoreUpgrade": "Upgrade to Pro to restore cloud backup",
+  "@cloudRestoreUpgrade": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreUpgrade."
+  },
+  "cloudRestoreSucceeded": "Focus data restored from cloud",
+  "@cloudRestoreSucceeded": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreSucceeded."
+  },
+  "cloudRestoreInvalid": "That cloud backup could not be restored",
+  "@cloudRestoreInvalid": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreInvalid."
+  },
+  "cloudRestoreNotFound": "No cloud backup found yet",
+  "@cloudRestoreNotFound": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreNotFound."
+  },
+  "cloudRestoreUnavailable": "Cloud restore is unavailable. Check your connection and try again.",
+  "@cloudRestoreUnavailable": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreUnavailable."
+  },
+  "cloudRestoreCouldNotComplete": "Cloud restore could not be completed right now",
+  "@cloudRestoreCouldNotComplete": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreCouldNotComplete."
+  },
+  "cloudBackupInProgress": "Backing up…",
+  "@cloudBackupInProgress": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudBackupInProgress."
+  },
+  "cloudBackupAction": "Back up",
+  "@cloudBackupAction": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudBackupAction."
+  },
+  "cloudRestoreInProgress": "Restoring…",
+  "@cloudRestoreInProgress": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreInProgress."
+  },
+  "cloudRestoreAction": "Restore",
+  "@cloudRestoreAction": {
+    "description": "Phase 215G-B5 source-catalog copy for cloudRestoreAction."
+  },
+  "proCompletePurchase": "Complete your purchase in the store window",
+  "@proCompletePurchase": {
+    "description": "Phase 215G-B5 source-catalog copy for proCompletePurchase."
+  },
+  "proPurchaseCouldNotStart": "The store could not start this purchase right now",
+  "@proPurchaseCouldNotStart": {
+    "description": "Phase 215G-B5 source-catalog copy for proPurchaseCouldNotStart."
+  },
+  "proCheckingPreviousPurchases": "Checking the store for previous purchases",
+  "@proCheckingPreviousPurchases": {
+    "description": "Phase 215G-B5 source-catalog copy for proCheckingPreviousPurchases."
+  },
+  "proRestoreCouldNotStart": "Previous purchases could not be checked right now",
+  "@proRestoreCouldNotStart": {
+    "description": "Phase 215G-B5 source-catalog copy for proRestoreCouldNotStart."
+  },
+  "proBackTooltip": "Back",
+  "@proBackTooltip": {
+    "description": "Phase 215G-B5 source-catalog copy for proBackTooltip."
+  },
+  "proTitle": "FocusHaven Pro",
+  "@proTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for proTitle."
+  },
+  "proLegacyDescription": "Protect your focus progress with secure cloud backup and restore it on your other devices.",
+  "@proLegacyDescription": {
+    "description": "Phase 215G-B5 source-catalog copy for proLegacyDescription."
+  },
+  "proSubscriptionDescription": "Core focus tools and private local coaching stay free. Pro subscriptions will add enhanced coaching and secure continuity across devices.",
+  "@proSubscriptionDescription": {
+    "description": "Phase 215G-B5 source-catalog copy for proSubscriptionDescription."
+  },
+  "proBenefitSecureBackup": "Secure cloud backup",
+  "@proBenefitSecureBackup": {
+    "description": "Phase 215G-B5 source-catalog copy for proBenefitSecureBackup."
+  },
+  "proBenefitRestoreDevice": "Restore on another device",
+  "@proBenefitRestoreDevice": {
+    "description": "Phase 215G-B5 source-catalog copy for proBenefitRestoreDevice."
+  },
+  "proBenefitLifetime": "One-time lifetime unlock",
+  "@proBenefitLifetime": {
+    "description": "Phase 215G-B5 source-catalog copy for proBenefitLifetime."
+  },
+  "proBenefitEnhancedCoaching": "Enhanced AI coaching allowance",
+  "@proBenefitEnhancedCoaching": {
+    "description": "Phase 215G-B5 source-catalog copy for proBenefitEnhancedCoaching."
+  },
+  "proBenefitMonthly": "Monthly plan for flexible access",
+  "@proBenefitMonthly": {
+    "description": "Phase 215G-B5 source-catalog copy for proBenefitMonthly."
+  },
+  "proBenefitAnnual": "Annual plan with early-supporter savings",
+  "@proBenefitAnnual": {
+    "description": "Phase 215G-B5 source-catalog copy for proBenefitAnnual."
+  },
+  "proActive": "FocusHaven Pro is active",
+  "@proActive": {
+    "description": "Phase 215G-B5 source-catalog copy for proActive."
+  },
+  "proStatusUnavailable": "Pro status is unavailable",
+  "@proStatusUnavailable": {
+    "description": "Phase 215G-B5 source-catalog copy for proStatusUnavailable."
+  },
+  "proCheckingStatus": "Checking Pro status",
+  "@proCheckingStatus": {
+    "description": "Phase 215G-B5 source-catalog copy for proCheckingStatus."
+  },
+  "proPlansComingSoon": "Monthly and annual plans coming soon",
+  "@proPlansComingSoon": {
+    "description": "Phase 215G-B5 source-catalog copy for proPlansComingSoon."
+  },
+  "proUnavailable": "Pro is not available yet",
+  "@proUnavailable": {
+    "description": "Phase 215G-B5 source-catalog copy for proUnavailable."
+  },
+  "proUnlockForPrice": "Unlock Pro for {price}",
+  "@proUnlockForPrice": {
+    "description": "Phase 215G-B5 source-catalog copy for proUnlockForPrice.",
+    "placeholders": {
+      "price": {
+        "type": "String",
+        "example": "$9.99"
+      }
+    }
+  },
+  "proRestorePurchases": "Restore purchases",
+  "@proRestorePurchases": {
+    "description": "Phase 215G-B5 source-catalog copy for proRestorePurchases."
+  },
+  "actionCancel": "Cancel",
+  "@actionCancel": {
+    "description": "Phase 215G-B5 source-catalog copy for actionCancel."
+  },
+  "journalCreateFailed": "Reflection could not be created. Please try again.",
+  "@journalCreateFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for journalCreateFailed."
+  },
+  "journalUpdateFailed": "Reflection could not be updated. Please try again.",
+  "@journalUpdateFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for journalUpdateFailed."
+  },
+  "journalTitle": "Reflection journal",
+  "@journalTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for journalTitle."
+  },
+  "journalPrivacy": "A private space saved only on this device.",
+  "@journalPrivacy": {
+    "description": "Phase 215G-B5 source-catalog copy for journalPrivacy."
+  },
+  "journalTodayPrompt": "Today’s prompt: {prompt}",
+  "@journalTodayPrompt": {
+    "description": "Phase 215G-B5 source-catalog copy for journalTodayPrompt.",
+    "placeholders": {
+      "prompt": {
+        "type": "String",
+        "example": "What felt steady today?"
+      }
+    }
+  },
+  "journalMoodSnapshot": "Mood snapshot",
+  "@journalMoodSnapshot": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodSnapshot."
+  },
+  "journalMostCommonMood": "Over the last 7 days, you most often felt {mood}.",
+  "@journalMostCommonMood": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMostCommonMood.",
+    "placeholders": {
+      "mood": {
+        "type": "String",
+        "example": "calm"
+      }
+    }
+  },
+  "journalMoodCount": "{mood} {count}",
+  "@journalMoodCount": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodCount.",
+    "placeholders": {
+      "mood": {
+        "type": "String",
+        "example": "Calm"
+      },
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "journalWriteToday": "Write today’s reflection",
+  "@journalWriteToday": {
+    "description": "Phase 215G-B5 source-catalog copy for journalWriteToday."
+  },
+  "journalWriteAnother": "Write another reflection",
+  "@journalWriteAnother": {
+    "description": "Phase 215G-B5 source-catalog copy for journalWriteAnother."
+  },
+  "journalRecent": "Recent reflections",
+  "@journalRecent": {
+    "description": "Phase 215G-B5 source-catalog copy for journalRecent."
+  },
+  "journalEmpty": "Your first reflection will appear here.",
+  "@journalEmpty": {
+    "description": "Phase 215G-B5 source-catalog copy for journalEmpty."
+  },
+  "journalEditTooltip": "Edit reflection",
+  "@journalEditTooltip": {
+    "description": "Phase 215G-B5 source-catalog copy for journalEditTooltip."
+  },
+  "journalDialogTitle": "Today's reflection",
+  "@journalDialogTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for journalDialogTitle."
+  },
+  "journalFeelingQuestion": "How are you feeling?",
+  "@journalFeelingQuestion": {
+    "description": "Phase 215G-B5 source-catalog copy for journalFeelingQuestion."
+  },
+  "journalSave": "Save reflection",
+  "@journalSave": {
+    "description": "Phase 215G-B5 source-catalog copy for journalSave."
+  },
+  "journalMoodCalm": "Calm",
+  "@journalMoodCalm": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodCalm."
+  },
+  "journalMoodFocused": "Focused",
+  "@journalMoodFocused": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodFocused."
+  },
+  "journalMoodTired": "Tired",
+  "@journalMoodTired": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodTired."
+  },
+  "journalMoodStressed": "Stressed",
+  "@journalMoodStressed": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodStressed."
+  },
+  "journalMoodGrateful": "Grateful",
+  "@journalMoodGrateful": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodGrateful."
+  },
+  "journalMoodCalmSentence": "calm",
+  "@journalMoodCalmSentence": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodCalmSentence."
+  },
+  "journalMoodFocusedSentence": "focused",
+  "@journalMoodFocusedSentence": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodFocusedSentence."
+  },
+  "journalMoodTiredSentence": "tired",
+  "@journalMoodTiredSentence": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodTiredSentence."
+  },
+  "journalMoodStressedSentence": "stressed",
+  "@journalMoodStressedSentence": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodStressedSentence."
+  },
+  "journalMoodGratefulSentence": "grateful",
+  "@journalMoodGratefulSentence": {
+    "description": "Phase 215G-B5 source-catalog copy for journalMoodGratefulSentence."
+  },
+  "profileSaveFailed": "Your focus profile could not be saved. Please try again.",
+  "@profileSaveFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for profileSaveFailed."
+  },
+  "profileQuestionNaturalTime": "When does focused work feel most natural?",
+  "@profileQuestionNaturalTime": {
+    "description": "Phase 215G-B5 source-catalog copy for profileQuestionNaturalTime."
+  },
+  "profileChoiceEarlyDay": "Early in the day",
+  "@profileChoiceEarlyDay": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceEarlyDay."
+  },
+  "profileChoiceBuildMomentum": "Once I build momentum",
+  "@profileChoiceBuildMomentum": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceBuildMomentum."
+  },
+  "profileChoiceEvening": "Later in the evening",
+  "@profileChoiceEvening": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceEvening."
+  },
+  "profileQuestionEnvironment": "Which environment helps you settle in?",
+  "@profileQuestionEnvironment": {
+    "description": "Phase 215G-B5 source-catalog copy for profileQuestionEnvironment."
+  },
+  "profileChoiceQuiet": "Quiet and uninterrupted",
+  "@profileChoiceQuiet": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceQuiet."
+  },
+  "profileChoiceGentleSound": "Gentle music or ambient sound",
+  "@profileChoiceGentleSound": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceGentleSound."
+  },
+  "profileChoiceClearPlan": "A clear plan and small steps",
+  "@profileChoiceClearPlan": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceClearPlan."
+  },
+  "profileQuestionStuck": "When you feel stuck, what helps most?",
+  "@profileQuestionStuck": {
+    "description": "Phase 215G-B5 source-catalog copy for profileQuestionStuck."
+  },
+  "profileChoiceRemoveDistractions": "Removing every distraction",
+  "@profileChoiceRemoveDistractions": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceRemoveDistractions."
+  },
+  "profileChoiceBriefReset": "Taking a brief reset",
+  "@profileChoiceBriefReset": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceBriefReset."
+  },
+  "profileChoiceTinyAction": "Starting with one tiny action",
+  "@profileChoiceTinyAction": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceTinyAction."
+  },
+  "profileQuestionSession": "What kind of session sounds best?",
+  "@profileQuestionSession": {
+    "description": "Phase 215G-B5 source-catalog copy for profileQuestionSession."
+  },
+  "profileChoiceLongBlock": "A long, uninterrupted block",
+  "@profileChoiceLongBlock": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceLongBlock."
+  },
+  "profileChoiceCalmRhythm": "A calm, flexible rhythm",
+  "@profileChoiceCalmRhythm": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceCalmRhythm."
+  },
+  "profileChoiceQuickSprint": "A quick, energizing sprint",
+  "@profileChoiceQuickSprint": {
+    "description": "Phase 215G-B5 source-catalog copy for profileChoiceQuickSprint."
+  },
+  "profileTypeClearStarter": "Clear Starter",
+  "@profileTypeClearStarter": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTypeClearStarter."
+  },
+  "profileTypeMomentumBuilder": "Momentum Builder",
+  "@profileTypeMomentumBuilder": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTypeMomentumBuilder."
+  },
+  "profileTypeDeepDiver": "Deep Diver",
+  "@profileTypeDeepDiver": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTypeDeepDiver."
+  },
+  "profileTypeGentleFlow": "Gentle Flow",
+  "@profileTypeGentleFlow": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTypeGentleFlow."
+  },
+  "profileTypeNightOwl": "Night Owl",
+  "@profileTypeNightOwl": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTypeNightOwl."
+  },
+  "profileTipClearStarter": "Protect your best early window with one clear intention and a short timer.",
+  "@profileTipClearStarter": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTipClearStarter."
+  },
+  "profileTipMomentumBuilder": "Start with a small five-minute step. Momentum is your best fuel.",
+  "@profileTipMomentumBuilder": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTipMomentumBuilder."
+  },
+  "profileTipDeepDiver": "Create a quiet, distraction-free block and let yourself stay with one meaningful task.",
+  "@profileTipDeepDiver": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTipDeepDiver."
+  },
+  "profileTipGentleFlow": "Use calm transitions, a comfortable pace, and intentional breaks to stay steady.",
+  "@profileTipGentleFlow": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTipGentleFlow."
+  },
+  "profileTipNightOwl": "Plan your most important work for your later high-energy window and protect your wind-down.",
+  "@profileTipNightOwl": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTipNightOwl."
+  },
+  "profileTipDefault": "Choose a calm space and one clear next step.",
+  "@profileTipDefault": {
+    "description": "Phase 215G-B5 source-catalog copy for profileTipDefault."
+  },
+  "profileQuestionProgress": "{current} of {total}",
+  "@profileQuestionProgress": {
+    "description": "Phase 215G-B5 source-catalog copy for profileQuestionProgress.",
+    "placeholders": {
+      "current": {
+        "type": "int",
+        "example": "1"
+      },
+      "total": {
+        "type": "int",
+        "example": "4"
+      }
+    }
+  },
+  "profileBackQuestion": "Back to previous question",
+  "@profileBackQuestion": {
+    "description": "Phase 215G-B5 source-catalog copy for profileBackQuestion."
+  },
+  "profileIntroductionTitle": "Find your focus profile",
+  "@profileIntroductionTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for profileIntroductionTitle."
+  },
+  "profileIntroductionDescription": "Answer four quick questions for a practical focus style and tip.",
+  "@profileIntroductionDescription": {
+    "description": "Phase 215G-B5 source-catalog copy for profileIntroductionDescription."
+  },
+  "profileCurrentDescription": "Your current profile is {profile}. Retake the quiz anytime as your habits change.",
+  "@profileCurrentDescription": {
+    "description": "Phase 215G-B5 source-catalog copy for profileCurrentDescription.",
+    "placeholders": {
+      "profile": {
+        "type": "String",
+        "example": "Gentle Flow"
+      }
+    }
+  },
+  "profileStartQuiz": "Start quiz",
+  "@profileStartQuiz": {
+    "description": "Phase 215G-B5 source-catalog copy for profileStartQuiz."
+  },
+  "profileRetakeQuiz": "Retake quiz",
+  "@profileRetakeQuiz": {
+    "description": "Phase 215G-B5 source-catalog copy for profileRetakeQuiz."
+  },
+  "profileResultTitle": "Your focus profile",
+  "@profileResultTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for profileResultTitle."
+  },
+  "profileUseThis": "Use this profile",
+  "@profileUseThis": {
+    "description": "Phase 215G-B5 source-catalog copy for profileUseThis."
+  },
+  "profileBackToAccount": "Back to account settings",
+  "@profileBackToAccount": {
+    "description": "Phase 215G-B5 source-catalog copy for profileBackToAccount."
+  },
+  "weekdayMondayShort": "Mon",
+  "@weekdayMondayShort": {
+    "description": "Phase 215G-B5 source-catalog copy for weekdayMondayShort."
+  },
+  "weekdayTuesdayShort": "Tue",
+  "@weekdayTuesdayShort": {
+    "description": "Phase 215G-B5 source-catalog copy for weekdayTuesdayShort."
+  },
+  "weekdayWednesdayShort": "Wed",
+  "@weekdayWednesdayShort": {
+    "description": "Phase 215G-B5 source-catalog copy for weekdayWednesdayShort."
+  },
+  "weekdayThursdayShort": "Thu",
+  "@weekdayThursdayShort": {
+    "description": "Phase 215G-B5 source-catalog copy for weekdayThursdayShort."
+  },
+  "weekdayFridayShort": "Fri",
+  "@weekdayFridayShort": {
+    "description": "Phase 215G-B5 source-catalog copy for weekdayFridayShort."
+  },
+  "weekdaySaturdayShort": "Sat",
+  "@weekdaySaturdayShort": {
+    "description": "Phase 215G-B5 source-catalog copy for weekdaySaturdayShort."
+  },
+  "weekdaySundayShort": "Sun",
+  "@weekdaySundayShort": {
+    "description": "Phase 215G-B5 source-catalog copy for weekdaySundayShort."
+  },
+  "reminderAllowNotificationsSchedule": "Allow notifications to schedule a focus time.",
+  "@reminderAllowNotificationsSchedule": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderAllowNotificationsSchedule."
+  },
+  "reminderSettingsFailed": "Reminder settings could not be updated right now.",
+  "@reminderSettingsFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderSettingsFailed."
+  },
+  "reminderScheduledReceipt": "Focus time scheduled for {time}.",
+  "@reminderScheduledReceipt": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderScheduledReceipt.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "9:00 AM"
+      }
+    }
+  },
+  "reminderAllowNotificationsTest": "Allow notifications to send a test alert.",
+  "@reminderAllowNotificationsTest": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderAllowNotificationsTest."
+  },
+  "reminderTestFailed": "The test notification could not be sent right now.",
+  "@reminderTestFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderTestFailed."
+  },
+  "reminderDaySeparator": ", ",
+  "@reminderDaySeparator": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderDaySeparator."
+  },
+  "reminderTitle": "Scheduled focus time",
+  "@reminderTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderTitle."
+  },
+  "reminderDescription": "Choose the days and time for a gentle invitation to focus. You can change or turn it off at any time.",
+  "@reminderDescription": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderDescription."
+  },
+  "reminderScheduled": "Focus time is scheduled",
+  "@reminderScheduled": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderScheduled."
+  },
+  "reminderNotScheduled": "No focus time scheduled",
+  "@reminderNotScheduled": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderNotScheduled."
+  },
+  "reminderTimeAndDays": "{time} • {days}",
+  "@reminderTimeAndDays": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderTimeAndDays.",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "9:00 AM"
+      },
+      "days": {
+        "type": "String",
+        "example": "Mon, Wed, Fri"
+      }
+    }
+  },
+  "reminderRepeatOn": "Repeat on",
+  "@reminderRepeatOn": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderRepeatOn."
+  },
+  "reminderDayGuidance": "Choose at least one day. Changes are saved when you choose a focus time.",
+  "@reminderDayGuidance": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderDayGuidance."
+  },
+  "reminderSaving": "Saving focus time…",
+  "@reminderSaving": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderSaving."
+  },
+  "reminderUpdateTime": "Update focus time",
+  "@reminderUpdateTime": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderUpdateTime."
+  },
+  "reminderChooseTime": "Choose focus time",
+  "@reminderChooseTime": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderChooseTime."
+  },
+  "reminderSendingTest": "Sending test notification…",
+  "@reminderSendingTest": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderSendingTest."
+  },
+  "reminderSendTest": "Send a test notification",
+  "@reminderSendTest": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderSendTest."
+  },
+  "reminderDashboardTooltip": "Daily focus reminder",
+  "@reminderDashboardTooltip": {
+    "description": "Phase 215G-B5 source-catalog copy for reminderDashboardTooltip."
+  },
+  "milestonesTitle": "Focus milestones",
+  "@milestonesTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestonesTitle."
+  },
+  "milestonesUnlocked": "{unlocked} of {total} unlocked",
+  "@milestonesUnlocked": {
+    "description": "Phase 215G-B5 source-catalog copy for milestonesUnlocked.",
+    "placeholders": {
+      "unlocked": {
+        "type": "int",
+        "example": "3"
+      },
+      "total": {
+        "type": "int",
+        "example": "8"
+      }
+    }
+  },
+  "milestoneFirstStepTitle": "First step",
+  "@milestoneFirstStepTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneFirstStepTitle."
+  },
+  "milestoneFirstStepDetail": "Complete your first focus session.",
+  "@milestoneFirstStepDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneFirstStepDetail."
+  },
+  "milestoneWeeklyRhythmTitle": "Weekly rhythm",
+  "@milestoneWeeklyRhythmTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneWeeklyRhythmTitle."
+  },
+  "milestoneWeeklyRhythmDetail": "Complete 3 focus sessions in seven days.",
+  "@milestoneWeeklyRhythmDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneWeeklyRhythmDetail."
+  },
+  "milestoneMomentumTitle": "Momentum",
+  "@milestoneMomentumTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneMomentumTitle."
+  },
+  "milestoneMomentumDetail": "Complete 5 focus sessions in total.",
+  "@milestoneMomentumDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneMomentumDetail."
+  },
+  "milestoneHalfHourTitle": "Half-hour haven",
+  "@milestoneHalfHourTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneHalfHourTitle."
+  },
+  "milestoneHalfHourDetail": "Reach 30 total minutes of focus.",
+  "@milestoneHalfHourDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneHalfHourDetail."
+  },
+  "milestoneCenturyTitle": "Century club",
+  "@milestoneCenturyTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneCenturyTitle."
+  },
+  "milestoneCenturyDetail": "Reach 100 total minutes of focus.",
+  "@milestoneCenturyDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneCenturyDetail."
+  },
+  "milestoneSteadyFlameTitle": "Steady flame",
+  "@milestoneSteadyFlameTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneSteadyFlameTitle."
+  },
+  "milestoneSteadyFlameDetail": "Build a 3-day focus streak.",
+  "@milestoneSteadyFlameDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneSteadyFlameDetail."
+  },
+  "milestoneDeepRootsTitle": "Deep roots",
+  "@milestoneDeepRootsTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneDeepRootsTitle."
+  },
+  "milestoneDeepRootsDetail": "Build a 7-day focus streak.",
+  "@milestoneDeepRootsDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneDeepRootsDetail."
+  },
+  "milestoneGoalGetterTitle": "Goal getter",
+  "@milestoneGoalGetterTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneGoalGetterTitle."
+  },
+  "milestoneGoalGetterDetail": "Reach your daily focus goal.",
+  "@milestoneGoalGetterDetail": {
+    "description": "Phase 215G-B5 source-catalog copy for milestoneGoalGetterDetail."
+  },
+  "focusHistoryCopyFailed": "Focus summary could not be copied right now.",
+  "@focusHistoryCopyFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryCopyFailed."
+  },
+  "focusHistorySessionSeconds": "{count, plural, =1 {1-second focus session} other {{count}-second focus session}}",
+  "@focusHistorySessionSeconds": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistorySessionSeconds.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "focusHistorySessionMinutes": "{count, plural, =1 {1-minute focus session} other {{count}-minute focus session}}",
+  "@focusHistorySessionMinutes": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistorySessionMinutes.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "focusHistorySessionMinutesSeconds": "{minutes} min {seconds} sec focus session",
+  "@focusHistorySessionMinutesSeconds": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistorySessionMinutesSeconds.",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "1"
+      },
+      "seconds": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "focusHistoryTitle": "All focus sessions",
+  "@focusHistoryTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryTitle."
+  },
+  "focusHistoryCompleted": "{count, plural, =1 {1 completed session} other {{count} completed sessions}}",
+  "@focusHistoryCompleted": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryCompleted.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "12"
+      }
+    }
+  },
+  "focusHistoryCopySummary": "Copy full summary",
+  "@focusHistoryCopySummary": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryCopySummary."
+  },
+  "focusHistoryThisWeek": "This week",
+  "@focusHistoryThisWeek": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryThisWeek."
+  },
+  "focusHistoryWeeklySummary": "{duration} • {count, plural, =1 {1 session} other {{count} sessions}}",
+  "@focusHistoryWeeklySummary": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryWeeklySummary.",
+    "placeholders": {
+      "duration": {
+        "type": "String",
+        "example": "45 minutes"
+      },
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "focusHistoryAll": "All",
+  "@focusHistoryAll": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryAll."
+  },
+  "focusHistoryEmptyRange": "No focus sessions in this time range yet.",
+  "@focusHistoryEmptyRange": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistoryEmptyRange."
+  },
+  "focusHistorySessionMetadata": "{duration} • {date} at {time}",
+  "@focusHistorySessionMetadata": {
+    "description": "Phase 215G-B5 source-catalog copy for focusHistorySessionMetadata.",
+    "placeholders": {
+      "duration": {
+        "type": "String",
+        "example": "25-minute focus session"
+      },
+      "date": {
+        "type": "String",
+        "example": "Today"
+      },
+      "time": {
+        "type": "String",
+        "example": "9:00 AM"
+      }
+    }
+  },
+  "privacyPolicyOpenFailed": "Unable to open the privacy policy right now.",
+  "@privacyPolicyOpenFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for privacyPolicyOpenFailed."
+  },
+  "deleteCloudBackupTitle": "Delete cloud backup?",
+  "@deleteCloudBackupTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteCloudBackupTitle."
+  },
+  "deleteCloudBackupMessage": "This permanently deletes the FocusHaven backup stored in your account. Your data on this device will stay here.",
+  "@deleteCloudBackupMessage": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteCloudBackupMessage."
+  },
+  "deleteCloudBackupKeep": "Keep backup",
+  "@deleteCloudBackupKeep": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteCloudBackupKeep."
+  },
+  "deleteCloudBackupConfirm": "Delete backup",
+  "@deleteCloudBackupConfirm": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteCloudBackupConfirm."
+  },
+  "deleteCloudBackupSucceeded": "Cloud backup deleted. Your local focus data remains on this device.",
+  "@deleteCloudBackupSucceeded": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteCloudBackupSucceeded."
+  },
+  "deleteCloudBackupFailed": "Unable to delete the cloud backup right now.",
+  "@deleteCloudBackupFailed": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteCloudBackupFailed."
+  },
+  "deleteLocalDataTitle": "Delete local data?",
+  "@deleteLocalDataTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteLocalDataTitle."
+  },
+  "deleteLocalDataMessage": "This permanently removes your timer history, coaching conversation, journal entries, tasks, parked thoughts, goals, profile, and appearance choices from this device. Your cloud backup will not be deleted.",
+  "@deleteLocalDataMessage": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteLocalDataMessage."
+  },
+  "deleteLocalDataKeep": "Keep my data",
+  "@deleteLocalDataKeep": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteLocalDataKeep."
+  },
+  "deleteLocalDataConfirm": "Delete local data",
+  "@deleteLocalDataConfirm": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteLocalDataConfirm."
+  },
+  "deleteAccountTitle": "Delete FocusHaven account?",
+  "@deleteAccountTitle": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteAccountTitle."
+  },
+  "deleteAccountMessage": "This permanently deletes your FocusHaven sign-in, cloud backup, and account-specific enhanced-coaching usage records. Your local focus data and store purchase history will stay on this device or with the store. You may be asked to sign in again to verify the request.",
+  "@deleteAccountMessage": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteAccountMessage."
+  },
+  "deleteAccountKeep": "Keep my account",
+  "@deleteAccountKeep": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteAccountKeep."
+  },
+  "deleteAccountConfirm": "Delete account",
+  "@deleteAccountConfirm": {
+    "description": "Phase 215G-B5 source-catalog copy for deleteAccountConfirm."
+  },
+  "accountDashboardTooltip": "Account",
+  "@accountDashboardTooltip": {
+    "description": "Phase 215G-B5 source-catalog copy for accountDashboardTooltip."
+  },
+  "accountSignInDashboardTooltip": "Sign in",
+  "@accountSignInDashboardTooltip": {
+    "description": "Phase 215G-B5 source-catalog copy for accountSignInDashboardTooltip."
   }
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/cloud_sync_service.dart';
 import 'package:focushaven/services/iap_service.dart';
@@ -87,6 +88,8 @@ Widget _app({
       cloudSyncServiceProvider.overrideWithValue(cloudService),
     ],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(),
       home: Scaffold(
         body: CloudBackupActions(

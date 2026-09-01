@@ -183,28 +183,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
               '${context.l10n.durationSecondsShort('$remainingSeconds')}';
   }
 
-  String _dateLabel(DateTime date) {
+  String _dateLabel(BuildContext context, DateTime date) {
     final localDate = date.toLocal();
     final now = DateTime.now().toLocal();
-    if (DateUtils.isSameDay(localDate, now)) return 'Today';
+    if (DateUtils.isSameDay(localDate, now)) return context.l10n.dateToday;
     if (DateUtils.isSameDay(localDate, now.subtract(const Duration(days: 1)))) {
-      return 'Yesterday';
+      return context.l10n.dateYesterday;
     }
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[localDate.month - 1]} ${localDate.day}';
+    return MaterialLocalizations.of(context).formatShortDate(localDate);
   }
 
   String _dashboardDateLabel(BuildContext context, DateTime date) {
@@ -330,9 +316,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     }
     if (!opened && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Unable to open the privacy policy right now.'),
-        ),
+        SnackBar(content: Text(context.l10n.privacyPolicyOpenFailed)),
       );
     }
   }
@@ -344,11 +328,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final confirmed = await ConfirmationDialog.show(
       context,
-      title: 'Delete cloud backup?',
-      message:
-          'This permanently deletes the FocusHaven backup stored in your account. Your data on this device will stay here.',
-      cancelLabel: 'Keep backup',
-      confirmLabel: 'Delete backup',
+      title: context.l10n.deleteCloudBackupTitle,
+      message: context.l10n.deleteCloudBackupMessage,
+      cancelLabel: context.l10n.deleteCloudBackupKeep,
+      confirmLabel: context.l10n.deleteCloudBackupConfirm,
       isDestructive: true,
     );
     if (!confirmed || !context.mounted) return;
@@ -359,8 +342,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
       SnackBar(
         content: Text(
           deleted
-              ? 'Cloud backup deleted. Your local focus data remains on this device.'
-              : 'Unable to delete the cloud backup right now.',
+              ? context.l10n.deleteCloudBackupSucceeded
+              : context.l10n.deleteCloudBackupFailed,
         ),
       ),
     );
@@ -380,11 +363,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final themes = ref.read(themeServiceProvider);
     final confirmed = await ConfirmationDialog.show(
       context,
-      title: 'Delete local data?',
-      message:
-          'This permanently removes your timer history, coaching conversation, journal entries, tasks, parked thoughts, goals, profile, and appearance choices from this device. Your cloud backup will not be deleted.',
-      cancelLabel: 'Keep my data',
-      confirmLabel: 'Delete local data',
+      title: context.l10n.deleteLocalDataTitle,
+      message: context.l10n.deleteLocalDataMessage,
+      cancelLabel: context.l10n.deleteLocalDataKeep,
+      confirmLabel: context.l10n.deleteLocalDataConfirm,
       isDestructive: true,
     );
     if (!confirmed || !context.mounted) return;
@@ -414,11 +396,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final confirmed = await ConfirmationDialog.show(
       context,
-      title: 'Delete FocusHaven account?',
-      message:
-          'This permanently deletes your FocusHaven sign-in, cloud backup, and account-specific enhanced-coaching usage records. Your local focus data and store purchase history will stay on this device or with the store. You may be asked to sign in again to verify the request.',
-      cancelLabel: 'Keep my account',
-      confirmLabel: 'Delete account',
+      title: context.l10n.deleteAccountTitle,
+      message: context.l10n.deleteAccountMessage,
+      cancelLabel: context.l10n.deleteAccountKeep,
+      confirmLabel: context.l10n.deleteAccountConfirm,
       isDestructive: true,
     );
     if (!confirmed || !context.mounted) return;
@@ -670,7 +651,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) => CompletedTasksSheet(dateLabel: _dateLabel),
+      builder: (sheetContext) => CompletedTasksSheet(
+        dateLabel: (date) => _dateLabel(sheetContext, date),
+      ),
     );
   }
 
@@ -729,43 +712,43 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final milestones = [
       FocusMilestone(
-        title: 'First step',
-        detail: 'Complete your first focus session.',
+        title: context.l10n.milestoneFirstStepTitle,
+        detail: context.l10n.milestoneFirstStepDetail,
         unlocked: timer.completedFocusSessions >= 1,
       ),
       FocusMilestone(
-        title: 'Weekly rhythm',
-        detail: 'Complete 3 focus sessions in seven days.',
+        title: context.l10n.milestoneWeeklyRhythmTitle,
+        detail: context.l10n.milestoneWeeklyRhythmDetail,
         unlocked: timer.weeklyFocusSessions >= 3,
       ),
       FocusMilestone(
-        title: 'Momentum',
-        detail: 'Complete 5 focus sessions in total.',
+        title: context.l10n.milestoneMomentumTitle,
+        detail: context.l10n.milestoneMomentumDetail,
         unlocked: timer.completedFocusSessions >= 5,
       ),
       FocusMilestone(
-        title: 'Half-hour haven',
-        detail: 'Reach 30 total minutes of focus.',
+        title: context.l10n.milestoneHalfHourTitle,
+        detail: context.l10n.milestoneHalfHourDetail,
         unlocked: timer.totalFocusSeconds >= 30 * 60,
       ),
       FocusMilestone(
-        title: 'Century club',
-        detail: 'Reach 100 total minutes of focus.',
+        title: context.l10n.milestoneCenturyTitle,
+        detail: context.l10n.milestoneCenturyDetail,
         unlocked: timer.totalFocusSeconds >= 100 * 60,
       ),
       FocusMilestone(
-        title: 'Steady flame',
-        detail: 'Build a 3-day focus streak.',
+        title: context.l10n.milestoneSteadyFlameTitle,
+        detail: context.l10n.milestoneSteadyFlameDetail,
         unlocked: timer.currentStreak >= 3,
       ),
       FocusMilestone(
-        title: 'Deep roots',
-        detail: 'Build a 7-day focus streak.',
+        title: context.l10n.milestoneDeepRootsTitle,
+        detail: context.l10n.milestoneDeepRootsDetail,
         unlocked: timer.currentStreak >= 7,
       ),
       FocusMilestone(
-        title: 'Goal getter',
-        detail: 'Reach your daily focus goal.',
+        title: context.l10n.milestoneGoalGetterTitle,
+        detail: context.l10n.milestoneGoalGetterDetail,
         unlocked: timer.hasReachedDailyGoal,
       ),
     ];
@@ -881,7 +864,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (sheetContext) => ReflectionJournalSheet(
-        dateLabel: _dateLabel,
+        dateLabel: (date) => _dateLabel(sheetContext, date),
         onCreateEntry: (dialogContext) => _createJournalEntry(
           dialogContext,
           ref.read(journalStateProvider),
@@ -1117,10 +1100,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
 
     return Scaffold(
       floatingActionButton: FloatingActionButton.extended(
-        tooltip: 'Focus Coach',
+        tooltip: l10n.coachTitle,
         onPressed: () => _showCoachingSheet(context, ref),
         icon: const Icon(Icons.auto_awesome_outlined),
-        label: const Text('Coach'),
+        label: Text(l10n.coachTitle),
       ),
       appBar: AppBar(
         title: Text(l10n.appTitle),
@@ -1128,27 +1111,29 @@ class TimerScreen extends riverpod.ConsumerWidget {
           IconButton(
             key: const ValueKey('openHavenActions'),
             icon: const Icon(Icons.bolt_outlined),
-            tooltip: 'Haven actions',
+            tooltip: l10n.havenActionTitle,
             onPressed: () => _showHavenActionSheet(context, ref, timer),
           ),
           IconButton(
             icon: const Icon(Icons.self_improvement_outlined),
-            tooltip: 'Mindful pause',
+            tooltip: l10n.breathingTitle,
             onPressed: () => _showBreathingPause(context),
           ),
           IconButton(
             icon: const Icon(Icons.menu_book_outlined),
-            tooltip: 'Reflection journal',
+            tooltip: l10n.journalTitle,
             onPressed: () => _showJournalSheet(context, ref),
           ),
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
-            tooltip: 'Daily focus reminder',
+            tooltip: l10n.reminderDashboardTooltip,
             onPressed: () => _showReminderSheet(context),
           ),
           IconButton(
             icon: const Icon(Icons.account_circle_outlined),
-            tooltip: isSignedIn ? 'Account' : 'Sign in',
+            tooltip: isSignedIn
+                ? l10n.accountDashboardTooltip
+                : l10n.accountSignInDashboardTooltip,
             onPressed: () => _showAccountSheet(context, ref),
           ),
         ],

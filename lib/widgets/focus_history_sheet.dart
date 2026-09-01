@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_session.dart';
 
 enum _HistoryFilter { all, today, week }
@@ -47,9 +48,7 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Focus summary could not be copied right now.'),
-          ),
+          SnackBar(content: Text(context.l10n.focusHistoryCopyFailed)),
         );
       }
     } finally {
@@ -78,51 +77,39 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
         .toList(growable: false);
   }
 
-  String _focusSessionLabel(int seconds) {
+  String _focusSessionLabel(BuildContext context, int seconds) {
     if (seconds < 60) {
-      return '$seconds-second focus session';
+      return context.l10n.focusHistorySessionSeconds(seconds);
     }
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     if (remainingSeconds == 0) {
-      return '$minutes-minute focus session';
+      return context.l10n.focusHistorySessionMinutes(minutes);
     }
-    return '$minutes min $remainingSeconds sec focus session';
+    return context.l10n.focusHistorySessionMinutesSeconds(
+      minutes,
+      remainingSeconds,
+    );
   }
 
-  String _dateLabel(DateTime date) {
+  String _dateLabel(BuildContext context, DateTime date) {
     final localDate = date.toLocal();
     final now = DateTime.now().toLocal();
     if (DateUtils.isSameDay(localDate, now)) {
-      return 'Today';
+      return context.l10n.dateToday;
     }
     if (DateUtils.isSameDay(localDate, now.subtract(const Duration(days: 1)))) {
-      return 'Yesterday';
+      return context.l10n.dateYesterday;
     }
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[localDate.month - 1]} ${localDate.day}';
+    return MaterialLocalizations.of(context).formatShortDate(localDate);
   }
 
-  String get _weeklyDuration {
+  String _weeklyDuration(BuildContext context) {
     if (widget.weeklyFocusSeconds < 60) {
-      final seconds = widget.weeklyFocusSeconds;
-      return '$seconds ${seconds == 1 ? 'second' : 'seconds'}';
+      return context.l10n.durationSeconds(widget.weeklyFocusSeconds);
     }
     final minutes = widget.weeklyFocusSeconds ~/ 60;
-    return '$minutes ${minutes == 1 ? 'minute' : 'minutes'}';
+    return context.l10n.durationMinutes(minutes);
   }
 
   @override
@@ -158,12 +145,12 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
               ),
               const SizedBox(height: 18),
               Text(
-                'All focus sessions',
+                context.l10n.focusHistoryTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                '${widget.completedSessions} completed sessions',
+                context.l10n.focusHistoryCompleted(widget.completedSessions),
                 style: const TextStyle(color: Colors.white70),
               ),
               Align(
@@ -176,7 +163,7 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : const Icon(Icons.copy_outlined),
-                  label: const Text('Copy full summary'),
+                  label: Text(context.l10n.focusHistoryCopySummary),
                 ),
               ),
               DecoratedBox(
@@ -192,13 +179,15 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'This week',
+                        context.l10n.focusHistoryThisWeek,
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '$_weeklyDuration • ${widget.weeklyFocusSessions} '
-                        '${widget.weeklyFocusSessions == 1 ? 'session' : 'sessions'}',
+                        context.l10n.focusHistoryWeeklySummary(
+                          _weeklyDuration(context),
+                          widget.weeklyFocusSessions,
+                        ),
                         style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 12),
@@ -233,15 +222,9 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      const [
-                                        'M',
-                                        'T',
-                                        'W',
-                                        'T',
-                                        'F',
-                                        'S',
-                                        'S',
-                                      ][day.weekday - 1],
+                                      MaterialLocalizations.of(
+                                        context,
+                                      ).narrowWeekdays[day.weekday % 7],
                                       style: const TextStyle(
                                         fontSize: 11,
                                         color: Colors.white60,
@@ -267,9 +250,10 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                     for (final option in _HistoryFilter.values)
                       ChoiceChip(
                         label: Text(switch (option) {
-                          _HistoryFilter.all => 'All',
-                          _HistoryFilter.today => 'Today',
-                          _HistoryFilter.week => 'This week',
+                          _HistoryFilter.all => context.l10n.focusHistoryAll,
+                          _HistoryFilter.today => context.l10n.dateToday,
+                          _HistoryFilter.week =>
+                            context.l10n.focusHistoryThisWeek,
                         }),
                         selected: _filter == option,
                         onSelected: (_) => setState(() => _filter = option),
@@ -283,10 +267,10 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                   controller: _scrollController,
                   interactive: true,
                   child: sessions.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
-                            'No focus sessions in this time range yet.',
-                            style: TextStyle(color: Colors.white60),
+                            context.l10n.focusHistoryEmptyRange,
+                            style: const TextStyle(color: Colors.white60),
                             textAlign: TextAlign.center,
                           ),
                         )
@@ -321,11 +305,20 @@ class _FocusHistorySheetState extends State<FocusHistorySheet> {
                               ),
                               title: Text(
                                 session.focusTask ??
-                                    _focusSessionLabel(session.durationSeconds),
+                                    _focusSessionLabel(
+                                      context,
+                                      session.durationSeconds,
+                                    ),
                               ),
                               subtitle: Text(
-                                '${_focusSessionLabel(session.durationSeconds)} '
-                                '• ${_dateLabel(localCompletedAt)} at $time',
+                                context.l10n.focusHistorySessionMetadata(
+                                  _focusSessionLabel(
+                                    context,
+                                    session.durationSeconds,
+                                  ),
+                                  _dateLabel(context, localCompletedAt),
+                                  time,
+                                ),
                                 style: const TextStyle(color: Colors.white60),
                               ),
                             );

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/notification_service.dart';
 import 'package:focushaven/services/reminder_service.dart';
@@ -65,6 +66,8 @@ Widget _app(
         notificationServiceProvider.overrideWithValue(notificationService),
     ],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(),
       home: const Scaffold(body: ReminderSheet()),
     ),

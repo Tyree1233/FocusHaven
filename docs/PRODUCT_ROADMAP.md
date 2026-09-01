@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-B4 coaching-and-voice localization extraction is implemented
+Status: living product contract; Phase 215G-B5 account-and-purchase localization extraction is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -67,7 +67,7 @@ Every future phase must preserve these rules:
 | Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, and Journey context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add local-coach context as one bounded, reviewable connection. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
-| Global localization | Foundation plus B1–B4 extraction shipped | Generated Flutter localization is wired to the English source catalog. Core entry/compact controls, the bounded timer dashboard/session-control presentation, queue and planning presentation, completed-session reflection, Rhythm, Forecast, Smart Reset, Journey, Haven Window, Focus Shield, Focus Coach, Voice-to-Coach, safe-command, and Haven action presentation boundaries are catalog-owned. English is the only production runtime locale; Spanish, French, German, and Brazilian Portuguese are planned, not current language claims. | Complete the remaining B5–B6 extraction slices, then human-review catalogs and native surfaces before qualifying each locale independently. |
+| Global localization | Foundation plus B1–B5 extraction shipped | Generated Flutter localization is wired to the English source catalog. Core entry/compact controls, timer, queue/planning, restorative, optional-system, coaching/voice, account/authentication, backup/deletion, Pro/purchase, journal/profile, reminder, milestone, Focus History, and current legal-launch presentation boundaries are catalog-owned. English is the only production runtime locale; Spanish, French, German, and Brazilian Portuguese are planned, not current language claims. | Complete the remaining B6 service-and-notification extraction, then human-review catalogs and native surfaces before qualifying each locale independently. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
@@ -299,7 +299,7 @@ Build a release-quality localization system before promoting FocusHaven in
 additional languages. Locale availability must remain truthful: an incomplete
 catalog is not a supported language.
 
-Status: Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4 extraction are
+Status: Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction are
 implemented in the current source. Flutter's generated localization pipeline
 owns the application title plus onboarding, appearance selection,
 custom-duration chrome, guided breathing, and the main timer's complete
@@ -330,13 +330,21 @@ transcripts, user messages, Coach responses, proposal explanations and effects,
 execution results, and service errors remain opaque runtime values with their
 existing owners. B4 does not change recognition, permission, coaching, action,
 or enhanced-AI behavior.
+Phase 215G-B5 adds account and authentication presentation, cloud-backup and
+destructive-data confirmations, Pro and purchase presentation, Reflection
+Journal and Focus Profile chrome, reminders, milestones, Focus History, and
+the current privacy-policy launch action. Private account identity, journal
+and reflection content, task names, store prices, and service-returned values
+remain opaque. Stable stored mood and profile identifiers are localized only
+for presentation and are not migrated or translated in storage. B5 does not
+perform an account, store, backup, deletion, reminder, permission, or legal
+launch action.
 The locale registry
 records Spanish, French, German, and Brazilian Portuguese as the planned first
 wave without exposing them through `supportedLocales` or making a
 store-language claim.
 
-The remaining B5–B6 extraction slices will move account and purchase, and
-service and notification strings
+The remaining B6 extraction slice will move service and notification strings
 into the English catalog. The audited slice
 boundaries are recorded in `docs/LOCALIZATION_EXTRACTION_INVENTORY.md`.
 Phase 215G-C will add human-reviewed first-wave catalogs and qualify one locale
@@ -346,7 +354,7 @@ translating private user content. Phase 215G-E will localize native Apple,
 Android, widget, watch, permission, policy, support, and store surfaces and run
 country-specific release checks.
 
-No Phase 215G-A, B1, B2, B3A, B3B, B3C, or B4 code changes a saved language, sends text to a
+No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, or B5 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a
 build, or edits a store listing. The detailed release gates are defined in

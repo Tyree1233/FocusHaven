@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B4 audited extraction contract
+Status: Phase 215G-B5 audited extraction contract
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -15,16 +15,17 @@ country release readiness.
   (`pt-BR`) form the planned first translation wave.
 - Planned locales are not exposed by `MaterialApp.supportedLocales` and must
   not appear as supported languages in Apple or Google store metadata.
-- Phases 215G-B1, B2, B3A, B3B, B3C, and B4 catalog-own onboarding, appearance selection,
+- Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5 catalog-own onboarding, appearance selection,
   custom-duration chrome, guided breathing, timer accessibility, the bounded
   timer dashboard/session-control presentation, Focus Queue management and
   completed-task history, Haven Plan, Haven Planner review, and the
   Plan-to-Focus task-decision card, completed-session reflection, Haven Rhythm,
   Focus Forecast, Smart Reset, Haven Journey, Haven Window, Focus Shield,
-  Focus Coach, Voice-to-Coach, safe-command, and Haven action presentation
-  boundaries. The remaining Flutter surfaces are explicitly inventoried for
-  B5 and B6;
-  these slices do not complete Phase 215G-B.
+  Focus Coach, Voice-to-Coach, safe-command, Haven action, account,
+  authentication, backup, deletion, Pro, purchase, journal, profile, reminder,
+  milestone, Focus History, and current legal-launch presentation boundaries.
+  The remaining Flutter service and notification strings are explicitly
+  inventoried for B6; these slices do not complete Phase 215G-B.
 - No runtime translation service is used, and no private user content is sent
   anywhere for translation.
 
@@ -110,7 +111,7 @@ tasks must still be evaluated from the console's current state.
   truthful locale registry, documentation, and contract tests.
 - **215G-B — English extraction:** move all current app-owned Flutter strings
   and semantics into the source catalog without changing behavior. B1, B2,
-  B3A, B3B, B3C, and B4 are audited; B5 and B6 remain required. Phase 215G-B3B
+  B3A, B3B, B3C, B4, and B5 are audited; B6 remains required. Phase 215G-B3B
   keeps personal reflection content outside the catalog and leaves generated
   restorative guidance with its B6 owner. Phase 215G-B3C catalog-owns optional
   connection chrome, permission and platform truth, and advisory boundaries
@@ -121,6 +122,12 @@ tasks must still be evaluated from the console's current state.
   messages, Coach responses, interpreted proposal text, execution results, and
   other service-generated runtime values remain outside the catalog; B6 keeps
   ownership of service-generated user-facing text.
+  Phase 215G-B5 catalog-owns account and authentication presentation, backup
+  and destructive confirmations, Pro and purchase presentation, journal and
+  profile chrome, reminders, milestones, Focus History, and the current
+  privacy-policy launch action. Private identities, journal text, tasks, store
+  prices, stable stored mood/profile identifiers, and service-returned values
+  retain their existing owners and are not translated.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,

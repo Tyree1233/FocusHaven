@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B4 audited extraction contract
+Status: Phase 215G-B5 audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -53,9 +53,9 @@ The following timer-dashboard presentation is now fully catalog-owned:
 
 Planning and recovery cards outside the completed B3A, B3B, and B3C
 presentation boundaries retain their later audited owners.
-Reminder, account, backup, milestone-sheet internals,
-Focus History sheet internals, Queue sheet internals, and service/notification
-messages retain their later owners. Timer notification wording intentionally
+Queue sheet internals are now owned by B3A. Reminder, account, backup,
+milestone-sheet internals, and Focus History sheet internals are now owned by
+B5. Service and notification messages retain their B6 owner. Timer notification wording intentionally
 continues to come from `TimerService` until B6. English behavior and all stored
 timer, task, queue, goal, and history values are unchanged. No locale was
 activated by B2.
@@ -108,8 +108,8 @@ runtime values, including Rhythm, Forecast, Smart Reset, and Journey guidance.
 They are passed through the localized presentation as opaque values and are not
 translated, copied to the ARB catalog, or sent anywhere. English behavior and
 stored focus data are unchanged. No locale was activated by B3B, and no
-permission, dependency, backend, deployment, or store setting changed. B5 and
-B6 remain required.
+permission, dependency, backend, deployment, or store setting changed. B6
+remains required.
 
 ## B3C — Optional system connections
 
@@ -128,7 +128,7 @@ pass through the localized cards as opaque values and are not translated or
 copied into the catalog. B3C changes no permission prompt, calendar access,
 calendar write behavior, reminder behavior, Focus Shield rule, platform bridge,
 dependency, backend, deployment, or store configuration. English behavior is
-unchanged. No locale was activated by B3C, and B5 and B6 remain required.
+unchanged. No locale was activated by B3C, and B6 remains required.
 
 ## B4 — Coaching and voice
 
@@ -163,14 +163,48 @@ locale.
 B4 records no audio, contacts no local or remote AI, changes no permission,
 speech-recognition behavior, enhanced-AI gate, action policy, dependency,
 backend, deployment, or store configuration. English behavior is unchanged,
-no planned locale was activated, and B5 and B6 remain required.
+no planned locale was activated, and B6 remains required.
+
+## B5 — Account, purchases, and private records
+
+The account-and-purchase presentation slice is now fully catalog-owned within
+these boundaries:
+
+- authentication and account-sheet headings, states, provider actions,
+  privacy guidance, dashboard entry, and fail-closed app-owned errors;
+- cloud-backup and restore presentation, entitlement guidance, receipts, and
+  the exact cloud, local-data, and account-deletion confirmations;
+- FocusHaven Pro headings, benefit and entitlement presentation, purchase and
+  restore controls, and app-owned store-action errors;
+- Reflection Journal chrome, stable mood display labels, editor actions,
+  private-device boundary, and locale-aware dates;
+- Focus Profile questions, choices, results, tips, and localized presentation
+  of the existing stable stored profile identifiers;
+- reminder chrome, weekday labels, scheduling guidance, test-notification
+  controls, and app-owned errors and receipts;
+- Focus Milestones and Focus History chrome, locale-aware dates and weekdays,
+  duration/session plurals, filters, metadata, and copy-summary presentation;
+- the current privacy-policy launch action and its app-owned failure message.
+
+Private account identity, journal and reflection content, task names, and
+other user-authored values remain opaque placeholders and never become catalog
+keys. Stable stored mood and profile identifiers remain unchanged; small
+presentation-only mappers localize their display labels without migrating,
+copying, or translating stored data. Store prices remain store-owned values.
+Authentication-provider errors, account-deletion results, store/backend
+errors, daily prompts, and other service-generated messages remain opaque
+runtime values with their existing owners; B6 still owns service-generated
+user-facing text.
+
+B5 does not sign in or out, purchase or restore an entitlement, back up,
+restore, delete an account or data, request notification permission, schedule
+a reminder, launch a policy, contact a provider, change a dependency, deploy,
+or edit a store configuration. English behavior is unchanged, no planned
+locale was activated, and B6 remains required.
 
 ## Remaining Phase 215G-B slices
 
-1. **B5 — Account and purchases:** authentication, account settings, backup,
-   deletion, Pro, purchases, journal, profile, reminders, and support/legal
-   launch surfaces.
-2. **B6 — Service and notification messages:** user-facing strings produced by
+1. **B6 — Service and notification messages:** user-facing strings produced by
    services plus Flutter-owned notification and recovery copy. Native Apple,
    Android, widget, watch, permission-purpose, policy, support, store-listing,
    and screenshot localization remains Phase 215G-E.

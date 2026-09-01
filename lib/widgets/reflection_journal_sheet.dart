@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/focus_haven_localizations.dart';
+import '../l10n/journal_localizations.dart';
 import '../models/journal_entry.dart';
 import '../providers/app_providers.dart';
 
@@ -62,14 +64,14 @@ class _ReflectionJournalSheetState
   Future<void> _createEntry() async {
     await _openEditor(
       () => widget.onCreateEntry(context),
-      failureMessage: 'Reflection could not be created. Please try again.',
+      failureMessage: context.l10n.journalCreateFailed,
     );
   }
 
   Future<void> _editEntry(JournalEntry entry) async {
     await _openEditor(
       () => widget.onEditEntry(context, entry),
-      failureMessage: 'Reflection could not be updated. Please try again.',
+      failureMessage: context.l10n.journalUpdateFailed,
     );
   }
 
@@ -104,13 +106,13 @@ class _ReflectionJournalSheetState
                     controller: _scrollController,
                     children: [
                       Text(
-                        'Reflection journal',
+                        context.l10n.journalTitle,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 6),
-                      const Text(
-                        'A private space saved only on this device.',
-                        style: TextStyle(color: Colors.white70),
+                      Text(
+                        context.l10n.journalPrivacy,
+                        style: const TextStyle(color: Colors.white70),
                       ),
                       const SizedBox(height: 14),
                       DecoratedBox(
@@ -121,7 +123,9 @@ class _ReflectionJournalSheetState
                         child: Padding(
                           padding: const EdgeInsets.all(14),
                           child: Text(
-                            'Today’s prompt: ${journalState.dailyPrompt}',
+                            context.l10n.journalTodayPrompt(
+                              journalState.dailyPrompt,
+                            ),
                             style: const TextStyle(
                               color: Colors.white70,
                               fontStyle: FontStyle.italic,
@@ -132,13 +136,17 @@ class _ReflectionJournalSheetState
                       if (journalState.recentMoodCounts.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text(
-                          'Mood snapshot',
+                          context.l10n.journalMoodSnapshot,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Over the last 7 days, you most often felt '
-                          '${journalState.mostCommonRecentMood?.toLowerCase()}.',
+                          context.l10n.journalMostCommonMood(
+                            localizeJournalMoodInSentence(
+                              context.l10n,
+                              journalState.mostCommonRecentMood!,
+                            ),
+                          ),
                           style: const TextStyle(color: Colors.white70),
                         ),
                         const SizedBox(height: 8),
@@ -148,7 +156,15 @@ class _ReflectionJournalSheetState
                           children: journalState.recentMoodCounts.entries
                               .map(
                                 (entry) => Chip(
-                                  label: Text('${entry.key} ${entry.value}'),
+                                  label: Text(
+                                    context.l10n.journalMoodCount(
+                                      localizeJournalMood(
+                                        context.l10n,
+                                        entry.key,
+                                      ),
+                                      entry.value,
+                                    ),
+                                  ),
                                   backgroundColor: primaryColor.withValues(
                                     alpha: 0.13,
                                   ),
@@ -170,8 +186,8 @@ class _ReflectionJournalSheetState
                             : const Icon(Icons.add_comment_outlined),
                         label: Text(
                           journalState.todayEntries.isEmpty
-                              ? 'Write today’s reflection'
-                              : 'Write another reflection',
+                              ? context.l10n.journalWriteToday
+                              : context.l10n.journalWriteAnother,
                         ),
                         style: FilledButton.styleFrom(
                           backgroundColor: primaryColor,
@@ -181,17 +197,17 @@ class _ReflectionJournalSheetState
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Recent reflections',
+                        context.l10n.journalRecent,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 6),
                       if (journalState.entries.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 30),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 30),
                           child: Center(
                             child: Text(
-                              'Your first reflection will appear here.',
-                              style: TextStyle(color: Colors.white60),
+                              context.l10n.journalEmpty,
+                              style: const TextStyle(color: Colors.white60),
                             ),
                           ),
                         )
@@ -207,7 +223,7 @@ class _ReflectionJournalSheetState
                               color: primaryColor,
                             ),
                             title: Text(
-                              '${entry.mood} • '
+                              '${localizeJournalMood(context.l10n, entry.mood)} • '
                               '${widget.dateLabel(entry.createdAt)}',
                             ),
                             subtitle: Text(
@@ -216,7 +232,7 @@ class _ReflectionJournalSheetState
                               overflow: TextOverflow.ellipsis,
                             ),
                             trailing: IconButton(
-                              tooltip: 'Edit reflection',
+                              tooltip: context.l10n.journalEditTooltip,
                               onPressed: _isOpeningEditor
                                   ? null
                                   : () => _editEntry(entry),

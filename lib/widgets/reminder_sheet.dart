@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 
 class ReminderSheet extends ConsumerStatefulWidget {
@@ -11,14 +12,14 @@ class ReminderSheet extends ConsumerStatefulWidget {
 }
 
 class _ReminderSheetState extends ConsumerState<ReminderSheet> {
-  static const _weekdayLabels = <int, String>{
-    DateTime.monday: 'Mon',
-    DateTime.tuesday: 'Tue',
-    DateTime.wednesday: 'Wed',
-    DateTime.thursday: 'Thu',
-    DateTime.friday: 'Fri',
-    DateTime.saturday: 'Sat',
-    DateTime.sunday: 'Sun',
+  Map<int, String> _weekdayLabels(BuildContext context) => <int, String>{
+    DateTime.monday: context.l10n.weekdayMondayShort,
+    DateTime.tuesday: context.l10n.weekdayTuesdayShort,
+    DateTime.wednesday: context.l10n.weekdayWednesdayShort,
+    DateTime.thursday: context.l10n.weekdayThursdayShort,
+    DateTime.friday: context.l10n.weekdayFridayShort,
+    DateTime.saturday: context.l10n.weekdaySaturdayShort,
+    DateTime.sunday: context.l10n.weekdaySundayShort,
   };
 
   late final Set<int> _selectedWeekdays;
@@ -51,6 +52,7 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
 
   Future<void> _toggleReminder(bool enabled, TimeOfDay currentTime) async {
     if (!_beginAction(enabled ? 'enable' : 'disable')) return;
+    final l10n = context.l10n;
     try {
       final reminderService = ref.read(reminderServiceProvider);
 
@@ -71,9 +73,9 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
       );
       if (!mounted || scheduled) return;
 
-      _showMessage('Allow notifications to schedule a focus time.');
+      _showMessage(l10n.reminderAllowNotificationsSchedule);
     } catch (_) {
-      _showMessage('Reminder settings could not be updated right now.');
+      _showMessage(l10n.reminderSettingsFailed);
     } finally {
       _finishAction();
     }
@@ -81,6 +83,7 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
 
   Future<void> _chooseTimeAndSchedule(TimeOfDay currentTime) async {
     if (!_beginAction('schedule')) return;
+    final l10n = context.l10n;
     try {
       final selected = await showTimePicker(
         context: context,
@@ -98,11 +101,11 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
       ).formatTimeOfDay(selected);
       _showMessage(
         scheduled
-            ? 'Focus time scheduled for $formattedTime.'
-            : 'Allow notifications to schedule a focus time.',
+            ? l10n.reminderScheduledReceipt(formattedTime)
+            : l10n.reminderAllowNotificationsSchedule,
       );
     } catch (_) {
-      _showMessage('Reminder settings could not be updated right now.');
+      _showMessage(l10n.reminderSettingsFailed);
     } finally {
       _finishAction();
     }
@@ -110,19 +113,20 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
 
   Future<void> _sendTestNotification() async {
     if (!_beginAction('test')) return;
+    final l10n = context.l10n;
     try {
       final notifications = ref.read(notificationServiceProvider);
       final permitted = await notifications.requestPermissions();
       if (!mounted) return;
 
       if (!permitted) {
-        _showMessage('Allow notifications to send a test alert.');
+        _showMessage(l10n.reminderAllowNotificationsTest);
         return;
       }
 
       await notifications.showTestNotification();
     } catch (_) {
-      _showMessage('The test notification could not be sent right now.');
+      _showMessage(l10n.reminderTestFailed);
     } finally {
       _finishAction();
     }
@@ -145,10 +149,11 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
     final reminderState = ref.watch(reminderStateProvider);
     final activeAction = _activeAction;
     final isBusy = activeAction != null;
-    final scheduledDays = _weekdayLabels.entries
+    final weekdayLabels = _weekdayLabels(context);
+    final scheduledDays = weekdayLabels.entries
         .where((entry) => reminderState.weekdays.contains(entry.key))
         .map((entry) => entry.value)
-        .join(', ');
+        .join(context.l10n.reminderDaySeparator);
     final formattedTime = MaterialLocalizations.of(
       context,
     ).formatTimeOfDay(reminderState.time);
@@ -162,14 +167,13 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Scheduled focus time',
+                context.l10n.reminderTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Choose the days and time for a gentle invitation to focus. '
-                'You can change or turn it off at any time.',
-                style: TextStyle(color: Colors.white70, height: 1.35),
+              Text(
+                context.l10n.reminderDescription,
+                style: const TextStyle(color: Colors.white70, height: 1.35),
               ),
               const SizedBox(height: 20),
               ListTile(
@@ -181,12 +185,16 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
                 ),
                 title: Text(
                   reminderState.isEnabled
-                      ? 'Focus time is scheduled'
-                      : 'No focus time scheduled',
+                      ? context.l10n.reminderScheduled
+                      : context.l10n.reminderNotScheduled,
                 ),
                 subtitle: Text(
-                  '$formattedTime'
-                  '${reminderState.isEnabled ? ' • $scheduledDays' : ''}',
+                  reminderState.isEnabled
+                      ? context.l10n.reminderTimeAndDays(
+                          formattedTime,
+                          scheduledDays,
+                        )
+                      : formattedTime,
                 ),
                 trailing: Switch(
                   value: reminderState.isEnabled,
@@ -197,12 +205,15 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
                 ),
               ),
               const SizedBox(height: 8),
-              Text('Repeat on', style: Theme.of(context).textTheme.titleSmall),
+              Text(
+                context.l10n.reminderRepeatOn,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: _weekdayLabels.entries
+                children: weekdayLabels.entries
                     .map(
                       (entry) => FilterChip(
                         label: Text(entry.value),
@@ -215,10 +226,9 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
                     .toList(),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Choose at least one day. Changes are saved when you choose '
-                'a focus time.',
-                style: TextStyle(color: Colors.white60),
+              Text(
+                context.l10n.reminderDayGuidance,
+                style: const TextStyle(color: Colors.white60),
               ),
               const SizedBox(height: 16),
               OutlinedButton.icon(
@@ -228,10 +238,10 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
                 icon: const Icon(Icons.schedule_outlined),
                 label: Text(
                   activeAction == 'schedule'
-                      ? 'Saving focus time…'
+                      ? context.l10n.reminderSaving
                       : reminderState.isEnabled
-                      ? 'Update focus time'
-                      : 'Choose focus time',
+                      ? context.l10n.reminderUpdateTime
+                      : context.l10n.reminderChooseTime,
                 ),
               ),
               TextButton.icon(
@@ -239,8 +249,8 @@ class _ReminderSheetState extends ConsumerState<ReminderSheet> {
                 icon: const Icon(Icons.notifications_outlined),
                 label: Text(
                   activeAction == 'test'
-                      ? 'Sending test notification…'
-                      : 'Send a test notification',
+                      ? context.l10n.reminderSendingTest
+                      : context.l10n.reminderSendTest,
                 ),
               ),
             ],

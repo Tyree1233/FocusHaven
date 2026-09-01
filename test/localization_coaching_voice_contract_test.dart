@@ -228,14 +228,14 @@ void main() {
       'User-authored messages and recognized transcripts remain opaque values',
       'B6 still owns service-generated user-facing text',
       'B4 records no audio, contacts no local or remote AI',
-      'B5 and B6 remain required',
+      'B6 remains required',
     ]) {
       expect(inventory, contains(required));
     }
     expect(policy, contains('Phase 215G-B4'));
-    expect(policy, contains('B5 and B6 remain required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4 extraction'));
-    expect(roadmap, contains('remaining B5–B6 extraction slices'));
+    expect(policy, contains('B6 remains required'));
+    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction'));
+    expect(roadmap, contains('remaining B6 extraction slice'));
     expect(readme, contains('Phase 215G-B4'));
     expect(
       locales,

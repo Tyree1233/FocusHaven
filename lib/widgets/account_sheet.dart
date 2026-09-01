@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 
 typedef AccountSheetAction = Future<void> Function();
@@ -55,12 +56,12 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Your FocusHaven account',
+                      context.l10n.accountTitle,
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Close account settings',
+                    tooltip: context.l10n.accountCloseTooltip,
                     onPressed: () {
                       final navigator = Navigator.of(context);
                       if (navigator.canPop()) {
@@ -74,8 +75,8 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
               const SizedBox(height: 8),
               Text(
                 authState.isSignedIn
-                    ? 'Signed in as ${authState.displayName}'
-                    : 'Sign in to protect your focus history and use cloud backup.',
+                    ? context.l10n.accountSignedInAs(authState.displayName)
+                    : context.l10n.accountSignedOutDescription,
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 16),
@@ -101,8 +102,8 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                       Expanded(
                         child: Text(
                           authState.isSignedIn
-                              ? 'Your focus data stays on this device. FocusHaven Pro can also back it up privately to your account.'
-                              : 'Your focus data stays private on this device. Sign in only when you want optional cloud backup.',
+                              ? context.l10n.accountSignedInPrivacy
+                              : context.l10n.accountSignedOutPrivacy,
                           style: const TextStyle(
                             color: Colors.white70,
                             height: 1.35,
@@ -119,7 +120,9 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                   onPressed: _isActionInProgress ? null : _signOut,
                   icon: const Icon(Icons.logout),
                   label: Text(
-                    _authActionInProgress ? 'Signing out…' : 'Sign out',
+                    _authActionInProgress
+                        ? context.l10n.accountSigningOut
+                        : context.l10n.accountSignOut,
                   ),
                 )
               else ...[
@@ -139,8 +142,8 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                     icon: const Icon(Icons.apple),
                     label: Text(
                       _authActionInProgress
-                          ? 'Signing in…'
-                          : 'Continue with Apple',
+                          ? context.l10n.accountSigningIn
+                          : context.l10n.accountContinueWithApple,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -151,8 +154,8 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                     icon: const Icon(Icons.login),
                     label: Text(
                       _authActionInProgress
-                          ? 'Signing in…'
-                          : 'Sign in with Google',
+                          ? context.l10n.accountSigningIn
+                          : context.l10n.accountSignInWithGoogle,
                     ),
                   )
                 else
@@ -161,8 +164,8 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                     icon: const Icon(Icons.login),
                     label: Text(
                       _authActionInProgress
-                          ? 'Signing in…'
-                          : 'Sign in with Google',
+                          ? context.l10n.accountSigningIn
+                          : context.l10n.accountSignInWithGoogle,
                     ),
                   ),
               ],
@@ -172,7 +175,7 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                       ? null
                       : () => _runSheetAction(widget.deleteCloudBackup),
                   icon: const Icon(Icons.delete_outline),
-                  label: const Text('Delete cloud backup'),
+                  label: Text(context.l10n.accountDeleteCloudBackup),
                 ),
               if (authState.isSignedIn)
                 TextButton.icon(
@@ -183,14 +186,14 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                       ? null
                       : () => _runSheetAction(widget.deleteAccount),
                   icon: const Icon(Icons.person_remove_outlined),
-                  label: const Text('Delete account'),
+                  label: Text(context.l10n.accountDeleteAccount),
                 ),
               TextButton.icon(
                 onPressed: _isActionInProgress
                     ? null
                     : () => _runSheetAction(widget.deleteLocalData),
                 icon: const Icon(Icons.delete_forever_outlined),
-                label: const Text('Delete local data'),
+                label: Text(context.l10n.accountDeleteLocalData),
               ),
               const SizedBox(height: 8),
               TextButton.icon(
@@ -198,28 +201,28 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
                     ? null
                     : () => _runSheetAction(widget.openPro),
                 icon: const Icon(Icons.workspace_premium_outlined),
-                label: const Text('FocusHaven Pro'),
+                label: Text(context.l10n.accountPro),
               ),
               TextButton.icon(
                 onPressed: _isActionInProgress
                     ? null
                     : () => _runSheetAction(widget.openFocusProfile),
                 icon: const Icon(Icons.psychology_outlined),
-                label: const Text('Discover your focus profile'),
+                label: Text(context.l10n.accountDiscoverProfile),
               ),
               TextButton.icon(
                 onPressed: _isActionInProgress
                     ? null
                     : () => _runSheetAction(widget.openAppearance),
                 icon: const Icon(Icons.palette_outlined),
-                label: const Text('Appearance'),
+                label: Text(context.l10n.accountAppearance),
               ),
               TextButton.icon(
                 onPressed: _isActionInProgress
                     ? null
                     : () => _runSheetAction(widget.openPrivacyPolicy),
                 icon: const Icon(Icons.privacy_tip_outlined),
-                label: const Text('Privacy Policy'),
+                label: Text(context.l10n.accountPrivacyPolicy),
               ),
             ],
           ),
@@ -231,12 +234,11 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
   Future<void> _runSheetAction(AccountSheetAction action) async {
     if (_isActionInProgress) return;
     setState(() => _sheetActionInProgress = true);
+    final l10n = context.l10n;
     try {
       await action();
     } catch (_) {
-      _showMessage(
-        'That account action could not be completed. Please try again.',
-      );
+      _showMessage(l10n.accountActionFailed);
     } finally {
       if (mounted) setState(() => _sheetActionInProgress = false);
     }
@@ -267,6 +269,7 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
 
   Future<void> _signIn(Future<Object?> Function() authenticate) async {
     if (!_beginAuthAction()) return;
+    final l10n = context.l10n;
     try {
       final result = await authenticate();
       if (!mounted) return;
@@ -278,10 +281,10 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
 
       final message =
           ref.read(authStateProvider).signInError ??
-          'Sign-in was not completed. Please try again.';
+          l10n.accountSignInNotCompleted;
       _showMessage(message);
     } catch (_) {
-      _showMessage('Sign-in could not be completed. Please try again.');
+      _showMessage(l10n.accountSignInFailed);
     } finally {
       _finishAuthAction();
     }
@@ -289,10 +292,11 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
 
   Future<void> _signOut() async {
     if (!_beginAuthAction()) return;
+    final l10n = context.l10n;
     try {
       await ref.read(authServiceProvider).signOut();
     } catch (_) {
-      _showMessage('Sign-out could not be completed. Please try again.');
+      _showMessage(l10n.accountSignOutFailed);
     } finally {
       _finishAuthAction();
     }

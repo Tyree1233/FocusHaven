@@ -739,7 +739,7 @@ tests, plural and placeholder review, human linguistic review, speech-locale
 acceptance where applicable, and country-specific store/disclosure review.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
-Phases 215G-B1, B2, B3A, B3B, B3C, and B4 now move the complete first-run onboarding, appearance
+Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5 now move the complete first-run onboarding, appearance
 picker, custom-duration chrome, guided breathing, timer accessibility, and the
 bounded timer dashboard/session-control presentation into that English
 catalog. B2 covers session names and encouragement, timer actions and
@@ -777,9 +777,19 @@ explanations and effects, execution results, and service-generated errors stay
 opaque runtime values with their existing owners. This slice does not record
 audio, contact AI, request a permission, change speech recognition or action
 policy, enable enhanced AI, or activate another language.
+Phase 215G-B5 additionally catalog-owns account and authentication
+presentation, backup and destructive-data confirmations, Pro and purchase
+presentation, Reflection Journal and Focus Profile chrome, reminders,
+milestones, Focus History, and the current privacy-policy launch action.
+Private account identity, journal and reflection content, task names, store
+prices, and service-returned values remain opaque. Stable mood and profile
+identifiers remain unchanged in storage and are localized only when displayed.
+This slice does not sign in, purchase, back up, restore, delete, request a
+permission, schedule a reminder, launch a policy, or activate another
+language.
 
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B5–B6 work; B1, B2, B3A, B3B, B3C, and B4 are not a claim that the whole interface
+remaining B6 work; B1, B2, B3A, B3B, B3C, B4, and B5 are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.

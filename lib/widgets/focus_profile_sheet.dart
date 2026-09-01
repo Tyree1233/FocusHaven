@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_profile_question.dart';
 import '../providers/app_providers.dart';
 
@@ -18,37 +20,39 @@ class FocusProfileSheet extends ConsumerStatefulWidget {
 class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
   static const _ink = Color(0xFF211442);
 
-  static const _questions = [
+  static const _questionCount = 4;
+
+  List<FocusProfileQuestion> _questions(AppLocalizations l10n) => [
     FocusProfileQuestion(
-      prompt: 'When does focused work feel most natural?',
+      prompt: l10n.profileQuestionNaturalTime,
       choices: [
-        FocusProfileChoice('Early in the day', 'Clear Starter'),
-        FocusProfileChoice('Once I build momentum', 'Momentum Builder'),
-        FocusProfileChoice('Later in the evening', 'Night Owl'),
+        FocusProfileChoice(l10n.profileChoiceEarlyDay, 'Clear Starter'),
+        FocusProfileChoice(l10n.profileChoiceBuildMomentum, 'Momentum Builder'),
+        FocusProfileChoice(l10n.profileChoiceEvening, 'Night Owl'),
       ],
     ),
     FocusProfileQuestion(
-      prompt: 'Which environment helps you settle in?',
+      prompt: l10n.profileQuestionEnvironment,
       choices: [
-        FocusProfileChoice('Quiet and uninterrupted', 'Deep Diver'),
-        FocusProfileChoice('Gentle music or ambient sound', 'Gentle Flow'),
-        FocusProfileChoice('A clear plan and small steps', 'Momentum Builder'),
+        FocusProfileChoice(l10n.profileChoiceQuiet, 'Deep Diver'),
+        FocusProfileChoice(l10n.profileChoiceGentleSound, 'Gentle Flow'),
+        FocusProfileChoice(l10n.profileChoiceClearPlan, 'Momentum Builder'),
       ],
     ),
     FocusProfileQuestion(
-      prompt: 'When you feel stuck, what helps most?',
+      prompt: l10n.profileQuestionStuck,
       choices: [
-        FocusProfileChoice('Removing every distraction', 'Deep Diver'),
-        FocusProfileChoice('Taking a brief reset', 'Gentle Flow'),
-        FocusProfileChoice('Starting with one tiny action', 'Momentum Builder'),
+        FocusProfileChoice(l10n.profileChoiceRemoveDistractions, 'Deep Diver'),
+        FocusProfileChoice(l10n.profileChoiceBriefReset, 'Gentle Flow'),
+        FocusProfileChoice(l10n.profileChoiceTinyAction, 'Momentum Builder'),
       ],
     ),
     FocusProfileQuestion(
-      prompt: 'What kind of session sounds best?',
+      prompt: l10n.profileQuestionSession,
       choices: [
-        FocusProfileChoice('A long, uninterrupted block', 'Deep Diver'),
-        FocusProfileChoice('A calm, flexible rhythm', 'Gentle Flow'),
-        FocusProfileChoice('A quick, energizing sprint', 'Clear Starter'),
+        FocusProfileChoice(l10n.profileChoiceLongBlock, 'Deep Diver'),
+        FocusProfileChoice(l10n.profileChoiceCalmRhythm, 'Gentle Flow'),
+        FocusProfileChoice(l10n.profileChoiceQuickSprint, 'Clear Starter'),
       ],
     ),
   ];
@@ -62,11 +66,19 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
   @override
   void initState() {
     super.initState();
-    _answers = List<FocusProfileChoice?>.filled(_questions.length, null);
+    _answers = List<FocusProfileChoice?>.filled(_questionCount, null);
   }
 
   Future<void> _selectChoice(FocusProfileChoice choice) async {
-    if (_answerInProgress || !_questions[_page].choices.contains(choice)) {
+    final l10n = context.l10n;
+    final questions = _questions(l10n);
+    final currentChoices = questions[_page].choices;
+    if (_answerInProgress ||
+        !currentChoices.any(
+          (candidate) =>
+              candidate.label == choice.label &&
+              candidate.focusType == choice.focusType,
+        )) {
       return;
     }
     setState(() {
@@ -76,7 +88,7 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
 
     try {
       _answers[_page] = choice;
-      if (_page < _questions.length - 1) {
+      if (_page < questions.length - 1) {
         setState(() => _page++);
         return;
       }
@@ -103,53 +115,62 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
 
       setState(() {
         _result = winner;
-        _page = _questions.length;
+        _page = questions.length;
       });
     } catch (_) {
       if (!mounted) return;
       setState(() {
-        _saveError = 'Your focus profile could not be saved. Please try again.';
+        _saveError = l10n.profileSaveFailed;
       });
     } finally {
       if (mounted) setState(() => _answerInProgress = false);
     }
   }
 
-  String _profileTip(String focusType) => switch (focusType) {
-    'Clear Starter' =>
-      'Protect your best early window with one clear intention and a short timer.',
-    'Momentum Builder' =>
-      'Start with a small five-minute step. Momentum is your best fuel.',
-    'Deep Diver' =>
-      'Create a quiet, distraction-free block and let yourself stay with one meaningful task.',
-    'Gentle Flow' =>
-      'Use calm transitions, a comfortable pace, and intentional breaks to stay steady.',
-    'Night Owl' =>
-      'Plan your most important work for your later high-energy window and protect your wind-down.',
-    _ => 'Choose a calm space and one clear next step.',
-  };
+  String _profileTypeLabel(AppLocalizations l10n, String focusType) =>
+      switch (focusType) {
+        'Clear Starter' => l10n.profileTypeClearStarter,
+        'Momentum Builder' => l10n.profileTypeMomentumBuilder,
+        'Deep Diver' => l10n.profileTypeDeepDiver,
+        'Gentle Flow' => l10n.profileTypeGentleFlow,
+        'Night Owl' => l10n.profileTypeNightOwl,
+        _ => focusType,
+      };
+
+  String _profileTip(AppLocalizations l10n, String focusType) =>
+      switch (focusType) {
+        'Clear Starter' => l10n.profileTipClearStarter,
+        'Momentum Builder' => l10n.profileTipMomentumBuilder,
+        'Deep Diver' => l10n.profileTipDeepDiver,
+        'Gentle Flow' => l10n.profileTipGentleFlow,
+        'Night Owl' => l10n.profileTipNightOwl,
+        _ => l10n.profileTipDefault,
+      };
 
   @override
   Widget build(BuildContext context) {
     final savedFocusType = ref.watch(focusProfileTypeProvider);
     final activeType = _result ?? savedFocusType;
 
-    if (_page == _questions.length && _result != null) {
+    final questions = _questions(context.l10n);
+    if (_page == questions.length && _result != null) {
       final completedType = activeType!;
       return _ResultView(
-        focusType: completedType,
-        tip: _profileTip(completedType),
+        focusType: _profileTypeLabel(context.l10n, completedType),
+        tip: _profileTip(context.l10n, completedType),
       );
     }
 
     if (_page == -1) {
       return _IntroductionView(
-        activeType: activeType,
+        activeType: activeType == null
+            ? null
+            : _profileTypeLabel(context.l10n, activeType),
         onStart: () => setState(() => _page = 0),
       );
     }
 
-    final question = _questions[_page];
+    final question = questions[_page];
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 22, 24, 30),
@@ -160,7 +181,7 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
             const _BackToAccountButton(),
             const SizedBox(height: 4),
             Text(
-              '${_page + 1} of ${_questions.length}',
+              context.l10n.profileQuestionProgress(_page + 1, questions.length),
               style: const TextStyle(color: Colors.white60),
             ),
             const SizedBox(height: 14),
@@ -198,7 +219,7 @@ class _FocusProfileSheetState extends ConsumerState<FocusProfileSheet> {
                     ? null
                     : () => setState(() => _page--),
                 icon: const Icon(Icons.arrow_back),
-                label: const Text('Back to previous question'),
+                label: Text(context.l10n.profileBackQuestion),
               ),
             ],
           ],
@@ -231,14 +252,14 @@ class _IntroductionView extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              'Find your focus profile',
+              context.l10n.profileIntroductionTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 10),
             Text(
               activeType == null
-                  ? 'Answer four quick questions for a practical focus style and tip.'
-                  : 'Your current profile is $activeType. Retake the quiz anytime as your habits change.',
+                  ? context.l10n.profileIntroductionDescription
+                  : context.l10n.profileCurrentDescription(activeType!),
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white70),
             ),
@@ -249,7 +270,11 @@ class _IntroductionView extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: _FocusProfileSheetState._ink,
               ),
-              child: Text(activeType == null ? 'Start quiz' : 'Retake quiz'),
+              child: Text(
+                activeType == null
+                    ? context.l10n.profileStartQuiz
+                    : context.l10n.profileRetakeQuiz,
+              ),
             ),
           ],
         ),
@@ -280,9 +305,9 @@ class _ResultView extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Your focus profile',
-              style: TextStyle(fontSize: 16, color: Colors.white70),
+            Text(
+              context.l10n.profileResultTitle,
+              style: const TextStyle(fontSize: 16, color: Colors.white70),
             ),
             const SizedBox(height: 6),
             Text(focusType, style: Theme.of(context).textTheme.headlineSmall),
@@ -299,7 +324,7 @@ class _ResultView extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: _FocusProfileSheetState._ink,
               ),
-              child: const Text('Use this profile'),
+              child: Text(context.l10n.profileUseThis),
             ),
           ],
         ),
@@ -316,7 +341,7 @@ class _BackToAccountButton extends StatelessWidget {
     return Align(
       alignment: Alignment.centerLeft,
       child: IconButton(
-        tooltip: 'Back to account settings',
+        tooltip: context.l10n.profileBackToAccount,
         onPressed: () {
           final navigator = Navigator.of(context);
           if (navigator.canPop()) {

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/auth_service.dart';
 import 'package:focushaven/widgets/account_sheet.dart';
@@ -113,6 +114,8 @@ Widget _app(_FakeAuthService auth, _ActionLog actions) {
   return ProviderScope(
     overrides: [authServiceProvider.overrideWith((ref) => auth)],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(),
       home: Scaffold(
         body: AccountSheet(

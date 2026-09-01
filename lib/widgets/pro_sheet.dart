@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 import 'pro_benefit.dart';
 
@@ -49,13 +50,14 @@ class _ProSheetState extends ConsumerState<ProSheet> {
 
   Future<void> _buyPro() async {
     if (!_beginStoreAction()) return;
+    final l10n = context.l10n;
     try {
       await ref.read(iapServiceProvider).buyPro();
-      _showMessage('Complete your purchase in the store window');
+      _showMessage(l10n.proCompletePurchase);
     } on StateError catch (error) {
       _showMessage(error.message);
     } catch (_) {
-      _showMessage('The store could not start this purchase right now');
+      _showMessage(l10n.proPurchaseCouldNotStart);
     } finally {
       _finishStoreAction();
     }
@@ -63,11 +65,12 @@ class _ProSheetState extends ConsumerState<ProSheet> {
 
   Future<void> _restorePurchases() async {
     if (!_beginStoreAction()) return;
+    final l10n = context.l10n;
     try {
       await ref.read(iapServiceProvider).restorePurchases();
-      _showMessage('Checking the store for previous purchases');
+      _showMessage(l10n.proCheckingPreviousPurchases);
     } catch (_) {
-      _showMessage('Previous purchases could not be checked right now');
+      _showMessage(l10n.proRestoreCouldNotStart);
     } finally {
       _finishStoreAction();
     }
@@ -102,7 +105,7 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: IconButton(
-                        tooltip: 'Back',
+                        tooltip: context.l10n.proBackTooltip,
                         onPressed: () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.arrow_back),
                       ),
@@ -125,44 +128,44 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'FocusHaven Pro',
+                  context.l10n.proTitle,
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   legacyLifetimePurchasesEnabled
-                      ? 'Protect your focus progress with secure cloud backup and restore it on your other devices.'
-                      : 'Core focus tools and private local coaching stay free. Pro subscriptions will add enhanced coaching and secure continuity across devices.',
+                      ? context.l10n.proLegacyDescription
+                      : context.l10n.proSubscriptionDescription,
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white70),
                 ),
                 const SizedBox(height: 18),
-                const ProBenefit(
+                ProBenefit(
                   icon: Icons.cloud_done_outlined,
-                  label: 'Secure cloud backup',
+                  label: context.l10n.proBenefitSecureBackup,
                 ),
-                const ProBenefit(
+                ProBenefit(
                   icon: Icons.devices_outlined,
-                  label: 'Restore on another device',
+                  label: context.l10n.proBenefitRestoreDevice,
                 ),
                 if (legacyLifetimePurchasesEnabled)
-                  const ProBenefit(
+                  ProBenefit(
                     icon: Icons.all_inclusive,
-                    label: 'One-time lifetime unlock',
+                    label: context.l10n.proBenefitLifetime,
                   )
                 else ...[
-                  const ProBenefit(
+                  ProBenefit(
                     icon: Icons.auto_awesome_outlined,
-                    label: 'Enhanced AI coaching allowance',
+                    label: context.l10n.proBenefitEnhancedCoaching,
                   ),
-                  const ProBenefit(
+                  ProBenefit(
                     icon: Icons.calendar_view_month_outlined,
-                    label: 'Monthly plan for flexible access',
+                    label: context.l10n.proBenefitMonthly,
                   ),
-                  const ProBenefit(
+                  ProBenefit(
                     icon: Icons.savings_outlined,
-                    label: 'Annual plan with early-supporter savings',
+                    label: context.l10n.proBenefitAnnual,
                   ),
                 ],
                 const SizedBox(height: 22),
@@ -185,16 +188,16 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                       ),
                       child: Text(
                         isPro == true
-                            ? 'FocusHaven Pro is active'
+                            ? context.l10n.proActive
                             : isPro == null
                             ? entitlementFailed
-                                  ? 'Pro status is unavailable'
-                                  : 'Checking Pro status'
+                                  ? context.l10n.proStatusUnavailable
+                                  : context.l10n.proCheckingStatus
                             : !legacyLifetimePurchasesEnabled
-                            ? 'Monthly and annual plans coming soon'
+                            ? context.l10n.proPlansComingSoon
                             : price == null
-                            ? 'Pro is not available yet'
-                            : 'Unlock Pro for $price',
+                            ? context.l10n.proUnavailable
+                            : context.l10n.proUnlockForPrice(price),
                       ),
                     );
                   },
@@ -204,7 +207,7 @@ class _ProSheetState extends ConsumerState<ProSheet> {
                     onPressed: _storeActionInProgress
                         ? null
                         : _restorePurchases,
-                    child: const Text('Restore purchases'),
+                    child: Text(context.l10n.proRestorePurchases),
                   ),
               ],
             ),

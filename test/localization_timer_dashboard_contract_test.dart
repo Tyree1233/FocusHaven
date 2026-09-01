@@ -150,7 +150,10 @@ void main() {
 
     expect(source, contains('MaterialLocalizations.of(context)'));
     expect(source, contains('String _dashboardDateLabel'));
-    expect(source, contains('CompletedTasksSheet(dateLabel: _dateLabel)'));
+    expect(
+      source,
+      contains('dateLabel: (date) => _dateLabel(sheetContext, date)'),
+    );
     expect(source, isNot(contains('session.sessionType.label')));
     expect(source, isNot(contains('session.completionMessage')));
   });
@@ -174,18 +177,18 @@ void main() {
       'B3B — Reflection and restorative guidance',
       'B3C — Optional system connections',
       'B4 — Coaching and voice',
-      'B5 — Account and purchases',
+      'B5 — Account, purchases, and private records',
       'B6 — Service and notification messages',
     ]) {
       expect(inventory, contains(required));
     }
 
     expect(policy, contains('Phase 215G-B4'));
-    expect(policy, contains('B5 and B6 remain required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4 extraction'));
-    expect(roadmap, contains('remaining B5–B6 extraction slices'));
-    expect(readme, contains('Phases 215G-B1, B2, B3A, B3B, B3C, and B4'));
-    expect(readme, contains('remaining B5–B6 work'));
+    expect(policy, contains('B6 remains required'));
+    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction'));
+    expect(roadmap, contains('remaining B6 extraction slice'));
+    expect(readme, contains('Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5'));
+    expect(readme, contains('remaining B6 work'));
   });
 }
 

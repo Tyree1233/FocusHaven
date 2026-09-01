@@ -153,17 +153,17 @@ void main() {
       'B3B — Reflection and restorative guidance',
       'B3C — Optional system connections',
       'B4 — Coaching and voice',
-      'B5 — Account and purchases',
+      'B5 — Account, purchases, and private records',
       'B6 — Service and notification messages',
       'Phase 215G-B is complete only when every Flutter-owned source string',
     ]) {
       expect(inventory, contains(required));
     }
 
-    expect(policy, contains('215G-B1, B2, B3A, B3B, B3C, and B4'));
+    expect(policy, contains('215G-B1, B2, B3A, B3B, B3C, B4, and B5'));
     expect(policy, contains('not complete Phase 215G-B'));
     expect(roadmap, contains('Phase 215G-B1'));
-    expect(roadmap, contains('remaining B5–B6 extraction slices'));
+    expect(roadmap, contains('remaining B6 extraction slice'));
   });
 }
 

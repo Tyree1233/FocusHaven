@@ -165,10 +165,23 @@ void main() {
     expect(matrix, contains('Run reviewed action'));
 
     final accountSheet = _read('lib/widgets/account_sheet.dart');
-    expect(accountSheet, contains('Sign in with Google'));
-    expect(accountSheet, contains('Continue with Apple'));
-    expect(accountSheet, contains('Delete cloud backup'));
-    expect(accountSheet, contains("Text('Delete account')"));
+    final englishCatalog = _read('lib/l10n/app_en.arb');
+    for (final getter in <String>[
+      'accountSignInWithGoogle',
+      'accountContinueWithApple',
+      'accountDeleteCloudBackup',
+      'accountDeleteAccount',
+    ]) {
+      expect(accountSheet, contains('context.l10n.$getter'));
+    }
+    for (final disclosure in <String>[
+      'Sign in with Google',
+      'Continue with Apple',
+      'Delete cloud backup',
+      'Delete account',
+    ]) {
+      expect(englishCatalog, contains(disclosure));
+    }
 
     final deletionPage = _read('docs/ACCOUNT_DELETION.md');
     expect(deletionPage, contains('Delete your account in the app'));

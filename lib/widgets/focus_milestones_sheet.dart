@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_milestone.dart';
 
 class FocusMilestonesSheet extends StatefulWidget {
@@ -44,12 +45,15 @@ class _FocusMilestonesSheetState extends State<FocusMilestonesSheet> {
               ),
               const SizedBox(height: 18),
               Text(
-                'Focus milestones',
+                context.l10n.milestonesTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 5),
               Text(
-                '$unlocked of ${widget.milestones.length} unlocked',
+                context.l10n.milestonesUnlocked(
+                  unlocked,
+                  widget.milestones.length,
+                ),
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 12),

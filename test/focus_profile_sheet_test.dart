@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/focus_profile_service.dart';
 import 'package:focushaven/widgets/focus_profile_sheet.dart';
@@ -10,6 +11,8 @@ Widget _app(FocusProfileService service, {FocusProfileSaver? saveFocusType}) {
   return ProviderScope(
     overrides: [focusProfileServiceProvider.overrideWith((ref) => service)],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(),
       home: Scaffold(body: FocusProfileSheet(saveFocusType: saveFocusType)),
     ),

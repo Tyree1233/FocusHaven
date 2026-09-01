@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/models/focus_session.dart';
 import 'package:focushaven/widgets/focus_history_sheet.dart';
 
@@ -10,6 +11,8 @@ Widget _app({
   Future<void> Function()? onCopySummary,
 }) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ThemeData.dark(),
     home: Scaffold(
       body: FocusHistorySheet(
@@ -182,22 +185,7 @@ void main() {
     final expectedTime = localizations.formatTimeOfDay(
       TimeOfDay.fromDateTime(localCompletedAt),
     );
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final expectedDate =
-        '${months[localCompletedAt.month - 1]} ${localCompletedAt.day}';
+    final expectedDate = localizations.formatShortDate(localCompletedAt);
 
     expect(find.text('Restored UTC session'), findsOneWidget);
     expect(

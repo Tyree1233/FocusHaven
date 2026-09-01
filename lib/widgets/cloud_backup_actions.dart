@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 import '../services/cloud_sync_service.dart';
 
@@ -44,16 +45,17 @@ class _CloudBackupActionsState extends ConsumerState<CloudBackupActions> {
 
   Future<void> _backUp() async {
     if (!_beginAction('backup')) return;
+    final l10n = context.l10n;
     try {
       if (!widget.isSignedIn) {
-        _showMessage('Sign in with Google to back up your focus data');
+        _showMessage(l10n.cloudBackupSignInToBackUp);
         return;
       }
 
       final isPro = await ref.read(iapServiceProvider).refreshEntitlement();
       if (!mounted) return;
       if (!isPro) {
-        _showMessage('Upgrade to Pro to use cloud backup');
+        _showMessage(l10n.cloudBackupUpgradeToBackUp);
         return;
       }
 
@@ -61,12 +63,10 @@ class _CloudBackupActionsState extends ConsumerState<CloudBackupActions> {
           .read(cloudSyncServiceProvider)
           .syncFocusData(widget.backup);
       _showMessage(
-        succeeded
-            ? 'Focus data backed up securely'
-            : 'Backup failed. Check your Firebase setup.',
+        succeeded ? l10n.cloudBackupSucceeded : l10n.cloudBackupFailed,
       );
     } catch (_) {
-      _showMessage('Cloud backup could not be completed right now');
+      _showMessage(l10n.cloudBackupUnavailable);
     } finally {
       _finishAction();
     }
@@ -74,16 +74,17 @@ class _CloudBackupActionsState extends ConsumerState<CloudBackupActions> {
 
   Future<void> _restore() async {
     if (!_beginAction('restore')) return;
+    final l10n = context.l10n;
     try {
       if (!widget.isSignedIn) {
-        _showMessage('Sign in with Google to restore your focus data');
+        _showMessage(l10n.cloudRestoreSignIn);
         return;
       }
 
       final isPro = await ref.read(iapServiceProvider).refreshEntitlement();
       if (!mounted) return;
       if (!isPro) {
-        _showMessage('Upgrade to Pro to restore cloud backup');
+        _showMessage(l10n.cloudRestoreUpgrade);
         return;
       }
 
@@ -94,19 +95,16 @@ class _CloudBackupActionsState extends ConsumerState<CloudBackupActions> {
       final message = switch (result.status) {
         CloudBackupFetchStatus.found =>
           widget.restoreBackup(result.backup!)
-              ? 'Focus data restored from cloud'
-              : 'That cloud backup could not be restored',
-        CloudBackupFetchStatus.notFound => 'No cloud backup found yet',
-        CloudBackupFetchStatus.unauthenticated =>
-          'Sign in with Google to restore your focus data',
-        CloudBackupFetchStatus.invalid =>
-          'That cloud backup could not be restored',
-        CloudBackupFetchStatus.unavailable =>
-          'Cloud restore is unavailable. Check your connection and try again.',
+              ? l10n.cloudRestoreSucceeded
+              : l10n.cloudRestoreInvalid,
+        CloudBackupFetchStatus.notFound => l10n.cloudRestoreNotFound,
+        CloudBackupFetchStatus.unauthenticated => l10n.cloudRestoreSignIn,
+        CloudBackupFetchStatus.invalid => l10n.cloudRestoreInvalid,
+        CloudBackupFetchStatus.unavailable => l10n.cloudRestoreUnavailable,
       };
       _showMessage(message);
     } catch (_) {
-      _showMessage('Cloud restore could not be completed right now');
+      _showMessage(l10n.cloudRestoreCouldNotComplete);
     } finally {
       _finishAction();
     }
@@ -124,12 +122,20 @@ class _CloudBackupActionsState extends ConsumerState<CloudBackupActions> {
         TextButton.icon(
           onPressed: isBusy ? null : _backUp,
           icon: const Icon(Icons.cloud_upload_outlined),
-          label: Text(activeAction == 'backup' ? 'Backing up…' : 'Back up'),
+          label: Text(
+            activeAction == 'backup'
+                ? context.l10n.cloudBackupInProgress
+                : context.l10n.cloudBackupAction,
+          ),
         ),
         TextButton.icon(
           onPressed: isBusy ? null : _restore,
           icon: const Icon(Icons.cloud_download_outlined),
-          label: Text(activeAction == 'restore' ? 'Restoring…' : 'Restore'),
+          label: Text(
+            activeAction == 'restore'
+                ? context.l10n.cloudRestoreInProgress
+                : context.l10n.cloudRestoreAction,
+          ),
         ),
       ],
     );

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/models/journal_entry.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/journal_service.dart';
@@ -19,6 +20,8 @@ Widget _app(
   return ProviderScope(
     overrides: [journalServiceProvider.overrideWith((ref) => service)],
     child: MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(),
       home: Scaffold(
         body: ReflectionJournalSheet(

@@ -128,16 +128,16 @@ void main() {
     expect(
       roadmap,
       contains(
-        '| Global localization | Foundation plus B1–B4 extraction shipped |',
+        '| Global localization | Foundation plus B1–B5 extraction shipped |',
       ),
     );
     expect(
       roadmap,
       contains(
-        'Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4 extraction',
+        'Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction',
       ),
     );
-    expect(roadmap, contains('remaining B5–B6 extraction slices'));
+    expect(roadmap, contains('remaining B6 extraction slice'));
     expect(readme, contains('English as the source catalog'));
     expect(readme, contains('deliberately not advertised'));
     expect(readme, contains('docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md'));

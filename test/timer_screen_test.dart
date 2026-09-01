@@ -944,7 +944,7 @@ void main() {
 
     final initialPushCount = observer.pushCount;
     final coachButton = tester.widget<FloatingActionButton>(
-      find.widgetWithText(FloatingActionButton, 'Coach'),
+      find.widgetWithText(FloatingActionButton, 'Focus Coach'),
     );
     coachButton.onPressed!.call();
     coachButton.onPressed!.call();
@@ -1388,22 +1388,10 @@ void main() {
     await tester.ensureVisible(find.text('Restored UTC dashboard session'));
     await tester.pumpAndSettle();
 
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final expectedDate =
-        '${months[localCompletedAt.month - 1]} ${localCompletedAt.day}';
+    final localizations = MaterialLocalizations.of(
+      tester.element(find.byType(TimerScreen)),
+    );
+    final expectedDate = localizations.formatShortMonthDay(localCompletedAt);
 
     expect(find.text('Restored UTC dashboard session'), findsOneWidget);
     expect(find.text(expectedDate), findsOneWidget);

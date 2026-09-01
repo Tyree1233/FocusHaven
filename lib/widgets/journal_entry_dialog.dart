@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
+import '../l10n/journal_localizations.dart';
+
 @immutable
 class JournalEntryDraft {
   const JournalEntryDraft({required this.mood, required this.reflection});
@@ -83,7 +86,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text("Today's reflection"),
+      title: Text(context.l10n.journalDialogTitle),
       content: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 420),
@@ -91,7 +94,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('How are you feeling?'),
+              Text(context.l10n.journalFeelingQuestion),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 6,
@@ -99,7 +102,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
                 children: [
                   for (final mood in widget.moods)
                     ChoiceChip(
-                      label: Text(mood),
+                      label: Text(localizeJournalMood(context.l10n, mood)),
                       selected: _selectedMood == mood,
                       onSelected: _isClosing
                           ? null
@@ -132,12 +135,12 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
         TextButton(
           key: const ValueKey<String>('journal-entry-cancel'),
           onPressed: _isClosing ? null : () => _close(),
-          child: const Text('Cancel'),
+          child: Text(context.l10n.actionCancel),
         ),
         FilledButton(
           key: const ValueKey<String>('journal-entry-submit'),
           onPressed: _isClosing ? null : _submit,
-          child: const Text('Save reflection'),
+          child: Text(context.l10n.journalSave),
         ),
       ],
     );
