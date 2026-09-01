@@ -372,7 +372,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
     );
     if (!confirmed || !context.mounted) return;
 
-    final coachingCleared = await coach.clearLocalData();
+    final coachingCleared = await coach.clearLocalData(
+      localizations: context.l10n,
+    );
     if (!coachingCleared) {
       throw StateError('Private coaching data was not completely cleared.');
     }

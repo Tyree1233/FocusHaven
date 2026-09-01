@@ -129,7 +129,17 @@ void main() {
 
     expect(responder.calls, 1);
     expect(responder.lastMessage, 'I need a smaller first step.');
-    expect(responder.lastContext, same(coachingContext));
+    expect(responder.lastContext, isNot(same(coachingContext)));
+    expect(
+      responder.lastContext!.toPromptData(),
+      coachingContext.toPromptData(),
+    );
+    expect(responder.lastContext!.localizations, isNotNull);
+    expect(responder.lastContext!.localizations!.localeName, 'en');
+    expect(
+      responder.lastContext!.toPromptData(),
+      isNot(contains('localizations')),
+    );
     expect(responder.lastConversation, hasLength(1));
     expect(responder.lastConversation!.single.role, CoachingMessageRole.user);
     expect(find.text('I need a smaller first step.'), findsOneWidget);

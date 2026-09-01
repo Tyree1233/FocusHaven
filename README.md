@@ -819,15 +819,23 @@ exact confirmation, replay protection, and existing timer, queue, and
 navigation service ownership are unchanged. English remains the only active
 locale.
 
+Phase 215G-B6C2 now catalog-owns deterministic private Local-Coach responses,
+stable remembered-challenge labels, enhanced-AI fallback notices, and coaching
+response, preference, storage-repair, and private-cleanup errors. User-authored
+messages, tasks, moods, profiles, and saved conversation content remain opaque
+runtime placeholders. The selected catalog is attached only to in-memory local
+response context and is excluded from Enhanced-AI prompt data. English signal
+matching, responder selection, consent, fallback, persistence, and cleanup
+behavior are unchanged. English remains the only active locale.
+
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B6C2–B6C3 work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, and B6C1 are not a claim that the whole interface
+remaining B6C3 work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, and B6C2 are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.
 
-The remaining B6 work is B6C2 local-Coach responses and receipts, followed by
-B6C3 authentication, store, journal, export, and other remaining service
-results.
+The remaining B6 work is B6C3 authentication, store, journal, export, and other
+remaining service results.
 
 ## Architecture
 

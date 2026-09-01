@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/coaching_message.dart';
 import 'privacy_safe_diagnostics.dart';
 
@@ -17,6 +19,7 @@ class CoachingContext {
     this.recentMood,
     this.parkedThoughtCount = 0,
     this.isTimerRunning = false,
+    this.localizations,
   });
 
   final String focusTask;
@@ -28,6 +31,20 @@ class CoachingContext {
   final String? recentMood;
   final int parkedThoughtCount;
   final bool isTimerRunning;
+  final AppLocalizations? localizations;
+
+  CoachingContext withLocalizations(AppLocalizations value) => CoachingContext(
+    focusTask: focusTask,
+    focusProfile: focusProfile,
+    todayFocusMinutes: todayFocusMinutes,
+    dailyGoalMinutes: dailyGoalMinutes,
+    queueRemaining: queueRemaining,
+    nextQueueTask: nextQueueTask,
+    recentMood: recentMood,
+    parkedThoughtCount: parkedThoughtCount,
+    isTimerRunning: isTimerRunning,
+    localizations: value,
+  );
 
   Map<String, dynamic> toPromptData() => {
     if (focusTask.trim().isNotEmpty) 'focusTask': focusTask.trim(),
@@ -75,16 +92,13 @@ enum CoachingFallbackReason {
 }
 
 extension CoachingFallbackReasonMessage on CoachingFallbackReason {
-  String get userMessage => switch (this) {
+  String userMessage(AppLocalizations localizations) => switch (this) {
     CoachingFallbackReason.allowanceReached =>
-      'Your enhanced AI allowance has been reached for this month. '
-          'Your private local coach answered instead.',
+      localizations.coachServiceFallbackAllowanceReached,
     CoachingFallbackReason.accessUnavailable =>
-      'Enhanced AI is not available for this account right now. '
-          'Your private local coach answered instead.',
+      localizations.coachServiceFallbackAccessUnavailable,
     CoachingFallbackReason.serviceUnavailable =>
-      'Enhanced AI is temporarily unavailable. '
-          'Your private local coach answered instead.',
+      localizations.coachServiceFallbackServiceUnavailable,
   };
 }
 
@@ -249,32 +263,29 @@ class LocalCoachingResponder implements CoachingResponder {
     required CoachingContext context,
     required List<CoachingMessage> conversation,
   }) async {
+    final l10n = context.localizations ?? defaultServiceLocalizations();
     final normalized = message.toLowerCase();
     if (isSafetyConcern(normalized)) {
-      return "I'm really glad you told me. Your safety matters more than "
-          'productivity. If you might act on this or you are in immediate '
-          'danger, contact local emergency services now and reach out to '
-          'someone you trust who can stay with you. You deserve real human '
-          'support; a focus coach is not a substitute for crisis care.';
+      return l10n.coachServiceSafetyResponse;
     }
     if (isBoundaryRequest(normalized)) {
-      return _boundaryReply();
+      return _boundaryReply(l10n);
     }
     if (isRepairRequest(normalized)) {
-      return _repairReply();
+      return _repairReply(l10n);
     }
     if (isReflectionRequest(normalized)) {
-      return _reflectionReply(normalized);
+      return _reflectionReply(normalized, l10n);
     }
     final rememberedSupportMode = _rememberedSupportMode(conversation);
     if (_containsAny(normalized, _listeningSignals)) {
-      return _listeningReply(conversation);
+      return _listeningReply(conversation, l10n);
     }
     if (_containsAny(normalized, _directSignals)) {
-      return _accountabilityReply(context);
+      return _accountabilityReply(context, l10n);
     }
     if (_containsAny(normalized, _gentleSignals)) {
-      return _gentleReply(context, conversation);
+      return _gentleReply(context, conversation, l10n);
     }
     if (_containsAny(normalized, const [
       'still stuck',
@@ -285,7 +296,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'fell behind',
       'failed again',
     ])) {
-      return _setbackReply(context, conversation);
+      return _setbackReply(context, conversation, l10n);
     }
     if (_containsAny(normalized, const [
       'i am lazy',
@@ -295,7 +306,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'hate myself',
       'what is wrong with me',
     ])) {
-      return _selfCriticismReply(context);
+      return _selfCriticismReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       'perfect',
@@ -305,7 +316,7 @@ class LocalCoachingResponder implements CoachingResponder {
       "afraid it'll be bad",
       'fear of failing',
     ])) {
-      return _perfectionismReply(context);
+      return _perfectionismReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       "can't decide",
@@ -314,7 +325,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'which one',
       'choose between',
     ])) {
-      return _decisionReply(context);
+      return _decisionReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       'running out of time',
@@ -323,7 +334,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'deadline',
       'only have',
     ])) {
-      return _timePressureReply(context);
+      return _timePressureReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       'overwhelmed',
@@ -333,7 +344,7 @@ class LocalCoachingResponder implements CoachingResponder {
       "can't handle",
       'cannot handle',
     ])) {
-      return _overwhelmReply(context);
+      return _overwhelmReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       'stuck',
@@ -343,7 +354,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'avoiding',
       'unmotivated',
     ])) {
-      return _startingReply(context, conversation);
+      return _startingReply(context, conversation, l10n);
     }
     if (_containsAny(normalized, const [
       'distracted',
@@ -352,7 +363,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'mind keeps',
       'wandering',
     ])) {
-      return _distractionReply(context);
+      return _distractionReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       'tired',
@@ -361,7 +372,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'burnt out',
       'no energy',
     ])) {
-      return _energyReply(context);
+      return _energyReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       'need a break',
@@ -369,7 +380,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'pause for a bit',
       'pause for a while',
     ])) {
-      return _breakReply(context);
+      return _breakReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       "i'm back",
@@ -381,7 +392,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'ready to get back',
       'took a break',
     ])) {
-      return _returnReply(context, conversation);
+      return _returnReply(context, conversation, l10n);
     }
     if (_containsAny(normalized, const [
       'i started',
@@ -397,7 +408,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'completed one',
       'one part done',
     ])) {
-      return _progressReply(context, conversation);
+      return _progressReply(context, conversation, l10n);
     }
     if (_containsAny(normalized, const [
       'what should i do',
@@ -406,7 +417,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'prioritize',
       'where do i start',
     ])) {
-      return _planningReply(context);
+      return _planningReply(context, l10n);
     }
     if (_containsAny(normalized, const [
       'i did it',
@@ -416,7 +427,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'proud',
       'small win',
     ])) {
-      return _celebrationReply(context, conversation);
+      return _celebrationReply(context, conversation, l10n);
     }
     if (_containsAny(normalized, const [
       'break it down',
@@ -425,7 +436,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'yes please',
       'please do',
     ])) {
-      return _followUpReply(context, conversation);
+      return _followUpReply(context, conversation, l10n);
     }
     if (_containsAny(normalized, const [
       "i don't know",
@@ -435,20 +446,22 @@ class LocalCoachingResponder implements CoachingResponder {
       'unsure',
     ])) {
       if (rememberedSupportMode == _CoachingSupportMode.reflective) {
-        return _reflectiveUncertaintyReply();
+        return _reflectiveUncertaintyReply(l10n);
       }
       return _uncertaintyReply(
         context,
         conversation,
+        l10n,
         supportMode: rememberedSupportMode,
       );
     }
     if (rememberedSupportMode == _CoachingSupportMode.reflective) {
-      return _reflectionFollowUpReply(conversation);
+      return _reflectionFollowUpReply(conversation, l10n);
     }
     return _generalReply(
       context,
       conversation,
+      l10n,
       supportMode: rememberedSupportMode,
     );
   }
@@ -479,7 +492,10 @@ class LocalCoachingResponder implements CoachingResponder {
     return null;
   }
 
-  static String? _recentChallenge(List<CoachingMessage> conversation) {
+  static String? _recentChallenge(
+    List<CoachingMessage> conversation,
+    AppLocalizations l10n,
+  ) {
     for (final entry in conversation.reversed) {
       if (entry.role != CoachingMessageRole.user) continue;
       final message = entry.text.toLowerCase();
@@ -492,7 +508,7 @@ class LocalCoachingResponder implements CoachingResponder {
         'hate myself',
         'what is wrong with me',
       ])) {
-        return 'self-criticism';
+        return l10n.coachServiceChallengeSelfCriticism;
       }
       if (_containsAny(message, const [
         'perfect',
@@ -502,7 +518,7 @@ class LocalCoachingResponder implements CoachingResponder {
         "afraid it'll be bad",
         'fear of failing',
       ])) {
-        return 'perfectionism';
+        return l10n.coachServiceChallengePerfectionism;
       }
       if (_containsAny(message, const [
         "can't decide",
@@ -511,7 +527,7 @@ class LocalCoachingResponder implements CoachingResponder {
         'which one',
         'choose between',
       ])) {
-        return 'too many choices';
+        return l10n.coachServiceChallengeTooManyChoices;
       }
       if (_containsAny(message, const [
         'running out of time',
@@ -520,7 +536,7 @@ class LocalCoachingResponder implements CoachingResponder {
         'deadline',
         'only have',
       ])) {
-        return 'deadline pressure';
+        return l10n.coachServiceChallengeDeadlinePressure;
       }
       if (_containsAny(message, const [
         'overwhelmed',
@@ -530,7 +546,7 @@ class LocalCoachingResponder implements CoachingResponder {
         "can't handle",
         'cannot handle',
       ])) {
-        return 'overwhelm';
+        return l10n.coachServiceChallengeOverwhelm;
       }
       if (_containsAny(message, const [
         'stuck',
@@ -540,7 +556,7 @@ class LocalCoachingResponder implements CoachingResponder {
         'avoiding',
         'unmotivated',
       ])) {
-        return 'getting started';
+        return l10n.coachServiceChallengeGettingStarted;
       }
       if (_containsAny(message, const [
         'distracted',
@@ -549,7 +565,7 @@ class LocalCoachingResponder implements CoachingResponder {
         'mind keeps',
         'wandering',
       ])) {
-        return 'distraction';
+        return l10n.coachServiceChallengeDistraction;
       }
       if (_containsAny(message, const [
         'tired',
@@ -558,34 +574,27 @@ class LocalCoachingResponder implements CoachingResponder {
         'burnt out',
         'no energy',
       ])) {
-        return 'low energy';
+        return l10n.coachServiceChallengeLowEnergy;
       }
     }
     return null;
   }
 
-  static String _currentTask(CoachingContext context) {
+  static String _currentTask(CoachingContext context, AppLocalizations l10n) {
     final focusTask = context.focusTask.trim();
     if (focusTask.isNotEmpty) return focusTask;
     final nextQueueTask = context.nextQueueTask?.trim() ?? '';
     if (nextQueueTask.isNotEmpty) return nextQueueTask;
-    return 'the task in front of you';
+    return l10n.coachServiceDefaultTask;
   }
 
-  static String _boundaryReply() {
-    return 'Okay. I’ll stop here and give you space. No next step, no '
-        'check-in, and nothing to prove. You can close Focus Coach now or '
-        'come back whenever you choose.';
-  }
+  static String _boundaryReply(AppLocalizations l10n) =>
+      l10n.coachServiceBoundaryResponse;
 
-  static String _repairReply() {
-    return 'Thank you for correcting me. I misunderstood what you needed, '
-        'and I’m sorry. Let’s reset without making you repeat everything. '
-        'What would fit better right now: listening without advice, gentle '
-        'support, or a direct next step?';
-  }
+  static String _repairReply(AppLocalizations l10n) =>
+      l10n.coachServiceRepairResponse;
 
-  static String _reflectionReply(String message) {
+  static String _reflectionReply(String message, AppLocalizations l10n) {
     if (_containsAny(message, const [
       'conflicted',
       'torn',
@@ -593,16 +602,15 @@ class LocalCoachingResponder implements CoachingResponder {
       'on one hand',
       'mixed feelings',
     ])) {
-      return 'It sounds like two honest needs are pulling in different '
-          'directions. Neither one has to be argued away yet. Which side '
-          'feels harder to disappoint?';
+      return l10n.coachServiceReflectionConflictResponse;
     }
-    return 'Let’s slow this down. You do not need to turn it into a decision '
-        'or an action plan yet. What part of this feels most important to '
-        'understand first?';
+    return l10n.coachServiceReflectionDefaultResponse;
   }
 
-  static String _reflectionFollowUpReply(List<CoachingMessage> conversation) {
+  static String _reflectionFollowUpReply(
+    List<CoachingMessage> conversation,
+    AppLocalizations l10n,
+  ) {
     var latestUserMessage = '';
     for (final entry in conversation.reversed) {
       if (entry.role != CoachingMessageRole.user) continue;
@@ -615,9 +623,7 @@ class LocalCoachingResponder implements CoachingResponder {
       'scared',
       'worried',
     ])) {
-      return 'That fear sounds like it is carrying a lot of weight, even if '
-          'another part of you knows what it wants. What is the fear trying '
-          'to protect you from?';
+      return l10n.coachServiceReflectionFearFollowUp;
     }
     if (_containsAny(latestUserMessage, const [
       'guilty',
@@ -626,109 +632,104 @@ class LocalCoachingResponder implements CoachingResponder {
       'let them down',
       'let everyone down',
     ])) {
-      return 'You seem to be holding your own needs alongside concern for '
-          'someone else. What would honoring yourself without dismissing '
-          'them look like?';
+      return l10n.coachServiceReflectionGuiltFollowUp;
     }
-    return 'There is something important in that, and we do not have to '
-        'force it into a plan. Which part feels most true now that you have '
-        'said it out loud?';
+    return l10n.coachServiceReflectionDefaultFollowUp;
   }
 
-  static String _reflectiveUncertaintyReply() {
-    return 'Not knowing can be part of understanding this, rather than a '
-        'problem to solve immediately. What feels uncertain underneath the '
-        'decision itself?';
-  }
+  static String _reflectiveUncertaintyReply(AppLocalizations l10n) =>
+      l10n.coachServiceReflectiveUncertaintyResponse;
 
-  static String _listeningReply(List<CoachingMessage> conversation) {
-    final challenge = _recentChallenge(conversation);
+  static String _listeningReply(
+    List<CoachingMessage> conversation,
+    AppLocalizations l10n,
+  ) {
+    final challenge = _recentChallenge(conversation, l10n);
     final recognition = challenge == null
         ? ''
-        : ' It makes sense that $challenge has been wearing on you.';
-    return 'Absolutely. You do not have to turn this into a plan or perform '
-        'being okay for me.$recognition Say as much or as little as you need. '
-        'I’ll stay with you and listen without trying to fix it.';
+        : l10n.coachServiceListeningRecognition(challenge);
+    return l10n.coachServiceListeningResponse(recognition);
   }
 
   static String _gentleReply(
     CoachingContext context,
     List<CoachingMessage> conversation,
+    AppLocalizations l10n,
   ) {
-    final challenge = _recentChallenge(conversation);
+    final challenge = _recentChallenge(conversation, l10n);
     final recognition = challenge == null
         ? ''
-        : ' I remember that $challenge has been making this harder.';
-    return 'Absolutely. I’ll keep this gentle.$recognition You do not have to '
-        'prove anything or solve “${_currentTask(context)}” all at once. What '
-        'would feel supportive right now: encouragement, a very small next '
-        'step, or a moment to breathe?';
+        : l10n.coachServiceGentleRecognition(challenge);
+    return l10n.coachServiceGentleResponse(
+      recognition,
+      _currentTask(context, l10n),
+    );
   }
 
-  static String _accountabilityReply(CoachingContext context) {
+  static String _accountabilityReply(
+    CoachingContext context,
+    AppLocalizations l10n,
+  ) {
     if (context.dailyGoalMinutes > 0 &&
         context.todayFocusMinutes >= context.dailyGoalMinutes) {
-      return 'Direct answer: you have already met today’s focus goal. The '
-          'accountable choice may be to stop intentionally instead of turning '
-          'rest into something you must earn twice. Close the session and '
-          'protect tomorrow’s attention.';
+      return l10n.coachServiceAccountabilityGoalMet;
     }
-    final task = _currentTask(context);
+    final task = _currentTask(context, l10n);
     final timerDirection = context.isTimerRunning
-        ? 'Your timer is running, so return to it now.'
-        : 'Start one ten-minute focus round now.';
+        ? l10n.coachServiceAccountabilityTimerRunning
+        : l10n.coachServiceAccountabilityTimerStart;
     final queueDirection = context.queueRemaining > 1
-        ? 'Ignore the other ${context.queueRemaining - 1} queued items.'
-        : 'Keep everything else out of view.';
-    return 'Direct version, without shame: commit to “$task” for ten minutes. '
-        '$queueDirection $timerDirection Do not negotiate with the whole '
-        'project—do the next visible action, then check back honestly.';
+        ? l10n.coachServiceAccountabilityQueueMultiple(
+            context.queueRemaining - 1,
+          )
+        : l10n.coachServiceAccountabilityQueueSingle;
+    return l10n.coachServiceAccountabilityResponse(
+      task,
+      queueDirection,
+      timerDirection,
+    );
   }
 
   static String _uncertaintyReply(
     CoachingContext context,
-    List<CoachingMessage> conversation, {
+    List<CoachingMessage> conversation,
+    AppLocalizations l10n, {
     _CoachingSupportMode? supportMode,
   }) {
-    final task = _currentTask(context);
-    final challenge = _recentChallenge(conversation);
+    final task = _currentTask(context, l10n);
+    final challenge = _recentChallenge(conversation, l10n);
     if (supportMode == _CoachingSupportMode.listening) {
-      return 'You do not need to find the answer yet. I remember that you '
-          'wanted listening without advice, so we can stay with the uncertainty. '
-          'What feels most present when you say “I don’t know”?';
+      return l10n.coachServiceUncertaintyListeningResponse;
     }
     if (supportMode == _CoachingSupportMode.direct) {
-      return 'You asked me to stay direct: do not solve the whole uncertainty. '
-          'Choose one two-minute action on “$task,” do it now, and use what '
-          'happens as the next piece of information.';
+      return l10n.coachServiceUncertaintyDirectResponse(task);
     }
     final gentleOpening = supportMode == _CoachingSupportMode.gentle
-        ? 'We can approach this gently. '
+        ? l10n.coachServiceGentleOpening
         : '';
     if (challenge != null) {
-      return '${gentleOpening}Not knowing is allowed. Since $challenge has been the obstacle, '
-          'you do not need a perfect answer. Choose one: a real five-minute '
-          'reset, or one two-minute action on “$task.” Which feels more '
-          'possible right now?';
+      return l10n.coachServiceUncertaintyChallengeResponse(
+        gentleOpening,
+        challenge,
+        task,
+      );
     }
-    return '${gentleOpening}Not knowing is enough information to make the question smaller. '
-        'For “$task,” which is closest: I need clarity, I need energy, or I’m '
-        'afraid to begin? Pick the nearest answer—not the perfect one.';
+    return l10n.coachServiceUncertaintyDefaultResponse(gentleOpening, task);
   }
 
-  static String _overwhelmReply(CoachingContext context) {
-    final task = _currentTask(context);
-    return 'That sounds like a lot to hold at once. Let’s make the next move '
-        'smaller: open “$task” and spend two minutes identifying the first '
-        'visible action. You do not need to finish it—just make it easier to '
-        'begin. Want to break it into three tiny steps together?';
+  static String _overwhelmReply(
+    CoachingContext context,
+    AppLocalizations l10n,
+  ) {
+    return l10n.coachServiceOverwhelmResponse(_currentTask(context, l10n));
   }
 
   static String _startingReply(
     CoachingContext context,
     List<CoachingMessage> conversation,
+    AppLocalizations l10n,
   ) {
-    final task = _currentTask(context);
+    final task = _currentTask(context, l10n);
     final alreadySuggestedStartingRound = conversation.any(
       (entry) =>
           entry.role == CoachingMessageRole.coach &&
@@ -736,227 +737,202 @@ class LocalCoachingResponder implements CoachingResponder {
               entry.text.contains('starting is the win')),
     );
     if (alreadySuggestedStartingRound) {
-      return 'You’re still here, so let’s change the experiment instead of '
-          'repeating the same advice. For “$task,” spend sixty seconds only '
-          'setting up—open it, put the needed item in front of you, and stop. '
-          'Then choose: continue for two minutes, or tell me what blocked you.';
+      return l10n.coachServiceStartingRetryResponse(task);
     }
-    return 'Let’s lower the stakes. For the next five minutes, your only job '
-        'is to begin “$task.” You may stop after five minutes if you want; '
-        'starting is the win. What is the smallest physical action—open the '
-        'file, write one line, or gather one item?';
+    return l10n.coachServiceStartingFirstResponse(task);
   }
 
   static String _setbackReply(
     CoachingContext context,
     List<CoachingMessage> conversation,
+    AppLocalizations l10n,
   ) {
-    final task = _currentTask(context);
-    final challenge = _recentChallenge(conversation);
+    final task = _currentTask(context, l10n);
+    final challenge = _recentChallenge(conversation, l10n);
     final memory = challenge == null
         ? ''
-        : 'We were already working with $challenge, so this calls for a '
-              'different experiment. ';
-    return 'That’s frustrating, especially because you already made an effort. '
-        'This is information, not proof that you failed. $memory'
-        'For “$task,” choose '
-        'one reset: make the next step half as small, take a real five-minute '
-        'break, or switch approaches. Which reset feels most honest right now?';
+        : l10n.coachServiceSetbackMemory(challenge);
+    return l10n.coachServiceSetbackResponse(memory, task);
   }
 
-  static String _selfCriticismReply(CoachingContext context) {
-    return 'I hear how hard you’re being on yourself. Struggling with '
-        '“${_currentTask(context)}” is a moment you’re having—not your '
-        'identity. Let’s replace the verdict with one useful fact: what exactly '
-        'is making the next step difficult—clarity, energy, or fear?';
-  }
+  static String _selfCriticismReply(
+    CoachingContext context,
+    AppLocalizations l10n,
+  ) => l10n.coachServiceSelfCriticismResponse(_currentTask(context, l10n));
 
-  static String _perfectionismReply(CoachingContext context) {
-    return 'It sounds like the standard has become so high that starting feels '
-        'unsafe. Give yourself permission to make a rough version of '
-        '“${_currentTask(context)}” for ten minutes—something useful, not '
-        'impressive. What would “good enough for this session” look like?';
-  }
+  static String _perfectionismReply(
+    CoachingContext context,
+    AppLocalizations l10n,
+  ) => l10n.coachServicePerfectionismResponse(_currentTask(context, l10n));
 
-  static String _decisionReply(CoachingContext context) {
+  static String _decisionReply(CoachingContext context, AppLocalizations l10n) {
     final queueNote = context.queueRemaining > 1
-        ? 'You have ${context.queueRemaining} items waiting, but only one needs '
-              'your attention now.'
-        : 'You only need to choose the next move, not the whole path.';
-    return 'Too many reasonable options can freeze a decision. $queueNote '
-        'Choose “${_currentTask(context)}” for one short trial round. A '
-        'reversible choice does not need perfect certainty.';
+        ? l10n.coachServiceDecisionQueueMultiple(context.queueRemaining)
+        : l10n.coachServiceDecisionQueueSingle;
+    return l10n.coachServiceDecisionResponse(
+      queueNote,
+      _currentTask(context, l10n),
+    );
   }
 
-  static String _timePressureReply(CoachingContext context) {
-    return 'That time pressure is real, and panic can make the remaining time '
-        'harder to use. For “${_currentTask(context)},” name the smallest '
-        'acceptable outcome, remove one nonessential piece, and work only on '
-        'the next ten-minute block. What can safely be left out?';
-  }
+  static String _timePressureReply(
+    CoachingContext context,
+    AppLocalizations l10n,
+  ) => l10n.coachServiceTimePressureResponse(_currentTask(context, l10n));
 
   static String _followUpReply(
     CoachingContext context,
     List<CoachingMessage> conversation,
+    AppLocalizations l10n,
   ) {
-    final task = _currentTask(context);
+    final task = _currentTask(context, l10n);
     final continuity = conversation.any(
       (entry) => entry.role == CoachingMessageRole.coach,
     );
-    final challenge = _recentChallenge(conversation);
+    final challenge = _recentChallenge(conversation, l10n);
     final opening = continuity
-        ? 'Absolutely—let’s make the step we were discussing concrete.'
-        : 'Absolutely—let’s make this concrete.';
+        ? l10n.coachServiceFollowUpContinuingOpening
+        : l10n.coachServiceFollowUpNewOpening;
     final memory = challenge == null
         ? ''
-        : ' Since $challenge was the sticking point, we’ll keep each step '
-              'deliberately small.';
-    return '$opening$memory For “$task”: first, open or gather what you need; second, '
-        'make one deliberately rough pass for five minutes; third, stop and '
-        'name the next visible action. Do only the first step right now.';
+        : l10n.coachServiceFollowUpMemory(challenge);
+    return l10n.coachServiceFollowUpResponse(opening, memory, task);
   }
 
-  static String _distractionReply(CoachingContext context) {
+  static String _distractionReply(
+    CoachingContext context,
+    AppLocalizations l10n,
+  ) {
     final savedThoughts = context.parkedThoughtCount;
     final parkingNote = savedThoughts == 0
-        ? 'If the thought can wait, park it in FocusHaven so your brain does '
-              'not have to keep rehearsing it.'
-        : 'You already have $savedThoughts parked '
-              '${savedThoughts == 1 ? 'thought' : 'thoughts'}; let those stay '
-              'safe while you return.';
-    return 'No judgment—attention wanders. $parkingNote Then take one slow '
-        'breath, look only at “${_currentTask(context)},” and choose the next '
-        'action that takes under two minutes.';
+        ? l10n.coachServiceDistractionParkingEmpty
+        : l10n.coachServiceDistractionParkingSaved(savedThoughts);
+    return l10n.coachServiceDistractionResponse(
+      parkingNote,
+      _currentTask(context, l10n),
+    );
   }
 
-  static String _energyReply(CoachingContext context) {
+  static String _energyReply(CoachingContext context, AppLocalizations l10n) {
     if (context.todayFocusMinutes >= context.dailyGoalMinutes) {
-      return 'You have already met today’s focus goal. Rest is not falling '
-          'behind; it is part of protecting tomorrow’s attention. Consider '
-          'ending on purpose, drinking some water, and choosing one gentle '
-          'thing that helps you recover.';
+      return l10n.coachServiceEnergyGoalMet;
     }
-    return 'Low energy deserves a smaller plan, not harsher self-talk. Try a '
-        'short break first. When you return, give “${_currentTask(context)}” '
-        'one ten-minute round and reassess honestly after that.';
+    return l10n.coachServiceEnergyLowResponse(_currentTask(context, l10n));
   }
 
-  static String _breakReply(CoachingContext context) {
+  static String _breakReply(CoachingContext context, AppLocalizations l10n) {
     if (context.dailyGoalMinutes > 0 &&
         context.todayFocusMinutes >= context.dailyGoalMinutes) {
-      return 'Yes—take the break. You have already met today’s focus goal, so '
-          'you do not need to promise another round before you rest. End the '
-          'session intentionally and let recovery count.';
+      return l10n.coachServiceBreakGoalMet;
     }
     final timerNote = context.isTimerRunning
-        ? ' Pause the timer so the break feels real.'
+        ? l10n.coachServiceBreakTimerRunning
         : '';
-    return 'Yes—take a real five-minute break.$timerNote Leave “${_currentTask(context)}” '
-        'open to the exact place you stopped, move your body, and get water if '
-        'you need it. When you return, say “I’m back,” and we’ll choose only '
-        'the next visible action.';
+    return l10n.coachServiceBreakResponse(
+      timerNote,
+      _currentTask(context, l10n),
+    );
   }
 
   static String _returnReply(
     CoachingContext context,
     List<CoachingMessage> conversation,
+    AppLocalizations l10n,
   ) {
-    final task = _currentTask(context);
-    final challenge = _recentChallenge(conversation);
+    final task = _currentTask(context, l10n);
+    final challenge = _recentChallenge(conversation, l10n);
     final memory = challenge == null
         ? ''
-        : ' Since $challenge was part of the earlier struggle, re-enter '
-              'gently.';
+        : l10n.coachServiceReturnMemory(challenge);
     final timerNote = context.isTimerRunning
-        ? ' Your timer is already running, so there is nothing else to set up.'
+        ? l10n.coachServiceReturnTimerRunning
         : '';
-    return 'Welcome back. You do not need to recreate all your motivation.'
-        '$memory$timerNote Look at “$task,” recover the last visible action, '
-        'and do only that for two minutes before deciding what comes next.';
+    return l10n.coachServiceReturnResponse(memory, timerNote, task);
   }
 
   static String _progressReply(
     CoachingContext context,
     List<CoachingMessage> conversation,
+    AppLocalizations l10n,
   ) {
-    final task = _currentTask(context);
-    final challenge = _recentChallenge(conversation);
+    final task = _currentTask(context, l10n);
+    final challenge = _recentChallenge(conversation, l10n);
     final memory = challenge == null
         ? ''
-        : ' That matters even more after $challenge was getting in the way.';
+        : l10n.coachServiceProgressMemory(challenge);
     final pace = context.isTimerRunning
-        ? 'Stay with the current session without speeding up.'
-        : 'Take one breath and let the progress register before continuing.';
-    return 'That is real progress—not a trivial prelude to the “real” work.'
-        '$memory $pace For “$task,” name what you completed, then choose one '
-        'next action no larger than the one you just did.';
+        ? l10n.coachServiceProgressPaceRunning
+        : l10n.coachServiceProgressPaceStopped;
+    return l10n.coachServiceProgressResponse(memory, pace, task);
   }
 
-  static String _planningReply(CoachingContext context) {
-    final task = _currentTask(context);
+  static String _planningReply(CoachingContext context, AppLocalizations l10n) {
+    final task = _currentTask(context, l10n);
     final queueNote = context.queueRemaining > 1
-        ? 'Ignore the other ${context.queueRemaining - 1} queued items for now.'
-        : 'Keep the rest out of view for now.';
-    return 'Start with “$task.” $queueNote Define what “done for this session” '
-        'means in one sentence, then choose a first action you can complete '
-        'without making another decision.';
+        ? l10n.coachServicePlanningQueueMultiple(context.queueRemaining - 1)
+        : l10n.coachServicePlanningQueueSingle;
+    return l10n.coachServicePlanningResponse(task, queueNote);
   }
 
   static String _celebrationReply(
     CoachingContext context,
     List<CoachingMessage> conversation,
+    AppLocalizations l10n,
   ) {
     final progress = context.todayFocusMinutes > 0
-        ? ' You have protected ${context.todayFocusMinutes} minutes of focus '
-              'today.'
+        ? l10n.coachServiceCelebrationProgress(context.todayFocusMinutes)
         : '';
-    final challenge = _recentChallenge(conversation);
+    final challenge = _recentChallenge(conversation, l10n);
     final memory = challenge == null
         ? ''
-        : ' You reached this point while working through $challenge.';
-    return 'That counts. Take a second to let the win register instead of '
-        'rushing past it.$progress$memory What helped this time that you want to '
-        'repeat in your next session?';
+        : l10n.coachServiceCelebrationMemory(challenge);
+    return l10n.coachServiceCelebrationResponse(progress, memory);
   }
 
   static String _generalReply(
     CoachingContext context,
-    List<CoachingMessage> conversation, {
+    List<CoachingMessage> conversation,
+    AppLocalizations l10n, {
     _CoachingSupportMode? supportMode,
   }) {
-    final task = _currentTask(context);
+    final task = _currentTask(context, l10n);
     if (supportMode == _CoachingSupportMode.listening) {
-      return _listeningReply(conversation);
+      return _listeningReply(conversation, l10n);
     }
     if (supportMode == _CoachingSupportMode.direct) {
       final timerDirection = context.isTimerRunning
-          ? 'Return to the running timer now.'
-          : 'Start one ten-minute focus round now.';
-      return 'You asked me to stay direct: put everything except “$task” out '
-          'of view. $timerDirection Do the next visible action, then report '
-          'what actually happened.';
+          ? l10n.coachServiceGeneralDirectTimerRunning
+          : l10n.coachServiceGeneralDirectTimerStart;
+      return l10n.coachServiceGeneralDirectResponse(task, timerDirection);
     }
     final gentleOpening = supportMode == _CoachingSupportMode.gentle
-        ? 'I remember that you wanted a gentler approach. '
+        ? l10n.coachServiceGeneralGentleOpening
         : '';
     final mood = context.recentMood?.trim();
     final profile = context.focusProfile?.trim();
     final personalNote = mood?.isNotEmpty == true
-        ? 'Your recent reflections have often felt $mood, so let’s work with '
-              'that rather than against it.'
+        ? l10n.coachServiceGeneralMoodNote(mood!)
         : profile?.isNotEmpty == true
-        ? 'We can shape this for your $profile focus style.'
-        : 'We can keep this gentle and practical.';
-    final challenge = _recentChallenge(conversation);
+        ? l10n.coachServiceGeneralProfileNote(profile!)
+        : l10n.coachServiceGeneralDefaultNote;
+    final challenge = _recentChallenge(conversation, l10n);
     if (challenge != null) {
-      return '$gentleOpening$personalNote Earlier, you were dealing with $challenge. Is that '
-          'still the main obstacle with “$task,” or has something changed?';
+      return l10n.coachServiceGeneralChallengeResponse(
+        gentleOpening,
+        personalNote,
+        challenge,
+        task,
+      );
     }
     final continuity = conversation.length > 2
-        ? ' I’m still with the thread we’ve been working through.'
+        ? l10n.coachServiceGeneralContinuity
         : '';
-    return '$gentleOpening$personalNote$continuity For “$task,” what feels hardest right '
-        'now: knowing what to do, getting started, or staying with it?';
+    return l10n.coachServiceGeneralResponse(
+      gentleOpening,
+      personalNote,
+      continuity,
+      task,
+    );
   }
 }
 
@@ -1026,7 +1002,12 @@ class CoachingService extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get noticeMessage => _noticeMessage;
 
-  Future<bool> send(String message, CoachingContext context) async {
+  Future<bool> send(
+    String message,
+    CoachingContext context, {
+    AppLocalizations? localizations,
+  }) async {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final cleanedMessage = _cleanText(message);
     if (cleanedMessage == null) return false;
     await initialized;
@@ -1055,12 +1036,12 @@ class CoachingService extends ChangeNotifier {
       await _save(_messages);
       if (_isDisposed) return false;
       userMessageCommitted = true;
-      return await _completeResponse(cleanedMessage, context);
+      return await _completeResponse(cleanedMessage, context, l10n);
     } catch (error) {
       if (_isDisposed) return false;
       if (!userMessageCommitted) _messages = previousMessages;
       _isResponding = false;
-      _errorMessage = 'Your coach could not respond right now. Please retry.';
+      _errorMessage = l10n.coachServiceResponseError;
       PrivacySafeDiagnostics.report(
         FocusHavenDiagnosticEvent.coachResponse,
         error: error,
@@ -1070,7 +1051,11 @@ class CoachingService extends ChangeNotifier {
     }
   }
 
-  Future<bool> retryLastResponse(CoachingContext context) async {
+  Future<bool> retryLastResponse(
+    CoachingContext context, {
+    AppLocalizations? localizations,
+  }) async {
+    final l10n = localizations ?? defaultServiceLocalizations();
     await initialized;
     if (!canRetryResponse) return false;
 
@@ -1080,11 +1065,11 @@ class CoachingService extends ChangeNotifier {
     _noticeMessage = null;
     _notifyConversationChanged();
     try {
-      return await _completeResponse(message, context);
+      return await _completeResponse(message, context, l10n);
     } catch (error) {
       if (_isDisposed) return false;
       _isResponding = false;
-      _errorMessage = 'Your coach could not respond right now. Please retry.';
+      _errorMessage = l10n.coachServiceResponseError;
       PrivacySafeDiagnostics.report(
         FocusHavenDiagnosticEvent.coachResponseRetry,
         error: error,
@@ -1097,6 +1082,7 @@ class CoachingService extends ChangeNotifier {
   Future<bool> _completeResponse(
     String message,
     CoachingContext context,
+    AppLocalizations l10n,
   ) async {
     final requiresLocalResponse =
         LocalCoachingResponder.isSafetyConcern(message) ||
@@ -1110,7 +1096,7 @@ class CoachingService extends ChangeNotifier {
         : _localResponder;
     final response = await responder.respond(
       message: message,
-      context: context,
+      context: context.withLocalizations(l10n),
       conversation: List.unmodifiable(_messages),
     );
     if (_isDisposed) return false;
@@ -1132,13 +1118,17 @@ class CoachingService extends ChangeNotifier {
     final fallbackReason = responder is CoachingFallbackNoticeSource
         ? (responder as CoachingFallbackNoticeSource).takeFallbackReason()
         : null;
-    _noticeMessage = fallbackReason?.userMessage;
+    _noticeMessage = fallbackReason?.userMessage(l10n);
     _isResponding = false;
     _notifyConversationChanged();
     return true;
   }
 
-  Future<bool> setEnhancedCoachingEnabled(bool enabled) async {
+  Future<bool> setEnhancedCoachingEnabled(
+    bool enabled, {
+    AppLocalizations? localizations,
+  }) async {
+    final l10n = localizations ?? defaultServiceLocalizations();
     await initialized;
     if (_isDisposed ||
         _isResponding ||
@@ -1156,7 +1146,7 @@ class CoachingService extends ChangeNotifier {
         saved = await _saveEnhancedPreference(preferences, enabled);
       } catch (error) {
         if (_isDisposed) return false;
-        _reportEnhancedPreferenceSaveFailure();
+        _reportEnhancedPreferenceSaveFailure(l10n);
         PrivacySafeDiagnostics.report(
           FocusHavenDiagnosticEvent.coachEnhancedPreferenceSave,
           error: error,
@@ -1165,7 +1155,7 @@ class CoachingService extends ChangeNotifier {
       }
       if (_isDisposed) return false;
       if (!saved) {
-        _reportEnhancedPreferenceSaveFailure();
+        _reportEnhancedPreferenceSaveFailure(l10n);
         return false;
       }
 
@@ -1179,15 +1169,23 @@ class CoachingService extends ChangeNotifier {
     }
   }
 
-  Future<bool> clearConversation() =>
-      _clearLocalData(includeEnhancedPreference: false);
+  Future<bool> clearConversation({AppLocalizations? localizations}) =>
+      _clearLocalData(
+        includeEnhancedPreference: false,
+        localizations: localizations,
+      );
 
-  Future<bool> clearLocalData() =>
-      _clearLocalData(includeEnhancedPreference: true);
+  Future<bool> clearLocalData({AppLocalizations? localizations}) =>
+      _clearLocalData(
+        includeEnhancedPreference: true,
+        localizations: localizations,
+      );
 
   Future<bool> _clearLocalData({
     required bool includeEnhancedPreference,
+    AppLocalizations? localizations,
   }) async {
+    final l10n = localizations ?? defaultServiceLocalizations();
     await initialized;
     if (_isDisposed || _isResponding || _isManagingPrivateData) return false;
 
@@ -1195,12 +1193,11 @@ class CoachingService extends ChangeNotifier {
     try {
       return await _performClearLocalData(
         includeEnhancedPreference: includeEnhancedPreference,
+        localizations: l10n,
       );
     } catch (error) {
       if (_isDisposed) return false;
-      _errorMessage =
-          'Your private coaching data could not be completely cleared. '
-          'Please retry.';
+      _errorMessage = l10n.coachServicePrivateClearError;
       PrivacySafeDiagnostics.report(
         FocusHavenDiagnosticEvent.coachPrivateCleanup,
         error: error,
@@ -1214,6 +1211,7 @@ class CoachingService extends ChangeNotifier {
 
   Future<bool> _performClearLocalData({
     required bool includeEnhancedPreference,
+    required AppLocalizations localizations,
   }) async {
     final preferences = await SharedPreferences.getInstance();
     final conversationCleared = await _removePrivateValue(
@@ -1245,8 +1243,7 @@ class CoachingService extends ChangeNotifier {
     }
     _errorMessage = clearCompleted
         ? null
-        : 'Your private coaching data could not be completely cleared. '
-              'Please retry.';
+        : localizations.coachServicePrivateClearError;
 
     if (conversationChanged) {
       _notifyConversationChanged();
@@ -1403,19 +1400,17 @@ class CoachingService extends ChangeNotifier {
     }
   }
 
-  void _reportStorageRepairFailure() {
+  void _reportStorageRepairFailure([AppLocalizations? localizations]) {
     if (_isDisposed) return;
-    _errorMessage =
-        'Your private coaching data could not be completely repaired. '
-        'Please clear it and retry.';
+    final l10n = localizations ?? defaultServiceLocalizations();
+    _errorMessage = l10n.coachServiceStorageRepairError;
     PrivacySafeDiagnostics.report(FocusHavenDiagnosticEvent.coachStorageRepair);
     notifyListeners();
   }
 
-  void _reportEnhancedPreferenceSaveFailure() {
+  void _reportEnhancedPreferenceSaveFailure(AppLocalizations localizations) {
     if (_isDisposed) return;
-    _errorMessage =
-        'Your enhanced coaching preference could not be saved. Please retry.';
+    _errorMessage = localizations.coachServiceEnhancedPreferenceError;
     _noticeMessage = null;
     notifyListeners();
   }

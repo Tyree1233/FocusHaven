@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B6C1 audited extraction contract
+Status: Phase 215G-B6C2 audited extraction contract
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -25,8 +25,10 @@ country release readiness.
   authentication, backup, deletion, Pro, purchase, journal, profile, reminder,
   milestone, Focus History, and current legal-launch presentation boundaries.
   Phase 215G-B6C1 additionally catalog-owns Haven action interpretation,
-  policy, and execution copy. Remaining service strings are explicitly
-  inventoried for B6C2 and B6C3; this slice does not complete Phase 215G-B.
+  policy, and execution copy. Phase 215G-B6C2 catalog-owns deterministic
+  Local-Coach responses, enhanced-AI fallback notices, and coaching service
+  errors and cleanup receipts. Remaining service strings are explicitly
+  inventoried for B6C3; this slice does not complete Phase 215G-B.
 - No runtime translation service is used, and no private user content is sent
   anywhere for translation.
 
@@ -152,6 +154,14 @@ tasks must still be evaluated from the console's current state.
   and voice-transcript allowlist, protected-operation exclusions, proposal
   schema, expiry, state tokens, exact confirmation, replay protection, and
   existing timer, queue, and navigation service ownership remain unchanged.
+  Phase 215G-B6C2 moves deterministic private Local-Coach responses,
+  remembered stable challenge labels, enhanced-AI fallback notices, and
+  coaching save, repair, consent-preference, and cleanup errors into the
+  catalog. User messages, task names, moods, profiles, and saved conversation
+  content remain opaque runtime placeholders. The in-memory selected catalog
+  is deliberately excluded from the Enhanced-AI prompt payload. English
+  signal matching and command interpretation remain unchanged until Phase
+  215G-D qualifies language-aware understanding.
   B6 remains required through B6C3.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.

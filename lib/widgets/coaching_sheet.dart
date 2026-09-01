@@ -246,7 +246,11 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         .toList(growable: false);
     var sendCompleted = false;
     try {
-      sendCompleted = await coach.send(message, widget.contextBuilder());
+      sendCompleted = await coach.send(
+        message,
+        widget.contextBuilder(),
+        localizations: context.l10n,
+      );
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -281,7 +285,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     try {
       await ref
           .read(coachingServiceProvider)
-          .retryLastResponse(widget.contextBuilder());
+          .retryLastResponse(
+            widget.contextBuilder(),
+            localizations: context.l10n,
+          );
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -313,7 +320,9 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         isDestructive: true,
       );
       if (!confirmed || !mounted) return;
-      await ref.read(coachingServiceProvider).clearConversation();
+      await ref
+          .read(coachingServiceProvider)
+          .clearConversation(localizations: context.l10n);
     } finally {
       if (mounted) setState(() => _isManagingHistory = false);
     }
@@ -340,7 +349,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
       }
       await ref
           .read(coachingServiceProvider)
-          .setEnhancedCoachingEnabled(enabled);
+          .setEnhancedCoachingEnabled(enabled, localizations: context.l10n);
     } finally {
       if (mounted) setState(() => _isManagingHistory = false);
     }

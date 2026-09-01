@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B6C1 audited extraction contract
+Status: Phase 215G-B6C2 audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -313,12 +313,43 @@ queue or timer, records no audio, contacts no AI or translation provider, adds
 no permission or dependency, deploys nothing, and activates no planned locale.
 Phase 215G-B is therefore not complete.
 
+## B6C2 — Local-Coach responses and receipts
+
+The second remaining-service sub-slice is now catalog-owned within these
+boundaries:
+
+- deterministic safety, boundary, repair, reflection, listening, gentle,
+  direct, uncertainty, planning, recovery, progress, and celebration
+  responses from the private Local Coach;
+- stable remembered-challenge labels and response fragments used only to
+  assemble those deterministic responses;
+- enhanced-AI allowance, access, and temporary-service fallback notices; and
+- coaching response, enhanced-consent preference, private cleanup, and
+  damaged-storage repair errors.
+
+Task names, next-queue titles, moods, focus profiles, user messages, and saved
+conversation content remain opaque runtime placeholders. They are never copied
+into catalog keys or sent to a translation provider. The selected catalog is
+attached only to the in-memory local response context and is intentionally
+absent from `CoachingContext.toPromptData()`, so this extraction adds nothing
+to the Enhanced-AI payload. Direct service callers retain a deterministic
+English fallback when no presentation catalog is supplied.
+
+English safety, boundary, repair, support-mode, and coaching-intent signal
+phrases remain the only accepted runtime grammar until Phase 215G-D aligns
+understanding with an independently qualified locale. Responder selection,
+local-first fallback, enhanced-AI consent and availability gates, bounded
+conversation persistence, retry behavior, diagnostics, and cleanup ownership
+are unchanged. English remains the only production catalog.
+
+B6C2 records no audio, sends no coaching text, contacts no AI or translation
+provider, changes no account, queue, timer, permission, dependency, backend,
+deployment, or store setting, and activates no planned locale. Phase 215G-B
+is therefore not complete.
+
 ## Remaining Phase 215G-B slices
 
-1. **B6C2 — Local-Coach responses and receipts:** deterministic local-Coach
-   responses, enhanced-AI fallback notices, and remaining coaching service
-   errors and cleanup receipts.
-2. **B6C3 — Remaining service results:** authentication, store, journal
+1. **B6C3 — Remaining service results:** authentication, store, journal
    prompts, exports, and all other audited user-facing service errors and
    receipts.
 

@@ -180,8 +180,8 @@ void main() {
     expect(inventory, contains('B6C1 — Haven action service results'));
     expect(policy, contains('Phase 215G-B6B2'));
     expect(policy, contains('B6 remains required through B6C3'));
-    expect(roadmap, contains('B1–B6C1 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C2 and B6C3'));
+    expect(roadmap, contains('B1–B6C2 extraction shipped'));
+    expect(roadmap, contains('remaining B6 extraction work is B6C3'));
     expect(readme, contains('Phase 215G-B6B2'));
     expect(
       locales,
