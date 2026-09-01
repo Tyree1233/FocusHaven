@@ -160,10 +160,10 @@ void main() {
       expect(inventory, contains(required));
     }
 
-    expect(policy, contains('215G-B1, B2, and B3A'));
+    expect(policy, contains('215G-B1, B2, B3A, and B3B'));
     expect(policy, contains('not complete Phase 215G-B'));
     expect(roadmap, contains('Phase 215G-B1'));
-    expect(roadmap, contains('remaining B3B–B6 extraction slices'));
+    expect(roadmap, contains('remaining B3C–B6 extraction slices'));
   });
 }
 

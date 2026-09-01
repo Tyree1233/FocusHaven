@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 
 import 'package:focushaven/models/haven_journey_state.dart';
 import 'package:focushaven/widgets/haven_journey_card.dart';
@@ -10,6 +11,8 @@ Widget _app(
   double cardWidth = 380,
 }) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ThemeData.dark().copyWith(
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFFF16FBA),

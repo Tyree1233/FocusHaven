@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_forecast.dart';
 
 /// A compact, expandable view of one private Focus Forecast observation.
@@ -23,6 +24,7 @@ class _FocusForecastCardState extends State<FocusForecastCard> {
   @override
   Widget build(BuildContext context) {
     final forecast = widget.forecast;
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     final accent = _accentColor(forecast.kind, colors);
     final borderRadius = BorderRadius.circular(18);
@@ -41,10 +43,13 @@ class _FocusForecastCardState extends State<FocusForecastCard> {
           Semantics(
             button: true,
             onTap: _toggle,
-            label:
-                'Focus Forecast. ${_kindLabel(forecast.kind)}. '
-                '${forecast.headline}. '
-                '${_isExpanded ? 'Hide details.' : 'Show details.'}',
+            label: l10n.focusForecastSemantics(
+              _kindLabel(context, forecast.kind),
+              forecast.headline,
+              _isExpanded
+                  ? l10n.focusForecastHideDetails
+                  : l10n.focusForecastShowDetails,
+            ),
             child: ExcludeSemantics(
               child: InkWell(
                 key: const ValueKey('toggle-focus-forecast'),
@@ -74,7 +79,12 @@ class _FocusForecastCardState extends State<FocusForecastCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'FOCUS FORECAST · ${_kindLabel(forecast.kind).toUpperCase()}',
+                              l10n.focusForecastEyebrow(
+                                _kindLabel(
+                                  context,
+                                  forecast.kind,
+                                ).toUpperCase(),
+                              ),
                               style: TextStyle(
                                 color: accent,
                                 fontSize: 11,
@@ -138,15 +148,13 @@ class _FocusForecastCardState extends State<FocusForecastCard> {
                   const SizedBox(height: 11),
                   _ForecastNote(
                     icon: Icons.explore_outlined,
-                    text:
-                        'A possible window is not a promise. Your energy and real-life availability keep leading.',
+                    text: l10n.focusForecastAdvisoryBoundary,
                     accent: accent,
                   ),
                   const SizedBox(height: 9),
                   _ForecastNote(
                     icon: Icons.lock_outline_rounded,
-                    text:
-                        'Calculated on this device from text-free completed-session timing. No task text, productivity score, or automatic schedule.',
+                    text: l10n.focusForecastPrivacy,
                     accent: accent,
                   ),
                 ],
@@ -165,11 +173,13 @@ class _FocusForecastCardState extends State<FocusForecastCard> {
         FocusForecastKind.flexible => colors.tertiary,
       };
 
-  static String _kindLabel(FocusForecastKind kind) => switch (kind) {
-    FocusForecastKind.learning => 'Still learning',
-    FocusForecastKind.emergingWindow => 'Possible window',
-    FocusForecastKind.flexible => 'Flexible timing',
-  };
+  static String _kindLabel(BuildContext context, FocusForecastKind kind) =>
+      switch (kind) {
+        FocusForecastKind.learning => context.l10n.focusForecastKindLearning,
+        FocusForecastKind.emergingWindow =>
+          context.l10n.focusForecastKindEmergingWindow,
+        FocusForecastKind.flexible => context.l10n.focusForecastKindFlexible,
+      };
 
   static IconData _kindIcon(FocusForecastKind kind) => switch (kind) {
     FocusForecastKind.learning => Icons.hourglass_empty_rounded,

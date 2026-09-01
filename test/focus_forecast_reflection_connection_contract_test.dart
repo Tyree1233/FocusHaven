@@ -48,8 +48,7 @@ void main() {
     ]) {
       expect(card, isNot(contains(forbidden)));
     }
-    expect(card, contains('Nothing changed automatically'));
-    expect(card, contains('A possible window is not a rule'));
-    expect(card, contains('your next session remains your choice'));
+    expect(card, contains('focusForecastReflectionSemantics'));
+    expect(card, contains('focusForecastNoAutomaticChange'));
   });
 }

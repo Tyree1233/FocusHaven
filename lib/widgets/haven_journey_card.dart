@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/haven_journey_state.dart';
 
 /// An accessible, noninteractive view of one private Haven Journey place.
@@ -15,13 +16,16 @@ class HavenJourneyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final accent = _accent(colors, state.place);
-    final placeLabel = _placeLabel(state.place);
+    final l10n = context.l10n;
+    final placeLabel = _placeLabel(context, state.place);
 
     return Semantics(
       container: true,
-      label:
-          'Haven Journey. $placeLabel. ${state.headline}. ${state.detail} '
-          'Built privately from completed focus sessions. No score or public ranking.',
+      label: l10n.havenJourneySemantics(
+        placeLabel,
+        state.headline,
+        state.detail,
+      ),
       child: ExcludeSemantics(
         child: DecoratedBox(
           key: const ValueKey('haven-journey-card'),
@@ -79,13 +83,14 @@ class HavenJourneyCard extends StatelessWidget {
     );
   }
 
-  static String _placeLabel(HavenJourneyPlace place) => switch (place) {
-    HavenJourneyPlace.lantern => 'Lantern',
-    HavenJourneyPlace.campsite => 'Campsite',
-    HavenJourneyPlace.cabin => 'Cabin',
-    HavenJourneyPlace.garden => 'Garden',
-    HavenJourneyPlace.sanctuary => 'Sanctuary',
-  };
+  static String _placeLabel(BuildContext context, HavenJourneyPlace place) =>
+      switch (place) {
+        HavenJourneyPlace.lantern => context.l10n.havenJourneyPlaceLantern,
+        HavenJourneyPlace.campsite => context.l10n.havenJourneyPlaceCampsite,
+        HavenJourneyPlace.cabin => context.l10n.havenJourneyPlaceCabin,
+        HavenJourneyPlace.garden => context.l10n.havenJourneyPlaceGarden,
+        HavenJourneyPlace.sanctuary => context.l10n.havenJourneyPlaceSanctuary,
+      };
 
   static Color _accent(ColorScheme colors, HavenJourneyPlace place) =>
       switch (place) {
@@ -113,7 +118,7 @@ class _JourneyCopy extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        'HAVEN JOURNEY · ${placeLabel.toUpperCase()}',
+        context.l10n.havenJourneyEyebrow(placeLabel.toUpperCase()),
         key: const ValueKey('haven-journey-place'),
         style: TextStyle(
           color: accent,
@@ -144,9 +149,9 @@ class _JourneyCopy extends StatelessWidget {
         children: [
           Icon(Icons.lock_outline_rounded, color: accent, size: 14),
           const SizedBox(width: 5),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Private and lasting · no score, decay, or public rank',
+              context.l10n.havenJourneyPrivacy,
               style: TextStyle(fontSize: 11, height: 1.25),
             ),
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/smart_reset_plan.dart';
 
 enum SmartResetChoice { restart, reset, keep }
@@ -22,10 +23,14 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
   bool _isClosing = false;
 
   String _durationLabel(int seconds) {
-    if (seconds < 60) return '$seconds sec';
+    final l10n = context.l10n;
+    if (seconds < 60) return l10n.durationSecondsShort(seconds.toString());
     final minutes = seconds ~/ 60;
     final remaining = seconds % 60;
-    return remaining == 0 ? '$minutes min' : '$minutes min $remaining sec';
+    return remaining == 0
+        ? l10n.durationMinutesShort(minutes)
+        : '${l10n.durationMinutesShort(minutes)} '
+              '${l10n.durationSecondsShort(remaining.toString())}';
   }
 
   void _close(SmartResetChoice choice) {
@@ -37,10 +42,13 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
   @override
   Widget build(BuildContext context) {
     final plan = widget.plan;
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     final progressMessage = plan.focusedDurationSeconds >= 60
-        ? '${_durationLabel(plan.focusedDurationSeconds)} of focus still counts.'
-        : 'Pausing to choose a better fit still counts.';
+        ? l10n.smartResetFocusStillCounts(
+            _durationLabel(plan.focusedDurationSeconds),
+          )
+        : l10n.smartResetPauseStillCounts;
 
     return SafeArea(
       top: false,
@@ -63,8 +71,8 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
             const SizedBox(height: 22),
             Icon(Icons.refresh_rounded, size: 34, color: colors.primary),
             const SizedBox(height: 12),
-            const Text(
-              'This session isn’t a failure',
+            Text(
+              l10n.smartResetTitle,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 21, fontWeight: FontWeight.w700),
             ),
@@ -87,8 +95,8 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
                 padding: const EdgeInsets.all(17),
                 child: Column(
                   children: [
-                    const Text(
-                      'A SMALLER WAY BACK',
+                    Text(
+                      l10n.smartResetSmallerWayBackUpper,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -117,14 +125,14 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
               ),
             ),
             const SizedBox(height: 14),
-            const Row(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.lock_outline, size: 17, color: Colors.white60),
                 SizedBox(width: 7),
                 Expanded(
                   child: Text(
-                    'Calculated privately on this device from time-only focus signals.',
+                    l10n.smartResetPrivacy,
                     style: TextStyle(color: Colors.white60, fontSize: 13),
                   ),
                 ),
@@ -132,7 +140,7 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
             ),
             if (widget.preservesSelectedTask) ...[
               const SizedBox(height: 12),
-              const Row(
+              Row(
                 key: ValueKey('smart-reset-linked-task-boundary'),
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -140,7 +148,7 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
                   SizedBox(width: 7),
                   Expanded(
                     child: Text(
-                      'Your selected queue item stays linked only while it remains active and unchanged. No task text is copied into Smart Reset.',
+                      l10n.smartResetLinkedTaskBoundary,
                       style: TextStyle(color: Colors.white60, fontSize: 13),
                     ),
                   ),
@@ -155,7 +163,9 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
                   : () => _close(SmartResetChoice.restart),
               icon: const Icon(Icons.play_arrow_rounded),
               label: Text(
-                'Restart with ${_durationLabel(plan.restartDurationSeconds)}',
+                l10n.smartResetRestartWith(
+                  _durationLabel(plan.restartDurationSeconds),
+                ),
               ),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
@@ -167,14 +177,14 @@ class _SmartResetSheetState extends State<SmartResetSheet> {
               onPressed: _isClosing
                   ? null
                   : () => _close(SmartResetChoice.reset),
-              child: const Text('Reset without restarting'),
+              child: Text(l10n.smartResetResetWithoutRestarting),
             ),
             TextButton(
               key: const ValueKey('smart-reset-keep'),
               onPressed: _isClosing
                   ? null
                   : () => _close(SmartResetChoice.keep),
-              child: const Text('Keep this session'),
+              child: Text(l10n.smartResetKeepSession),
             ),
           ],
         ),

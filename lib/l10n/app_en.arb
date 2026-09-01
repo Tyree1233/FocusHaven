@@ -1013,5 +1013,307 @@
   "havenLoopRecoveryUnlinked": "The queue item changed, so recovery continued without a task link.",
   "@havenLoopRecoveryUnlinked": {
     "description": "Receipt when Plan-to-Focus recovery safely drops a stale queue link."
+  },
+  "focusReflectionTitle": "How did that session feel?",
+  "@focusReflectionTitle": {
+    "description": "Heading for the optional text-free reflection after a completed focus session."
+  },
+  "focusReflectionDescription": "Optional and text-free. Choose one or continue without a reflection.",
+  "@focusReflectionDescription": {
+    "description": "Privacy and skip guidance for the completed-session reflection."
+  },
+  "focusSessionFitTooMuch": "Too much",
+  "@focusSessionFitTooMuch": {
+    "description": "Text-free completed-session fit choice indicating the session felt too demanding."
+  },
+  "focusSessionFitAboutRight": "About right",
+  "@focusSessionFitAboutRight": {
+    "description": "Text-free completed-session fit choice indicating the session felt suitable."
+  },
+  "focusSessionFitCouldDoMore": "Could do more",
+  "@focusSessionFitCouldDoMore": {
+    "description": "Text-free completed-session fit choice indicating capacity for more focus."
+  },
+  "focusReflectionSaved": "Saved privately. You can change your answer before continuing.",
+  "@focusReflectionSaved": {
+    "description": "Private local-save receipt shown after selecting a session fit."
+  },
+  "havenRhythmKindLearning": "Still learning",
+  "@havenRhythmKindLearning": {
+    "description": "Haven Rhythm kind shown while there are not enough private signals."
+  },
+  "havenRhythmKindGentleReturn": "Gentle return",
+  "@havenRhythmKindGentleReturn": {
+    "description": "Haven Rhythm kind suggesting a gentle return without controlling the timer."
+  },
+  "havenRhythmKindGentlerPace": "Gentler pace",
+  "@havenRhythmKindGentlerPace": {
+    "description": "Haven Rhythm kind describing a possible gentler pace."
+  },
+  "havenRhythmKindSustainablePace": "Sustainable pace",
+  "@havenRhythmKindSustainablePace": {
+    "description": "Haven Rhythm kind describing a possible sustainable pace."
+  },
+  "havenRhythmKindRoomToGrow": "Room to grow",
+  "@havenRhythmKindRoomToGrow": {
+    "description": "Haven Rhythm kind describing possible additional capacity."
+  },
+  "havenRhythmKindVariablePace": "Flexible rhythm",
+  "@havenRhythmKindVariablePace": {
+    "description": "Haven Rhythm kind describing varied completed-session signals."
+  },
+  "havenRhythmKindCompletionPattern": "Pattern emerging",
+  "@havenRhythmKindCompletionPattern": {
+    "description": "Haven Rhythm kind describing an emerging completed-session pattern."
+  },
+  "havenRhythmEyebrow": "HAVEN RHYTHM · {kind}",
+  "@havenRhythmEyebrow": {
+    "description": "Uppercase Haven Rhythm card eyebrow with a localized kind label.",
+    "placeholders": {
+      "kind": {
+        "type": "String",
+        "example": "STILL LEARNING"
+      }
+    }
+  },
+  "havenRhythmPossiblePace": "Possible pace · {count, plural, =1 {1 min} other {{count} min}}",
+  "@havenRhythmPossiblePace": {
+    "description": "Advisory possible focus pace in compact minutes.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "havenRhythmPrivacy": "Built privately from text-free focus signals. No productivity score.",
+  "@havenRhythmPrivacy": {
+    "description": "Privacy and non-scoring boundary in the expanded Haven Rhythm card."
+  },
+  "havenRhythmReflectionSemantics": "Haven Rhythm reflection update. {headline}. {detail}. Nothing changed automatically.",
+  "@havenRhythmReflectionSemantics": {
+    "description": "Complete screen-reader description for a reflection-to-Rhythm advisory.",
+    "placeholders": {
+      "headline": {
+        "type": "String",
+        "example": "Your Haven Rhythm is still forming"
+      },
+      "detail": {
+        "type": "String",
+        "example": "Haven Rhythm will wait for repeated private signals"
+      }
+    }
+  },
+  "havenRhythmReflectionSavedUpper": "HAVEN RHYTHM · REFLECTION SAVED",
+  "@havenRhythmReflectionSavedUpper": {
+    "description": "Uppercase eyebrow for a reflection-to-Rhythm advisory."
+  },
+  "havenRhythmNoAutomaticChange": "Nothing changed automatically. Your next session remains your choice.",
+  "@havenRhythmNoAutomaticChange": {
+    "description": "Agency boundary on a reflection-to-Rhythm advisory."
+  },
+  "focusForecastKindLearning": "Still learning",
+  "@focusForecastKindLearning": {
+    "description": "Focus Forecast kind shown while there are not enough timing signals."
+  },
+  "focusForecastKindEmergingWindow": "Possible window",
+  "@focusForecastKindEmergingWindow": {
+    "description": "Focus Forecast kind for an emerging completed-session timing window."
+  },
+  "focusForecastKindFlexible": "Flexible timing",
+  "@focusForecastKindFlexible": {
+    "description": "Focus Forecast kind for timing signals spread across the day."
+  },
+  "focusForecastEyebrow": "FOCUS FORECAST · {kind}",
+  "@focusForecastEyebrow": {
+    "description": "Uppercase Focus Forecast card eyebrow with a localized kind label.",
+    "placeholders": {
+      "kind": {
+        "type": "String",
+        "example": "STILL LEARNING"
+      }
+    }
+  },
+  "focusForecastShowDetails": "Show details",
+  "@focusForecastShowDetails": {
+    "description": "Screen-reader action for expanding Focus Forecast details."
+  },
+  "focusForecastHideDetails": "Hide details",
+  "@focusForecastHideDetails": {
+    "description": "Screen-reader action for collapsing Focus Forecast details."
+  },
+  "focusForecastSemantics": "Focus Forecast. {kind}. {headline}. {action}.",
+  "@focusForecastSemantics": {
+    "description": "Complete screen-reader toggle description for Focus Forecast.",
+    "placeholders": {
+      "kind": {
+        "type": "String",
+        "example": "Still learning"
+      },
+      "headline": {
+        "type": "String",
+        "example": "Your Focus Forecast is still forming"
+      },
+      "action": {
+        "type": "String",
+        "example": "Show details"
+      }
+    }
+  },
+  "focusForecastAdvisoryBoundary": "A possible window is not a promise. Your energy and real-life availability keep leading.",
+  "@focusForecastAdvisoryBoundary": {
+    "description": "Agency boundary on the expanded Focus Forecast card."
+  },
+  "focusForecastPrivacy": "Calculated on this device from text-free completed-session timing. No task text, productivity score, or automatic schedule.",
+  "@focusForecastPrivacy": {
+    "description": "Privacy and non-automation boundary on Focus Forecast."
+  },
+  "focusForecastReflectionSemantics": "Focus Forecast reflection update. {headline}. {detail}. Nothing changed automatically. A possible window is not a rule.",
+  "@focusForecastReflectionSemantics": {
+    "description": "Complete screen-reader description for a reflection-to-Forecast advisory.",
+    "placeholders": {
+      "headline": {
+        "type": "String",
+        "example": "Your Focus Forecast is still forming"
+      },
+      "detail": {
+        "type": "String",
+        "example": "Focus Forecast is an observation, not a rule"
+      }
+    }
+  },
+  "focusForecastReflectionSavedUpper": "FOCUS FORECAST · REFLECTION SAVED",
+  "@focusForecastReflectionSavedUpper": {
+    "description": "Uppercase eyebrow for a reflection-to-Forecast advisory."
+  },
+  "focusForecastNoAutomaticChange": "Nothing changed automatically. A possible window is not a rule; your next session remains your choice.",
+  "@focusForecastNoAutomaticChange": {
+    "description": "Agency boundary on a reflection-to-Forecast advisory."
+  },
+  "smartResetTitle": "This session isn’t a failure",
+  "@smartResetTitle": {
+    "description": "Compassionate Smart Reset sheet heading."
+  },
+  "smartResetFocusStillCounts": "{duration} of focus still counts.",
+  "@smartResetFocusStillCounts": {
+    "description": "Acknowledges meaningful focus time before offering a smaller restart.",
+    "placeholders": {
+      "duration": {
+        "type": "String",
+        "example": "7 min"
+      }
+    }
+  },
+  "smartResetPauseStillCounts": "Pausing to choose a better fit still counts.",
+  "@smartResetPauseStillCounts": {
+    "description": "Neutral acknowledgement when Smart Reset follows a just-started attempt."
+  },
+  "smartResetSmallerWayBackUpper": "A SMALLER WAY BACK",
+  "@smartResetSmallerWayBackUpper": {
+    "description": "Uppercase eyebrow above the suggested Smart Reset duration."
+  },
+  "smartResetPrivacy": "Calculated privately on this device from time-only focus signals.",
+  "@smartResetPrivacy": {
+    "description": "Local calculation privacy boundary in Smart Reset."
+  },
+  "smartResetLinkedTaskBoundary": "Your selected queue item stays linked only while it remains active and unchanged. No task text is copied into Smart Reset.",
+  "@smartResetLinkedTaskBoundary": {
+    "description": "Fail-closed linked-task and no-content-copy boundary in Smart Reset."
+  },
+  "smartResetRestartWith": "Restart with {duration}",
+  "@smartResetRestartWith": {
+    "description": "Action label for accepting the smaller Smart Reset duration.",
+    "placeholders": {
+      "duration": {
+        "type": "String",
+        "example": "10 min"
+      }
+    }
+  },
+  "smartResetResetWithoutRestarting": "Reset without restarting",
+  "@smartResetResetWithoutRestarting": {
+    "description": "Action label for resetting without starting a smaller session."
+  },
+  "smartResetKeepSession": "Keep this session",
+  "@smartResetKeepSession": {
+    "description": "Action label for leaving the current session unchanged."
+  },
+  "havenJourneyPlaceLantern": "Lantern",
+  "@havenJourneyPlaceLantern": {
+    "description": "Display name for the private Haven Journey lantern place."
+  },
+  "havenJourneyPlaceCampsite": "Campsite",
+  "@havenJourneyPlaceCampsite": {
+    "description": "Display name for the private Haven Journey campsite place."
+  },
+  "havenJourneyPlaceCabin": "Cabin",
+  "@havenJourneyPlaceCabin": {
+    "description": "Display name for the private Haven Journey cabin place."
+  },
+  "havenJourneyPlaceGarden": "Garden",
+  "@havenJourneyPlaceGarden": {
+    "description": "Display name for the private Haven Journey garden place."
+  },
+  "havenJourneyPlaceSanctuary": "Sanctuary",
+  "@havenJourneyPlaceSanctuary": {
+    "description": "Display name for the private Haven Journey sanctuary place."
+  },
+  "havenJourneyEyebrow": "HAVEN JOURNEY · {place}",
+  "@havenJourneyEyebrow": {
+    "description": "Uppercase Haven Journey card eyebrow with a localized place label.",
+    "placeholders": {
+      "place": {
+        "type": "String",
+        "example": "GARDEN"
+      }
+    }
+  },
+  "havenJourneySemantics": "Haven Journey. {place}. {headline}. {detail} Built privately from completed focus sessions. No score or public ranking.",
+  "@havenJourneySemantics": {
+    "description": "Complete non-scoring screen-reader description for Haven Journey.",
+    "placeholders": {
+      "place": {
+        "type": "String",
+        "example": "Garden"
+      },
+      "headline": {
+        "type": "String",
+        "example": "A gentle garden is growing"
+      },
+      "detail": {
+        "type": "String",
+        "example": "The garden keeps its shape without demanding a streak."
+      }
+    }
+  },
+  "havenJourneyPrivacy": "Private and lasting · no score, decay, or public rank",
+  "@havenJourneyPrivacy": {
+    "description": "Private, non-scoring boundary on the Haven Journey card."
+  },
+  "havenJourneyCompletionSemantics": "Haven Journey completion update. {headline}. {detail}. This advisory changed nothing automatically.",
+  "@havenJourneyCompletionSemantics": {
+    "description": "Complete screen-reader description for a completion-to-Journey advisory.",
+    "placeholders": {
+      "headline": {
+        "type": "String",
+        "example": "This completed Focus session opened a new Haven place"
+      },
+      "detail": {
+        "type": "String",
+        "example": "Your private Journey now rests at the quiet cabin"
+      }
+    }
+  },
+  "havenJourneyNewPlaceUpper": "HAVEN JOURNEY · NEW PLACE",
+  "@havenJourneyNewPlaceUpper": {
+    "description": "Uppercase eyebrow when a completed focus session enters a new Haven Journey place."
+  },
+  "havenJourneyCompletionKeptUpper": "HAVEN JOURNEY · COMPLETION KEPT",
+  "@havenJourneyCompletionKeptUpper": {
+    "description": "Uppercase eyebrow when a completed focus session remains in the current Journey place."
+  },
+  "havenJourneyNoAutomaticChange": "This advisory changed nothing automatically. Journey stays private, cumulative, and free of scores or streak pressure.",
+  "@havenJourneyNoAutomaticChange": {
+    "description": "Agency and non-scoring boundary on a completion-to-Journey advisory."
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_event.dart';
 
 /// An optional, text-free reflection shown after a completed focus session.
@@ -20,6 +21,7 @@ class FocusSessionReflectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return DecoratedBox(
       key: const ValueKey('focus-session-reflection'),
       decoration: BoxDecoration(
@@ -31,14 +33,14 @@ class FocusSessionReflectionCard extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 13),
         child: Column(
           children: [
-            const Text(
-              'How did that session feel?',
+            Text(
+              l10n.focusReflectionTitle,
               textAlign: TextAlign.center,
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 5),
-            const Text(
-              'Optional and text-free. Choose one or continue without a reflection.',
+            Text(
+              l10n.focusReflectionDescription,
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white70, fontSize: 12),
             ),
@@ -51,7 +53,7 @@ class FocusSessionReflectionCard extends StatelessWidget {
                 for (final fit in FocusSessionFit.values)
                   ChoiceChip(
                     key: ValueKey('focus-session-fit-${fit.name}'),
-                    label: Text(_label(fit)),
+                    label: Text(_label(context, fit)),
                     selected: selected == fit,
                     onSelected: (isSelected) {
                       if (isSelected) onSelected(fit);
@@ -61,8 +63,8 @@ class FocusSessionReflectionCard extends StatelessWidget {
             ),
             if (selected != null) ...[
               const SizedBox(height: 9),
-              const Text(
-                'Saved privately. You can change your answer before continuing.',
+              Text(
+                l10n.focusReflectionSaved,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.white70, fontSize: 12),
               ),
@@ -73,9 +75,10 @@ class FocusSessionReflectionCard extends StatelessWidget {
     );
   }
 
-  static String _label(FocusSessionFit fit) => switch (fit) {
-    FocusSessionFit.tooMuch => 'Too much',
-    FocusSessionFit.aboutRight => 'About right',
-    FocusSessionFit.couldDoMore => 'Could do more',
-  };
+  static String _label(BuildContext context, FocusSessionFit fit) =>
+      switch (fit) {
+        FocusSessionFit.tooMuch => context.l10n.focusSessionFitTooMuch,
+        FocusSessionFit.aboutRight => context.l10n.focusSessionFitAboutRight,
+        FocusSessionFit.couldDoMore => context.l10n.focusSessionFitCouldDoMore,
+      };
 }

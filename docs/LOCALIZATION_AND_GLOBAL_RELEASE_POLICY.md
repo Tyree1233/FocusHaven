@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B3A audited extraction contract
+Status: Phase 215G-B3B audited extraction contract
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -15,12 +15,13 @@ country release readiness.
   (`pt-BR`) form the planned first translation wave.
 - Planned locales are not exposed by `MaterialApp.supportedLocales` and must
   not appear as supported languages in Apple or Google store metadata.
-- Phases 215G-B1, B2, and B3A catalog-own onboarding, appearance selection,
+- Phases 215G-B1, B2, B3A, and B3B catalog-own onboarding, appearance selection,
   custom-duration chrome, guided breathing, timer accessibility, the bounded
   timer dashboard/session-control presentation, Focus Queue management and
   completed-task history, Haven Plan, Haven Planner review, and the
-  Plan-to-Focus task-decision card. The
-  remaining Flutter surfaces are explicitly inventoried for B3B through B6;
+  Plan-to-Focus task-decision card, completed-session reflection, Haven Rhythm,
+  Focus Forecast, Smart Reset, and Haven Journey presentation boundaries. The
+  remaining Flutter surfaces are explicitly inventoried for B3C through B6;
   these slices do not complete Phase 215G-B.
 - No runtime translation service is used, and no private user content is sent
   anywhere for translation.
@@ -107,7 +108,9 @@ tasks must still be evaluated from the console's current state.
   truthful locale registry, documentation, and contract tests.
 - **215G-B — English extraction:** move all current app-owned Flutter strings
   and semantics into the source catalog without changing behavior. B1, B2,
-  and B3A are audited; B3B through B6 remain required.
+  B3A, and B3B are audited; B3C through B6 remain required. Phase 215G-B3B
+  keeps personal reflection content outside the catalog and leaves generated
+  restorative guidance with its B6 owner.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,

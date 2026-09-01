@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/haven_rhythm_insight.dart';
 
@@ -19,12 +20,15 @@ class HavenRhythmReflectionConnectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final accent = colorScheme.tertiary;
+    final l10n = context.l10n;
 
     return Semantics(
       key: const ValueKey('haven-rhythm-reflection-connection'),
       container: true,
-      label:
-          'Haven Rhythm reflection update. ${connection.headline}. ${connection.detail}. Nothing changed automatically.',
+      label: l10n.havenRhythmReflectionSemantics(
+        connection.headline,
+        connection.detail,
+      ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: accent.withValues(alpha: 0.09),
@@ -42,7 +46,7 @@ class HavenRhythmReflectionConnectionCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'HAVEN RHYTHM · REFLECTION SAVED',
+                      l10n.havenRhythmReflectionSavedUpper,
                       style: TextStyle(
                         color: accent,
                         fontSize: 11,
@@ -52,7 +56,7 @@ class HavenRhythmReflectionConnectionCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    _fitLabel(connection.selectedFit),
+                    _fitLabel(context, connection.selectedFit),
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 11,
@@ -79,7 +83,7 @@ class HavenRhythmReflectionConnectionCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Nothing changed automatically. Your next session remains your choice.',
+                      l10n.havenRhythmNoAutomaticChange,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
@@ -95,9 +99,10 @@ class HavenRhythmReflectionConnectionCard extends StatelessWidget {
     );
   }
 
-  static String _fitLabel(FocusSessionFit fit) => switch (fit) {
-    FocusSessionFit.tooMuch => 'Too much',
-    FocusSessionFit.aboutRight => 'About right',
-    FocusSessionFit.couldDoMore => 'Could do more',
-  };
+  static String _fitLabel(BuildContext context, FocusSessionFit fit) =>
+      switch (fit) {
+        FocusSessionFit.tooMuch => context.l10n.focusSessionFitTooMuch,
+        FocusSessionFit.aboutRight => context.l10n.focusSessionFitAboutRight,
+        FocusSessionFit.couldDoMore => context.l10n.focusSessionFitCouldDoMore,
+      };
 }

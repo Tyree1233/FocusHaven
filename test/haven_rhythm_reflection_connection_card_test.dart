@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 
 import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/models/haven_rhythm_insight.dart';
@@ -14,6 +15,8 @@ void main() {
 
   Widget app(HavenRhythmReflectionConnection connection) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark().copyWith(
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFFF16FBA),

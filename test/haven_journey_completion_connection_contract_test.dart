@@ -54,7 +54,7 @@ void main() {
     ]) {
       expect(card, isNot(contains(forbidden)));
     }
-    expect(card, contains('changed nothing automatically'));
-    expect(card, contains('free of scores or streak pressure'));
+    expect(card, contains('havenJourneyCompletionSemantics'));
+    expect(card, contains('havenJourneyNoAutomaticChange'));
   });
 }

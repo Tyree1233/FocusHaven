@@ -739,7 +739,7 @@ tests, plural and placeholder review, human linguistic review, speech-locale
 acceptance where applicable, and country-specific store/disclosure review.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
-Phases 215G-B1, B2, and B3A now move the complete first-run onboarding, appearance
+Phases 215G-B1, B2, B3A, and B3B now move the complete first-run onboarding, appearance
 picker, custom-duration chrome, guided breathing, timer accessibility, and the
 bounded timer dashboard/session-control presentation into that English
 catalog. B2 covers session names and encouragement, timer actions and
@@ -755,10 +755,15 @@ task-decision card. User-authored
 task titles and goals remain opaque placeholders. Generated planner items and
 other service-originated planning copy remain B6-owned, so B3A does not claim
 that every planning sentence is localized. English remains the only active
-runtime locale.
+runtime locale. Phase 215G-B3B additionally catalog-owns the optional text-free
+session reflection presentation, Haven Rhythm and Focus Forecast chrome and
+advisory boundaries, Smart Reset presentation and actions, and Haven Journey
+place, privacy, accessibility, and completion-advisory copy. Personal
+reflection content never becomes a catalog key, and service-generated
+restorative copy remains B6-owned runtime data.
 
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B3B–B6 work; B1, B2, and B3A are not a claim that the whole interface
+remaining B3C–B6 work; B1, B2, B3A, and B3B are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.

@@ -54,7 +54,7 @@ void main() {
     ]) {
       expect(card, isNot(contains(forbidden)));
     }
-    expect(card, contains('Nothing changed automatically'));
-    expect(card, contains('Your next session remains your choice'));
+    expect(card, contains('havenRhythmReflectionSemantics'));
+    expect(card, contains('havenRhythmNoAutomaticChange'));
   });
 }

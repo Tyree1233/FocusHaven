@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 
 import 'package:focushaven/models/smart_reset_plan.dart';
 import 'package:focushaven/widgets/smart_reset_sheet.dart';
 
 Widget _app(SmartResetPlan plan, {bool preservesSelectedTask = false}) =>
     MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark().copyWith(
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFFF16FBA),

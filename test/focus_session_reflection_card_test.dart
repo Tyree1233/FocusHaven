@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 
 import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
@@ -9,6 +10,8 @@ Widget _app({
   required ValueChanged<FocusSessionFit> onSelected,
 }) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ThemeData.dark(),
     home: Scaffold(
       body: Center(

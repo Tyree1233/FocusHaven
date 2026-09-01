@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/haven_rhythm_insight.dart';
 
 /// A calm, expandable view of one ephemeral local Haven Rhythm insight.
@@ -22,6 +23,7 @@ class _HavenRhythmCardState extends State<HavenRhythmCard> {
   @override
   Widget build(BuildContext context) {
     final insight = widget.insight;
+    final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
     final accent = insight.isLearning
         ? colorScheme.secondary
@@ -63,7 +65,9 @@ class _HavenRhythmCardState extends State<HavenRhythmCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'HAVEN RHYTHM · ${_kindLabel(insight.kind).toUpperCase()}',
+                          l10n.havenRhythmEyebrow(
+                            _kindLabel(context, insight.kind).toUpperCase(),
+                          ),
                           style: TextStyle(
                             color: accent,
                             fontSize: 11,
@@ -132,7 +136,9 @@ class _HavenRhythmCardState extends State<HavenRhythmCard> {
                       child: Chip(
                         avatar: const Icon(Icons.timer_outlined, size: 17),
                         label: Text(
-                          'Possible pace · ${insight.suggestedFocusMinutes} min',
+                          l10n.havenRhythmPossiblePace(
+                            insight.suggestedFocusMinutes!,
+                          ),
                         ),
                         backgroundColor: accent.withValues(alpha: 0.14),
                         side: BorderSide.none,
@@ -150,7 +156,7 @@ class _HavenRhythmCardState extends State<HavenRhythmCard> {
                       const SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          'Built privately from text-free focus signals. No productivity score.',
+                          l10n.havenRhythmPrivacy,
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
                             fontSize: 11,
@@ -168,14 +174,19 @@ class _HavenRhythmCardState extends State<HavenRhythmCard> {
     );
   }
 
-  static String _kindLabel(HavenRhythmKind kind) => switch (kind) {
-    HavenRhythmKind.learning => 'Still learning',
-    HavenRhythmKind.gentleReturn => 'Gentle return',
-    HavenRhythmKind.gentlerPace => 'Gentler pace',
-    HavenRhythmKind.sustainablePace => 'Sustainable pace',
-    HavenRhythmKind.roomToGrow => 'Room to grow',
-    HavenRhythmKind.variablePace => 'Flexible rhythm',
-    HavenRhythmKind.completionPattern => 'Pattern emerging',
+  static String _kindLabel(
+    BuildContext context,
+    HavenRhythmKind kind,
+  ) => switch (kind) {
+    HavenRhythmKind.learning => context.l10n.havenRhythmKindLearning,
+    HavenRhythmKind.gentleReturn => context.l10n.havenRhythmKindGentleReturn,
+    HavenRhythmKind.gentlerPace => context.l10n.havenRhythmKindGentlerPace,
+    HavenRhythmKind.sustainablePace =>
+      context.l10n.havenRhythmKindSustainablePace,
+    HavenRhythmKind.roomToGrow => context.l10n.havenRhythmKindRoomToGrow,
+    HavenRhythmKind.variablePace => context.l10n.havenRhythmKindVariablePace,
+    HavenRhythmKind.completionPattern =>
+      context.l10n.havenRhythmKindCompletionPattern,
   };
 
   static IconData _icon(HavenRhythmKind kind) => switch (kind) {

@@ -29,7 +29,7 @@ void main() {
       expect(screen, contains('beginSmartResetRecovery'));
       expect(screen, contains('finishSmartResetRecovery'));
       expect(screen, contains('preservesSelectedTask: recoveryTicket != null'));
-      expect(sheet, contains('No task text is copied into Smart Reset.'));
+      expect(sheet, contains('smartResetLinkedTaskBoundary'));
       expect(sheet, isNot(contains('FocusQueueItem')));
       expect(sheet, isNot(contains('focusTask')));
     },

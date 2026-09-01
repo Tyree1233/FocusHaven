@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/haven_journey_state.dart';
 
 /// A read-only bridge from one exact completed Focus session to Haven Journey.
@@ -18,12 +19,15 @@ class HavenJourneyCompletionConnectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final accent = colorScheme.primary;
+    final l10n = context.l10n;
 
     return Semantics(
       key: const ValueKey('haven-journey-completion-connection'),
       container: true,
-      label:
-          'Haven Journey completion update. ${connection.headline}. ${connection.detail}. This advisory changed nothing automatically.',
+      label: l10n.havenJourneyCompletionSemantics(
+        connection.headline,
+        connection.detail,
+      ),
       child: ExcludeSemantics(
         child: DecoratedBox(
           decoration: BoxDecoration(
@@ -43,8 +47,8 @@ class HavenJourneyCompletionConnectionCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         connection.enteredNewPlace
-                            ? 'HAVEN JOURNEY · NEW PLACE'
-                            : 'HAVEN JOURNEY · COMPLETION KEPT',
+                            ? l10n.havenJourneyNewPlaceUpper
+                            : l10n.havenJourneyCompletionKeptUpper,
                         style: TextStyle(
                           color: accent,
                           fontSize: 11,
@@ -73,7 +77,7 @@ class HavenJourneyCompletionConnectionCard extends StatelessWidget {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'This advisory changed nothing automatically. Journey stays private, cumulative, and free of scores or streak pressure.',
+                        l10n.havenJourneyNoAutomaticChange,
                         style: TextStyle(
                           color: colorScheme.onSurfaceVariant,
                           fontSize: 11,

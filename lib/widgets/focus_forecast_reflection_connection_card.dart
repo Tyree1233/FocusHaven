@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/focus_forecast.dart';
 
@@ -20,12 +21,15 @@ class FocusForecastReflectionConnectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final accent = colorScheme.secondary;
+    final l10n = context.l10n;
 
     return Semantics(
       key: const ValueKey('focus-forecast-reflection-connection'),
       container: true,
-      label:
-          'Focus Forecast reflection update. ${connection.headline}. ${connection.detail}. Nothing changed automatically. A possible window is not a rule.',
+      label: l10n.focusForecastReflectionSemantics(
+        connection.headline,
+        connection.detail,
+      ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: accent.withValues(alpha: 0.09),
@@ -43,7 +47,7 @@ class FocusForecastReflectionConnectionCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'FOCUS FORECAST · REFLECTION SAVED',
+                      l10n.focusForecastReflectionSavedUpper,
                       style: TextStyle(
                         color: accent,
                         fontSize: 11,
@@ -53,7 +57,7 @@ class FocusForecastReflectionConnectionCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    _fitLabel(connection.selectedFit),
+                    _fitLabel(context, connection.selectedFit),
                     style: TextStyle(
                       color: colorScheme.onSurfaceVariant,
                       fontSize: 11,
@@ -80,7 +84,7 @@ class FocusForecastReflectionConnectionCard extends StatelessWidget {
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
-                      'Nothing changed automatically. A possible window is not a rule; your next session remains your choice.',
+                      l10n.focusForecastNoAutomaticChange,
                       style: TextStyle(
                         color: colorScheme.onSurfaceVariant,
                         fontSize: 11,
@@ -96,9 +100,10 @@ class FocusForecastReflectionConnectionCard extends StatelessWidget {
     );
   }
 
-  static String _fitLabel(FocusSessionFit fit) => switch (fit) {
-    FocusSessionFit.tooMuch => 'Too much',
-    FocusSessionFit.aboutRight => 'About right',
-    FocusSessionFit.couldDoMore => 'Could do more',
-  };
+  static String _fitLabel(BuildContext context, FocusSessionFit fit) =>
+      switch (fit) {
+        FocusSessionFit.tooMuch => context.l10n.focusSessionFitTooMuch,
+        FocusSessionFit.aboutRight => context.l10n.focusSessionFitAboutRight,
+        FocusSessionFit.couldDoMore => context.l10n.focusSessionFitCouldDoMore,
+      };
 }
