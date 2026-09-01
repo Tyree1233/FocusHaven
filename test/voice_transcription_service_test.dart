@@ -129,6 +129,7 @@ void main() {
       expect(await service.start(), isFalse);
 
       expect(service.status, VoiceTranscriptionStatus.permissionDenied);
+      expect(service.noticeCode, VoiceTranscriptionNotice.accessNotGranted);
       expect(service.notice, contains('You can keep typing instead'));
       expect(adapter.listenCalls, 0);
 
@@ -147,6 +148,7 @@ void main() {
     adapter.emitError('network_secret_vendor_detail', isPermanent: false);
 
     expect(service.status, VoiceTranscriptionStatus.failed);
+    expect(service.noticeCode, VoiceTranscriptionNotice.stoppedReviewOrRetry);
     expect(
       service.notice,
       'Voice transcription stopped. Review the draft or try again.',

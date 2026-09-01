@@ -17,6 +17,22 @@ enum VoiceTranscriptionStatus {
 
 enum VoiceTranscriptionPurpose { coach, havenAction }
 
+/// Stable presentation reasons for a voice-transcription notice.
+///
+/// Widgets localize these values at the active presentation boundary. The
+/// service retains its English [notice] compatibility getter for existing
+/// diagnostics and tests, but production UI must use [noticeCode] instead of
+/// treating service-owned English text as localized presentation copy.
+enum VoiceTranscriptionNotice {
+  recognitionUnavailableOnDevice,
+  accessNotGranted,
+  recognitionDidNotStart,
+  transcriptionCouldNotStart,
+  stoppedUnexpectedly,
+  recognitionUnavailableNow,
+  stoppedReviewOrRetry,
+}
+
 typedef VoiceRecognitionResultCallback =
     void Function(String transcript, bool isFinal);
 typedef VoiceRecognitionStatusCallback = void Function(String status);
@@ -113,7 +129,7 @@ class VoiceTranscriptionService extends ChangeNotifier {
 
   VoiceTranscriptionStatus _status = VoiceTranscriptionStatus.idle;
   String _transcript = '';
-  String? _notice;
+  VoiceTranscriptionNotice? _noticeCode;
   bool _isFinal = false;
   bool _isInitialized = false;
   final Set<VoiceTranscriptionPurpose> _acknowledgedDisclosures = {};
@@ -123,7 +139,24 @@ class VoiceTranscriptionService extends ChangeNotifier {
 
   VoiceTranscriptionStatus get status => _status;
   String get transcript => _transcript;
-  String? get notice => _notice;
+  VoiceTranscriptionNotice? get noticeCode => _noticeCode;
+  String? get notice => switch (_noticeCode) {
+    VoiceTranscriptionNotice.recognitionUnavailableOnDevice =>
+      'Speech recognition is unavailable on this device.',
+    VoiceTranscriptionNotice.accessNotGranted =>
+      'Microphone or speech-recognition access was not granted. You can keep typing instead.',
+    VoiceTranscriptionNotice.recognitionDidNotStart =>
+      'Speech recognition did not start. You can keep typing.',
+    VoiceTranscriptionNotice.transcriptionCouldNotStart =>
+      'Voice transcription could not start. You can keep typing.',
+    VoiceTranscriptionNotice.stoppedUnexpectedly =>
+      'Voice transcription stopped unexpectedly. Review the draft before sending.',
+    VoiceTranscriptionNotice.recognitionUnavailableNow =>
+      'Speech recognition is unavailable right now. You can keep typing instead.',
+    VoiceTranscriptionNotice.stoppedReviewOrRetry =>
+      'Voice transcription stopped. Review the draft or try again.',
+    null => null,
+  };
   bool get isFinal => _isFinal;
   bool get disclosureAcknowledged =>
       disclosureAcknowledgedFor(VoiceTranscriptionPurpose.coach);
@@ -152,7 +185,7 @@ class VoiceTranscriptionService extends ChangeNotifier {
     _acceptPlatformCallbacks = true;
     _transcript = '';
     _isFinal = false;
-    _notice = null;
+    _noticeCode = null;
     _setStatus(VoiceTranscriptionStatus.preparing);
 
     try {
@@ -164,9 +197,9 @@ class VoiceTranscriptionService extends ChangeNotifier {
         if (!_isCurrentOperation(operationRevision)) return false;
         if (!initialized) {
           final permitted = await _adapter.hasPermission;
-          _notice = permitted
-              ? 'Speech recognition is unavailable on this device.'
-              : 'Microphone or speech-recognition access was not granted. You can keep typing instead.';
+          _noticeCode = permitted
+              ? VoiceTranscriptionNotice.recognitionUnavailableOnDevice
+              : VoiceTranscriptionNotice.accessNotGranted;
           _setStatus(
             permitted
                 ? VoiceTranscriptionStatus.unavailable
@@ -185,7 +218,7 @@ class VoiceTranscriptionService extends ChangeNotifier {
         return false;
       }
       if (!_adapter.isListening) {
-        _notice = 'Speech recognition did not start. You can keep typing.';
+        _noticeCode = VoiceTranscriptionNotice.recognitionDidNotStart;
         _setStatus(VoiceTranscriptionStatus.failed);
         _acceptPlatformCallbacks = false;
         return false;
@@ -194,7 +227,7 @@ class VoiceTranscriptionService extends ChangeNotifier {
       return true;
     } catch (_) {
       if (!_isCurrentOperation(operationRevision)) return false;
-      _notice = 'Voice transcription could not start. You can keep typing.';
+      _noticeCode = VoiceTranscriptionNotice.transcriptionCouldNotStart;
       _setStatus(VoiceTranscriptionStatus.failed);
       _acceptPlatformCallbacks = false;
       return false;
@@ -207,8 +240,7 @@ class VoiceTranscriptionService extends ChangeNotifier {
     try {
       await _adapter.stop();
     } catch (_) {
-      _notice =
-          'Voice transcription stopped unexpectedly. Review the draft before sending.';
+      _noticeCode = VoiceTranscriptionNotice.stoppedUnexpectedly;
     } finally {
       _acceptPlatformCallbacks = false;
       _setStatus(VoiceTranscriptionStatus.idle);
@@ -223,13 +255,13 @@ class VoiceTranscriptionService extends ChangeNotifier {
     }
     _transcript = '';
     _isFinal = false;
-    _notice = null;
+    _noticeCode = null;
     _setStatus(VoiceTranscriptionStatus.idle);
   }
 
   void dismissNotice() {
-    if (_notice == null) return;
-    _notice = null;
+    if (_noticeCode == null) return;
+    _noticeCode = null;
     if (_status != VoiceTranscriptionStatus.listening) {
       _status = VoiceTranscriptionStatus.idle;
     }
@@ -262,11 +294,11 @@ class VoiceTranscriptionService extends ChangeNotifier {
         normalized.contains('permission') ||
         normalized.contains('not_allowed') ||
         normalized.contains('notallowed');
-    _notice = denied
-        ? 'Microphone or speech-recognition access was not granted. You can keep typing instead.'
+    _noticeCode = denied
+        ? VoiceTranscriptionNotice.accessNotGranted
         : isPermanent
-        ? 'Speech recognition is unavailable right now. You can keep typing instead.'
-        : 'Voice transcription stopped. Review the draft or try again.';
+        ? VoiceTranscriptionNotice.recognitionUnavailableNow
+        : VoiceTranscriptionNotice.stoppedReviewOrRetry;
     _setStatus(
       denied
           ? VoiceTranscriptionStatus.permissionDenied

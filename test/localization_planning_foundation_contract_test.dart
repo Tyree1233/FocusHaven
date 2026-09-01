@@ -226,10 +226,10 @@ void main() {
     ]) {
       expect(inventory, contains(required));
     }
-    expect(policy, contains('Phase 215G-B3C'));
-    expect(policy, contains('B4 through B6 remain required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C extraction'));
-    expect(roadmap, contains('remaining B4–B6 extraction slices'));
+    expect(policy, contains('Phase 215G-B4'));
+    expect(policy, contains('B5 and B6 remain required'));
+    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4 extraction'));
+    expect(roadmap, contains('remaining B5–B6 extraction slices'));
     expect(readme, contains('Phase 215G-B3A'));
     expect(readme, contains('service-originated planning copy remain B6'));
   });

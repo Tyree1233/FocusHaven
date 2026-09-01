@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/focus_haven_localizations.dart';
+import '../l10n/voice_transcription_localizations.dart';
 import '../models/haven_action.dart';
 import '../services/focus_queue_service.dart';
 import '../services/haven_action_engine.dart';
@@ -101,11 +104,10 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
     )) {
       final confirmed = await ConfirmationDialog.show(
         context,
-        title: 'Use voice for Haven actions?',
-        message:
-            'FocusHaven uses the microphone only while you are visibly listening and keeps no raw audio. Your device or browser speech service may process audio on-device or over a network. The transcript stays editable. Nothing is reviewed or run until you separately tap Review action and then the visual run or confirmation control.',
-        cancelLabel: 'Keep typing',
-        confirmLabel: 'Continue to microphone',
+        title: context.l10n.havenActionVoiceDisclosureTitle,
+        message: context.l10n.havenActionVoiceDisclosureMessage,
+        cancelLabel: context.l10n.voiceKeepTyping,
+        confirmLabel: context.l10n.voiceContinueToMicrophone,
       );
       if (!confirmed || !mounted) return;
       _voiceTranscription.acknowledgeDisclosure(
@@ -231,6 +233,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     final proposal = _proposal;
     final voice = _voiceTranscription;
@@ -238,8 +241,8 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
     final proposalSourceLabel = proposal == null
         ? null
         : proposal.source == HavenActionSource.voiceTranscript
-        ? 'Voice transcript • reviewed locally'
-        : 'Typed request • reviewed locally';
+        ? l10n.havenActionSourceVoice
+        : l10n.havenActionSourceTyped;
     return SafeArea(
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
@@ -256,22 +259,25 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
               children: [
                 Icon(Icons.bolt_outlined, color: colors.primary),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Haven actions',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                    l10n.havenActionTitle,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Close Haven actions',
+                  tooltip: l10n.havenActionCloseTooltip,
                   onPressed: _busy ? null : () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close),
                 ),
               ],
             ),
-            const Text(
-              'Type or dictate one local action. Haven will show what it understood before anything runs.',
-              style: TextStyle(height: 1.35),
+            Text(
+              l10n.havenActionIntroduction,
+              style: const TextStyle(height: 1.35),
             ),
             const SizedBox(height: 12),
             DecoratedBox(
@@ -279,16 +285,16 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                 color: colors.primaryContainer.withValues(alpha: 0.45),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Padding(
-                padding: EdgeInsets.all(12),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    Icon(Icons.privacy_tip_outlined, size: 20),
-                    SizedBox(width: 8),
+                    const Icon(Icons.privacy_tip_outlined, size: 20),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Typed or voice transcript • local review • no remote AI',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        l10n.havenActionPrivateBoundary,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -315,10 +321,10 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                           Expanded(
                             child: Text(
                               voice.isListening
-                                  ? 'Listening… Review this editable transcript before creating a proposal.'
+                                  ? l10n.havenActionVoiceListening
                                   : voice.isBusy
-                                  ? 'Preparing private voice transcription…'
-                                  : 'Voice draft ready. Edit it, discard it, or review it locally.',
+                                  ? l10n.havenActionVoicePreparing
+                                  : l10n.havenActionVoiceReady,
                             ),
                           ),
                         ],
@@ -334,13 +340,13 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                             onPressed: voice.isBusy
                                 ? null
                                 : _discardVoiceTranscription,
-                            child: const Text('Discard'),
+                            child: Text(l10n.voiceDiscard),
                           ),
                           if (voice.isListening)
                             FilledButton.tonal(
                               key: const ValueKey('stopHavenActionVoice'),
                               onPressed: _stopVoiceTranscription,
-                              child: const Text('Stop listening'),
+                              child: Text(l10n.havenActionVoiceStop),
                             ),
                         ],
                       ),
@@ -350,7 +356,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
               ),
               const SizedBox(height: 12),
             ],
-            if (voice.notice != null) ...[
+            if (voice.noticeCode != null) ...[
               Semantics(
                 liveRegion: true,
                 child: DecoratedBox(
@@ -365,10 +371,17 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                       children: [
                         const Icon(Icons.mic_off_outlined, size: 20),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(voice.notice!)),
+                        Expanded(
+                          child: Text(
+                            localizeVoiceTranscriptionNotice(
+                              l10n,
+                              voice.noticeCode!,
+                            ),
+                          ),
+                        ),
                         IconButton(
                           key: const ValueKey('dismissHavenActionVoiceNotice'),
-                          tooltip: 'Dismiss voice notice',
+                          tooltip: l10n.voiceDismissNotice,
                           onPressed: voice.dismissNotice,
                           icon: const Icon(Icons.close),
                         ),
@@ -403,14 +416,14 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                 }
               },
               decoration: InputDecoration(
-                labelText: 'What should Haven do?',
-                hintText: 'Example: add 5 minutes',
+                labelText: l10n.havenActionInputLabel,
+                hintText: l10n.havenActionInputHint,
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   key: const ValueKey('havenActionVoiceInput'),
                   tooltip: voice.isListening
-                      ? 'Stop dictating Haven action'
-                      : 'Dictate Haven action',
+                      ? l10n.havenActionVoiceStopTooltip
+                      : l10n.havenActionVoiceDictateTooltip,
                   onPressed: _busy || voice.isBusy || proposal != null
                       ? null
                       : voice.isListening
@@ -427,7 +440,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
               key: const ValueKey('reviewHavenAction'),
               onPressed: _busy || voiceBlocksReview ? null : _review,
               icon: const Icon(Icons.fact_check_outlined),
-              label: const Text('Review action'),
+              label: Text(l10n.havenActionReview),
             ),
             if (_message != null) ...[
               const SizedBox(height: 14),
@@ -448,7 +461,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
               Semantics(
                 container: true,
                 liveRegion: true,
-                label: _proposalSemanticsLabel(proposal),
+                label: _proposalSemanticsLabel(l10n, proposal),
                 child: ExcludeSemantics(
                   child: Card(
                     key: const ValueKey('havenActionProposal'),
@@ -481,7 +494,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            _riskLabel(proposal.risk),
+                            _riskLabel(l10n, proposal.risk),
                             style: TextStyle(
                               color: colors.primary,
                               fontWeight: FontWeight.w600,
@@ -498,7 +511,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                 key: const ValueKey('changeHavenAction'),
                 onPressed: _busy ? null : _changeRequest,
                 icon: const Icon(Icons.edit_outlined),
-                label: const Text('Change request'),
+                label: Text(l10n.havenActionChangeRequest),
               ),
               const SizedBox(height: 8),
               FilledButton(
@@ -506,16 +519,16 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
                 onPressed: _busy ? null : _execute,
                 child: Text(
                   _busy
-                      ? 'Working…'
+                      ? l10n.havenActionWorking
                       : proposal.confirmationRequired
-                      ? 'Confirm exact action'
-                      : 'Run reviewed action',
+                      ? l10n.havenActionConfirmExact
+                      : l10n.havenActionRunReviewed,
                 ),
               ),
             ],
             const SizedBox(height: 12),
             Text(
-              'Try: “timer status,” “start focus,” “pause,” “resume,” “add 5 minutes,” “open Focus Queue,” or “add task: Review notes.”',
+              l10n.havenActionExamples,
               style: TextStyle(
                 color: colors.onSurfaceVariant,
                 fontSize: 12,
@@ -528,20 +541,29 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
     );
   }
 
-  String _proposalSemanticsLabel(HavenActionProposal proposal) {
+  String _proposalSemanticsLabel(
+    AppLocalizations l10n,
+    HavenActionProposal proposal,
+  ) {
     final source = proposal.source == HavenActionSource.voiceTranscript
-        ? 'Voice transcript reviewed locally.'
-        : 'Typed request reviewed locally.';
+        ? l10n.havenActionSemanticsSourceVoice
+        : l10n.havenActionSemanticsSourceTyped;
     final nextStep = proposal.confirmationRequired
-        ? 'Confirmation is required. Choose Confirm exact action to continue, or Change request to edit.'
-        : 'Choose Run reviewed action to continue, or Change request to edit.';
-    return 'Reviewed Haven action. $source ${proposal.interpretation}. '
-        '${proposal.effect} ${_riskLabel(proposal.risk)}. $nextStep';
+        ? l10n.havenActionSemanticsNextConfirm
+        : l10n.havenActionSemanticsNextRun;
+    return l10n.havenActionProposalSemantics(
+      source,
+      proposal.interpretation,
+      proposal.effect,
+      _riskLabel(l10n, proposal.risk),
+      nextStep,
+    );
   }
 
-  String _riskLabel(HavenActionRisk risk) => switch (risk) {
-    HavenActionRisk.informational => 'Informational • no saved-data change',
-    HavenActionRisk.reversibleControl => 'Reversible timer control',
-    HavenActionRisk.statefulEdit => 'Saved local edit • confirmation required',
-  };
+  String _riskLabel(AppLocalizations l10n, HavenActionRisk risk) =>
+      switch (risk) {
+        HavenActionRisk.informational => l10n.havenActionRiskInformational,
+        HavenActionRisk.reversibleControl => l10n.havenActionRiskReversible,
+        HavenActionRisk.statefulEdit => l10n.havenActionRiskStateful,
+      };
 }

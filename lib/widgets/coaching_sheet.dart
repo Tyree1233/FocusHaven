@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/focus_haven_localizations.dart';
+import '../l10n/voice_transcription_localizations.dart';
 import '../models/coaching_message.dart';
 import '../providers/app_providers.dart';
 import '../services/coaching_service.dart';
@@ -21,14 +24,14 @@ class CoachingSheet extends ConsumerStatefulWidget {
 }
 
 class _CoachingSheetState extends ConsumerState<CoachingSheet> {
-  static const _starterPrompts = <String>[
-    'I’m stuck—help me start',
-    'I’m feeling overwhelmed',
-    'What should I do next?',
-    'Help me think this through',
-    'Be gentle with me',
-    'Please just listen',
-    'Hold me accountable',
+  static List<String> _starterPrompts(AppLocalizations l10n) => <String>[
+    l10n.coachPromptHelpMeStart,
+    l10n.coachPromptOverwhelmed,
+    l10n.coachPromptWhatNext,
+    l10n.coachPromptThinkThrough,
+    l10n.coachPromptGentle,
+    l10n.coachPromptListen,
+    l10n.coachPromptAccountability,
   ];
 
   final TextEditingController _controller = TextEditingController();
@@ -42,7 +45,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
   String _lastVoiceTranscript = '';
   int _lastConversationRevision = -1;
 
-  static List<String> _quickRepliesFor(List<CoachingMessage> messages) {
+  static List<String> _quickRepliesFor(
+    List<CoachingMessage> messages,
+    AppLocalizations l10n,
+  ) {
     if (messages.isEmpty || messages.last.role != CoachingMessageRole.coach) {
       return const [];
     }
@@ -60,10 +66,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     }
 
     if (LocalCoachingResponder.isRepairRequest(latestUserMessage.text)) {
-      return const [
-        'Please just listen',
-        'Be gentle with me',
-        'Hold me accountable',
+      return <String>[
+        l10n.coachPromptListen,
+        l10n.coachPromptGentle,
+        l10n.coachPromptAccountability,
       ];
     }
 
@@ -74,22 +80,22 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     final coachReply = messages.last.text.toLowerCase();
     if (coachReply.contains('take a real five-minute break') ||
         coachReply.contains('let recovery count')) {
-      return const ['I’m back after a break'];
+      return <String>[l10n.coachReplyBackAfterBreak];
     }
     if (coachReply.contains('listen without trying to fix')) {
-      return const [
-        'What should I do next?',
-        'Be gentle with me',
-        'Hold me accountable',
+      return <String>[
+        l10n.coachPromptWhatNext,
+        l10n.coachPromptGentle,
+        l10n.coachPromptAccountability,
       ];
     }
     if (coachReply.startsWith('direct version') ||
         coachReply.startsWith('you asked me to stay direct')) {
-      return const [
-        'I did the first step',
-        'I’m still stuck',
-        'I need a break',
-        'Be gentle with me',
+      return <String>[
+        l10n.coachReplyDidFirstStep,
+        l10n.coachReplyStillStuck,
+        l10n.coachReplyNeedBreak,
+        l10n.coachPromptGentle,
       ];
     }
     if (coachReply.contains('i’ll keep this gentle') ||
@@ -97,16 +103,24 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
           'i remember that you wanted a gentler approach',
         ) ||
         coachReply.startsWith('we can approach this gently')) {
-      return const ['Break it down', 'Please just listen', 'I need a break'];
+      return <String>[
+        l10n.coachReplyBreakItDown,
+        l10n.coachPromptListen,
+        l10n.coachReplyNeedBreak,
+      ];
     }
     if (coachReply.startsWith('welcome back')) {
-      return const ['I did the first step', 'I’m still stuck'];
+      return <String>[l10n.coachReplyDidFirstStep, l10n.coachReplyStillStuck];
     }
     if (coachReply.startsWith('that counts') ||
         coachReply.startsWith('that is real progress')) {
-      return const ['What should I do next?', 'I need a break'];
+      return <String>[l10n.coachPromptWhatNext, l10n.coachReplyNeedBreak];
     }
-    return const ['Break it down', 'I’m still stuck', 'Please just listen'];
+    return <String>[
+      l10n.coachReplyBreakItDown,
+      l10n.coachReplyStillStuck,
+      l10n.coachPromptListen,
+    ];
   }
 
   @override
@@ -159,11 +173,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     if (!_voiceTranscription.disclosureAcknowledged) {
       final confirmed = await ConfirmationDialog.show(
         context,
-        title: 'Use voice transcription?',
-        message:
-            'FocusHaven uses the microphone only while you are visibly listening. It keeps no raw audio. Your device or browser speech service may process audio on-device or over a network. The transcript stays in this editable draft and is not sent to Focus Coach until you tap Send.',
-        cancelLabel: 'Keep typing',
-        confirmLabel: 'Continue to microphone',
+        title: context.l10n.coachVoiceDisclosureTitle,
+        message: context.l10n.coachVoiceDisclosureMessage,
+        cancelLabel: context.l10n.voiceKeepTyping,
+        confirmLabel: context.l10n.voiceContinueToMicrophone,
       );
       if (!confirmed || !mounted) return;
       _voiceTranscription.acknowledgeDisclosure();
@@ -239,9 +252,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
-            const SnackBar(
-              content: Text('Your coach could not respond. Please try again.'),
-            ),
+            SnackBar(content: Text(context.l10n.coachResponseFailed)),
           );
       }
     } finally {
@@ -276,9 +287,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
-            const SnackBar(
-              content: Text('Your coach could not respond. Please try again.'),
-            ),
+            SnackBar(content: Text(context.l10n.coachResponseFailed)),
           );
       }
     } finally {
@@ -297,11 +306,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     try {
       final confirmed = await ConfirmationDialog.show(
         context,
-        title: 'Clear coaching conversation?',
-        message:
-            'This permanently removes the coaching conversation saved on this device.',
-        cancelLabel: 'Keep conversation',
-        confirmLabel: 'Clear conversation',
+        title: context.l10n.coachClearConversationTitle,
+        message: context.l10n.coachClearConversationMessage,
+        cancelLabel: context.l10n.coachKeepConversation,
+        confirmLabel: context.l10n.coachClearConversation,
         isDestructive: true,
       );
       if (!confirmed || !mounted) return;
@@ -323,11 +331,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
       if (enabled) {
         final confirmed = await ConfirmationDialog.show(
           context,
-          title: 'Use enhanced AI coaching?',
-          message:
-              'When enabled, your message, up to 12 recent coaching messages, and relevant FocusHaven context are sent securely through Firebase to OpenAI to generate a response. OpenAI does not use API data for training unless the API account opts in, but may retain content for abuse monitoring for up to 30 days by default. Your conversation remains saved on this device. You can turn this off anytime.',
-          cancelLabel: 'Keep coaching local',
-          confirmLabel: 'Enable AI coaching',
+          title: context.l10n.coachEnhancedDisclosureTitle,
+          message: context.l10n.coachEnhancedDisclosureMessage,
+          cancelLabel: context.l10n.coachEnhancedKeepLocal,
+          confirmLabel: context.l10n.coachEnhancedEnable,
         );
         if (!confirmed || !mounted) return;
       }
@@ -341,6 +348,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final coachingState = ref.watch(coachingStateProvider);
     final voiceState = ref.watch(voiceTranscriptionServiceProvider);
     if (coachingState.conversationRevision != _lastConversationRevision) {
@@ -366,7 +374,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         !isBusy &&
             !isAwaitingResponseRetry &&
             coachingState.errorMessage == null
-        ? _quickRepliesFor(coachingState.messages)
+        ? _quickRepliesFor(coachingState.messages, l10n)
         : const <String>[];
     final primaryColor = Theme.of(context).colorScheme.primary;
 
@@ -406,13 +414,13 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Focus Coach',
+                            l10n.coachTitle,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                           Text(
                             coachingState.enhancedCoachingEnabled
-                                ? 'Enhanced AI · conversation saved on this device'
-                                : 'Private guidance saved on this device',
+                                ? l10n.coachSubtitleEnhanced
+                                : l10n.coachSubtitlePrivate,
                             style: const TextStyle(color: Colors.white60),
                           ),
                         ],
@@ -420,7 +428,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                     ),
                     IconButton(
                       key: const ValueKey<String>('coach-clear-history'),
-                      tooltip: 'Clear coaching conversation',
+                      tooltip: l10n.coachClearConversationTooltip,
                       onPressed: coachingState.messages.isEmpty || isBusy
                           ? null
                           : _clearConversation,
@@ -432,7 +440,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                           : const Icon(Icons.delete_outline),
                     ),
                     IconButton(
-                      tooltip: 'Close Focus Coach',
+                      tooltip: l10n.coachCloseTooltip,
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close),
                     ),
@@ -446,11 +454,11 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                   value: coachingState.enhancedCoachingEnabled,
                   onChanged: isBusy ? null : _setEnhancedCoachingEnabled,
                   secondary: const Icon(Icons.cloud_outlined),
-                  title: const Text('Enhanced AI coaching'),
+                  title: Text(l10n.coachEnhancedTitle),
                   subtitle: Text(
                     coachingState.enhancedCoachingEnabled
-                        ? 'Messages use secure cloud AI with an automatic local fallback.'
-                        : 'Off · coaching stays on this device.',
+                        ? l10n.coachEnhancedOnDescription
+                        : l10n.coachEnhancedOffDescription,
                   ),
                 ),
                 const Divider(height: 1),
@@ -459,7 +467,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                 child: _ConversationBody(
                   messages: coachingState.messages,
                   isResponding: coachingState.isResponding,
-                  starterPrompts: _starterPrompts,
+                  starterPrompts: _starterPrompts(l10n),
                   primaryColor: primaryColor,
                   scrollController: _scrollController,
                   quickReplies: quickReplies,
@@ -523,7 +531,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                       key: const ValueKey<String>('coach-retry-response'),
                       onPressed: isBusy ? null : _retryResponse,
                       icon: const Icon(Icons.refresh),
-                      label: const Text('Retry coach response'),
+                      label: Text(l10n.coachRetryResponse),
                     ),
                   ),
                 ),
@@ -550,8 +558,8 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                                 Expanded(
                                   child: Text(
                                     voiceState.isListening
-                                        ? 'Listening… Review this editable draft before sending.'
-                                        : 'Preparing the microphone…',
+                                        ? l10n.coachVoiceListening
+                                        : l10n.coachVoicePreparing,
                                   ),
                                 ),
                               ],
@@ -569,7 +577,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                                     onPressed: voiceState.isBusy
                                         ? null
                                         : _discardVoiceTranscription,
-                                    child: const Text('Discard'),
+                                    child: Text(l10n.voiceDiscard),
                                   ),
                                   if (voiceState.isListening)
                                     FilledButton.tonal(
@@ -577,7 +585,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                                         'coach-stop-voice',
                                       ),
                                       onPressed: _stopVoiceTranscription,
-                                      child: const Text('Stop'),
+                                      child: Text(l10n.coachVoiceStop),
                                     ),
                                 ],
                               ),
@@ -588,7 +596,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                     ),
                   ),
                 ),
-              if (voiceState.notice != null)
+              if (voiceState.noticeCode != null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                   child: Semantics(
@@ -607,12 +615,19 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                           children: [
                             const Icon(Icons.mic_off_outlined, size: 20),
                             const SizedBox(width: 8),
-                            Expanded(child: Text(voiceState.notice!)),
+                            Expanded(
+                              child: Text(
+                                localizeVoiceTranscriptionNotice(
+                                  l10n,
+                                  voiceState.noticeCode!,
+                                ),
+                              ),
+                            ),
                             IconButton(
                               key: const ValueKey<String>(
                                 'coach-dismiss-voice-notice',
                               ),
-                              tooltip: 'Dismiss voice notice',
+                              tooltip: l10n.voiceDismissNotice,
                               onPressed: voiceState.dismissNotice,
                               icon: const Icon(Icons.close),
                             ),
@@ -639,10 +654,10 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                         textCapitalization: TextCapitalization.sentences,
                         textInputAction: TextInputAction.send,
                         onSubmitted: canSend ? (_) => _send() : null,
-                        decoration: const InputDecoration(
-                          hintText: 'What’s on your mind?',
+                        decoration: InputDecoration(
+                          hintText: l10n.coachInputHint,
                           counterText: '',
-                          border: OutlineInputBorder(),
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                     ),
@@ -650,8 +665,8 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                     IconButton.outlined(
                       key: const ValueKey<String>('coach-voice-input'),
                       tooltip: voiceState.isListening
-                          ? 'Stop voice transcription'
-                          : 'Dictate coaching message',
+                          ? l10n.coachVoiceStopTooltip
+                          : l10n.coachVoiceDictateTooltip,
                       onPressed: isCoachBusy || voiceState.isBusy
                           ? null
                           : voiceState.isListening
@@ -669,7 +684,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                     const SizedBox(width: 10),
                     IconButton.filled(
                       key: const ValueKey<String>('coach-send-message'),
-                      tooltip: 'Send message',
+                      tooltip: l10n.coachSendTooltip,
                       onPressed: canSend ? _send : null,
                       icon: isCoachBusy
                           ? const SizedBox.square(
@@ -681,12 +696,12 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                 child: Text(
-                  'Focus Coach supports wellbeing and productivity, but it is not professional or crisis care.',
+                  l10n.coachCareBoundary,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white54, fontSize: 11),
+                  style: const TextStyle(color: Colors.white54, fontSize: 11),
                 ),
               ),
             ],
@@ -728,15 +743,15 @@ class _ConversationBody extends StatelessWidget {
           Icon(Icons.chat_bubble_outline, color: primaryColor, size: 34),
           const SizedBox(height: 12),
           Text(
-            'You don’t have to figure out the next step alone.',
+            context.l10n.coachEmptyHeadline,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Choose what you need right now: listening without fixing, a gentle next step, or direct accountability.',
+          Text(
+            context.l10n.coachEmptyDescription,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white70, height: 1.4),
+            style: const TextStyle(color: Colors.white70, height: 1.4),
           ),
           const SizedBox(height: 18),
           ...starterPrompts.map(
@@ -800,7 +815,7 @@ class _QuickReplyBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       container: true,
-      label: 'Suggested follow-up replies',
+      label: context.l10n.coachSuggestedRepliesSemantics,
       child: SingleChildScrollView(
         key: const ValueKey<String>('coach-quick-replies'),
         scrollDirection: Axis.horizontal,
@@ -855,7 +870,9 @@ class _MessageBubble extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isUser ? 'You' : 'Focus Coach',
+                  isUser
+                      ? context.l10n.coachUserLabel
+                      : context.l10n.coachTitle,
                   style: TextStyle(
                     color: isUser ? primaryColor : Colors.white60,
                     fontSize: 11,
@@ -881,7 +898,7 @@ class _ThinkingBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: 'Focus Coach is thinking',
+      label: context.l10n.coachThinkingSemantics,
       child: Align(
         alignment: Alignment.centerLeft,
         child: DecoratedBox(
@@ -907,9 +924,9 @@ class _ThinkingBubble extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 9),
-                const Text(
-                  'Thinking…',
-                  style: TextStyle(color: Colors.white70),
+                Text(
+                  context.l10n.coachThinking,
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ],
             ),

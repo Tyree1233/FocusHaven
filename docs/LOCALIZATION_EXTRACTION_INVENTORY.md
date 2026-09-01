@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B3C audited extraction contract
+Status: Phase 215G-B4 audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -53,7 +53,7 @@ The following timer-dashboard presentation is now fully catalog-owned:
 
 Planning and recovery cards outside the completed B3A, B3B, and B3C
 presentation boundaries retain their later audited owners.
-Coach, Haven action, reminder, account, backup, milestone-sheet internals,
+Reminder, account, backup, milestone-sheet internals,
 Focus History sheet internals, Queue sheet internals, and service/notification
 messages retain their later owners. Timer notification wording intentionally
 continues to come from `TimerService` until B6. English behavior and all stored
@@ -108,8 +108,8 @@ runtime values, including Rhythm, Forecast, Smart Reset, and Journey guidance.
 They are passed through the localized presentation as opaque values and are not
 translated, copied to the ARB catalog, or sent anywhere. English behavior and
 stored focus data are unchanged. No locale was activated by B3B, and no
-permission, dependency, backend, deployment, or store setting changed. B4
-through B6 remain required.
+permission, dependency, backend, deployment, or store setting changed. B5 and
+B6 remain required.
 
 ## B3C — Optional system connections
 
@@ -128,17 +128,49 @@ pass through the localized cards as opaque values and are not translated or
 copied into the catalog. B3C changes no permission prompt, calendar access,
 calendar write behavior, reminder behavior, Focus Shield rule, platform bridge,
 dependency, backend, deployment, or store configuration. English behavior is
-unchanged. No locale was activated by B3C, and B4 through B6 remain required.
+unchanged. No locale was activated by B3C, and B5 and B6 remain required.
+
+## B4 — Coaching and voice
+
+The coaching-and-voice presentation slice is now fully catalog-owned within
+these boundaries:
+
+- local Focus Coach headings, empty state, starter prompts, quick replies,
+  composer chrome, retry and clear-conversation controls, care boundary,
+  accessibility labels, and local/enhanced-AI state and consent disclosures;
+- Voice-to-Coach and safe-command tap-to-talk disclosure, listening,
+  preparing, editable-draft, stop, discard, and permission/recognition notice
+  presentation;
+- Haven action heading, privacy and source labels, example commands, review
+  and exact-confirmation controls, risk labels, proposal semantics, action
+  states, and typed/voice composer chrome.
+
+The voice service exposes stable notice codes to presentation code. Its English
+`notice` getter remains only as a compatibility diagnostic for existing tests
+and non-UI callers; production sheets map `noticeCode` through the generated
+catalog. Recognition behavior, speech locale selection, permission requests,
+and transcript lifecycle are unchanged.
+
+User-authored messages and recognized transcripts remain opaque values.
+Local- or remote-Coach responses, service errors and receipts, interpreted
+proposal explanations and effects, and execution results also remain runtime
+values with their existing service owners; they are not copied into the ARB
+catalog or sent to a translation service. B6 still owns service-generated
+user-facing text. Phase 215G-D must later align recognition, rule-based action
+interpretation, local coaching, and fallbacks with each individually qualified
+locale.
+
+B4 records no audio, contacts no local or remote AI, changes no permission,
+speech-recognition behavior, enhanced-AI gate, action policy, dependency,
+backend, deployment, or store configuration. English behavior is unchanged,
+no planned locale was activated, and B5 and B6 remain required.
 
 ## Remaining Phase 215G-B slices
 
-1. **B4 — Coaching and voice:** local Coach, enhanced-AI boundary text,
-   Voice-to-Coach, safe voice commands, permission states, transcript review,
-   and Haven action review/confirmation.
-2. **B5 — Account and purchases:** authentication, account settings, backup,
+1. **B5 — Account and purchases:** authentication, account settings, backup,
    deletion, Pro, purchases, journal, profile, reminders, and support/legal
    launch surfaces.
-3. **B6 — Service and notification messages:** user-facing strings produced by
+2. **B6 — Service and notification messages:** user-facing strings produced by
    services plus Flutter-owned notification and recovery copy. Native Apple,
    Android, widget, watch, permission-purpose, policy, support, store-listing,
    and screenshot localization remains Phase 215G-E.

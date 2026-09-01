@@ -1621,5 +1621,360 @@
   "focusShieldActionRetryProtection": "Retry protection",
   "@focusShieldActionRetryProtection": {
     "description": "Action to retry Focus Shield protection after a native failure."
+  },
+  "voiceKeepTyping": "Keep typing",
+  "@voiceKeepTyping": {
+    "description": "voice-transcription presentation copy for voice keep typing."
+  },
+  "voiceContinueToMicrophone": "Continue to microphone",
+  "@voiceContinueToMicrophone": {
+    "description": "voice-transcription presentation copy for voice continue to microphone."
+  },
+  "voiceDiscard": "Discard",
+  "@voiceDiscard": {
+    "description": "voice-transcription presentation copy for voice discard."
+  },
+  "voiceDismissNotice": "Dismiss voice notice",
+  "@voiceDismissNotice": {
+    "description": "voice-transcription presentation copy for voice dismiss notice."
+  },
+  "voiceRecognitionUnavailableOnDevice": "Speech recognition is unavailable on this device.",
+  "@voiceRecognitionUnavailableOnDevice": {
+    "description": "voice-transcription presentation copy for voice recognition unavailable on device."
+  },
+  "voiceAccessNotGranted": "Microphone or speech-recognition access was not granted. You can keep typing instead.",
+  "@voiceAccessNotGranted": {
+    "description": "voice-transcription presentation copy for voice access not granted."
+  },
+  "voiceRecognitionDidNotStart": "Speech recognition did not start. You can keep typing.",
+  "@voiceRecognitionDidNotStart": {
+    "description": "voice-transcription presentation copy for voice recognition did not start."
+  },
+  "voiceTranscriptionCouldNotStart": "Voice transcription could not start. You can keep typing.",
+  "@voiceTranscriptionCouldNotStart": {
+    "description": "voice-transcription presentation copy for voice transcription could not start."
+  },
+  "voiceTranscriptionStoppedUnexpectedly": "Voice transcription stopped unexpectedly. Review the draft before sending.",
+  "@voiceTranscriptionStoppedUnexpectedly": {
+    "description": "voice-transcription presentation copy for voice transcription stopped unexpectedly."
+  },
+  "voiceRecognitionUnavailableNow": "Speech recognition is unavailable right now. You can keep typing instead.",
+  "@voiceRecognitionUnavailableNow": {
+    "description": "voice-transcription presentation copy for voice recognition unavailable now."
+  },
+  "voiceTranscriptionStoppedReviewOrRetry": "Voice transcription stopped. Review the draft or try again.",
+  "@voiceTranscriptionStoppedReviewOrRetry": {
+    "description": "voice-transcription presentation copy for voice transcription stopped review or retry."
+  },
+  "coachTitle": "Focus Coach",
+  "@coachTitle": {
+    "description": "Focus Coach presentation copy for coach title."
+  },
+  "coachSubtitleEnhanced": "Enhanced AI · conversation saved on this device",
+  "@coachSubtitleEnhanced": {
+    "description": "Focus Coach presentation copy for coach subtitle enhanced."
+  },
+  "coachSubtitlePrivate": "Private guidance saved on this device",
+  "@coachSubtitlePrivate": {
+    "description": "Focus Coach presentation copy for coach subtitle private."
+  },
+  "coachClearConversationTooltip": "Clear coaching conversation",
+  "@coachClearConversationTooltip": {
+    "description": "Focus Coach presentation copy for coach clear conversation tooltip."
+  },
+  "coachCloseTooltip": "Close Focus Coach",
+  "@coachCloseTooltip": {
+    "description": "Focus Coach presentation copy for coach close tooltip."
+  },
+  "coachEnhancedTitle": "Enhanced AI coaching",
+  "@coachEnhancedTitle": {
+    "description": "Focus Coach presentation copy for coach enhanced title."
+  },
+  "coachEnhancedOnDescription": "Messages use secure cloud AI with an automatic local fallback.",
+  "@coachEnhancedOnDescription": {
+    "description": "Focus Coach presentation copy for coach enhanced on description."
+  },
+  "coachEnhancedOffDescription": "Off · coaching stays on this device.",
+  "@coachEnhancedOffDescription": {
+    "description": "Focus Coach presentation copy for coach enhanced off description."
+  },
+  "coachRetryResponse": "Retry coach response",
+  "@coachRetryResponse": {
+    "description": "Focus Coach presentation copy for coach retry response."
+  },
+  "coachVoiceListening": "Listening… Review this editable draft before sending.",
+  "@coachVoiceListening": {
+    "description": "Focus Coach presentation copy for coach voice listening."
+  },
+  "coachVoicePreparing": "Preparing the microphone…",
+  "@coachVoicePreparing": {
+    "description": "Focus Coach presentation copy for coach voice preparing."
+  },
+  "coachVoiceStop": "Stop",
+  "@coachVoiceStop": {
+    "description": "Focus Coach presentation copy for coach voice stop."
+  },
+  "coachInputHint": "What’s on your mind?",
+  "@coachInputHint": {
+    "description": "Focus Coach presentation copy for coach input hint."
+  },
+  "coachVoiceStopTooltip": "Stop voice transcription",
+  "@coachVoiceStopTooltip": {
+    "description": "Focus Coach presentation copy for coach voice stop tooltip."
+  },
+  "coachVoiceDictateTooltip": "Dictate coaching message",
+  "@coachVoiceDictateTooltip": {
+    "description": "Focus Coach presentation copy for coach voice dictate tooltip."
+  },
+  "coachSendTooltip": "Send message",
+  "@coachSendTooltip": {
+    "description": "Focus Coach presentation copy for coach send tooltip."
+  },
+  "coachCareBoundary": "Focus Coach supports wellbeing and productivity, but it is not professional or crisis care.",
+  "@coachCareBoundary": {
+    "description": "Focus Coach presentation copy for coach care boundary."
+  },
+  "coachEmptyHeadline": "You don’t have to figure out the next step alone.",
+  "@coachEmptyHeadline": {
+    "description": "Focus Coach presentation copy for coach empty headline."
+  },
+  "coachEmptyDescription": "Choose what you need right now: listening without fixing, a gentle next step, or direct accountability.",
+  "@coachEmptyDescription": {
+    "description": "Focus Coach presentation copy for coach empty description."
+  },
+  "coachSuggestedRepliesSemantics": "Suggested follow-up replies",
+  "@coachSuggestedRepliesSemantics": {
+    "description": "Focus Coach presentation copy for coach suggested replies semantics."
+  },
+  "coachUserLabel": "You",
+  "@coachUserLabel": {
+    "description": "Focus Coach presentation copy for coach user label."
+  },
+  "coachThinkingSemantics": "Focus Coach is thinking",
+  "@coachThinkingSemantics": {
+    "description": "Focus Coach presentation copy for coach thinking semantics."
+  },
+  "coachThinking": "Thinking…",
+  "@coachThinking": {
+    "description": "Focus Coach presentation copy for coach thinking."
+  },
+  "coachResponseFailed": "Your coach could not respond. Please try again.",
+  "@coachResponseFailed": {
+    "description": "Focus Coach presentation copy for coach response failed."
+  },
+  "coachVoiceDisclosureTitle": "Use voice transcription?",
+  "@coachVoiceDisclosureTitle": {
+    "description": "Focus Coach presentation copy for coach voice disclosure title."
+  },
+  "coachVoiceDisclosureMessage": "FocusHaven uses the microphone only while you are visibly listening. It keeps no raw audio. Your device or browser speech service may process audio on-device or over a network. The transcript stays in this editable draft and is not sent to Focus Coach until you tap Send.",
+  "@coachVoiceDisclosureMessage": {
+    "description": "Focus Coach presentation copy for coach voice disclosure message."
+  },
+  "coachClearConversationTitle": "Clear coaching conversation?",
+  "@coachClearConversationTitle": {
+    "description": "Focus Coach presentation copy for coach clear conversation title."
+  },
+  "coachClearConversationMessage": "This permanently removes the coaching conversation saved on this device.",
+  "@coachClearConversationMessage": {
+    "description": "Focus Coach presentation copy for coach clear conversation message."
+  },
+  "coachKeepConversation": "Keep conversation",
+  "@coachKeepConversation": {
+    "description": "Focus Coach presentation copy for coach keep conversation."
+  },
+  "coachClearConversation": "Clear conversation",
+  "@coachClearConversation": {
+    "description": "Focus Coach presentation copy for coach clear conversation."
+  },
+  "coachEnhancedDisclosureTitle": "Use enhanced AI coaching?",
+  "@coachEnhancedDisclosureTitle": {
+    "description": "Focus Coach presentation copy for coach enhanced disclosure title."
+  },
+  "coachEnhancedDisclosureMessage": "When enabled, your message, up to 12 recent coaching messages, and relevant FocusHaven context are sent securely through Firebase to OpenAI to generate a response. OpenAI does not use API data for training unless the API account opts in, but may retain content for abuse monitoring for up to 30 days by default. Your conversation remains saved on this device. You can turn this off anytime.",
+  "@coachEnhancedDisclosureMessage": {
+    "description": "Focus Coach presentation copy for coach enhanced disclosure message."
+  },
+  "coachEnhancedKeepLocal": "Keep coaching local",
+  "@coachEnhancedKeepLocal": {
+    "description": "Focus Coach presentation copy for coach enhanced keep local."
+  },
+  "coachEnhancedEnable": "Enable AI coaching",
+  "@coachEnhancedEnable": {
+    "description": "Focus Coach presentation copy for coach enhanced enable."
+  },
+  "coachPromptHelpMeStart": "I’m stuck—help me start",
+  "@coachPromptHelpMeStart": {
+    "description": "Focus Coach presentation copy for coach prompt help me start."
+  },
+  "coachPromptOverwhelmed": "I’m feeling overwhelmed",
+  "@coachPromptOverwhelmed": {
+    "description": "Focus Coach presentation copy for coach prompt overwhelmed."
+  },
+  "coachPromptWhatNext": "What should I do next?",
+  "@coachPromptWhatNext": {
+    "description": "Focus Coach presentation copy for coach prompt what next."
+  },
+  "coachPromptThinkThrough": "Help me think this through",
+  "@coachPromptThinkThrough": {
+    "description": "Focus Coach presentation copy for coach prompt think through."
+  },
+  "coachPromptGentle": "Be gentle with me",
+  "@coachPromptGentle": {
+    "description": "Focus Coach presentation copy for coach prompt gentle."
+  },
+  "coachPromptListen": "Please just listen",
+  "@coachPromptListen": {
+    "description": "Focus Coach presentation copy for coach prompt listen."
+  },
+  "coachPromptAccountability": "Hold me accountable",
+  "@coachPromptAccountability": {
+    "description": "Focus Coach presentation copy for coach prompt accountability."
+  },
+  "coachReplyBackAfterBreak": "I’m back after a break",
+  "@coachReplyBackAfterBreak": {
+    "description": "Focus Coach presentation copy for coach reply back after break."
+  },
+  "coachReplyDidFirstStep": "I did the first step",
+  "@coachReplyDidFirstStep": {
+    "description": "Focus Coach presentation copy for coach reply did first step."
+  },
+  "coachReplyStillStuck": "I’m still stuck",
+  "@coachReplyStillStuck": {
+    "description": "Focus Coach presentation copy for coach reply still stuck."
+  },
+  "coachReplyNeedBreak": "I need a break",
+  "@coachReplyNeedBreak": {
+    "description": "Focus Coach presentation copy for coach reply need break."
+  },
+  "coachReplyBreakItDown": "Break it down",
+  "@coachReplyBreakItDown": {
+    "description": "Focus Coach presentation copy for coach reply break it down."
+  },
+  "havenActionTitle": "Haven actions",
+  "@havenActionTitle": {
+    "description": "Haven action review presentation copy for haven action title."
+  },
+  "havenActionCloseTooltip": "Close Haven actions",
+  "@havenActionCloseTooltip": {
+    "description": "Haven action review presentation copy for haven action close tooltip."
+  },
+  "havenActionIntroduction": "Type or dictate one local action. Haven will show what it understood before anything runs.",
+  "@havenActionIntroduction": {
+    "description": "Haven action review presentation copy for haven action introduction."
+  },
+  "havenActionPrivateBoundary": "Typed or voice transcript • local review • no remote AI",
+  "@havenActionPrivateBoundary": {
+    "description": "Haven action review presentation copy for haven action private boundary."
+  },
+  "havenActionVoiceDisclosureTitle": "Use voice for Haven actions?",
+  "@havenActionVoiceDisclosureTitle": {
+    "description": "Haven action review presentation copy for haven action voice disclosure title."
+  },
+  "havenActionVoiceDisclosureMessage": "FocusHaven uses the microphone only while you are visibly listening and keeps no raw audio. Your device or browser speech service may process audio on-device or over a network. The transcript stays editable. Nothing is reviewed or run until you separately tap Review action and then the visual run or confirmation control.",
+  "@havenActionVoiceDisclosureMessage": {
+    "description": "Haven action review presentation copy for haven action voice disclosure message."
+  },
+  "havenActionVoiceListening": "Listening… Review this editable transcript before creating a proposal.",
+  "@havenActionVoiceListening": {
+    "description": "Haven action review presentation copy for haven action voice listening."
+  },
+  "havenActionVoicePreparing": "Preparing private voice transcription…",
+  "@havenActionVoicePreparing": {
+    "description": "Haven action review presentation copy for haven action voice preparing."
+  },
+  "havenActionVoiceReady": "Voice draft ready. Edit it, discard it, or review it locally.",
+  "@havenActionVoiceReady": {
+    "description": "Haven action review presentation copy for haven action voice ready."
+  },
+  "havenActionVoiceStop": "Stop listening",
+  "@havenActionVoiceStop": {
+    "description": "Haven action review presentation copy for haven action voice stop."
+  },
+  "havenActionInputLabel": "What should Haven do?",
+  "@havenActionInputLabel": {
+    "description": "Haven action review presentation copy for haven action input label."
+  },
+  "havenActionInputHint": "Example: add 5 minutes",
+  "@havenActionInputHint": {
+    "description": "Haven action review presentation copy for haven action input hint."
+  },
+  "havenActionVoiceStopTooltip": "Stop dictating Haven action",
+  "@havenActionVoiceStopTooltip": {
+    "description": "Haven action review presentation copy for haven action voice stop tooltip."
+  },
+  "havenActionVoiceDictateTooltip": "Dictate Haven action",
+  "@havenActionVoiceDictateTooltip": {
+    "description": "Haven action review presentation copy for haven action voice dictate tooltip."
+  },
+  "havenActionReview": "Review action",
+  "@havenActionReview": {
+    "description": "Haven action review presentation copy for haven action review."
+  },
+  "havenActionSourceVoice": "Voice transcript • reviewed locally",
+  "@havenActionSourceVoice": {
+    "description": "Haven action review presentation copy for haven action source voice."
+  },
+  "havenActionSourceTyped": "Typed request • reviewed locally",
+  "@havenActionSourceTyped": {
+    "description": "Haven action review presentation copy for haven action source typed."
+  },
+  "havenActionChangeRequest": "Change request",
+  "@havenActionChangeRequest": {
+    "description": "Haven action review presentation copy for haven action change request."
+  },
+  "havenActionWorking": "Working…",
+  "@havenActionWorking": {
+    "description": "Haven action review presentation copy for haven action working."
+  },
+  "havenActionConfirmExact": "Confirm exact action",
+  "@havenActionConfirmExact": {
+    "description": "Haven action review presentation copy for haven action confirm exact."
+  },
+  "havenActionRunReviewed": "Run reviewed action",
+  "@havenActionRunReviewed": {
+    "description": "Haven action review presentation copy for haven action run reviewed."
+  },
+  "havenActionExamples": "Try: “timer status,” “start focus,” “pause,” “resume,” “add 5 minutes,” “open Focus Queue,” or “add task: Review notes.”",
+  "@havenActionExamples": {
+    "description": "Haven action review presentation copy for haven action examples."
+  },
+  "havenActionSemanticsSourceVoice": "Voice transcript reviewed locally.",
+  "@havenActionSemanticsSourceVoice": {
+    "description": "Haven action review presentation copy for haven action semantics source voice."
+  },
+  "havenActionSemanticsSourceTyped": "Typed request reviewed locally.",
+  "@havenActionSemanticsSourceTyped": {
+    "description": "Haven action review presentation copy for haven action semantics source typed."
+  },
+  "havenActionSemanticsNextConfirm": "Confirmation is required. Choose Confirm exact action to continue, or Change request to edit.",
+  "@havenActionSemanticsNextConfirm": {
+    "description": "Haven action review presentation copy for haven action semantics next confirm."
+  },
+  "havenActionSemanticsNextRun": "Choose Run reviewed action to continue, or Change request to edit.",
+  "@havenActionSemanticsNextRun": {
+    "description": "Haven action review presentation copy for haven action semantics next run."
+  },
+  "havenActionRiskInformational": "Informational • no saved-data change",
+  "@havenActionRiskInformational": {
+    "description": "Haven action review presentation copy for haven action risk informational."
+  },
+  "havenActionRiskReversible": "Reversible timer control",
+  "@havenActionRiskReversible": {
+    "description": "Haven action review presentation copy for haven action risk reversible."
+  },
+  "havenActionRiskStateful": "Saved local edit • confirmation required",
+  "@havenActionRiskStateful": {
+    "description": "Haven action review presentation copy for haven action risk stateful."
+  },
+  "havenActionProposalSemantics": "Reviewed Haven action. {source} {interpretation}. {effect} {risk}. {nextStep}",
+  "@havenActionProposalSemantics": {
+    "description": "Complete screen-reader announcement for one reviewed Haven-action proposal while service-generated proposal text remains opaque.",
+    "placeholders": {
+      "source": {"type": "String", "example": "Typed request reviewed locally."},
+      "interpretation": {"type": "String", "example": "Draft one Focus Queue item"},
+      "effect": {"type": "String", "example": "Add Review notes to the private Focus Queue after confirmation."},
+      "risk": {"type": "String", "example": "Saved local edit • confirmation required"},
+      "nextStep": {"type": "String", "example": "Confirmation is required."}
+    }
   }
 }

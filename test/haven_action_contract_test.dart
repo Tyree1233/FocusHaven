@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -78,23 +79,33 @@ void main() {
   test('voice transcripts enter only through the reviewed action boundary', () {
     final sheet = _read('lib/widgets/haven_action_sheet.dart');
     final coachingSheet = _read('lib/widgets/coaching_sheet.dart');
+    final catalog =
+        jsonDecode(_read('lib/l10n/app_en.arb')) as Map<String, dynamic>;
     final androidManifest = _read('android/app/src/main/AndroidManifest.xml');
     final iosInfo = _read('ios/Runner/Info.plist');
     final pubspec = _read('pubspec.yaml');
 
+    expect(sheet, contains('l10n.havenActionPrivateBoundary'));
     expect(
-      sheet,
-      contains('Typed or voice transcript • local review • no remote AI'),
+      catalog['havenActionPrivateBoundary'],
+      'Typed or voice transcript • local review • no remote AI',
     );
     expect(sheet, isNot(contains('SharedPreferences')));
     expect(sheet, contains('VoiceTranscriptionService'));
     expect(sheet, contains('VoiceTranscriptionPurpose.havenAction'));
     expect(sheet, contains('disclosureAcknowledgedFor'));
     expect(sheet, contains('source: _inputSource'));
-    expect(sheet, contains('Review action'));
-    expect(sheet, contains('Run reviewed action'));
-    expect(sheet, contains('Confirm exact action'));
-    expect(sheet, contains('Nothing is reviewed or run'));
+    expect(sheet, contains('l10n.havenActionReview'));
+    expect(sheet, contains('l10n.havenActionRunReviewed'));
+    expect(sheet, contains('l10n.havenActionConfirmExact'));
+    expect(sheet, contains('l10n.havenActionVoiceDisclosureMessage'));
+    expect(catalog['havenActionReview'], 'Review action');
+    expect(catalog['havenActionRunReviewed'], 'Run reviewed action');
+    expect(catalog['havenActionConfirmExact'], 'Confirm exact action');
+    expect(
+      catalog['havenActionVoiceDisclosureMessage'],
+      contains('Nothing is reviewed or run'),
+    );
     expect(coachingSheet, contains('VoiceTranscriptionService'));
     expect(coachingSheet, isNot(contains('HavenActionEngine')));
     expect(androidManifest, contains('android.permission.RECORD_AUDIO'));

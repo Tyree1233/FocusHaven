@@ -190,14 +190,14 @@ void main() {
       'Haven Window suggestion headlines, details, and evidence and Focus Shield state headlines and details remain B6-owned',
       'changes no permission prompt, calendar access, calendar write behavior, reminder behavior, Focus Shield rule, platform bridge',
       'No locale was activated by B3C',
-      'B4 through B6 remain required',
+      'B5 and B6 remain required',
     ]) {
       expect(inventory, contains(required));
     }
-    expect(policy, contains('Phase 215G-B3C'));
-    expect(policy, contains('B4 through B6 remain required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C extraction'));
-    expect(roadmap, contains('remaining B4–B6 extraction slices'));
+    expect(policy, contains('Phase 215G-B4'));
+    expect(policy, contains('B5 and B6 remain required'));
+    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4 extraction'));
+    expect(roadmap, contains('remaining B5–B6 extraction slices'));
     expect(readme, contains('Phase 215G-B3C'));
     expect(
       readme,
