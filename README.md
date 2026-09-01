@@ -795,15 +795,23 @@ rules, permission behavior, timer state, and account-deletion status enums are
 unchanged. Generated planner/restorative copy and coaching, action,
 authentication, store, journal, export, and other service-owned results remain
 for later B6 slices. English remains the only active locale.
+Phase 215G-B6B1 additionally catalog-owns the stable local Haven Planner
+validation, assumptions, uncertainty explanation, generated queue-item
+templates, session-size suggestion, and no-calendar free-time suggestion.
+User-authored goal text remains an opaque placeholder, planner proposal schema
+and review behavior are unchanged, and the existing English fallback remains
+the only active service catalog. Rhythm, Forecast, Smart Reset, Journey, Haven
+Window, and Focus Shield guidance remains for B6B2.
 
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B6B and B6C work; B1, B2, B3A, B3B, B3C, B4, B5, and B6A are not a claim that the whole interface
+remaining B6B2 and B6C work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, and B6B1 are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.
 
-The remaining B6 work is now explicitly divided into B6B generated guidance
-and B6C coaching, action, and remaining service results.
+The remaining B6 work is now explicitly divided into B6B2 restorative and
+optional-system guidance and B6C coaching, action, and remaining service
+results.
 
 ## Architecture
 

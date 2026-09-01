@@ -229,8 +229,11 @@ void main() {
     }
     expect(policy, contains('Phase 215G-B4'));
     expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction'));
-    expect(roadmap, contains('remaining B6 extraction slice'));
+    expect(roadmap, contains('B1–B6B1 extraction shipped'));
+    expect(
+      roadmap,
+      contains('remaining B6 extraction work is now divided into B6B2 and B6C'),
+    );
     expect(readme, contains('Phase 215G-B3B'));
     expect(
       readme,

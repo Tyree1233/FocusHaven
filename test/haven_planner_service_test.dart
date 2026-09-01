@@ -24,6 +24,11 @@ void main() {
     expect(proposal.input.availableMinutes, 60);
     expect(proposal.input.preferredFocusMinutes, 25);
     expect(proposal.assumptions, hasLength(3));
+    expect(proposal.assumptions, <String>[
+      'You want a small starting sequence, not a complete project plan.',
+      'The goal can be advanced through visible steps you can revise.',
+      'A 25-minute focus block fits within the 60-minute window you entered.',
+    ]);
     expect(proposal.uncertainty, HavenPlannerUncertainty.medium);
     expect(proposal.uncertaintyExplanation, contains('deadlines'));
     expect(
@@ -38,6 +43,11 @@ void main() {
         .where((item) => item.kind == HavenPlannerItemKind.queueTask)
         .toList();
     expect(queueItems, hasLength(3));
+    expect(queueItems.map((item) => item.title), <String>[
+      'Define done for Prepare the FocusHaven launch',
+      'Take the first visible step for Prepare the FocusHaven launch',
+      'Review progress and choose the next step for Prepare the FocusHaven launch',
+    ]);
     expect(queueItems.every((item) => item.canEdit), isTrue);
     expect(queueItems.every((item) => item.willMutateWhenAccepted), isTrue);
     expect(

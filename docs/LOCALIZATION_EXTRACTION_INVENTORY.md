@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B6A audited extraction contract
+Status: Phase 215G-B6B1 audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -232,11 +232,36 @@ Haven Window/Focus Shield, Coach, Haven action, authentication, store, journal,
 and other service-owned guidance remains for later B6 slices. Phase 215G-B is
 therefore not complete.
 
+## B6B1 — Generated Haven Planner guidance
+
+The first generated-guidance sub-slice is now catalog-owned within these
+boundaries:
+
+- empty and oversized-goal validation returned by the local planner;
+- the three transparent planner assumptions and its uncertainty explanation;
+- the three generated queue-item title templates and explanations;
+- the informational session-size title and safety explanation; and
+- the informational free-time title and explicit no-calendar explanation.
+
+User-authored goal text remains an opaque placeholder. It is bounded by the
+existing service before insertion and is never used as a catalog key,
+translated, persisted by this phase, or sent anywhere. Proposal schema, IDs,
+time bounds, title bounds, uncertainty level, affected-data declarations,
+review choices, queue mutations, timer behavior, and calendar behavior are
+unchanged. English remains the only production service catalog and the
+fallback remains explicit until a later reviewed locale-selection boundary.
+
+B6B1 creates no proposal during verification, reads or writes no calendar,
+changes no queue or timer, adds no permission or dependency, contacts no AI or
+translation provider, deploys nothing, and activates no planned locale. Rhythm,
+Forecast, Smart Reset, Journey, Haven Window, and Focus Shield generated
+guidance remains for B6B2. Phase 215G-B is therefore not complete.
+
 ## Remaining Phase 215G-B slices
 
-1. **B6B — Generated planning and restorative guidance:** planner, Rhythm,
-   Forecast, Smart Reset, Journey, Haven Window, Focus Shield, and related
-   advisory values produced by services.
+1. **B6B2 — Restorative and optional-system guidance:** Rhythm, Forecast,
+   Smart Reset, Journey, Haven Window, Focus Shield, and related advisory
+   values produced by services.
 2. **B6C — Coaching, action, and remaining service results:** local-Coach
    responses, Haven action interpretation/policy/execution copy,
    authentication, store, journal prompts, exports, and remaining

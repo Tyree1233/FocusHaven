@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/haven_planner_proposal.dart';
 
 typedef HavenPlannerClock = DateTime Function();
@@ -24,16 +26,22 @@ class HavenPlannerService {
     required String goal,
     required int availableMinutes,
     required int preferredFocusMinutes,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final normalizedGoal = goal.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (normalizedGoal.isEmpty) {
-      throw ArgumentError.value(goal, 'goal', 'A goal is required.');
+      throw ArgumentError.value(
+        goal,
+        'goal',
+        l10n.havenPlannerServiceGoalRequired,
+      );
     }
     if (normalizedGoal.length > maxGoalLength) {
       throw ArgumentError.value(
         goal,
         'goal',
-        'A goal must be 240 characters or fewer.',
+        l10n.havenPlannerServiceGoalTooLong,
       );
     }
 
@@ -60,13 +68,15 @@ class HavenPlannerService {
         preferredFocusMinutes: focusMinutes,
       ),
       assumptions: List.unmodifiable(<String>[
-        'You want a small starting sequence, not a complete project plan.',
-        'The goal can be advanced through visible steps you can revise.',
-        'A $focusMinutes-minute focus block fits within the $boundedAvailable-minute window you entered.',
+        l10n.havenPlannerServiceAssumptionSmallSequence,
+        l10n.havenPlannerServiceAssumptionVisibleSteps,
+        l10n.havenPlannerServiceAssumptionFocusFits(
+          focusMinutes,
+          boundedAvailable,
+        ),
       ]),
       uncertainty: HavenPlannerUncertainty.medium,
-      uncertaintyExplanation:
-          'Haven has only the goal and time you entered. It does not know your deadlines, dependencies, calendar, or preferred order.',
+      uncertaintyExplanation: l10n.havenPlannerServiceUncertainty,
       affectedLocalData: const <HavenPlannerLocalData>{
         HavenPlannerLocalData.temporaryGoalText,
         HavenPlannerLocalData.focusQueue,
@@ -74,28 +84,27 @@ class HavenPlannerService {
       items: List.unmodifiable(<HavenPlannerItem>[
         _queueItem(
           '$proposalId-task-1',
-          _boundedTitle('Define done for $shortGoal'),
-          'Clarify one observable result before doing the work.',
+          _boundedTitle(l10n.havenPlannerServiceDefineDoneTitle(shortGoal)),
+          l10n.havenPlannerServiceDefineDoneExplanation,
         ),
         _queueItem(
           '$proposalId-task-2',
-          _boundedTitle('Take the first visible step for $shortGoal'),
-          'Choose an action small enough to begin without another planning pass.',
+          _boundedTitle(l10n.havenPlannerServiceFirstStepTitle(shortGoal)),
+          l10n.havenPlannerServiceFirstStepExplanation,
         ),
         _queueItem(
           '$proposalId-task-3',
-          _boundedTitle(
-            'Review progress and choose the next step for $shortGoal',
-          ),
-          'Pause after the first attempt and decide what actually belongs next.',
+          _boundedTitle(l10n.havenPlannerServiceReviewProgressTitle(shortGoal)),
+          l10n.havenPlannerServiceReviewProgressExplanation,
         ),
         HavenPlannerItem(
           id: '$proposalId-session',
           kind: HavenPlannerItemKind.sessionSuggestion,
-          title:
-              '$focusMinutes minutes of focus, then $breakMinutes minutes away',
-          explanation:
-              'This is an informational session-size suggestion. Accepting it does not start or reconfigure the timer.',
+          title: l10n.havenPlannerServiceSessionTitle(
+            focusMinutes,
+            breakMinutes,
+          ),
+          explanation: l10n.havenPlannerServiceSessionExplanation,
           affectedLocalData: const <HavenPlannerLocalData>{},
           canEdit: false,
           willMutateWhenAccepted: false,
@@ -103,9 +112,8 @@ class HavenPlannerService {
         HavenPlannerItem(
           id: '$proposalId-free-time',
           kind: HavenPlannerItemKind.freeTimeSuggestion,
-          title: 'Look for one uninterrupted $focusMinutes-minute opening',
-          explanation:
-              'This is informational only. Haven did not read or write a calendar and will not reserve time.',
+          title: l10n.havenPlannerServiceFreeTimeTitle(focusMinutes),
+          explanation: l10n.havenPlannerServiceFreeTimeExplanation,
           affectedLocalData: const <HavenPlannerLocalData>{},
           canEdit: false,
           willMutateWhenAccepted: false,

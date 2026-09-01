@@ -127,9 +127,10 @@ void main() {
       inventory,
       contains('B6A — Notifications and bounded service receipts'),
     );
+    expect(inventory, contains('B6B1 — Generated Haven Planner guidance'));
     expect(
       inventory,
-      contains('B6B — Generated planning and restorative guidance'),
+      contains('B6B2 — Restorative and optional-system guidance'),
     );
     expect(
       inventory,
@@ -137,7 +138,7 @@ void main() {
     );
     expect(policy, contains('Phase 215G-B6A'));
     expect(policy, contains('Phase 215G-B is not complete'));
-    expect(roadmap, contains('B1–B6A extraction shipped'));
+    expect(roadmap, contains('B1–B6B1 extraction shipped'));
     expect(readme, contains('Phase 215G-B6A'));
     expect(
       locales,

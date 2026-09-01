@@ -215,7 +215,11 @@ void main() {
     expect(planner, contains('Text(item.title)'));
     expect(planner, contains('Text(item.explanation)'));
     expect(planService, contains("selectedTask?.title"));
-    expect(plannerService, contains("_boundedTitle('Define done for"));
+    expect(
+      plannerService,
+      contains('havenPlannerServiceDefineDoneTitle(shortGoal)'),
+    );
+    expect(plannerService, isNot(contains("'Define done for \$shortGoal'")));
 
     for (final required in <String>[
       'B3A — Queue and planning foundation',
@@ -228,8 +232,11 @@ void main() {
     }
     expect(policy, contains('Phase 215G-B4'));
     expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction'));
-    expect(roadmap, contains('remaining B6 extraction slice'));
+    expect(roadmap, contains('B1–B6B1 extraction shipped'));
+    expect(
+      roadmap,
+      contains('remaining B6 extraction work is now divided into B6B2 and B6C'),
+    );
     expect(readme, contains('Phase 215G-B3A'));
     expect(readme, contains('service-originated planning copy remain B6'));
   });

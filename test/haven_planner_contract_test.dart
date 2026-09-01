@@ -20,8 +20,10 @@ void main() {
     }
 
     expect(planner, contains('Creates an explainable planning draft'));
-    expect(planner, contains('does not know your deadlines'));
-    expect(planner, contains('did not read or write a calendar'));
+    expect(planner, contains('l10n.havenPlannerServiceUncertainty'));
+    expect(planner, contains('l10n.havenPlannerServiceFreeTimeExplanation'));
+    expect(catalog, contains('does not know your deadlines'));
+    expect(catalog, contains('did not read or write a calendar'));
     expect(sheet, contains('l10n.havenPlannerLocalOnly'));
     expect(sheet, contains('l10n.havenPlannerDescription'));
     expect(sheet, contains('l10n.havenPlannerReviewEach'));
