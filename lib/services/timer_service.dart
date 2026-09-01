@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/focus_session.dart';
 import '../models/parked_thought.dart';
@@ -87,6 +89,7 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   bool _activeFocusDidResume = false;
   SessionType _sessionType = SessionType.focus;
   final NotificationService? _notificationService;
+  final AppLocalizations _localizations;
   late final Future<void> _initialization;
 
   int get secondsRemaining => _secondsRemaining;
@@ -262,11 +265,17 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       ? 0
       : 1 - (_secondsRemaining / _totalSessionSeconds);
 
-  factory TimerService({NotificationService? notificationService}) {
-    return TimerService._(notificationService);
+  factory TimerService({
+    NotificationService? notificationService,
+    AppLocalizations? localizations,
+  }) {
+    return TimerService._(
+      notificationService,
+      localizations ?? defaultServiceLocalizations(),
+    );
   }
 
-  TimerService._(this._notificationService) {
+  TimerService._(this._notificationService, this._localizations) {
     WidgetsBinding.instance.addObserver(this);
     _initialization = _loadFromPrefs();
   }
@@ -876,7 +885,9 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     _endsAt = null;
     unawaited(
       _notificationService?.showSessionComplete(
-            title: '${_sessionType.label} complete',
+            title: _localizations.timerSessionCompleteTitle(
+              _localizedSessionType,
+            ),
             body: _completionMessage,
           ) ??
           Future<void>.value(),
@@ -903,13 +914,16 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     SessionType.longBreak => _longBreakSeconds,
   };
 
+  String get _localizedSessionType => switch (_sessionType) {
+    SessionType.focus => _localizations.timerSessionFocusLabel,
+    SessionType.shortBreak => _localizations.timerSessionShortBreakLabel,
+    SessionType.longBreak => _localizations.timerSessionLongBreakLabel,
+  };
+
   String get _completionMessage => switch (_sessionType) {
-    SessionType.focus =>
-      'You showed up for what matters. Let yourself take a real breath.',
-    SessionType.shortBreak =>
-      'A small pause counts. Return when you feel ready.',
-    SessionType.longBreak =>
-      'You made room to restore. Carry the calm forward.',
+    SessionType.focus => _localizations.timerFocusCompletionBody,
+    SessionType.shortBreak => _localizations.timerShortBreakCompletionBody,
+    SessionType.longBreak => _localizations.timerLongBreakCompletionBody,
   };
 
   Future<void> _saveToPrefs() async {

@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B5 audited extraction contract
+Status: Phase 215G-B6A audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -202,12 +202,48 @@ a reminder, launch a policy, contact a provider, change a dependency, deploy,
 or edit a store configuration. English behavior is unchanged, no planned
 locale was activated, and B6 remains required.
 
+## B6A — Notifications and bounded service receipts
+
+The first service-owned extraction slice is now catalog-owned within these
+boundaries:
+
+- Flutter-owned notification titles and bodies for the explicit notification
+  test, scheduled focus reminders, completed timer sessions, and one user-held
+  Haven Window;
+- Flutter-created Android notification channel names and descriptions for
+  those same three notification categories;
+- focus, short-break, and long-break labels plus the three bounded completion
+  messages used by timer-completion notifications; and
+- all stable account-deletion outcome receipts, mapped from the existing
+  `AccountDeletionStatus` enum only when presented.
+
+Notification identifiers, channel identifiers, schedules, time-zone rules,
+permission behavior, timer state, and account-deletion behavior are unchanged.
+Account-deletion results remain stable status values in the service layer; no
+success or failure status is inferred from translated text. English remains
+the only production locale, and the catalog fallback exists only to preserve
+that current single-locale runtime until a reviewed locale-selection boundary
+is implemented.
+
+B6A requests no permission, schedules no reminder, finishes no timer, deletes
+no account or data, contacts no provider, changes no dependency, deploys
+nothing, and activates no planned locale. Generated planner, restorative,
+Haven Window/Focus Shield, Coach, Haven action, authentication, store, journal,
+and other service-owned guidance remains for later B6 slices. Phase 215G-B is
+therefore not complete.
+
 ## Remaining Phase 215G-B slices
 
-1. **B6 — Service and notification messages:** user-facing strings produced by
-   services plus Flutter-owned notification and recovery copy. Native Apple,
-   Android, widget, watch, permission-purpose, policy, support, store-listing,
-   and screenshot localization remains Phase 215G-E.
+1. **B6B — Generated planning and restorative guidance:** planner, Rhythm,
+   Forecast, Smart Reset, Journey, Haven Window, Focus Shield, and related
+   advisory values produced by services.
+2. **B6C — Coaching, action, and remaining service results:** local-Coach
+   responses, Haven action interpretation/policy/execution copy,
+   authentication, store, journal prompts, exports, and remaining
+   user-facing service errors and receipts.
+
+Native Apple, Android, widget, watch, permission-purpose, policy, support,
+store-listing, and screenshot localization remains Phase 215G-E.
 
 Each slice must preserve English behavior, add catalog metadata for every new
 message, update focused tests, pass the complete suite and release builds, and

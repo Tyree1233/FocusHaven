@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/service_localizations.dart';
 import 'package:focushaven/services/account_deletion_service.dart';
 import 'package:focushaven/services/auth_service.dart';
 
@@ -61,7 +62,10 @@ void main() {
         AccountDeletionStatus.deletedAppleRevocationRequired,
       );
       expect(result.deleted, isTrue);
-      expect(result.message, contains('Apple Account settings'));
+      expect(
+        localizeAccountDeletionResult(defaultServiceLocalizations(), result),
+        contains('Apple Account settings'),
+      );
       expect(backend.deleteCalls, 1);
       expect(auth.guestResetCalls, 1);
     },

@@ -5,6 +5,8 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import 'haven_window_hold_service.dart';
 import 'privacy_safe_diagnostics.dart';
 
@@ -24,17 +26,23 @@ abstract interface class NotificationGateway {
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
   });
   Future<void> scheduleDailyNotification({
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
     required tz.TZDateTime scheduledDate,
   });
   Future<void> scheduleOneTimeNotification({
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
     required tz.TZDateTime scheduledDate,
   });
   Future<void> cancelNotification(int id);
@@ -92,12 +100,14 @@ final class FlutterNotificationGateway implements NotificationGateway {
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
   }) async {
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         'focus_session_complete',
-        'Focus session complete',
-        channelDescription: 'Alerts when a FocusHaven timer finishes.',
+        channelName,
+        channelDescription: channelDescription,
         importance: Importance.high,
         priority: Priority.high,
       ),
@@ -118,14 +128,15 @@ final class FlutterNotificationGateway implements NotificationGateway {
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
     required tz.TZDateTime scheduledDate,
   }) async {
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         'daily_focus_reminder',
-        'Scheduled focus time',
-        channelDescription:
-            'A gentle invitation to begin a scheduled focus session.',
+        channelName,
+        channelDescription: channelDescription,
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
       ),
@@ -149,14 +160,15 @@ final class FlutterNotificationGateway implements NotificationGateway {
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
     required tz.TZDateTime scheduledDate,
   }) async {
-    const details = NotificationDetails(
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         'haven_window_reminder',
-        'Haven Window reminders',
-        channelDescription:
-            'A private reminder for a Haven Window the user chose to hold.',
+        channelName,
+        channelDescription: channelDescription,
         importance: Importance.defaultImportance,
         priority: Priority.defaultPriority,
       ),
@@ -182,9 +194,11 @@ class NotificationService
     implements ReminderNotificationClient, HavenWindowReminderClient {
   NotificationService({
     NotificationGateway? gateway,
+    AppLocalizations? localizations,
     TimeZoneIdentifierLoader? timeZoneIdentifierLoader,
     ZonedNow? zonedNow,
   }) : _gateway = gateway ?? FlutterNotificationGateway(),
+       _localizations = localizations ?? defaultServiceLocalizations(),
        _loadTimeZoneIdentifier =
            timeZoneIdentifierLoader ?? _systemTimeZoneIdentifier,
        _zonedNow = zonedNow ?? _systemZonedNow;
@@ -195,6 +209,7 @@ class NotificationService
   static const _weekdays = <int>{1, 2, 3, 4, 5, 6, 7};
 
   final NotificationGateway _gateway;
+  final AppLocalizations _localizations;
   final TimeZoneIdentifierLoader _loadTimeZoneIdentifier;
   final ZonedNow _zonedNow;
   Future<void>? _initialization;
@@ -231,8 +246,8 @@ class NotificationService
   }
 
   Future<void> showTestNotification() => showSessionComplete(
-    title: 'FocusHaven notifications are ready',
-    body: 'You will see an alert when your focus timer ends.',
+    title: _localizations.notificationTestTitle,
+    body: _localizations.notificationTestBody,
   );
 
   Future<void> showSessionComplete({
@@ -246,6 +261,8 @@ class NotificationService
         id: DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
         title: title,
         body: body,
+        channelName: _localizations.notificationFocusChannelName,
+        channelDescription: _localizations.notificationFocusChannelDescription,
       );
     } catch (error) {
       PrivacySafeDiagnostics.report(
@@ -283,8 +300,11 @@ class NotificationService
 
         await _gateway.scheduleDailyNotification(
           id: _dailyReminderId + weekday,
-          title: 'Your scheduled focus time',
-          body: 'Whenever you are ready, make a little space for what matters.',
+          title: _localizations.notificationDailyTitle,
+          body: _localizations.notificationDailyBody,
+          channelName: _localizations.notificationDailyChannelName,
+          channelDescription:
+              _localizations.notificationDailyChannelDescription,
           scheduledDate: scheduled,
         );
       }
@@ -330,9 +350,11 @@ class NotificationService
 
       await _gateway.scheduleOneTimeNotification(
         id: _havenWindowReminderId,
-        title: 'Your possible Haven Window is here',
-        body:
-            'If it still fits, you can make a little space for focus. Nothing was added to your calendar.',
+        title: _localizations.notificationHavenWindowTitle,
+        body: _localizations.notificationHavenWindowBody,
+        channelName: _localizations.notificationHavenWindowChannelName,
+        channelDescription:
+            _localizations.notificationHavenWindowChannelDescription,
         scheduledDate: scheduledDate,
       );
       return true;

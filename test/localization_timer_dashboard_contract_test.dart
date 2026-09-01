@@ -178,7 +178,9 @@ void main() {
       'B3C — Optional system connections',
       'B4 — Coaching and voice',
       'B5 — Account, purchases, and private records',
-      'B6 — Service and notification messages',
+      'B6A — Notifications and bounded service receipts',
+      'B6B — Generated planning and restorative guidance',
+      'B6C — Coaching, action, and remaining service results',
     ]) {
       expect(inventory, contains(required));
     }

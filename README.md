@@ -787,12 +787,23 @@ identifiers remain unchanged in storage and are localized only when displayed.
 This slice does not sign in, purchase, back up, restore, delete, request a
 permission, schedule a reminder, launch a policy, or activate another
 language.
+Phase 215G-B6A additionally catalog-owns Flutter notification titles and
+bodies, Flutter-created Android notification channel names and descriptions,
+timer-completion notification copy, and the presentation of every stable
+account-deletion outcome. Notification and channel IDs, schedules, time-zone
+rules, permission behavior, timer state, and account-deletion status enums are
+unchanged. Generated planner/restorative copy and coaching, action,
+authentication, store, journal, export, and other service-owned results remain
+for later B6 slices. English remains the only active locale.
 
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B6 work; B1, B2, B3A, B3B, B3C, B4, and B5 are not a claim that the whole interface
+remaining B6B and B6C work; B1, B2, B3A, B3B, B3C, B4, B5, and B6A are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.
+
+The remaining B6 work is now explicitly divided into B6B generated guidance
+and B6C coaching, action, and remaining service results.
 
 ## Architecture
 

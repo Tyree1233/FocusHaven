@@ -190,7 +190,10 @@ void main() {
       _read('lib/widgets/pro_sheet.dart'),
       contains('_showMessage(error.message)'),
     );
-    expect(_read('lib/screens/timer_screen.dart'), contains('result.message'));
+    expect(
+      _read('lib/screens/timer_screen.dart'),
+      contains('localizeAccountDeletionResult'),
+    );
   });
 
   test('B5 scope is truthful and planned locales remain inactive', () {

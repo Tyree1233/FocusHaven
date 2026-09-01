@@ -128,13 +128,13 @@ void main() {
     expect(
       roadmap,
       contains(
-        '| Global localization | Foundation plus B1–B5 extraction shipped |',
+        '| Global localization | Foundation plus B1–B6A extraction shipped |',
       ),
     );
     expect(
       roadmap,
       contains(
-        'Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction',
+        'Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5/B6A extraction',
       ),
     );
     expect(roadmap, contains('remaining B6 extraction slice'));

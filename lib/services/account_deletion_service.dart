@@ -66,27 +66,6 @@ final class AccountDeletionResult {
   bool get deleted =>
       status == AccountDeletionStatus.deleted ||
       status == AccountDeletionStatus.deletedAppleRevocationRequired;
-
-  String get message => switch (status) {
-    AccountDeletionStatus.deleted =>
-      'Your FocusHaven account and associated cloud data were deleted. '
-          'Your local focus data remains on this device.',
-    AccountDeletionStatus.deletedAppleRevocationRequired =>
-      'Your FocusHaven account and associated cloud data were deleted. '
-          'Apple authorization could not be revoked automatically. In your '
-          'Apple Account settings, stop using Sign in with Apple for '
-          'FocusHaven. Your local focus data remains on this device.',
-    AccountDeletionStatus.notSignedIn =>
-      'There is no signed-in FocusHaven account to delete.',
-    AccountDeletionStatus.reauthenticationCancelled =>
-      'Account deletion was cancelled before your identity was verified.',
-    AccountDeletionStatus.reauthenticationUnavailable =>
-      'FocusHaven could not verify your identity. Please sign in again and retry.',
-    AccountDeletionStatus.unsupportedProvider =>
-      'This account cannot be verified in the app yet. Use the account-deletion page for help.',
-    AccountDeletionStatus.unavailable =>
-      'Your account was not confirmed as deleted. Please try again before removing the app.',
-  };
 }
 
 class AccountDeletionService {

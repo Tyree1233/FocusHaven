@@ -2892,5 +2892,115 @@
   "accountSignInDashboardTooltip": "Sign in",
   "@accountSignInDashboardTooltip": {
     "description": "Phase 215G-B5 source-catalog copy for accountSignInDashboardTooltip."
+  },
+  "notificationFocusChannelName": "Focus session complete",
+  "@notificationFocusChannelName": {
+    "description": "Android notification channel name for completed focus sessions."
+  },
+  "notificationFocusChannelDescription": "Alerts when a FocusHaven timer finishes.",
+  "@notificationFocusChannelDescription": {
+    "description": "Android notification channel description for completed focus sessions."
+  },
+  "notificationDailyChannelName": "Scheduled focus time",
+  "@notificationDailyChannelName": {
+    "description": "Android notification channel name for scheduled focus reminders."
+  },
+  "notificationDailyChannelDescription": "A gentle invitation to begin a scheduled focus session.",
+  "@notificationDailyChannelDescription": {
+    "description": "Android notification channel description for scheduled focus reminders."
+  },
+  "notificationHavenWindowChannelName": "Haven Window reminders",
+  "@notificationHavenWindowChannelName": {
+    "description": "Android notification channel name for user-held Haven Windows."
+  },
+  "notificationHavenWindowChannelDescription": "A private reminder for a Haven Window you chose to hold.",
+  "@notificationHavenWindowChannelDescription": {
+    "description": "Android notification channel description for user-held Haven Windows."
+  },
+  "notificationTestTitle": "FocusHaven notifications are ready",
+  "@notificationTestTitle": {
+    "description": "Title of the notification sent after a user tests notification access."
+  },
+  "notificationTestBody": "You will see an alert when your focus timer ends.",
+  "@notificationTestBody": {
+    "description": "Body of the notification sent after a user tests notification access."
+  },
+  "notificationDailyTitle": "Your scheduled focus time",
+  "@notificationDailyTitle": {
+    "description": "Title of a user-scheduled daily focus reminder."
+  },
+  "notificationDailyBody": "Whenever you are ready, make a little space for what matters.",
+  "@notificationDailyBody": {
+    "description": "Body of a user-scheduled daily focus reminder."
+  },
+  "notificationHavenWindowTitle": "Your possible Haven Window is here",
+  "@notificationHavenWindowTitle": {
+    "description": "Title of the one-time reminder for a user-held Haven Window."
+  },
+  "notificationHavenWindowBody": "If it still fits, you can make a little space for focus. Nothing was added to your calendar.",
+  "@notificationHavenWindowBody": {
+    "description": "Body of the one-time reminder for a user-held Haven Window."
+  },
+  "timerSessionFocusLabel": "Focus",
+  "@timerSessionFocusLabel": {
+    "description": "Localized label for a focus timer session."
+  },
+  "timerSessionShortBreakLabel": "Short break",
+  "@timerSessionShortBreakLabel": {
+    "description": "Localized label for a short-break timer session."
+  },
+  "timerSessionLongBreakLabel": "Long break",
+  "@timerSessionLongBreakLabel": {
+    "description": "Localized label for a long-break timer session."
+  },
+  "timerSessionCompleteTitle": "{session} complete",
+  "@timerSessionCompleteTitle": {
+    "description": "Notification title shown when a timer session completes.",
+    "placeholders": {
+      "session": {
+        "type": "String",
+        "example": "Focus"
+      }
+    }
+  },
+  "timerFocusCompletionBody": "You showed up for what matters. Let yourself take a real breath.",
+  "@timerFocusCompletionBody": {
+    "description": "Notification body shown after a focus session completes."
+  },
+  "timerShortBreakCompletionBody": "A small pause counts. Return when you feel ready.",
+  "@timerShortBreakCompletionBody": {
+    "description": "Notification body shown after a short break completes."
+  },
+  "timerLongBreakCompletionBody": "You made room to restore. Carry the calm forward.",
+  "@timerLongBreakCompletionBody": {
+    "description": "Notification body shown after a long break completes."
+  },
+  "accountDeletionDeletedReceipt": "Your FocusHaven account and associated cloud data were deleted. Your local focus data remains on this device.",
+  "@accountDeletionDeletedReceipt": {
+    "description": "Receipt after verified account and cloud-data deletion succeeds."
+  },
+  "accountDeletionAppleRevocationReceipt": "Your FocusHaven account and associated cloud data were deleted. Apple authorization could not be revoked automatically. In your Apple Account settings, stop using Sign in with Apple for FocusHaven. Your local focus data remains on this device.",
+  "@accountDeletionAppleRevocationReceipt": {
+    "description": "Receipt after deletion succeeds but Apple authorization requires manual revocation."
+  },
+  "accountDeletionNotSignedInReceipt": "There is no signed-in FocusHaven account to delete.",
+  "@accountDeletionNotSignedInReceipt": {
+    "description": "Receipt when account deletion is requested without a signed-in account."
+  },
+  "accountDeletionCancelledReceipt": "Account deletion was cancelled before your identity was verified.",
+  "@accountDeletionCancelledReceipt": {
+    "description": "Receipt when account-deletion reauthentication is cancelled."
+  },
+  "accountDeletionReauthenticationReceipt": "FocusHaven could not verify your identity. Please sign in again and retry.",
+  "@accountDeletionReauthenticationReceipt": {
+    "description": "Receipt when account-deletion reauthentication is unavailable."
+  },
+  "accountDeletionUnsupportedProviderReceipt": "This account cannot be verified in the app yet. Use the account-deletion page for help.",
+  "@accountDeletionUnsupportedProviderReceipt": {
+    "description": "Receipt when the account provider cannot be reauthenticated in the app."
+  },
+  "accountDeletionUnavailableReceipt": "Your account was not confirmed as deleted. Please try again before removing the app.",
+  "@accountDeletionUnavailableReceipt": {
+    "description": "Receipt when the account backend does not confirm deletion."
   }
 }

@@ -111,7 +111,7 @@ tasks must still be evaluated from the console's current state.
   truthful locale registry, documentation, and contract tests.
 - **215G-B — English extraction:** move all current app-owned Flutter strings
   and semantics into the source catalog without changing behavior. B1, B2,
-  B3A, B3B, B3C, B4, and B5 are audited; B6 remains required. Phase 215G-B3B
+  B3A, B3B, B3C, B4, B5, and B6A are audited; later B6 slices remain required. Phase 215G-B3B
   keeps personal reflection content outside the catalog and leaves generated
   restorative guidance with its B6 owner. Phase 215G-B3C catalog-owns optional
   connection chrome, permission and platform truth, and advisory boundaries
@@ -128,6 +128,14 @@ tasks must still be evaluated from the console's current state.
   privacy-policy launch action. Private identities, journal text, tasks, store
   prices, stable stored mood/profile identifiers, and service-returned values
   retain their existing owners and are not translated.
+  Phase 215G-B6A moves Flutter-owned notification copy, Flutter-created Android
+  channel labels, timer-completion notification copy, and stable
+  account-deletion receipts into the catalog. Notification and channel IDs,
+  schedules, permission behavior, timer state, and deletion status enums remain
+  unchanged. Generated planning/restorative copy and coaching, action,
+  authentication, store, journal, export, and other service results retain
+  later B6 owners, so Phase 215G-B is not complete.
+  B6 remains required through the bounded B6B and B6C slices.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,

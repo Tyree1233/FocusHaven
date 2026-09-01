@@ -271,6 +271,8 @@ final class _FakeNotificationGateway implements NotificationGateway {
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
   }) async {
     shownNotifications.add((id: id, title: title, body: body));
   }
@@ -280,6 +282,8 @@ final class _FakeNotificationGateway implements NotificationGateway {
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
     required tz.TZDateTime scheduledDate,
   }) async {
     scheduleCalls += 1;
@@ -299,6 +303,8 @@ final class _FakeNotificationGateway implements NotificationGateway {
     required int id,
     required String title,
     required String body,
+    required String channelName,
+    required String channelDescription,
     required tz.TZDateTime scheduledDate,
   }) async {
     oneTimeScheduleCalls += 1;

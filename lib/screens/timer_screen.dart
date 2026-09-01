@@ -11,6 +11,7 @@ import '../models/haven_action.dart';
 import '../models/haven_window_suggestion.dart';
 import '../models/journal_entry.dart';
 import '../l10n/focus_haven_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../providers/app_providers.dart';
 import '../services/coaching_service.dart';
 import '../services/focus_queue_service.dart';
@@ -412,7 +413,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (result.deleted) {
       Navigator.of(context).pop();
     }
-    messenger.showSnackBar(SnackBar(content: Text(result.message)));
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(localizeAccountDeletionResult(context.l10n, result)),
+      ),
+    );
   }
 
   Future<void> _showReminderSheet(BuildContext context) async {

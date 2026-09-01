@@ -154,7 +154,9 @@ void main() {
       'B3C — Optional system connections',
       'B4 — Coaching and voice',
       'B5 — Account, purchases, and private records',
-      'B6 — Service and notification messages',
+      'B6A — Notifications and bounded service receipts',
+      'B6B — Generated planning and restorative guidance',
+      'B6C — Coaching, action, and remaining service results',
       'Phase 215G-B is complete only when every Flutter-owned source string',
     ]) {
       expect(inventory, contains(required));
