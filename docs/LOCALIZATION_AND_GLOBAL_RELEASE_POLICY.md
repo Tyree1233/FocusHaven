@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B6B2 audited extraction contract
+Status: Phase 215G-B6C1 audited extraction contract
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -24,8 +24,9 @@ country release readiness.
   Focus Coach, Voice-to-Coach, safe-command, Haven action, account,
   authentication, backup, deletion, Pro, purchase, journal, profile, reminder,
   milestone, Focus History, and current legal-launch presentation boundaries.
-  The remaining Flutter service and notification strings are explicitly
-  inventoried for B6; these slices do not complete Phase 215G-B.
+  Phase 215G-B6C1 additionally catalog-owns Haven action interpretation,
+  policy, and execution copy. Remaining service strings are explicitly
+  inventoried for B6C2 and B6C3; this slice does not complete Phase 215G-B.
 - No runtime translation service is used, and no private user content is sent
   anywhere for translation.
 
@@ -144,7 +145,14 @@ tasks must still be evaluated from the console's current state.
   Private reflections, completion identities, redacted calendar boundaries,
   and native-owned app or website selections remain opaque values; no service
   rule, threshold, permission, platform adapter, timer, queue, or persistence
-  behavior changes. B6 remains required through B6C.
+  behavior changes.
+  Phase 215G-B6C1 moves stable Haven action interpretation, proposal-effect,
+  policy, replay, confirmation, failure, and success receipts into the
+  catalog. User-authored queue titles remain opaque placeholders; the typed
+  and voice-transcript allowlist, protected-operation exclusions, proposal
+  schema, expiry, state tokens, exact confirmation, replay protection, and
+  existing timer, queue, and navigation service ownership remain unchanged.
+  B6 remains required through B6C3.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,

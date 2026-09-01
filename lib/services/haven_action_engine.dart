@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/haven_action.dart';
 import 'focus_queue_service.dart';
 import 'haven_action_policy.dart';
@@ -113,25 +115,32 @@ class HavenActionEngine {
   final Set<String> _consumedProposalIds = <String>{};
   final List<String> _consumptionOrder = <String>[];
 
-  HavenActionPolicyDecision evaluate(HavenActionProposal proposal) {
+  HavenActionPolicyDecision evaluate(
+    HavenActionProposal proposal, {
+    AppLocalizations? localizations,
+  }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     if (_consumedProposalIds.contains(proposal.id)) {
-      return const HavenActionPolicyDecision.rejected(
+      return HavenActionPolicyDecision.rejected(
         HavenActionReason.duplicateProposal,
-        'That proposal was already handled. Nothing was replayed.',
+        l10n.havenActionServiceDuplicateProposal,
       );
     }
     return _policy.evaluate(
       proposal: proposal,
       state: _executor.snapshot(),
       nowUtc: _clock().toUtc(),
+      localizations: l10n,
     );
   }
 
   Future<HavenActionResult> execute(
     HavenActionProposal proposal, {
     HavenActionConfirmation? confirmation,
+    AppLocalizations? localizations,
   }) async {
-    final decision = evaluate(proposal);
+    final l10n = localizations ?? defaultServiceLocalizations();
+    final decision = evaluate(proposal, localizations: l10n);
     if (!decision.allowed) {
       _rememberConsumed(proposal.id);
       return _result(
@@ -148,7 +157,7 @@ class HavenActionEngine {
           proposal,
           HavenActionOutcome.rejected,
           HavenActionReason.confirmationRequired,
-          'Review and confirm this exact proposal before it can run.',
+          l10n.havenActionServiceConfirmationRequired,
         );
       }
       if (confirmation.proposalId != proposal.id ||
@@ -161,7 +170,7 @@ class HavenActionEngine {
           proposal,
           HavenActionOutcome.rejected,
           HavenActionReason.confirmationMismatch,
-          'The confirmation does not match this proposal. Nothing changed.',
+          l10n.havenActionServiceConfirmationMismatch,
         );
       }
     }
@@ -174,21 +183,21 @@ class HavenActionEngine {
           proposal,
           HavenActionOutcome.rejected,
           HavenActionReason.serviceRejected,
-          'The owning FocusHaven service declined the action. Nothing changed.',
+          l10n.havenActionServiceRejected,
         );
       }
       return _result(
         proposal,
         HavenActionOutcome.executed,
         HavenActionReason.none,
-        _successMessage(proposal),
+        _successMessage(proposal, l10n),
       );
     } catch (_) {
       return _result(
         proposal,
         HavenActionOutcome.failed,
         HavenActionReason.serviceFailure,
-        'The action could not be completed. No success was recorded.',
+        l10n.havenActionServiceFailure,
       );
     }
   }
@@ -218,16 +227,14 @@ class HavenActionEngine {
     message: message,
   );
 
-  String _successMessage(HavenActionProposal proposal) =>
+  String _successMessage(HavenActionProposal proposal, AppLocalizations l10n) =>
       switch (proposal.kind) {
         HavenActionKind.readTimerStatus => proposal.effect,
-        HavenActionKind.startTimer => 'The timer started.',
-        HavenActionKind.pauseTimer => 'The timer paused.',
-        HavenActionKind.resumeTimer => 'The timer resumed.',
-        HavenActionKind.addTime => 'Time was added to the current timer.',
-        HavenActionKind.openSurface =>
-          'The requested FocusHaven screen opened.',
-        HavenActionKind.draftQueueItem =>
-          'The reviewed item was added to Focus Queue.',
+        HavenActionKind.startTimer => l10n.havenActionServiceTimerStarted,
+        HavenActionKind.pauseTimer => l10n.havenActionServiceTimerPaused,
+        HavenActionKind.resumeTimer => l10n.havenActionServiceTimerResumed,
+        HavenActionKind.addTime => l10n.havenActionServiceTimeAdded,
+        HavenActionKind.openSurface => l10n.havenActionServiceSurfaceOpened,
+        HavenActionKind.draftQueueItem => l10n.havenActionServiceQueueItemAdded,
       };
 }

@@ -181,15 +181,15 @@ void main() {
       'B6A — Notifications and bounded service receipts',
       'B6B1 — Generated Haven Planner guidance',
       'B6B2 — Restorative and optional-system guidance',
-      'B6C — Coaching, action, and remaining service results',
+      'B6C1 — Haven action service results',
     ]) {
       expect(inventory, contains(required));
     }
 
     expect(policy, contains('Phase 215G-B4'));
     expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('B1–B6B2 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C'));
+    expect(roadmap, contains('B1–B6C1 extraction shipped'));
+    expect(roadmap, contains('remaining B6 extraction work is B6C2 and B6C3'));
     expect(readme, contains('Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5'));
     expect(readme, contains('remaining B6 work'));
   });

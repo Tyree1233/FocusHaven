@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/haven_action.dart';
 
 class HavenActionPolicyDecision {
@@ -23,7 +25,9 @@ class HavenActionPolicy {
     required HavenActionProposal proposal,
     required HavenActionState state,
     required DateTime nowUtc,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final supportedSource =
         proposal.source == HavenActionSource.typed ||
         proposal.source == HavenActionSource.voiceTranscript;
@@ -31,62 +35,59 @@ class HavenActionPolicy {
         proposal.id.isEmpty ||
         !supportedSource ||
         proposal.createdAtUtc.isAfter(proposal.expiresAtUtc)) {
-      return const HavenActionPolicyDecision.rejected(
+      return HavenActionPolicyDecision.rejected(
         HavenActionReason.invalidProposal,
-        'The proposal is invalid. Nothing was changed.',
+        l10n.havenActionServiceInvalidProposal,
       );
     }
     if (nowUtc.isBefore(proposal.createdAtUtc)) {
-      return const HavenActionPolicyDecision.rejected(
+      return HavenActionPolicyDecision.rejected(
         HavenActionReason.invalidProposal,
-        'The proposal time is invalid. Nothing was changed.',
+        l10n.havenActionServiceInvalidProposalTime,
       );
     }
     if (nowUtc.isAfter(proposal.expiresAtUtc)) {
-      return const HavenActionPolicyDecision.rejected(
+      return HavenActionPolicyDecision.rejected(
         HavenActionReason.expiredProposal,
-        'That proposal expired. Review the request again.',
+        l10n.havenActionServiceExpiredProposal,
       );
     }
     if (proposal.stateToken != state.token) {
-      return const HavenActionPolicyDecision.rejected(
+      return HavenActionPolicyDecision.rejected(
         HavenActionReason.staleProposal,
-        'The timer or queue changed. Review a fresh proposal.',
+        l10n.havenActionServiceStaleProposal,
       );
     }
 
     return switch (proposal.kind) {
       HavenActionKind.readTimerStatus =>
         const HavenActionPolicyDecision.allowed(),
-      HavenActionKind.startTimer => _startDecision(proposal, state),
+      HavenActionKind.startTimer => _startDecision(proposal, state, l10n),
       HavenActionKind.pauseTimer =>
         state.activity == HavenTimerActivity.running
             ? const HavenActionPolicyDecision.allowed()
-            : _unavailable(
-                'The timer must be running before it can be paused.',
-              ),
+            : _unavailable(l10n.havenActionServicePauseUnavailable),
       HavenActionKind.resumeTimer =>
         state.activity == HavenTimerActivity.paused ||
                 state.activity == HavenTimerActivity.pendingResume
             ? const HavenActionPolicyDecision.allowed()
-            : _unavailable('There is no paused timer to resume.'),
-      HavenActionKind.addTime => _addTimeDecision(proposal, state),
-      HavenActionKind.openSurface => _surfaceDecision(proposal, state),
-      HavenActionKind.draftQueueItem => _queueDecision(proposal),
+            : _unavailable(l10n.havenActionServiceResumeUnavailable),
+      HavenActionKind.addTime => _addTimeDecision(proposal, state, l10n),
+      HavenActionKind.openSurface => _surfaceDecision(proposal, state, l10n),
+      HavenActionKind.draftQueueItem => _queueDecision(proposal, l10n),
     };
   }
 
   HavenActionPolicyDecision _startDecision(
     HavenActionProposal proposal,
     HavenActionState state,
+    AppLocalizations l10n,
   ) {
     if (proposal.arguments.session == null) {
-      return _invalid();
+      return _invalid(l10n);
     }
     if (state.activity != HavenTimerActivity.ready) {
-      return _unavailable(
-        'A timer can start here only when the current session is ready.',
-      );
+      return _unavailable(l10n.havenActionServiceStartUnavailable);
     }
     return const HavenActionPolicyDecision.allowed();
   }
@@ -94,24 +95,21 @@ class HavenActionPolicy {
   HavenActionPolicyDecision _addTimeDecision(
     HavenActionProposal proposal,
     HavenActionState state,
+    AppLocalizations l10n,
   ) {
     final seconds = proposal.arguments.durationSeconds;
     if (seconds == null || seconds < 1 || seconds > maxAddedSeconds) {
-      return const HavenActionPolicyDecision.rejected(
+      return HavenActionPolicyDecision.rejected(
         HavenActionReason.invalidProposal,
-        'Added time must be from 1 to 60 minutes. Nothing was changed.',
+        l10n.havenActionServiceAddedTimeInvalid,
       );
     }
     if (state.activity != HavenTimerActivity.running &&
         state.activity != HavenTimerActivity.paused) {
-      return _unavailable(
-        'Time can be added only to a running or paused timer.',
-      );
+      return _unavailable(l10n.havenActionServiceAddTimeUnavailable);
     }
     if (state.totalSessionSeconds + seconds > maxSessionSeconds) {
-      return _unavailable(
-        'That would exceed the 24-hour timer limit. Nothing was changed.',
-      );
+      return _unavailable(l10n.havenActionServiceTimerLimitExceeded);
     }
     return const HavenActionPolicyDecision.allowed();
   }
@@ -119,41 +117,41 @@ class HavenActionPolicy {
   HavenActionPolicyDecision _surfaceDecision(
     HavenActionProposal proposal,
     HavenActionState state,
+    AppLocalizations l10n,
   ) {
     final surface = proposal.arguments.surface;
-    if (surface == null) return _invalid();
+    if (surface == null) return _invalid(l10n);
     if (surface == HavenActionSurface.havenPlan && !state.canStartHavenPlan) {
-      return _unavailable(
-        'Haven Plan is available only before a ready Focus session starts.',
-      );
+      return _unavailable(l10n.havenActionServiceHavenPlanUnavailable);
     }
     if (surface == HavenActionSurface.smartReset && !state.canOfferSmartReset) {
-      return _unavailable(
-        'Smart Reset is available only for eligible active Focus sessions.',
-      );
+      return _unavailable(l10n.havenActionServiceSmartResetUnavailable);
     }
     return const HavenActionPolicyDecision.allowed();
   }
 
-  HavenActionPolicyDecision _queueDecision(HavenActionProposal proposal) {
+  HavenActionPolicyDecision _queueDecision(
+    HavenActionProposal proposal,
+    AppLocalizations l10n,
+  ) {
     final title = proposal.arguments.queueTitle;
     if (title == null ||
         title.trim().isEmpty ||
         title != title.trim() ||
         title.length > maxQueueTitleLength) {
-      return const HavenActionPolicyDecision.rejected(
+      return HavenActionPolicyDecision.rejected(
         HavenActionReason.invalidProposal,
-        'The queue item is invalid. Nothing was changed.',
+        l10n.havenActionServiceQueueItemInvalidProposal,
       );
     }
-    if (!proposal.confirmationRequired) return _invalid();
+    if (!proposal.confirmationRequired) return _invalid(l10n);
     return const HavenActionPolicyDecision.allowed();
   }
 
-  HavenActionPolicyDecision _invalid() =>
-      const HavenActionPolicyDecision.rejected(
+  HavenActionPolicyDecision _invalid(AppLocalizations l10n) =>
+      HavenActionPolicyDecision.rejected(
         HavenActionReason.invalidProposal,
-        'The proposal is invalid. Nothing was changed.',
+        l10n.havenActionServiceInvalidProposal,
       );
 
   HavenActionPolicyDecision _unavailable(String message) =>

@@ -166,7 +166,10 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
     if (!confirmed || !mounted) return;
 
     setState(() => _busy = true);
-    final results = await _actionService.addReviewedQueueItems(titles);
+    final results = await _actionService.addReviewedQueueItems(
+      titles,
+      localizations: context.l10n,
+    );
     if (!mounted) return;
     final added = results.where((result) => result.added).length;
     final failed = results.length - added;

@@ -128,13 +128,10 @@ void main() {
       inventory,
       contains('B6B2 — Restorative and optional-system guidance'),
     );
-    expect(
-      inventory,
-      contains('B6C — Coaching, action, and remaining service results'),
-    );
+    expect(inventory, contains('B6C1 — Haven action service results'));
     expect(policy, contains('Phase 215G-B6B1'));
-    expect(policy, contains('B6 remains required through B6C'));
-    expect(roadmap, contains('B1–B6B2 extraction shipped'));
+    expect(policy, contains('B6 remains required through B6C3'));
+    expect(roadmap, contains('B1–B6C1 extraction shipped'));
     expect(readme, contains('Phase 215G-B6B1'));
     expect(
       locales,

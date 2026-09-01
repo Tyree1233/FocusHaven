@@ -181,6 +181,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
       _controller.text,
       _executor.snapshot(),
       source: _inputSource,
+      localizations: context.l10n,
     );
     final proposal = interpretation.proposal;
     if (proposal == null) {
@@ -190,7 +191,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
       });
       return;
     }
-    final decision = _engine.evaluate(proposal);
+    final decision = _engine.evaluate(proposal, localizations: context.l10n);
     setState(() {
       _proposal = decision.allowed ? proposal : null;
       _message = decision.allowed ? null : decision.message;
@@ -214,11 +215,16 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
   Future<void> _execute() async {
     final proposal = _proposal;
     if (_busy || proposal == null) return;
+    final l10n = context.l10n;
     setState(() => _busy = true);
     final confirmation = proposal.confirmationRequired
         ? HavenActionConfirmation.forProposal(proposal)
         : null;
-    final result = await _engine.execute(proposal, confirmation: confirmation);
+    final result = await _engine.execute(
+      proposal,
+      confirmation: confirmation,
+      localizations: l10n,
+    );
     if (!mounted) return;
     setState(() {
       _busy = false;

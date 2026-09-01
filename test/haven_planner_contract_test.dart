@@ -56,7 +56,8 @@ void main() {
 
     expect(actionService, contains("'add task: \$title'"));
     expect(actionService, contains('executor.snapshot()'));
-    expect(actionService, contains('engine.evaluate(proposal)'));
+    expect(actionService, contains('engine.evaluate('));
+    expect(actionService, contains('localizations: localizations'));
     expect(actionService, contains('engine.execute('));
     expect(actionService, contains('HavenActionConfirmation.forProposal('));
     expect(actionService, contains('confirmedAtUtc:'));

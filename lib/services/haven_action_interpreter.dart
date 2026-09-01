@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/haven_action.dart';
 
 typedef HavenActionClock = DateTime Function();
@@ -24,40 +26,42 @@ class HavenActionInterpreter {
     String input,
     HavenActionState state, {
     HavenActionSource source = HavenActionSource.typed,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     if (source != HavenActionSource.typed &&
         source != HavenActionSource.voiceTranscript) {
-      return const HavenActionInterpretation.rejected(
+      return HavenActionInterpretation.rejected(
         HavenActionInterpretationStatus.unsupported,
-        'That input source cannot create a Haven action proposal.',
+        l10n.havenActionServiceUnsupportedSource,
       );
     }
     final normalized = input.trim().replaceAll(RegExp(r'\s+'), ' ');
     if (normalized.isEmpty) {
-      return const HavenActionInterpretation.rejected(
+      return HavenActionInterpretation.rejected(
         HavenActionInterpretationStatus.empty,
-        'Type one request for Haven to review.',
+        l10n.havenActionServiceEmptyRequest,
       );
     }
     if (normalized.length > maxInputLength) {
-      return const HavenActionInterpretation.rejected(
+      return HavenActionInterpretation.rejected(
         HavenActionInterpretationStatus.unsupported,
-        'Keep a Haven action request under 240 characters.',
+        l10n.havenActionServiceRequestTooLong,
       );
     }
 
     final lower = normalized.toLowerCase();
     if (_containsProtectedRequest(lower)) {
-      return const HavenActionInterpretation.rejected(
+      return HavenActionInterpretation.rejected(
         HavenActionInterpretationStatus.unsupported,
-        'That action stays in its protected screen and cannot be run here.',
+        l10n.havenActionServiceProtectedAction,
       );
     }
-    if (_queueCandidate(normalized) == null &&
+    if (_queueCandidate(normalized, l10n) == null &&
         _containsMultipleActionIntents(lower)) {
-      return const HavenActionInterpretation.rejected(
+      return HavenActionInterpretation.rejected(
         HavenActionInterpretationStatus.ambiguous,
-        'I found more than one action. Please ask for one change at a time.',
+        l10n.havenActionServiceMultipleActions,
       );
     }
 
@@ -66,24 +70,24 @@ class HavenActionInterpreter {
       if (candidate != null) candidates.add(candidate);
     }
 
-    add(_timerStatusCandidate(lower, state));
-    add(_startCandidate(lower));
-    add(_simpleCandidate(lower, 'pause', HavenActionKind.pauseTimer));
-    add(_simpleCandidate(lower, 'resume', HavenActionKind.resumeTimer));
-    add(_addTimeCandidate(lower));
-    add(_openCandidate(lower));
-    add(_queueCandidate(normalized));
+    add(_timerStatusCandidate(lower, state, l10n));
+    add(_startCandidate(lower, l10n));
+    add(_simpleCandidate(lower, 'pause', HavenActionKind.pauseTimer, l10n));
+    add(_simpleCandidate(lower, 'resume', HavenActionKind.resumeTimer, l10n));
+    add(_addTimeCandidate(lower, l10n));
+    add(_openCandidate(lower, l10n));
+    add(_queueCandidate(normalized, l10n));
 
     if (candidates.length > 1) {
-      return const HavenActionInterpretation.rejected(
+      return HavenActionInterpretation.rejected(
         HavenActionInterpretationStatus.ambiguous,
-        'I found more than one action. Please ask for one change at a time.',
+        l10n.havenActionServiceMultipleActions,
       );
     }
     if (candidates.isEmpty) {
-      return const HavenActionInterpretation.rejected(
+      return HavenActionInterpretation.rejected(
         HavenActionInterpretationStatus.unsupported,
-        'I could not match that to a safe local Haven action.',
+        l10n.havenActionServiceUnsupportedAction,
       );
     }
 
@@ -114,7 +118,11 @@ class HavenActionInterpreter {
     );
   }
 
-  _Candidate? _timerStatusCandidate(String lower, HavenActionState state) {
+  _Candidate? _timerStatusCandidate(
+    String lower,
+    HavenActionState state,
+    AppLocalizations l10n,
+  ) {
     const phrases = <String>[
       'timer status',
       'what is my timer',
@@ -127,15 +135,15 @@ class HavenActionInterpreter {
     return _Candidate(
       kind: HavenActionKind.readTimerStatus,
       arguments: const HavenActionArguments.none(),
-      interpretation: 'Read the current timer status',
-      effect: _statusText(state),
+      interpretation: l10n.havenActionServiceTimerStatusInterpretation,
+      effect: _statusText(state, l10n),
       risk: HavenActionRisk.informational,
       confirmationRequired: false,
       safeUndoAvailable: true,
     );
   }
 
-  _Candidate? _startCandidate(String lower) {
+  _Candidate? _startCandidate(String lower, AppLocalizations l10n) {
     if (!RegExp(
       r'^(?:please\s+)?(?:start|begin)(?:\s+(?:the|a))?(?:\s+(?:focus|short break|long break))?(?:\s+timer|\s+session)?$',
     ).hasMatch(lower)) {
@@ -146,12 +154,12 @@ class HavenActionInterpreter {
         : lower.contains('long break')
         ? HavenSessionKind.longBreak
         : HavenSessionKind.focus;
-    final label = _sessionLabel(session);
+    final label = _sessionLabel(session, l10n);
     return _Candidate(
       kind: HavenActionKind.startTimer,
       arguments: HavenActionArguments.start(session),
-      interpretation: 'Start a $label timer',
-      effect: 'Select $label and start it if the timer is ready.',
+      interpretation: l10n.havenActionServiceStartTimerInterpretation(label),
+      effect: l10n.havenActionServiceStartTimerEffect(label),
       risk: HavenActionRisk.reversibleControl,
       confirmationRequired: false,
       safeUndoAvailable: true,
@@ -162,25 +170,37 @@ class HavenActionInterpreter {
     String lower,
     String verb,
     HavenActionKind kind,
+    AppLocalizations l10n,
   ) {
     if (!RegExp(
       '^(?:please\\s+)?$verb(?:\\s+(?:the\\s+)?timer)?\$',
     ).hasMatch(lower)) {
       return null;
     }
-    final title = '${verb[0].toUpperCase()}${verb.substring(1)} the timer';
+    final title = switch (kind) {
+      HavenActionKind.pauseTimer =>
+        l10n.havenActionServicePauseTimerInterpretation,
+      HavenActionKind.resumeTimer =>
+        l10n.havenActionServiceResumeTimerInterpretation,
+      _ => throw StateError('Unsupported simple Haven action.'),
+    };
+    final effect = switch (kind) {
+      HavenActionKind.pauseTimer => l10n.havenActionServicePauseTimerEffect,
+      HavenActionKind.resumeTimer => l10n.havenActionServiceResumeTimerEffect,
+      _ => throw StateError('Unsupported simple Haven action.'),
+    };
     return _Candidate(
       kind: kind,
       arguments: const HavenActionArguments.none(),
       interpretation: title,
-      effect: '$title using the private timer service.',
+      effect: effect,
       risk: HavenActionRisk.reversibleControl,
       confirmationRequired: false,
       safeUndoAvailable: true,
     );
   }
 
-  _Candidate? _addTimeCandidate(String lower) {
+  _Candidate? _addTimeCandidate(String lower, AppLocalizations l10n) {
     final hasAddTimeIntent = RegExp(
       r'^(?:please\s+)?(?:add|extend)\b.*\b(?:time|minute|minutes|min)\b',
     ).hasMatch(lower);
@@ -191,28 +211,28 @@ class HavenActionInterpreter {
     if (match == null) {
       return _Candidate.rejected(
         HavenActionKind.addTime,
-        'Say how many minutes to add, from 1 to 60.',
+        l10n.havenActionServiceAddTimePrompt,
       );
     }
     final minutes = int.parse(match.group(1)!);
     if (minutes < 1 || minutes > maxAddedMinutes) {
       return _Candidate.rejected(
         HavenActionKind.addTime,
-        'Added time must be from 1 to 60 minutes. Nothing was changed.',
+        l10n.havenActionServiceAddedTimeInvalid,
       );
     }
     return _Candidate(
       kind: HavenActionKind.addTime,
       arguments: HavenActionArguments.addTime(minutes * 60),
-      interpretation: 'Add $minutes ${minutes == 1 ? 'minute' : 'minutes'}',
-      effect: 'Extend only the current active or paused timer.',
+      interpretation: l10n.havenActionServiceAddTimeInterpretation(minutes),
+      effect: l10n.havenActionServiceAddTimeEffect,
       risk: HavenActionRisk.reversibleControl,
       confirmationRequired: false,
       safeUndoAvailable: true,
     );
   }
 
-  _Candidate? _openCandidate(String lower) {
+  _Candidate? _openCandidate(String lower, AppLocalizations l10n) {
     final match = RegExp(
       r'^(?:please\s+)?(?:open|show|go to)\s+(?:the\s+)?(.+)$',
     ).firstMatch(lower);
@@ -229,19 +249,19 @@ class HavenActionInterpreter {
       _ => null,
     };
     if (surface == null) return null;
-    final label = _surfaceLabel(surface);
+    final label = _surfaceLabel(surface, l10n);
     return _Candidate(
       kind: HavenActionKind.openSurface,
       arguments: HavenActionArguments.open(surface),
-      interpretation: 'Open $label',
-      effect: 'Navigate to the existing $label screen without changing data.',
+      interpretation: l10n.havenActionServiceOpenInterpretation(label),
+      effect: l10n.havenActionServiceOpenEffect(label),
       risk: HavenActionRisk.informational,
       confirmationRequired: false,
       safeUndoAvailable: true,
     );
   }
 
-  _Candidate? _queueCandidate(String original) {
+  _Candidate? _queueCandidate(String original, AppLocalizations l10n) {
     final match = RegExp(
       r'^(?:please\s+)?(?:add|draft)\s+(?:a\s+)?(?:task|queue item)(?:\s+(?:called|named))?\s*[:\-]?\s+(.+)$',
       caseSensitive: false,
@@ -251,14 +271,14 @@ class HavenActionInterpreter {
     if (title.isEmpty || title.length > maxQueueTitleLength) {
       return _Candidate.rejected(
         HavenActionKind.draftQueueItem,
-        'A queue item must be between 1 and 100 characters.',
+        l10n.havenActionServiceQueueItemInvalid,
       );
     }
     return _Candidate(
       kind: HavenActionKind.draftQueueItem,
       arguments: HavenActionArguments.queueItem(title),
-      interpretation: 'Draft one Focus Queue item',
-      effect: 'Add “$title” to the private Focus Queue after confirmation.',
+      interpretation: l10n.havenActionServiceQueueItemInterpretation,
+      effect: l10n.havenActionServiceQueueItemEffect(title),
       risk: HavenActionRisk.statefulEdit,
       confirmationRequired: true,
       safeUndoAvailable: true,
@@ -305,25 +325,47 @@ class HavenActionInterpreter {
         1;
   }
 
-  static String _statusText(HavenActionState state) {
+  static String _statusText(HavenActionState state, AppLocalizations l10n) {
     final minutes = state.secondsRemaining ~/ 60;
     final seconds = state.secondsRemaining % 60;
     final time = '$minutes:${seconds.toString().padLeft(2, '0')}';
-    return '${_sessionLabel(state.session)} is ${state.activity.name} with $time remaining.';
+    return l10n.havenActionServiceTimerStatusEffect(
+      _sessionLabel(state.session, l10n),
+      _activityLabel(state.activity, l10n),
+      time,
+    );
   }
 
-  static String _sessionLabel(HavenSessionKind session) => switch (session) {
-    HavenSessionKind.focus => 'Focus',
-    HavenSessionKind.shortBreak => 'Short break',
-    HavenSessionKind.longBreak => 'Long break',
+  static String _sessionLabel(
+    HavenSessionKind session,
+    AppLocalizations l10n,
+  ) => switch (session) {
+    HavenSessionKind.focus => l10n.havenActionServiceSessionFocus,
+    HavenSessionKind.shortBreak => l10n.havenActionServiceSessionShortBreak,
+    HavenSessionKind.longBreak => l10n.havenActionServiceSessionLongBreak,
   };
 
-  static String _surfaceLabel(HavenActionSurface surface) => switch (surface) {
-    HavenActionSurface.focusQueue => 'Focus Queue',
-    HavenActionSurface.havenPlan => 'Haven Plan',
-    HavenActionSurface.smartReset => 'Smart Reset',
-    HavenActionSurface.localCoach => 'local Focus Coach',
-    HavenActionSurface.settings => 'settings',
+  static String _activityLabel(
+    HavenTimerActivity activity,
+    AppLocalizations l10n,
+  ) => switch (activity) {
+    HavenTimerActivity.ready => l10n.havenActionServiceActivityReady,
+    HavenTimerActivity.running => l10n.havenActionServiceActivityRunning,
+    HavenTimerActivity.paused => l10n.havenActionServiceActivityPaused,
+    HavenTimerActivity.pendingResume =>
+      l10n.havenActionServiceActivityPendingResume,
+    HavenTimerActivity.completed => l10n.havenActionServiceActivityCompleted,
+  };
+
+  static String _surfaceLabel(
+    HavenActionSurface surface,
+    AppLocalizations l10n,
+  ) => switch (surface) {
+    HavenActionSurface.focusQueue => l10n.havenActionServiceSurfaceFocusQueue,
+    HavenActionSurface.havenPlan => l10n.havenActionServiceSurfaceHavenPlan,
+    HavenActionSurface.smartReset => l10n.havenActionServiceSurfaceSmartReset,
+    HavenActionSurface.localCoach => l10n.havenActionServiceSurfaceLocalCoach,
+    HavenActionSurface.settings => l10n.havenActionServiceSurfaceSettings,
   };
 
   static String _secureId() {

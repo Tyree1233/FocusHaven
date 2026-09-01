@@ -810,14 +810,24 @@ remain opaque runtime values rather than translation keys. The services keep
 their deterministic rules, local ownership, validation thresholds, and
 fail-closed behavior; English remains the only active locale.
 
+Phase 215G-B6C1 now catalog-owns stable Haven action interpretation and effect
+text, policy decisions, replay and exact-confirmation receipts, service
+failure receipts, and successful execution receipts. User-authored queue
+titles remain opaque placeholders. The English command grammar, bounded action
+allowlist, protected-operation exclusions, proposal expiry, state tokens,
+exact confirmation, replay protection, and existing timer, queue, and
+navigation service ownership are unchanged. English remains the only active
+locale.
+
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B6C work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, and B6B2 are not a claim that the whole interface
+remaining B6C2–B6C3 work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, and B6C1 are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.
 
-The remaining B6 work is B6C coaching, action, authentication, store, journal,
-export, and other remaining service results.
+The remaining B6 work is B6C2 local-Coach responses and receipts, followed by
+B6C3 authentication, store, journal, export, and other remaining service
+results.
 
 ## Architecture
 

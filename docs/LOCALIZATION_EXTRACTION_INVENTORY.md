@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B6B2 audited extraction contract
+Status: Phase 215G-B6C1 audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -284,12 +284,43 @@ no protection, adds no permission or dependency, contacts no AI or translation
 provider, deploys nothing, and activates no planned locale. Phase 215G-B is
 therefore not complete.
 
+## B6C1 — Haven action service results
+
+The first remaining-service sub-slice is now catalog-owned within these
+boundaries:
+
+- typed- and reviewed-voice request validation and fail-closed rejection copy;
+- reviewed timer, navigation, and queue-item interpretation and effect text;
+- stable session, activity, and destination labels used only to assemble those
+  reviewed effects;
+- proposal validation, expiry, stale-state, availability, and fixed-limit
+  policy decisions;
+- replay, exact-confirmation, service-decline, failure, and successful
+  execution receipts.
+
+User-authored queue titles remain opaque bounded placeholders and are never
+used as catalog keys or sent to a translator. English command phrases remain
+the only accepted runtime grammar until Phase 215G-D aligns action
+interpretation with a separately qualified locale. The action kind allowlist,
+protected-operation exclusions, proposal schema and lifetime, state token,
+confirmation fingerprint, replay consumption, timer and queue ownership, and
+navigation callback are unchanged. Both the Haven action sheet and reviewed
+Planner-to-Queue path pass the selected catalog explicitly; English remains
+the only production catalog.
+
+B6C1 creates no proposal during verification, executes no action, changes no
+queue or timer, records no audio, contacts no AI or translation provider, adds
+no permission or dependency, deploys nothing, and activates no planned locale.
+Phase 215G-B is therefore not complete.
+
 ## Remaining Phase 215G-B slices
 
-1. **B6C — Coaching, action, and remaining service results:** local-Coach
-   responses, Haven action interpretation/policy/execution copy,
-   authentication, store, journal prompts, exports, and remaining
-   user-facing service errors and receipts.
+1. **B6C2 — Local-Coach responses and receipts:** deterministic local-Coach
+   responses, enhanced-AI fallback notices, and remaining coaching service
+   errors and cleanup receipts.
+2. **B6C3 — Remaining service results:** authentication, store, journal
+   prompts, exports, and all other audited user-facing service errors and
+   receipts.
 
 Native Apple, Android, widget, watch, permission-purpose, policy, support,
 store-listing, and screenshot localization remains Phase 215G-E.

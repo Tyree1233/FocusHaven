@@ -1,3 +1,4 @@
+import '../l10n/app_localizations.dart';
 import '../models/haven_action.dart';
 import 'haven_action_engine.dart';
 import 'haven_action_interpreter.dart';
@@ -32,14 +33,16 @@ class HavenPlannerActionService {
   final DateTime Function()? clock;
 
   Future<List<HavenPlannerItemApplyResult>> addReviewedQueueItems(
-    List<String> titles,
-  ) async {
+    List<String> titles, {
+    AppLocalizations? localizations,
+  }) async {
     final results = <HavenPlannerItemApplyResult>[];
     for (final title in titles) {
       final interpretation = interpreter.interpret(
         'add task: $title',
         executor.snapshot(),
         source: HavenActionSource.typed,
+        localizations: localizations,
       );
       final proposal = interpretation.proposal;
       if (proposal == null) {
@@ -52,7 +55,7 @@ class HavenPlannerActionService {
         );
         continue;
       }
-      final decision = engine.evaluate(proposal);
+      final decision = engine.evaluate(proposal, localizations: localizations);
       if (!decision.allowed) {
         results.add(
           HavenPlannerItemApplyResult(
@@ -69,6 +72,7 @@ class HavenPlannerActionService {
           proposal,
           confirmedAtUtc: (clock ?? DateTime.now)().toUtc(),
         ),
+        localizations: localizations,
       );
       results.add(
         HavenPlannerItemApplyResult(
