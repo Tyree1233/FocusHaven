@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/models/focus_shield_state.dart';
 import 'package:focushaven/widgets/focus_shield_card.dart';
 
@@ -25,6 +26,8 @@ Widget _app(
   double textScale = 1,
   Size surface = const Size(420, 760),
 }) => MaterialApp(
+  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  supportedLocales: AppLocalizations.supportedLocales,
   builder: (context, child) => MediaQuery(
     data: MediaQueryData(
       size: surface,

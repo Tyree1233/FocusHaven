@@ -1315,5 +1315,311 @@
   "havenJourneyNoAutomaticChange": "This advisory changed nothing automatically. Journey stays private, cumulative, and free of scores or streak pressure.",
   "@havenJourneyNoAutomaticChange": {
     "description": "Agency and non-scoring boundary on a completion-to-Journey advisory."
+  },
+  "havenWindowHeadlineArrived": "Your optional Haven Window is here",
+  "@havenWindowHeadlineArrived": {
+    "description": "Haven Window headline when a privately held optional window has arrived."
+  },
+  "havenWindowHeadlineHeld": "One private reminder is held",
+  "@havenWindowHeadlineHeld": {
+    "description": "Haven Window headline while one optional opening has a private local reminder."
+  },
+  "havenWindowHeadlineOff": "Calendar assistance stays off",
+  "@havenWindowHeadlineOff": {
+    "description": "Haven Window headline before its supported native bridge has started."
+  },
+  "havenWindowShowDetails": "Show details.",
+  "@havenWindowShowDetails": {
+    "description": "Screen-reader action for expanding Haven Window details."
+  },
+  "havenWindowHideDetails": "Hide details.",
+  "@havenWindowHideDetails": {
+    "description": "Screen-reader action for collapsing Haven Window details."
+  },
+  "havenWindowSemantics": "Haven Window. {status}. {headline}. {action}",
+  "@havenWindowSemantics": {
+    "description": "Complete screen-reader label for the expandable Haven Window card.",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "Possible opening"
+      },
+      "headline": {
+        "type": "String",
+        "example": "A possible Haven Window is open"
+      },
+      "action": {
+        "type": "String",
+        "example": "Show details."
+      }
+    }
+  },
+  "havenWindowEyebrow": "HAVEN WINDOW · {status}",
+  "@havenWindowEyebrow": {
+    "description": "Uppercase Haven Window card eyebrow with the localized current status.",
+    "placeholders": {
+      "status": {
+        "type": "String",
+        "example": "POSSIBLE OPENING"
+      }
+    }
+  },
+  "havenWindowArrivedDetail": "This optional opening has arrived, but nothing has started. Begin focus only if the moment still fits, or let the window pass without penalty.",
+  "@havenWindowArrivedDetail": {
+    "description": "Agency-preserving explanation when an optional held Haven Window arrives."
+  },
+  "havenWindowHeldDetail": "FocusHaven will give one private reminder for this optional opening. The hold remains local and can be released at any time.",
+  "@havenWindowHeldDetail": {
+    "description": "Local-only explanation while a Haven Window reminder is held."
+  },
+  "havenWindowDormantDetail": "FocusHaven has not checked or requested calendar access. A supported native connection must be available before any permission control appears.",
+  "@havenWindowDormantDetail": {
+    "description": "Platform-truth explanation before the Haven Window native bridge is available."
+  },
+  "havenWindowNoAvailabilityRead": "No calendar availability was read.",
+  "@havenWindowNoAvailabilityRead": {
+    "description": "Evidence boundary when Haven Window has read no calendar availability."
+  },
+  "havenWindowPrivateBoundary": "Only short-range busy and free boundaries can enter FocusHaven. Event titles, calendars, people, locations, notes, and accounts stay outside.",
+  "@havenWindowPrivateBoundary": {
+    "description": "Haven Window privacy boundary describing the limited calendar availability data admitted to FocusHaven."
+  },
+  "havenWindowNoCalendarWriteBoundary": "FocusHaven never creates or changes calendar events. A possible opening remains optional and never starts the timer.",
+  "@havenWindowNoCalendarWriteBoundary": {
+    "description": "Haven Window no-calendar-write and no-automatic-timer boundary."
+  },
+  "havenWindowArrivedHoldBoundary": "Focus remains stopped until you explicitly begin. Letting this window pass removes only its private local hold.",
+  "@havenWindowArrivedHoldBoundary": {
+    "description": "Haven Window agency boundary when a private held opening has arrived."
+  },
+  "havenWindowHeldNotificationBoundary": "This is one local notification, not a calendar reservation. Releasing it cancels only this reminder.",
+  "@havenWindowHeldNotificationBoundary": {
+    "description": "Haven Window boundary distinguishing a local reminder from a calendar reservation."
+  },
+  "havenWindowAvailableHoldBoundary": "Holding this opening creates one generic local reminder. It does not reserve time or copy calendar content.",
+  "@havenWindowAvailableHoldBoundary": {
+    "description": "Haven Window boundary before a user elects to hold an optional opening."
+  },
+  "havenWindowActionBeginFocus": "Begin focus",
+  "@havenWindowActionBeginFocus": {
+    "description": "Explicit action to begin focus from an arrived Haven Window."
+  },
+  "havenWindowActionLetPass": "Let this window pass",
+  "@havenWindowActionLetPass": {
+    "description": "Action to release an arrived Haven Window without beginning focus."
+  },
+  "havenWindowActionReleaseHold": "Release hold",
+  "@havenWindowActionReleaseHold": {
+    "description": "Action to release one private Haven Window reminder."
+  },
+  "havenWindowActionReviewCalendarAccess": "Review calendar access",
+  "@havenWindowActionReviewCalendarAccess": {
+    "description": "Explicit action that can begin the supported calendar-access review."
+  },
+  "havenWindowActionRecheckAccess": "Recheck access",
+  "@havenWindowActionRecheckAccess": {
+    "description": "Non-prompting Haven Window action to recheck calendar access."
+  },
+  "havenWindowActionRefreshAvailability": "Refresh private availability",
+  "@havenWindowActionRefreshAvailability": {
+    "description": "Haven Window action to refresh private busy and free availability."
+  },
+  "havenWindowActionHold": "Hold this window",
+  "@havenWindowActionHold": {
+    "description": "Explicit action to create one generic local reminder for an optional Haven Window."
+  },
+  "havenWindowStatusArrived": "Window arrived",
+  "@havenWindowStatusArrived": {
+    "description": "Haven Window status when a held optional opening has arrived."
+  },
+  "havenWindowStatusHeld": "Reminder held",
+  "@havenWindowStatusHeld": {
+    "description": "Haven Window status while one private local reminder is held."
+  },
+  "havenWindowStatusOff": "Off",
+  "@havenWindowStatusOff": {
+    "description": "Haven Window status before its native bridge has started."
+  },
+  "havenWindowStatusUnavailable": "Unavailable",
+  "@havenWindowStatusUnavailable": {
+    "description": "Haven Window status when the optional system connection is unavailable."
+  },
+  "havenWindowStatusNotConnected": "Not connected",
+  "@havenWindowStatusNotConnected": {
+    "description": "Haven Window status before calendar access has been connected."
+  },
+  "havenWindowStatusAccessOff": "Access off",
+  "@havenWindowStatusAccessOff": {
+    "description": "Haven Window status when calendar access is denied or off."
+  },
+  "havenWindowStatusLearning": "Still learning",
+  "@havenWindowStatusLearning": {
+    "description": "Haven Window status while private focus timing patterns are still forming."
+  },
+  "havenWindowStatusPossibleOpening": "Possible opening",
+  "@havenWindowStatusPossibleOpening": {
+    "description": "Haven Window status when one optional opening may fit."
+  },
+  "havenWindowStatusNoOpening": "No opening",
+  "@havenWindowStatusNoOpening": {
+    "description": "Haven Window status when no matching optional opening is present."
+  },
+  "havenWindowHeldFallback": "One private local reminder is held.",
+  "@havenWindowHeldFallback": {
+    "description": "Fallback Haven Window reminder description when no valid bounded time range is available."
+  },
+  "havenWindowHeldSameDay": "{startDate}, {startTime}–{endTime}",
+  "@havenWindowHeldSameDay": {
+    "description": "Locale-aware same-day time range for a private Haven Window reminder.",
+    "placeholders": {
+      "startDate": {
+        "type": "String",
+        "example": "8/18/2026"
+      },
+      "startTime": {
+        "type": "String",
+        "example": "9:00 AM"
+      },
+      "endTime": {
+        "type": "String",
+        "example": "9:25 AM"
+      }
+    }
+  },
+  "havenWindowHeldMultiDay": "{startDate}, {startTime} – {endDate}, {endTime}",
+  "@havenWindowHeldMultiDay": {
+    "description": "Locale-aware multi-day time range for a private Haven Window reminder.",
+    "placeholders": {
+      "startDate": {
+        "type": "String",
+        "example": "8/18/2026"
+      },
+      "startTime": {
+        "type": "String",
+        "example": "11:50 PM"
+      },
+      "endDate": {
+        "type": "String",
+        "example": "8/19/2026"
+      },
+      "endTime": {
+        "type": "String",
+        "example": "12:15 AM"
+      }
+    }
+  },
+  "havenWindowAccessReviewFailed": "Calendar access could not be reviewed right now. Nothing was connected.",
+  "@havenWindowAccessReviewFailed": {
+    "description": "Fail-closed receipt when Haven Window calendar-access review cannot be opened."
+  },
+  "havenWindowRefreshFailed": "Calendar availability could not be refreshed. No schedule or timer was changed.",
+  "@havenWindowRefreshFailed": {
+    "description": "Fail-closed receipt when private Haven Window availability cannot refresh."
+  },
+  "havenWindowStaleHold": "This window is no longer current enough to hold. Refresh only if you want to check again.",
+  "@havenWindowStaleHold": {
+    "description": "Receipt when a Haven Window proposal is too stale to hold."
+  },
+  "havenWindowHoldFailed": "This window could not be held. No calendar event or reminder was created.",
+  "@havenWindowHoldFailed": {
+    "description": "Fail-closed receipt when a private Haven Window reminder could not be held."
+  },
+  "havenWindowReleaseFailed": "The private reminder could not be released right now. No calendar event was changed.",
+  "@havenWindowReleaseFailed": {
+    "description": "Fail-closed receipt when a private Haven Window reminder cannot be released."
+  },
+  "havenWindowBeginReleaseFailed": "Focus did not begin because the private hold could not be released.",
+  "@havenWindowBeginReleaseFailed": {
+    "description": "Fail-closed receipt when focus cannot begin because the private Haven Window hold remains."
+  },
+  "havenWindowTimerChanged": "The timer changed, so this Haven Window was allowed to pass.",
+  "@havenWindowTimerChanged": {
+    "description": "Receipt when a timer-state change prevents an arrived Haven Window from beginning focus."
+  },
+  "havenWindowFocusBegan": "Focus began by your choice.",
+  "@havenWindowFocusBegan": {
+    "description": "Receipt after the user explicitly begins focus from an arrived Haven Window."
+  },
+  "focusShieldEyebrow": "FOCUS SHIELD · {phase}",
+  "@focusShieldEyebrow": {
+    "description": "Uppercase Focus Shield card eyebrow with the localized current phase.",
+    "placeholders": {
+      "phase": {
+        "type": "String",
+        "example": "PROTECTED"
+      }
+    }
+  },
+  "focusShieldPhaseOff": "Off",
+  "@focusShieldPhaseOff": {
+    "description": "Focus Shield phase while protection is off."
+  },
+  "focusShieldPhaseUnavailable": "Unavailable",
+  "@focusShieldPhaseUnavailable": {
+    "description": "Focus Shield phase when native protection is unavailable."
+  },
+  "focusShieldPhasePermissionNeeded": "Permission needed",
+  "@focusShieldPhasePermissionNeeded": {
+    "description": "Focus Shield phase when explicit device permission review is needed."
+  },
+  "focusShieldPhaseSetupNeeded": "Setup needed",
+  "@focusShieldPhaseSetupNeeded": {
+    "description": "Focus Shield phase when the user must choose distractions locally."
+  },
+  "focusShieldPhaseReady": "Ready",
+  "@focusShieldPhaseReady": {
+    "description": "Focus Shield phase when setup is ready but protection is not active."
+  },
+  "focusShieldPhaseConfirming": "Confirming",
+  "@focusShieldPhaseConfirming": {
+    "description": "Focus Shield phase while native protection is being confirmed."
+  },
+  "focusShieldPhaseProtected": "Protected",
+  "@focusShieldPhaseProtected": {
+    "description": "Focus Shield phase only after native protection is reported active."
+  },
+  "focusShieldPhasePaused": "Paused",
+  "@focusShieldPhasePaused": {
+    "description": "Focus Shield phase while protection is intentionally paused."
+  },
+  "focusShieldPhaseNeedsAttention": "Needs attention",
+  "@focusShieldPhaseNeedsAttention": {
+    "description": "Focus Shield phase when expected native protection needs attention."
+  },
+  "focusShieldRunningOnlyBoundary": "Protection is requested only during a running focus session. Breaks and pauses stay open.",
+  "@focusShieldRunningOnlyBoundary": {
+    "description": "Focus Shield boundary limiting protection requests to running focus sessions."
+  },
+  "focusShieldPrivateSelectionBoundary": "Your selected apps and websites stay on this device and never enter FocusHaven history.",
+  "@focusShieldPrivateSelectionBoundary": {
+    "description": "Focus Shield privacy boundary for locally selected apps and websites."
+  },
+  "focusShieldActionEnable": "Turn on Focus Shield",
+  "@focusShieldActionEnable": {
+    "description": "Explicit action to turn on Focus Shield."
+  },
+  "focusShieldActionDisable": "Turn off Focus Shield",
+  "@focusShieldActionDisable": {
+    "description": "Explicit action to turn off Focus Shield."
+  },
+  "focusShieldActionReviewPermission": "Review device permission",
+  "@focusShieldActionReviewPermission": {
+    "description": "Explicit action to review required native Focus Shield permission."
+  },
+  "focusShieldActionChooseDistractions": "Choose distractions",
+  "@focusShieldActionChooseDistractions": {
+    "description": "Action to choose Focus Shield distractions on the device."
+  },
+  "focusShieldActionPauseProtection": "Pause protection",
+  "@focusShieldActionPauseProtection": {
+    "description": "Action to pause active Focus Shield protection."
+  },
+  "focusShieldActionResumeProtection": "Resume protection",
+  "@focusShieldActionResumeProtection": {
+    "description": "Action to resume paused Focus Shield protection."
+  },
+  "focusShieldActionRetryProtection": "Retry protection",
+  "@focusShieldActionRetryProtection": {
+    "description": "Action to retry Focus Shield protection after a native failure."
   }
 }

@@ -222,15 +222,15 @@ void main() {
       'B3B — Reflection and restorative guidance',
       'Service-generated headlines, details, evidence, and explanations remain B6-owned',
       'Personal reflection content is never a catalog key',
-      'B3C through B6 remain required',
+      'B4 through B6 remain required',
       'No locale was activated by B3B',
     ]) {
       expect(inventory, contains(required));
     }
-    expect(policy, contains('Phase 215G-B3B'));
-    expect(policy, contains('B3C through B6 remain required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B extraction'));
-    expect(roadmap, contains('remaining B3C–B6 extraction slices'));
+    expect(policy, contains('Phase 215G-B3C'));
+    expect(policy, contains('B4 through B6 remain required'));
+    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C extraction'));
+    expect(roadmap, contains('remaining B4–B6 extraction slices'));
     expect(readme, contains('Phase 215G-B3B'));
     expect(
       readme,

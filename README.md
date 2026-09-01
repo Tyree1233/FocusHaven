@@ -739,7 +739,7 @@ tests, plural and placeholder review, human linguistic review, speech-locale
 acceptance where applicable, and country-specific store/disclosure review.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
-Phases 215G-B1, B2, B3A, and B3B now move the complete first-run onboarding, appearance
+Phases 215G-B1, B2, B3A, B3B, and B3C now move the complete first-run onboarding, appearance
 picker, custom-duration chrome, guided breathing, timer accessibility, and the
 bounded timer dashboard/session-control presentation into that English
 catalog. B2 covers session names and encouragement, timer actions and
@@ -761,9 +761,16 @@ advisory boundaries, Smart Reset presentation and actions, and Haven Journey
 place, privacy, accessibility, and completion-advisory copy. Personal
 reflection content never becomes a catalog key, and service-generated
 restorative copy remains B6-owned runtime data.
+Phase 215G-B3C additionally catalog-owns Haven Window and Focus Shield status
+and action labels, permission and platform-truth presentation, privacy and
+agency boundaries, locale-aware held-window time ranges, and Haven Window
+fail-closed receipts. Haven Window suggestion text and Focus Shield state text
+remain opaque B6-owned service values. This slice does not request a permission,
+read or write a calendar, change a reminder or protection rule, start a bridge,
+or activate another language.
 
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B3C–B6 work; B1, B2, B3A, and B3B are not a claim that the whole interface
+remaining B4–B6 work; B1, B2, B3A, B3B, and B3C are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.

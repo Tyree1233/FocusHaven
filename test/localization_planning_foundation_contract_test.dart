@@ -221,15 +221,15 @@ void main() {
       'B3A — Queue and planning foundation',
       'User-authored task titles and goals remain opaque placeholders',
       'service-originated planning text remain B6-owned',
-      'B3C remains required for optional system connections',
+      'B3C — Optional system connections',
       'English behavior and stored planning data are unchanged',
     ]) {
       expect(inventory, contains(required));
     }
-    expect(policy, contains('Phase 215G-B3B'));
-    expect(policy, contains('B3C through B6 remain required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B extraction'));
-    expect(roadmap, contains('remaining B3C–B6 extraction slices'));
+    expect(policy, contains('Phase 215G-B3C'));
+    expect(policy, contains('B4 through B6 remain required'));
+    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C extraction'));
+    expect(roadmap, contains('remaining B4–B6 extraction slices'));
     expect(readme, contains('Phase 215G-B3A'));
     expect(readme, contains('service-originated planning copy remain B6'));
   });

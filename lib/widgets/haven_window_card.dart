@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/haven_window_suggestion.dart';
 
 /// A compact consent surface for one private Haven Window suggestion.
@@ -64,16 +65,17 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final colors = Theme.of(context).colorScheme;
     final accent = _accentColor(colors);
     final borderRadius = BorderRadius.circular(18);
     final headline = widget.hasArrived
-        ? 'Your optional Haven Window is here'
+        ? l10n.havenWindowHeadlineArrived
         : widget.isHeld
-        ? 'One private reminder is held'
+        ? l10n.havenWindowHeadlineHeld
         : widget.isPlatformStarted
         ? widget.suggestion.headline
-        : 'Calendar assistance stays off';
+        : l10n.havenWindowHeadlineOff;
     final actions = _availableActions();
     final isBusy = _isWorking || widget.isHoldUpdating;
 
@@ -91,9 +93,13 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
           Semantics(
             button: true,
             onTap: _toggle,
-            label:
-                'Haven Window. ${_statusLabel()}. $headline. '
-                '${_isExpanded ? 'Hide details.' : 'Show details.'}',
+            label: l10n.havenWindowSemantics(
+              _statusLabel(),
+              headline,
+              _isExpanded
+                  ? l10n.havenWindowHideDetails
+                  : l10n.havenWindowShowDetails,
+            ),
             child: ExcludeSemantics(
               child: InkWell(
                 key: const ValueKey('toggle-haven-window'),
@@ -119,7 +125,9 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'HAVEN WINDOW · ${_statusLabel().toUpperCase()}',
+                              l10n.havenWindowEyebrow(
+                                _statusLabel().toUpperCase(),
+                              ),
                               style: TextStyle(
                                 color: accent,
                                 fontSize: 11,
@@ -160,12 +168,12 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                 children: [
                   Text(
                     widget.hasArrived
-                        ? 'This optional opening has arrived, but nothing has started. Begin focus only if the moment still fits, or let the window pass without penalty.'
+                        ? l10n.havenWindowArrivedDetail
                         : widget.isHeld
-                        ? 'FocusHaven will give one private reminder for this optional opening. The hold remains local and can be released at any time.'
+                        ? l10n.havenWindowHeldDetail
                         : widget.isPlatformStarted
                         ? widget.suggestion.detail
-                        : 'FocusHaven has not checked or requested calendar access. A supported native connection must be available before any permission control appears.',
+                        : l10n.havenWindowDormantDetail,
                     style: TextStyle(
                       color: colors.onSurfaceVariant,
                       height: 1.35,
@@ -185,7 +193,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                             ? _heldWindowLabel(context)
                             : widget.isPlatformStarted
                             ? widget.suggestion.evidence
-                            : 'No calendar availability was read.',
+                            : l10n.havenWindowNoAvailabilityRead,
                         accent: accent,
                       ),
                     ),
@@ -193,15 +201,13 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                   const SizedBox(height: 11),
                   _WindowNote(
                     icon: Icons.visibility_off_outlined,
-                    text:
-                        'Only short-range busy and free boundaries can enter FocusHaven. Event titles, calendars, people, locations, notes, and accounts stay outside.',
+                    text: l10n.havenWindowPrivateBoundary,
                     accent: accent,
                   ),
                   const SizedBox(height: 9),
                   _WindowNote(
                     icon: Icons.event_busy_outlined,
-                    text:
-                        'FocusHaven never creates or changes calendar events. A possible opening remains optional and never starts the timer.',
+                    text: l10n.havenWindowNoCalendarWriteBoundary,
                     accent: accent,
                   ),
                   if (widget.isHeld || widget.suggestion.hasOpening) ...[
@@ -213,10 +219,10 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
                           ? Icons.notifications_active_outlined
                           : Icons.notifications_none_outlined,
                       text: widget.hasArrived
-                          ? 'Focus remains stopped until you explicitly begin. Letting this window pass removes only its private local hold.'
+                          ? l10n.havenWindowArrivedHoldBoundary
                           : widget.isHeld
-                          ? 'This is one local notification, not a calendar reservation. Releasing it cancels only this reminder.'
-                          : 'Holding this opening creates one generic local reminder. It does not reserve time or copy calendar content.',
+                          ? l10n.havenWindowHeldNotificationBoundary
+                          : l10n.havenWindowAvailableHoldBoundary,
                       accent: accent,
                     ),
                   ],
@@ -266,6 +272,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
   }
 
   List<_WindowAction> _availableActions() {
+    final l10n = context.l10n;
     if (widget.isHeld) {
       final release = widget.onReleaseHold;
       if (widget.hasArrived) {
@@ -274,7 +281,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
           if (begin != null)
             _WindowAction(
               key: 'haven-window-begin-focus',
-              label: 'Begin focus',
+              label: l10n.havenWindowActionBeginFocus,
               icon: Icons.play_arrow_rounded,
               isPrimary: true,
               callback: begin,
@@ -282,7 +289,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
           if (release != null)
             _WindowAction(
               key: 'haven-window-let-pass',
-              label: 'Let this window pass',
+              label: l10n.havenWindowActionLetPass,
               icon: Icons.close_rounded,
               isPrimary: false,
               callback: release,
@@ -294,7 +301,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
           : [
               _WindowAction(
                 key: 'haven-window-release-hold',
-                label: 'Release hold',
+                label: l10n.havenWindowActionReleaseHold,
                 icon: Icons.notifications_off_outlined,
                 isPrimary: false,
                 callback: release,
@@ -308,7 +315,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
             ? null
             : _WindowAction(
                 key: 'haven-window-request-access',
-                label: 'Review calendar access',
+                label: l10n.havenWindowActionReviewCalendarAccess,
                 icon: Icons.event_available_outlined,
                 isPrimary: true,
                 callback: widget.onRequestReadOnlyAccess!,
@@ -318,7 +325,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
             ? null
             : _WindowAction(
                 key: 'haven-window-refresh-access',
-                label: 'Recheck access',
+                label: l10n.havenWindowActionRecheckAccess,
                 icon: Icons.refresh_rounded,
                 isPrimary: false,
                 callback: widget.onRefreshAvailability!,
@@ -328,7 +335,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
             ? null
             : _WindowAction(
                 key: 'haven-window-refresh-availability',
-                label: 'Refresh private availability',
+                label: l10n.havenWindowActionRefreshAvailability,
                 icon: Icons.refresh_rounded,
                 isPrimary: false,
                 callback: widget.onRefreshAvailability!,
@@ -341,7 +348,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
             widget.onHoldWindow != null
         ? _WindowAction(
             key: 'haven-window-hold',
-            label: 'Hold this window',
+            label: l10n.havenWindowActionHold,
             icon: Icons.notifications_active_outlined,
             isPrimary: true,
             callback: widget.onHoldWindow!,
@@ -351,19 +358,23 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
   }
 
   String _statusLabel() {
-    if (widget.hasArrived) return 'Window arrived';
-    if (widget.isHeld) return 'Reminder held';
-    if (!widget.isPlatformStarted) return 'Off';
+    final l10n = context.l10n;
+    if (widget.hasArrived) return l10n.havenWindowStatusArrived;
+    if (widget.isHeld) return l10n.havenWindowStatusHeld;
+    if (!widget.isPlatformStarted) return l10n.havenWindowStatusOff;
     return switch (widget.availabilityStatus) {
-      PrivateCalendarAvailabilityStatus.unsupported => 'Unavailable',
-      PrivateCalendarAvailabilityStatus.disconnected => 'Not connected',
-      PrivateCalendarAvailabilityStatus.denied => 'Access off',
+      PrivateCalendarAvailabilityStatus.unsupported =>
+        l10n.havenWindowStatusUnavailable,
+      PrivateCalendarAvailabilityStatus.disconnected =>
+        l10n.havenWindowStatusNotConnected,
+      PrivateCalendarAvailabilityStatus.denied =>
+        l10n.havenWindowStatusAccessOff,
       PrivateCalendarAvailabilityStatus.ready =>
         switch (widget.suggestion.kind) {
-          HavenWindowKind.learning => 'Still learning',
-          HavenWindowKind.opening => 'Possible opening',
-          HavenWindowKind.noOpening => 'No opening',
-          HavenWindowKind.unavailable => 'Unavailable',
+          HavenWindowKind.learning => l10n.havenWindowStatusLearning,
+          HavenWindowKind.opening => l10n.havenWindowStatusPossibleOpening,
+          HavenWindowKind.noOpening => l10n.havenWindowStatusNoOpening,
+          HavenWindowKind.unavailable => l10n.havenWindowStatusUnavailable,
         },
     };
   }
@@ -405,7 +416,7 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
     final startsAt = widget.heldStartsAtUtc?.toLocal();
     final endsAt = widget.heldEndsAtUtc?.toLocal();
     if (startsAt == null || endsAt == null || !startsAt.isBefore(endsAt)) {
-      return 'One private local reminder is held.';
+      return context.l10n.havenWindowHeldFallback;
     }
     final localizations = MaterialLocalizations.of(context);
     final startDate = localizations.formatShortDate(startsAt);
@@ -419,8 +430,15 @@ class _HavenWindowCardState extends State<HavenWindowCard> {
         startsAt.year == endsAt.year &&
         startsAt.month == endsAt.month &&
         startsAt.day == endsAt.day;
-    if (isSameDay) return '$startDate, $startTime–$endTime';
-    return '$startDate, $startTime – ${localizations.formatShortDate(endsAt)}, $endTime';
+    if (isSameDay) {
+      return context.l10n.havenWindowHeldSameDay(startDate, startTime, endTime);
+    }
+    return context.l10n.havenWindowHeldMultiDay(
+      startDate,
+      startTime,
+      localizations.formatShortDate(endsAt),
+      endTime,
+    );
   }
 }
 

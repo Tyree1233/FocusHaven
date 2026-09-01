@@ -980,11 +980,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         .requestReadOnlyAccess();
     if (!connected && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Calendar access could not be reviewed right now. Nothing was connected.',
-          ),
-        ),
+        SnackBar(content: Text(context.l10n.havenWindowAccessReviewFailed)),
       );
     }
     return connected;
@@ -999,11 +995,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         .refreshAvailability();
     if (!refreshed && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Calendar availability could not be refreshed. No schedule or timer was changed.',
-          ),
-        ),
+        SnackBar(content: Text(context.l10n.havenWindowRefreshFailed)),
       );
     }
     return refreshed;
@@ -1017,11 +1009,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!currentSuggestion.hasOpening) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'This window is no longer current enough to hold. Refresh only if you want to check again.',
-            ),
-          ),
+          SnackBar(content: Text(context.l10n.havenWindowStaleHold)),
         );
       }
       return false;
@@ -1032,11 +1020,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         .hold(currentSuggestion);
     if (!held && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'This window could not be held. No calendar event or reminder was created.',
-          ),
-        ),
+        SnackBar(content: Text(context.l10n.havenWindowHoldFailed)),
       );
     }
     return held;
@@ -1049,11 +1033,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final released = await ref.read(havenWindowHoldServiceProvider).release();
     if (!released && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'The private reminder could not be released right now. No calendar event was changed.',
-          ),
-        ),
+        SnackBar(content: Text(context.l10n.havenWindowReleaseFailed)),
       );
     }
     return released;
@@ -1070,22 +1050,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!released || !context.mounted) {
       if (!released && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Focus did not begin because the private hold could not be released.',
-            ),
-          ),
+          SnackBar(content: Text(context.l10n.havenWindowBeginReleaseFailed)),
         );
       }
       return false;
     }
     if (!timer.canStartHavenPlan) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'The timer changed, so this Haven Window was allowed to pass.',
-          ),
-        ),
+        SnackBar(content: Text(context.l10n.havenWindowTimerChanged)),
       );
       return false;
     }
@@ -1094,7 +1066,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final started = timer.isRunning;
     if (started) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Focus began by your choice.')),
+        SnackBar(content: Text(context.l10n.havenWindowFocusBegan)),
       );
     }
     return started;

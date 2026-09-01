@@ -167,7 +167,7 @@ void main() {
 
     for (final required in <String>[
       'B2 — Timer dashboard and session controls',
-      'Planning and recovery cards outside the completed B3A and B3B boundaries remain owned by B3C',
+      'Planning and recovery cards outside the completed B3A, B3B, and B3C presentation boundaries retain their later audited owners',
       'Timer notification wording intentionally continues to come from `TimerService` until B6',
       'No locale was activated by B2',
       'B3A — Queue and planning foundation',
@@ -180,12 +180,12 @@ void main() {
       expect(inventory, contains(required));
     }
 
-    expect(policy, contains('Phase 215G-B3B'));
-    expect(policy, contains('B3C through B6 remain required'));
-    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B extraction'));
-    expect(roadmap, contains('remaining B3C–B6 extraction slices'));
-    expect(readme, contains('Phases 215G-B1, B2, B3A, and B3B'));
-    expect(readme, contains('remaining B3C–B6 work'));
+    expect(policy, contains('Phase 215G-B3C'));
+    expect(policy, contains('B4 through B6 remain required'));
+    expect(roadmap, contains('Phase 215G-B1/B2/B3A/B3B/B3C extraction'));
+    expect(roadmap, contains('remaining B4–B6 extraction slices'));
+    expect(readme, contains('Phases 215G-B1, B2, B3A, B3B, and B3C'));
+    expect(readme, contains('remaining B4–B6 work'));
   });
 }
 

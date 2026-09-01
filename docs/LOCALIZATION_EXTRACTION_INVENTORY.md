@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B3B audited extraction contract
+Status: Phase 215G-B3C audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -51,8 +51,8 @@ The following timer-dashboard presentation is now fully catalog-owned:
 - focus-summary copy success and failure receipts plus dashboard tooltips and
   user-facing input guidance inside this boundary.
 
-Planning and recovery cards outside the completed B3A and B3B boundaries remain
-owned by B3C.
+Planning and recovery cards outside the completed B3A, B3B, and B3C
+presentation boundaries retain their later audited owners.
 Coach, Haven action, reminder, account, backup, milestone-sheet internals,
 Focus History sheet internals, Queue sheet internals, and service/notification
 messages retain their later owners. Timer notification wording intentionally
@@ -80,8 +80,8 @@ these presentation boundaries:
 User-authored task titles and goals remain opaque placeholders: they are never
 catalog keys and are not translated or sent anywhere. Planner item titles,
 assumptions, explanations, Haven Plan task/step/explanation values, and other
-service-originated planning text remain B6-owned. B3C remains required for
-optional system connections. English behavior and stored planning
+service-originated planning text remain B6-owned. B3C now owns optional-system
+connection presentation without changing planning behavior. English behavior and stored planning
 data are unchanged, no locale was activated, and no permission, dependency,
 backend, deployment, or store setting changed.
 
@@ -108,20 +108,37 @@ runtime values, including Rhythm, Forecast, Smart Reset, and Journey guidance.
 They are passed through the localized presentation as opaque values and are not
 translated, copied to the ARB catalog, or sent anywhere. English behavior and
 stored focus data are unchanged. No locale was activated by B3B, and no
-permission, dependency, backend, deployment, or store setting changed. B3C
+permission, dependency, backend, deployment, or store setting changed. B4
 through B6 remain required.
+
+## B3C — Optional system connections
+
+The optional-system-connection presentation slice is now fully catalog-owned
+within these boundaries:
+
+- Haven Window status and action labels, expandable-card semantics, dormant,
+  held, and arrived explanations, locale-aware held-window time ranges,
+  privacy and no-calendar-write boundaries, and fail-closed dashboard receipts;
+- Focus Shield phase and action labels, card eyebrow, running-focus-only
+  boundary, and private on-device selection boundary.
+
+Haven Window suggestion headlines, details, and evidence and Focus Shield state
+headlines and details remain B6-owned service-generated runtime values. They
+pass through the localized cards as opaque values and are not translated or
+copied into the catalog. B3C changes no permission prompt, calendar access,
+calendar write behavior, reminder behavior, Focus Shield rule, platform bridge,
+dependency, backend, deployment, or store configuration. English behavior is
+unchanged. No locale was activated by B3C, and B4 through B6 remain required.
 
 ## Remaining Phase 215G-B slices
 
-1. **B3C — Optional system connections:** Haven Window, Focus Shield, and their
-   permission, platform-truth, and advisory presentation boundaries.
-2. **B4 — Coaching and voice:** local Coach, enhanced-AI boundary text,
+1. **B4 — Coaching and voice:** local Coach, enhanced-AI boundary text,
    Voice-to-Coach, safe voice commands, permission states, transcript review,
    and Haven action review/confirmation.
-3. **B5 — Account and purchases:** authentication, account settings, backup,
+2. **B5 — Account and purchases:** authentication, account settings, backup,
    deletion, Pro, purchases, journal, profile, reminders, and support/legal
    launch surfaces.
-4. **B6 — Service and notification messages:** user-facing strings produced by
+3. **B6 — Service and notification messages:** user-facing strings produced by
    services plus Flutter-owned notification and recovery copy. Native Apple,
    Android, widget, watch, permission-purpose, policy, support, store-listing,
    and screenshot localization remains Phase 215G-E.

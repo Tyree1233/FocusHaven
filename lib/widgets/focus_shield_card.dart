@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/focus_shield_state.dart';
 
 /// A compact, honest view of the current Focus Shield state.
@@ -22,6 +23,7 @@ class _FocusShieldCardState extends State<FocusShieldCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final state = widget.state;
     final colors = Theme.of(context).colorScheme;
     final accent = _accentColor(state, colors);
@@ -63,7 +65,9 @@ class _FocusShieldCardState extends State<FocusShieldCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'FOCUS SHIELD · ${_phaseLabel(state.phase).toUpperCase()}',
+                          l10n.focusShieldEyebrow(
+                            _phaseLabel(state.phase).toUpperCase(),
+                          ),
                           style: TextStyle(
                             color: accent,
                             fontSize: 11,
@@ -108,15 +112,13 @@ class _FocusShieldCardState extends State<FocusShieldCard> {
                   const SizedBox(height: 13),
                   _BoundaryNote(
                     icon: Icons.timer_outlined,
-                    text:
-                        'Protection is requested only during a running focus session. Breaks and pauses stay open.',
+                    text: l10n.focusShieldRunningOnlyBoundary,
                     accent: accent,
                   ),
                   const SizedBox(height: 9),
                   _BoundaryNote(
                     icon: Icons.lock_outline_rounded,
-                    text:
-                        'Your selected apps and websites stay on this device and never enter FocusHaven history.',
+                    text: l10n.focusShieldPrivateSelectionBoundary,
                     accent: accent,
                   ),
                   if (actions.isNotEmpty && widget.onAction != null) ...[
@@ -164,16 +166,18 @@ class _FocusShieldCardState extends State<FocusShieldCard> {
         _ => colors.primary,
       };
 
-  static String _phaseLabel(FocusShieldPhase phase) => switch (phase) {
-    FocusShieldPhase.off => 'Off',
-    FocusShieldPhase.unsupported => 'Unavailable',
-    FocusShieldPhase.needsAuthorization => 'Permission needed',
-    FocusShieldPhase.needsSelection => 'Setup needed',
-    FocusShieldPhase.ready => 'Ready',
-    FocusShieldPhase.starting => 'Confirming',
-    FocusShieldPhase.protecting => 'Protected',
-    FocusShieldPhase.paused => 'Paused',
-    FocusShieldPhase.needsAttention => 'Needs attention',
+  String _phaseLabel(FocusShieldPhase phase) => switch (phase) {
+    FocusShieldPhase.off => context.l10n.focusShieldPhaseOff,
+    FocusShieldPhase.unsupported => context.l10n.focusShieldPhaseUnavailable,
+    FocusShieldPhase.needsAuthorization =>
+      context.l10n.focusShieldPhasePermissionNeeded,
+    FocusShieldPhase.needsSelection => context.l10n.focusShieldPhaseSetupNeeded,
+    FocusShieldPhase.ready => context.l10n.focusShieldPhaseReady,
+    FocusShieldPhase.starting => context.l10n.focusShieldPhaseConfirming,
+    FocusShieldPhase.protecting => context.l10n.focusShieldPhaseProtected,
+    FocusShieldPhase.paused => context.l10n.focusShieldPhasePaused,
+    FocusShieldPhase.needsAttention =>
+      context.l10n.focusShieldPhaseNeedsAttention,
   };
 
   static IconData _phaseIcon(FocusShieldPhase phase) => switch (phase) {
@@ -205,14 +209,19 @@ class _FocusShieldCardState extends State<FocusShieldCard> {
     ];
   }
 
-  static String _actionLabel(FocusShieldAction action) => switch (action) {
-    FocusShieldAction.enable => 'Turn on Focus Shield',
-    FocusShieldAction.disable => 'Turn off Focus Shield',
-    FocusShieldAction.requestAuthorization => 'Review device permission',
-    FocusShieldAction.chooseDistractions => 'Choose distractions',
-    FocusShieldAction.pauseProtection => 'Pause protection',
-    FocusShieldAction.resumeProtection => 'Resume protection',
-    FocusShieldAction.retryProtection => 'Retry protection',
+  String _actionLabel(FocusShieldAction action) => switch (action) {
+    FocusShieldAction.enable => context.l10n.focusShieldActionEnable,
+    FocusShieldAction.disable => context.l10n.focusShieldActionDisable,
+    FocusShieldAction.requestAuthorization =>
+      context.l10n.focusShieldActionReviewPermission,
+    FocusShieldAction.chooseDistractions =>
+      context.l10n.focusShieldActionChooseDistractions,
+    FocusShieldAction.pauseProtection =>
+      context.l10n.focusShieldActionPauseProtection,
+    FocusShieldAction.resumeProtection =>
+      context.l10n.focusShieldActionResumeProtection,
+    FocusShieldAction.retryProtection =>
+      context.l10n.focusShieldActionRetryProtection,
   };
 
   static IconData _actionIcon(FocusShieldAction action) => switch (action) {
