@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B1 audited extraction contract
+Status: Phase 215G-B2 audited extraction contract
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -15,10 +15,11 @@ country release readiness.
   (`pt-BR`) form the planned first translation wave.
 - Planned locales are not exposed by `MaterialApp.supportedLocales` and must
   not appear as supported languages in Apple or Google store metadata.
-- Phase 215G-B1 catalog-owns onboarding, appearance selection, custom-duration
-  chrome, guided breathing, and the main timer's accessibility description.
-  The remaining Flutter surfaces are explicitly inventoried for B2 through B6;
-  this first slice does not complete Phase 215G-B.
+- Phases 215G-B1 and B2 catalog-own onboarding, appearance selection,
+  custom-duration chrome, guided breathing, timer accessibility, and the
+  bounded timer dashboard/session-control presentation. The remaining Flutter
+  surfaces are explicitly inventoried for B3 through B6; these two slices do
+  not complete Phase 215G-B.
 - No runtime translation service is used, and no private user content is sent
   anywhere for translation.
 
@@ -103,8 +104,8 @@ tasks must still be evaluated from the console's current state.
 - **215G-A — Foundation:** generated localization, English source catalog,
   truthful locale registry, documentation, and contract tests.
 - **215G-B — English extraction:** move all current app-owned Flutter strings
-  and semantics into the source catalog without changing behavior. B1 is the
-  first audited slice; B2 through B6 remain required.
+  and semantics into the source catalog without changing behavior. B1 and B2
+  are audited; B3 through B6 remain required.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,

@@ -197,5 +197,359 @@
         "example": "50"
       }
     }
+  },
+  "sessionFocus": "Focus",
+  "@sessionFocus": {
+    "description": "Display name for a focus timer session."
+  },
+  "sessionShortBreak": "Short break",
+  "@sessionShortBreak": {
+    "description": "Display name for a short-break timer session."
+  },
+  "sessionLongBreak": "Long break",
+  "@sessionLongBreak": {
+    "description": "Display name for a long-break timer session."
+  },
+  "sessionStatusFocus": "FOCUS",
+  "@sessionStatusFocus": {
+    "description": "Uppercase status heading for an active or ready focus session."
+  },
+  "sessionStatusShortBreak": "SHORT BREAK",
+  "@sessionStatusShortBreak": {
+    "description": "Uppercase status heading for an active or ready short break."
+  },
+  "sessionStatusLongBreak": "LONG BREAK",
+  "@sessionStatusLongBreak": {
+    "description": "Uppercase status heading for an active or ready long break."
+  },
+  "sessionComplete": "SESSION COMPLETE",
+  "@sessionComplete": {
+    "description": "Status heading shown after any timer session completes."
+  },
+  "sessionFocusEncouragement": "Give your full attention to one thing.",
+  "@sessionFocusEncouragement": {
+    "description": "Encouragement shown for a focus session."
+  },
+  "sessionShortBreakEncouragement": "Step away and let your mind breathe.",
+  "@sessionShortBreakEncouragement": {
+    "description": "Encouragement shown for a short break."
+  },
+  "sessionLongBreakEncouragement": "You earned a longer moment to recharge.",
+  "@sessionLongBreakEncouragement": {
+    "description": "Encouragement shown for a long break."
+  },
+  "sessionFocusCompleteMessage": "You showed up for what matters. Let yourself take a real breath.",
+  "@sessionFocusCompleteMessage": {
+    "description": "Supportive message shown after a focus session completes."
+  },
+  "sessionShortBreakCompleteMessage": "A small pause counts. Return when you feel ready.",
+  "@sessionShortBreakCompleteMessage": {
+    "description": "Supportive message shown after a short break completes."
+  },
+  "sessionLongBreakCompleteMessage": "You made room to restore. Carry the calm forward.",
+  "@sessionLongBreakCompleteMessage": {
+    "description": "Supportive message shown after a long break completes."
+  },
+  "timerDurationSecondsUpper": "{count, plural, =1 {1 SECOND} other {{count} SECONDS}}",
+  "@timerDurationSecondsUpper": {
+    "description": "Uppercase seconds duration displayed beneath the main countdown.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "timerDurationMinutesUpper": "{count, plural, =1 {1 MINUTE} other {{count} MINUTES}}",
+  "@timerDurationMinutesUpper": {
+    "description": "Uppercase minutes duration displayed beneath the main countdown.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "timerDurationSecondsShortUpper": "{count} SEC",
+  "@timerDurationSecondsShortUpper": {
+    "description": "Compact uppercase seconds component displayed after a minute duration.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "focusSessionSeconds": "{count, plural, =1 {1-second focus session} other {{count}-second focus session}}",
+  "@focusSessionSeconds": {
+    "description": "Fallback history label for a focus session measured only in seconds.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "focusSessionMinutes": "{count, plural, =1 {1-minute focus session} other {{count}-minute focus session}}",
+  "@focusSessionMinutes": {
+    "description": "Fallback history label for a whole-minute focus session.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "focusSessionMinutesSeconds": "{minutes} min {seconds} sec focus session",
+  "@focusSessionMinutesSeconds": {
+    "description": "Fallback history label for a focus session containing minutes and seconds.",
+    "placeholders": {
+      "minutes": {
+        "type": "int",
+        "example": "1"
+      },
+      "seconds": {
+        "type": "int",
+        "example": "30"
+      }
+    }
+  },
+  "dateToday": "Today",
+  "@dateToday": {
+    "description": "Relative date label for the current local day."
+  },
+  "dateYesterday": "Yesterday",
+  "@dateYesterday": {
+    "description": "Relative date label for the previous local day."
+  },
+  "focusSummaryCopyError": "Focus summary could not be copied right now.",
+  "@focusSummaryCopyError": {
+    "description": "Error shown when the focus-history summary cannot be copied."
+  },
+  "focusSummaryCopied": "Focus summary copied. Paste it into Notes, email, or a document.",
+  "@focusSummaryCopied": {
+    "description": "Receipt shown after the focus-history summary is copied."
+  },
+  "focusIntentionTitle": "What are you focusing on?",
+  "@focusIntentionTitle": {
+    "description": "Heading for the dialog that edits the current focus intention."
+  },
+  "actionSave": "Save",
+  "@actionSave": {
+    "description": "Generic action label for saving a user-authored value."
+  },
+  "focusIntentionHint": "Example: Finish the project proposal",
+  "@focusIntentionHint": {
+    "description": "Example placeholder for a focus intention."
+  },
+  "actionClear": "Clear",
+  "@actionClear": {
+    "description": "Generic action label for clearing an optional value."
+  },
+  "focusIntentionSet": "Set a focus intention",
+  "@focusIntentionSet": {
+    "description": "Dashboard action shown when no focus intention is set."
+  },
+  "focusQueueLinked": "Linked to Focus Queue • you keep control",
+  "@focusQueueLinked": {
+    "description": "Boundary text shown when the current focus session is linked to a queue task."
+  },
+  "focusQueueOpen": "Open focus queue",
+  "@focusQueueOpen": {
+    "description": "Action label for opening an empty Focus Queue."
+  },
+  "focusQueueCount": "Focus queue • {count}",
+  "@focusQueueCount": {
+    "description": "Action label for opening Focus Queue with its remaining task count.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "resumeSessionTitle": "Resume your saved session?",
+  "@resumeSessionTitle": {
+    "description": "Heading shown when a paused timer can be resumed after reopening."
+  },
+  "resumeSessionDescription": "Your timer was paused when FocusHaven reopened.",
+  "@resumeSessionDescription": {
+    "description": "Explanation shown for a restorable paused timer."
+  },
+  "resumeSessionStartFresh": "Start fresh",
+  "@resumeSessionStartFresh": {
+    "description": "Action label that discards a restorable paused timer."
+  },
+  "actionResume": "Resume",
+  "@actionResume": {
+    "description": "Generic action label for resuming a paused timer."
+  },
+  "timerTakeBreak": "Take a break",
+  "@timerTakeBreak": {
+    "description": "Action label offered after a focus session completes."
+  },
+  "timerBeginFocus": "Begin focus",
+  "@timerBeginFocus": {
+    "description": "Action label for beginning a focus session."
+  },
+  "timerBeginShortBreak": "Begin short break",
+  "@timerBeginShortBreak": {
+    "description": "Action label for beginning a short break."
+  },
+  "timerBeginLongBreak": "Begin long break",
+  "@timerBeginLongBreak": {
+    "description": "Action label for beginning a long break."
+  },
+  "timerLinkedTaskRestoring": "Checking for a linked Focus Queue task…",
+  "@timerLinkedTaskRestoring": {
+    "description": "Status shown while completion waits for a linked queue task to restore."
+  },
+  "timerTaskOutcomeRequired": "Choose the task outcome above before moving on.",
+  "@timerTaskOutcomeRequired": {
+    "description": "Instruction shown when a linked queue task needs a completion decision."
+  },
+  "timerResetTooltip": "Reset timer",
+  "@timerResetTooltip": {
+    "description": "Tooltip for the main timer reset control."
+  },
+  "actionPauseTimer": "Pause",
+  "@actionPauseTimer": {
+    "description": "Primary timer action label while a session is running."
+  },
+  "timerCustomDuration": "Custom duration",
+  "@timerCustomDuration": {
+    "description": "Action label for opening the custom timer duration picker."
+  },
+  "statMinutesCompact": "{count}m",
+  "@statMinutesCompact": {
+    "description": "Compact minute value in a dashboard statistic.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "42"
+      }
+    }
+  },
+  "statToday": "today",
+  "@statToday": {
+    "description": "Label for today's focused-minute statistic."
+  },
+  "statDayStreak": "day streak",
+  "@statDayStreak": {
+    "description": "Label for the current consecutive-day focus statistic."
+  },
+  "statCompleted": "completed",
+  "@statCompleted": {
+    "description": "Label for the completed focus-session statistic."
+  },
+  "dashboardMilestones": "Milestones",
+  "@dashboardMilestones": {
+    "description": "Dashboard action label for opening focus milestones."
+  },
+  "dailyGoalTitle": "Daily focus goal",
+  "@dailyGoalTitle": {
+    "description": "Heading for the daily focus-goal progress card."
+  },
+  "actionChange": "Change",
+  "@actionChange": {
+    "description": "Generic action label for changing a saved setting."
+  },
+  "dailyGoalProgress": "{focused} of {goal}",
+  "@dailyGoalProgress": {
+    "description": "Daily focus-goal progress combining focused and target durations.",
+    "placeholders": {
+      "focused": {
+        "type": "String",
+        "example": "15 min"
+      },
+      "goal": {
+        "type": "String",
+        "example": "25 min"
+      }
+    }
+  },
+  "dailyGoalComplete": "Daily goal complete — wonderful work.",
+  "@dailyGoalComplete": {
+    "description": "Encouragement shown when the daily focus goal is complete."
+  },
+  "dailyGoalRemaining": "{count, plural, =1 {1 min remaining today} other {{count} min remaining today}}",
+  "@dailyGoalRemaining": {
+    "description": "Minutes remaining before today's focus goal is complete.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "dailyGoalDialogTitle": "Set daily focus goal",
+  "@dailyGoalDialogTitle": {
+    "description": "Heading for the dialog that changes the daily focus goal."
+  },
+  "dailyGoalSave": "Save goal",
+  "@dailyGoalSave": {
+    "description": "Action label for saving a daily focus goal."
+  },
+  "dailyGoalMinutesHint": "Minutes per day",
+  "@dailyGoalMinutesHint": {
+    "description": "Input hint for a daily focus goal measured in minutes."
+  },
+  "dailyGoalRangeHelp": "Choose between 5 and 480 minutes",
+  "@dailyGoalRangeHelp": {
+    "description": "Validation guidance for the supported daily focus-goal range."
+  },
+  "dailyChallengeTitle": "Daily challenge",
+  "@dailyChallengeTitle": {
+    "description": "Heading for the daily focus-session challenge card."
+  },
+  "dailyChallengeComplete": "Challenge complete — you showed up for yourself today.",
+  "@dailyChallengeComplete": {
+    "description": "Encouragement shown when the daily session challenge is complete."
+  },
+  "dailyChallengeTarget": "{count, plural, =1 {Complete 1 focus session today.} other {Complete {count} focus sessions today.}}",
+  "@dailyChallengeTarget": {
+    "description": "Instruction describing the number of focus sessions in today's challenge.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "recentFocusTitle": "Recent focus",
+  "@recentFocusTitle": {
+    "description": "Heading for the recent focus-session list."
+  },
+  "actionViewAll": "View all",
+  "@actionViewAll": {
+    "description": "Generic action label for opening a complete list."
+  },
+  "recentFocusEmpty": "Complete a focus session to begin your history.",
+  "@recentFocusEmpty": {
+    "description": "Empty state for recent focus-session history."
+  },
+  "focusHistoryClear": "Clear focus history",
+  "@focusHistoryClear": {
+    "description": "Action label for clearing locally saved focus history."
+  },
+  "focusHistoryClearTitle": "Clear focus history?",
+  "@focusHistoryClearTitle": {
+    "description": "Heading for the focus-history deletion confirmation."
+  },
+  "focusHistoryClearMessage": "This removes all saved focus sessions on this device and resets your completed count and streak.",
+  "@focusHistoryClearMessage": {
+    "description": "Explanation in the focus-history deletion confirmation."
+  },
+  "focusHistoryKeep": "Keep history",
+  "@focusHistoryKeep": {
+    "description": "Action label that cancels focus-history deletion."
+  },
+  "focusHistoryClearConfirm": "Clear history",
+  "@focusHistoryClearConfirm": {
+    "description": "Destructive action label that confirms focus-history deletion."
+  },
+  "focusHistoryCleared": "Focus history cleared from this device",
+  "@focusHistoryCleared": {
+    "description": "Receipt shown after local focus history is cleared."
   }
 }

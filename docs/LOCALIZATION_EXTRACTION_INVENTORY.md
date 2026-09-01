@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B1 audited extraction contract
+Status: Phase 215G-B2 audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -36,21 +36,41 @@ The reusable `BuildContext.l10n` access pattern and the English ARB catalog are
 the presentation authority. Stored enum names, preference values, timer state,
 and user-authored text are unchanged. No locale was activated by B1.
 
+## B2 — Timer dashboard and session controls
+
+The following timer-dashboard presentation is now fully catalog-owned:
+
+- focus, short-break, and long-break names, status headings, encouragement,
+  completion copy, start/pause/reset/resume/next-session actions, and saved
+  session recovery;
+- visible countdown duration forms, focus-intention entry, the dashboard's
+  Focus Queue entry and link boundary, and linked-task completion waiting copy;
+- compact statistics, the daily focus goal and challenge, recent-focus empty
+  state and rows, locale-aware relative/short dates, and the clear-history
+  confirmation and receipt;
+- focus-summary copy success and failure receipts plus dashboard tooltips and
+  user-facing input guidance inside this boundary.
+
+Planning and recovery cards that happen to appear on the dashboard remain B3.
+Coach, Haven action, reminder, account, backup, milestone-sheet internals,
+Focus History sheet internals, Queue sheet internals, and service/notification
+messages retain their later owners. Timer notification wording intentionally
+continues to come from `TimerService` until B6. English behavior and all stored
+timer, task, queue, goal, and history values are unchanged. No locale was
+activated by B2.
+
 ## Remaining Phase 215G-B slices
 
-1. **B2 — Timer dashboard and session controls:** session names, timer actions,
-   task entry, goals, queue entry points, receipts, errors, and all associated
-   semantics.
-2. **B3 — Planning and recovery:** Queue, Plan, Planner, Plan-to-Focus,
+1. **B3 — Planning and recovery:** Queue, Plan, Planner, Plan-to-Focus,
    reflection, Rhythm, Forecast, Smart Reset, Journey, Haven Window, Focus
    Shield, and related advisory boundaries.
-3. **B4 — Coaching and voice:** local Coach, enhanced-AI boundary text,
+2. **B4 — Coaching and voice:** local Coach, enhanced-AI boundary text,
    Voice-to-Coach, safe voice commands, permission states, transcript review,
    and Haven action review/confirmation.
-4. **B5 — Account and purchases:** authentication, account settings, backup,
+3. **B5 — Account and purchases:** authentication, account settings, backup,
    deletion, Pro, purchases, journal, profile, reminders, and support/legal
    launch surfaces.
-5. **B6 — Service and notification messages:** user-facing strings produced by
+4. **B6 — Service and notification messages:** user-facing strings produced by
    services plus Flutter-owned notification and recovery copy. Native Apple,
    Android, widget, watch, permission-purpose, policy, support, store-listing,
    and screenshot localization remains Phase 215G-E.

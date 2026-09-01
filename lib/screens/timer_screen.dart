@@ -10,6 +10,7 @@ import '../models/haven_plan.dart';
 import '../models/haven_action.dart';
 import '../models/haven_window_suggestion.dart';
 import '../models/journal_entry.dart';
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 import '../services/coaching_service.dart';
 import '../services/focus_queue_service.dart';
@@ -99,9 +100,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Focus summary could not be copied right now.'),
-          ),
+          SnackBar(content: Text(context.l10n.focusSummaryCopyError)),
         );
       }
       return;
@@ -109,46 +108,79 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!context.mounted) {
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Focus summary copied. Paste it into Notes, email, or a document.',
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(context.l10n.focusSummaryCopied)));
   }
 
-  String _durationLabel(int seconds) {
+  String _sessionLabel(BuildContext context, SessionType type) =>
+      switch (type) {
+        SessionType.focus => context.l10n.sessionFocus,
+        SessionType.shortBreak => context.l10n.sessionShortBreak,
+        SessionType.longBreak => context.l10n.sessionLongBreak,
+      };
+
+  String _sessionStatus(BuildContext context, SessionType type) =>
+      switch (type) {
+        SessionType.focus => context.l10n.sessionStatusFocus,
+        SessionType.shortBreak => context.l10n.sessionStatusShortBreak,
+        SessionType.longBreak => context.l10n.sessionStatusLongBreak,
+      };
+
+  String _sessionEncouragement(BuildContext context, SessionType type) =>
+      switch (type) {
+        SessionType.focus => context.l10n.sessionFocusEncouragement,
+        SessionType.shortBreak => context.l10n.sessionShortBreakEncouragement,
+        SessionType.longBreak => context.l10n.sessionLongBreakEncouragement,
+      };
+
+  String _sessionCompletionMessage(BuildContext context, SessionType type) =>
+      switch (type) {
+        SessionType.focus => context.l10n.sessionFocusCompleteMessage,
+        SessionType.shortBreak => context.l10n.sessionShortBreakCompleteMessage,
+        SessionType.longBreak => context.l10n.sessionLongBreakCompleteMessage,
+      };
+
+  String _beginSessionLabel(BuildContext context, SessionType type) =>
+      switch (type) {
+        SessionType.focus => context.l10n.timerBeginFocus,
+        SessionType.shortBreak => context.l10n.timerBeginShortBreak,
+        SessionType.longBreak => context.l10n.timerBeginLongBreak,
+      };
+
+  String _durationLabel(BuildContext context, int seconds) {
     if (seconds < 60) {
-      return '$seconds ${seconds == 1 ? 'SECOND' : 'SECONDS'}';
+      return context.l10n.timerDurationSecondsUpper(seconds);
     }
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     if (remainingSeconds == 0) {
-      return '$minutes ${minutes == 1 ? 'MINUTE' : 'MINUTES'}';
+      return context.l10n.timerDurationMinutesUpper(minutes);
     }
-    return '$minutes ${minutes == 1 ? 'MINUTE' : 'MINUTES'} $remainingSeconds SEC';
+    return '${context.l10n.timerDurationMinutesUpper(minutes)} '
+        '${context.l10n.timerDurationSecondsShortUpper(remainingSeconds)}';
   }
 
-  String _focusSessionLabel(int seconds) {
+  String _focusSessionLabel(BuildContext context, int seconds) {
     if (seconds < 60) {
-      return '$seconds-second focus session';
+      return context.l10n.focusSessionSeconds(seconds);
     }
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     if (remainingSeconds == 0) {
-      return '$minutes-minute focus session';
+      return context.l10n.focusSessionMinutes(minutes);
     }
-    return '$minutes min $remainingSeconds sec focus session';
+    return context.l10n.focusSessionMinutesSeconds(minutes, remainingSeconds);
   }
 
-  String _shortDurationLabel(int seconds) {
-    if (seconds < 60) return '$seconds sec';
+  String _shortDurationLabel(BuildContext context, int seconds) {
+    if (seconds < 60) return context.l10n.durationSecondsShort('$seconds');
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
     return remainingSeconds == 0
-        ? '$minutes min'
-        : '$minutes min $remainingSeconds sec';
+        ? context.l10n.durationMinutesShort(minutes)
+        : '${context.l10n.durationMinutesShort(minutes)} '
+              '${context.l10n.durationSecondsShort('$remainingSeconds')}';
   }
 
   String _dateLabel(DateTime date) {
@@ -175,6 +207,16 @@ class TimerScreen extends riverpod.ConsumerWidget {
     return '${months[localDate.month - 1]} ${localDate.day}';
   }
 
+  String _dashboardDateLabel(BuildContext context, DateTime date) {
+    final localDate = date.toLocal();
+    final now = DateTime.now().toLocal();
+    if (DateUtils.isSameDay(localDate, now)) return context.l10n.dateToday;
+    if (DateUtils.isSameDay(localDate, now.subtract(const Duration(days: 1)))) {
+      return context.l10n.dateYesterday;
+    }
+    return MaterialLocalizations.of(context).formatShortMonthDay(localDate);
+  }
+
   void _beginNextSession(TimerService timer) {
     if (!timer.isComplete) return;
     timer.beginNextSession();
@@ -193,7 +235,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (_) => CustomDurationSheet(
-        sessionLabel: timer.sessionType.label,
+        sessionLabel: _sessionLabel(context, timer.sessionType),
         sessionColor: _sessionColor(context, timer.sessionType),
         initialDuration: Duration(seconds: timer.totalSessionSeconds),
         foregroundColor: _ink,
@@ -490,20 +532,17 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final shouldClear = await ConfirmationDialog.show(
       context,
-      title: 'Clear focus history?',
-      message:
-          'This removes all saved focus sessions on this device and resets your completed count and streak.',
-      cancelLabel: 'Keep history',
-      confirmLabel: 'Clear history',
+      title: context.l10n.focusHistoryClearTitle,
+      message: context.l10n.focusHistoryClearMessage,
+      cancelLabel: context.l10n.focusHistoryKeep,
+      confirmLabel: context.l10n.focusHistoryClearConfirm,
       isDestructive: true,
     );
     if (shouldClear) {
       timer.clearFocusHistory();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Focus history cleared from this device'),
-          ),
+          SnackBar(content: Text(context.l10n.focusHistoryCleared)),
         );
       }
     }
@@ -513,12 +552,12 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final task = await TextEntryDialog.show(
       context,
-      title: 'What are you focusing on?',
-      confirmLabel: 'Save',
+      title: context.l10n.focusIntentionTitle,
+      confirmLabel: context.l10n.actionSave,
       initialValue: timer.focusTask,
-      hintText: 'Example: Finish the project proposal',
+      hintText: context.l10n.focusIntentionHint,
       cancelLabel: null,
-      clearLabel: 'Clear',
+      clearLabel: context.l10n.actionClear,
       maxLength: 80,
     );
     if (task == null || !context.mounted) return;
@@ -782,11 +821,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final value = await TextEntryDialog.show(
       context,
-      title: 'Set daily focus goal',
-      confirmLabel: 'Save goal',
+      title: context.l10n.dailyGoalDialogTitle,
+      confirmLabel: context.l10n.dailyGoalSave,
       initialValue: timer.dailyGoalMinutes.toString(),
-      hintText: 'Minutes per day',
-      helperText: 'Choose between 5 and 480 minutes',
+      hintText: context.l10n.dailyGoalMinutesHint,
+      helperText: context.l10n.dailyGoalRangeHelp,
       keyboardType: TextInputType.number,
       textCapitalization: TextCapitalization.none,
     );
@@ -1071,6 +1110,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
 
   @override
   Widget build(BuildContext context, riverpod.WidgetRef ref) {
+    final l10n = context.l10n;
     final timer = ref.read(timerServiceProvider);
     final session = ref.watch(timerSessionStateProvider);
     final havenLoop = ref.watch(havenLoopStateProvider);
@@ -1119,7 +1159,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         label: const Text('Coach'),
       ),
       appBar: AppBar(
-        title: const Text('FocusHaven'),
+        title: Text(l10n.appTitle),
         actions: [
           IconButton(
             key: const ValueKey('openHavenActions'),
@@ -1168,7 +1208,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         children: SessionType.values
                             .map(
                               (type) => ChoiceChip(
-                                label: Text(type.label),
+                                label: Text(_sessionLabel(context, type)),
                                 selected: session.sessionType == type,
                                 onSelected: (selected) {
                                   if (selected) timer.selectSession(type);
@@ -1183,8 +1223,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                       const SizedBox(height: 34),
                       Text(
                         session.isComplete
-                            ? 'SESSION COMPLETE'
-                            : session.sessionType.label.toUpperCase(),
+                            ? l10n.sessionComplete
+                            : _sessionStatus(context, session.sessionType),
                         style: TextStyle(
                           color: sessionColor,
                           fontWeight: FontWeight.bold,
@@ -1194,8 +1234,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
                       const SizedBox(height: 10),
                       Text(
                         session.isComplete
-                            ? session.completionMessage
-                            : session.sessionType.encouragement,
+                            ? _sessionCompletionMessage(
+                                context,
+                                session.sessionType,
+                              )
+                            : _sessionEncouragement(
+                                context,
+                                session.sessionType,
+                              ),
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: Colors.white70),
                       ),
@@ -1217,7 +1263,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           icon: const Icon(Icons.edit_outlined, size: 18),
                           label: Text(
                             session.focusTask.isEmpty
-                                ? 'Set a focus intention'
+                                ? l10n.focusIntentionSet
                                 : session.focusTask,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -1226,7 +1272,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             !session.isComplete) ...[
                           const SizedBox(height: 2),
                           Text(
-                            'Linked to Focus Queue • you keep control',
+                            l10n.focusQueueLinked,
                             key: const ValueKey('haven-loop-linked-task'),
                             style: TextStyle(
                               color: sessionColor.withValues(alpha: 0.85),
@@ -1243,8 +1289,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           ),
                           label: Text(
                             queueRemaining == 0
-                                ? 'Open focus queue'
-                                : 'Focus queue • $queueRemaining',
+                                ? l10n.focusQueueOpen
+                                : l10n.focusQueueCount(queueRemaining),
                           ),
                         ),
                         TextButton.icon(
@@ -1289,7 +1335,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                       TimerCountdown(
                         sessionColor: sessionColor,
                         formatTime: _formattedTime,
-                        durationLabel: _durationLabel,
+                        durationLabel: (seconds) =>
+                            _durationLabel(context, seconds),
                       ),
                       const SizedBox(height: 28),
                       if (session.hasPendingResume)
@@ -1302,15 +1349,17 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             padding: const EdgeInsets.all(14),
                             child: Column(
                               children: [
-                                const Text(
-                                  'Resume your saved session?',
-                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                Text(
+                                  l10n.resumeSessionTitle,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                                 const SizedBox(height: 5),
-                                const Text(
-                                  'Your timer was paused when FocusHaven reopened.',
+                                Text(
+                                  l10n.resumeSessionDescription,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white70),
+                                  style: const TextStyle(color: Colors.white70),
                                 ),
                                 const SizedBox(height: 12),
                                 Row(
@@ -1318,7 +1367,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                     Expanded(
                                       child: OutlinedButton(
                                         onPressed: timer.discardPendingSession,
-                                        child: const Text('Start fresh'),
+                                        child: Text(
+                                          l10n.resumeSessionStartFresh,
+                                        ),
                                       ),
                                     ),
                                     const SizedBox(width: 10),
@@ -1329,7 +1380,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                           backgroundColor: sessionColor,
                                           foregroundColor: _ink,
                                         ),
-                                        child: const Text('Resume'),
+                                        child: Text(l10n.actionResume),
                                       ),
                                     ),
                                   ],
@@ -1395,8 +1446,8 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               icon: const Icon(Icons.arrow_forward),
                               label: Text(
                                 session.sessionType == SessionType.focus
-                                    ? 'Take a break'
-                                    : 'Begin focus',
+                                    ? l10n.timerTakeBreak
+                                    : l10n.timerBeginFocus,
                               ),
                               style: FilledButton.styleFrom(
                                 backgroundColor: sessionColor,
@@ -1405,25 +1456,25 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               ),
                             ),
                             if (!havenLoop.isInitialized)
-                              const Padding(
-                                padding: EdgeInsets.only(top: 8),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
                                 child: Text(
-                                  'Checking for a linked Focus Queue task…',
-                                  key: ValueKey('haven-loop-restoring'),
+                                  l10n.timerLinkedTaskRestoring,
+                                  key: const ValueKey('haven-loop-restoring'),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white70),
+                                  style: const TextStyle(color: Colors.white70),
                                 ),
                               )
                             else if (havenLoop.canResolveCompletion)
-                              const Padding(
-                                padding: EdgeInsets.only(top: 8),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8),
                                 child: Text(
-                                  'Choose the task outcome above before moving on.',
-                                  key: ValueKey(
+                                  l10n.timerTaskOutcomeRequired,
+                                  key: const ValueKey(
                                     'haven-loop-resolution-required',
                                   ),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.white70),
+                                  style: const TextStyle(color: Colors.white70),
                                 ),
                               ),
                           ],
@@ -1439,7 +1490,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             IconButton.outlined(
                               key: const ValueKey('timer-reset-action'),
                               onPressed: () => _resetTimer(context, ref, timer),
-                              tooltip: 'Reset timer',
+                              tooltip: l10n.timerResetTooltip,
                               icon: const Icon(Icons.replay),
                             ),
                             FilledButton.icon(
@@ -1454,8 +1505,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               ),
                               label: Text(
                                 session.isRunning
-                                    ? 'Pause'
-                                    : 'Begin ${session.sessionType.label.toLowerCase()}',
+                                    ? l10n.actionPauseTimer
+                                    : _beginSessionLabel(
+                                        context,
+                                        session.sessionType,
+                                      ),
                               ),
                               style: FilledButton.styleFrom(
                                 backgroundColor: sessionColor,
@@ -1469,7 +1523,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                       TextButton.icon(
                         onPressed: () => _chooseCustomDuration(context, timer),
                         icon: const Icon(Icons.tune),
-                        label: const Text('Custom duration'),
+                        label: Text(l10n.timerCustomDuration),
                         style: TextButton.styleFrom(
                           foregroundColor: sessionColor,
                         ),
@@ -1485,8 +1539,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             Expanded(
                               child: StatCard(
                                 icon: Icons.today_outlined,
-                                value: '${summary.todayFocusMinutes}m',
-                                label: 'today',
+                                value: l10n.statMinutesCompact(
+                                  summary.todayFocusMinutes,
+                                ),
+                                label: l10n.statToday,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -1494,7 +1550,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               child: StatCard(
                                 icon: Icons.local_fire_department_outlined,
                                 value: '${summary.currentStreak}',
-                                label: 'day streak',
+                                label: l10n.statDayStreak,
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -1502,7 +1558,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               child: StatCard(
                                 icon: Icons.check_circle_outline,
                                 value: '${summary.completedFocusSessions}',
-                                label: 'completed',
+                                label: l10n.statCompleted,
                               ),
                             ),
                           ],
@@ -1554,7 +1610,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             onPressed: () =>
                                 _showMilestonesSheet(context, timer),
                             icon: const Icon(Icons.emoji_events_outlined),
-                            label: const Text('Milestones'),
+                            label: Text(l10n.dashboardMilestones),
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -1575,10 +1631,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                       color: primaryColor,
                                     ),
                                     const SizedBox(width: 8),
-                                    const Expanded(
+                                    Expanded(
                                       child: Text(
-                                        'Daily focus goal',
-                                        style: TextStyle(
+                                        l10n.dailyGoalTitle,
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -1586,12 +1642,20 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                     TextButton(
                                       onPressed: () =>
                                           _chooseDailyGoal(context, timer),
-                                      child: const Text('Change'),
+                                      child: Text(l10n.actionChange),
                                     ),
                                   ],
                                 ),
                                 Text(
-                                  '${_shortDurationLabel(timer.todayFocusSeconds)} of ${summary.dailyGoalMinutes} min',
+                                  l10n.dailyGoalProgress(
+                                    _shortDurationLabel(
+                                      context,
+                                      timer.todayFocusSeconds,
+                                    ),
+                                    l10n.durationMinutesShort(
+                                      summary.dailyGoalMinutes,
+                                    ),
+                                  ),
                                   style: const TextStyle(color: Colors.white70),
                                 ),
                                 const SizedBox(height: 10),
@@ -1609,8 +1673,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                 const SizedBox(height: 8),
                                 Text(
                                   summary.hasReachedDailyGoal
-                                      ? 'Daily goal complete — wonderful work.'
-                                      : '${((summary.dailyGoalMinutes * 60 - timer.todayFocusSeconds) / 60).ceil()} min remaining today',
+                                      ? l10n.dailyGoalComplete
+                                      : l10n.dailyGoalRemaining(
+                                          ((summary.dailyGoalMinutes * 60 -
+                                                      timer.todayFocusSeconds) /
+                                                  60)
+                                              .ceil(),
+                                        ),
                                   style: const TextStyle(color: Colors.white60),
                                 ),
                               ],
@@ -1641,10 +1710,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                           : primaryColor,
                                     ),
                                     const SizedBox(width: 8),
-                                    const Expanded(
+                                    Expanded(
                                       child: Text(
-                                        'Daily challenge',
-                                        style: TextStyle(
+                                        l10n.dailyChallengeTitle,
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -1660,8 +1729,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                 const SizedBox(height: 6),
                                 Text(
                                   summary.hasCompletedDailyChallenge
-                                      ? 'Challenge complete — you showed up for yourself today.'
-                                      : 'Complete ${summary.dailyChallengeTarget} focus sessions today.',
+                                      ? l10n.dailyChallengeComplete
+                                      : l10n.dailyChallengeTarget(
+                                          summary.dailyChallengeTarget,
+                                        ),
                                   style: const TextStyle(color: Colors.white70),
                                 ),
                                 const SizedBox(height: 10),
@@ -1685,7 +1756,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                'Recent focus',
+                                l10n.recentFocusTitle,
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
@@ -1696,17 +1767,17 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                   timer,
                                   focusHistory,
                                 ),
-                                child: const Text('View all'),
+                                child: Text(l10n.actionViewAll),
                               ),
                           ],
                         ),
                         const SizedBox(height: 8),
                         if (focusHistory.isEmpty)
-                          const Align(
+                          Align(
                             alignment: Alignment.centerLeft,
                             child: Text(
-                              'Complete a focus session to begin your history.',
-                              style: TextStyle(color: Colors.white60),
+                              l10n.recentFocusEmpty,
+                              style: const TextStyle(color: Colors.white60),
                             ),
                           )
                         else
@@ -1727,6 +1798,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                   title: Text(
                                     session.focusTask ??
                                         _focusSessionLabel(
+                                          context,
                                           session.durationSeconds,
                                         ),
                                   ),
@@ -1734,6 +1806,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                       ? null
                                       : Text(
                                           _focusSessionLabel(
+                                            context,
                                             session.durationSeconds,
                                           ),
                                           style: const TextStyle(
@@ -1741,7 +1814,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                           ),
                                         ),
                                   trailing: Text(
-                                    _dateLabel(session.completedAt),
+                                    _dashboardDateLabel(
+                                      context,
+                                      session.completedAt,
+                                    ),
                                     style: const TextStyle(
                                       color: Colors.white60,
                                     ),
@@ -1755,7 +1831,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               onPressed: () =>
                                   _confirmClearHistory(context, timer),
                               icon: const Icon(Icons.delete_outline),
-                              label: const Text('Clear focus history'),
+                              label: Text(l10n.focusHistoryClear),
                             ),
                           ),
                         const SizedBox(height: 4),
