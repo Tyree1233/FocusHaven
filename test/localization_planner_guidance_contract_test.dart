@@ -133,8 +133,8 @@ void main() {
       contains('B6C — Coaching, action, and remaining service results'),
     );
     expect(policy, contains('Phase 215G-B6B1'));
-    expect(policy, contains('B6 remains required through B6B2 and B6C'));
-    expect(roadmap, contains('B1–B6B1 extraction shipped'));
+    expect(policy, contains('B6 remains required through B6C'));
+    expect(roadmap, contains('B1–B6B2 extraction shipped'));
     expect(readme, contains('Phase 215G-B6B1'));
     expect(
       locales,

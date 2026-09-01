@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/haven_rhythm_insight.dart';
 
@@ -17,7 +19,9 @@ class HavenRhythmService {
   HavenRhythmReflectionConnection? createReflectionConnection({
     required FocusCompletionIdentity completion,
     required List<FocusEvent> recentEvents,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final ordered = [...recentEvents]
       ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
     if (ordered.isEmpty || ordered.first.completionIdentity != completion) {
@@ -30,7 +34,10 @@ class HavenRhythmService {
     if (matches.length != 1 || matches.single.sessionFit == null) return null;
 
     final selectedFit = matches.single.sessionFit!;
-    final insight = createInsight(recentEvents: recentEvents);
+    final insight = createInsight(
+      recentEvents: recentEvents,
+      localizations: l10n,
+    );
     final kind = switch (insight.kind) {
       HavenRhythmKind.gentlerPace ||
       HavenRhythmKind.sustainablePace ||
@@ -45,16 +52,16 @@ class HavenRhythmService {
 
     final (headline, detail) = switch (kind) {
       HavenRhythmReflectionConnectionKind.learning => (
-        'One reflection is a beginning, not a pattern',
-        'Haven Rhythm will wait for repeated private signals before describing a pace.',
+        l10n.havenRhythmConnectionLearningHeadline,
+        l10n.havenRhythmConnectionLearningDetail,
       ),
       HavenRhythmReflectionConnectionKind.reflectionPattern => (
-        'Your private Rhythm has new evidence',
-        'This reflection contributed to the current local observation: “${insight.headline}”',
+        l10n.havenRhythmConnectionPatternHeadline,
+        l10n.havenRhythmConnectionPatternDetail(insight.headline),
       ),
       HavenRhythmReflectionConnectionKind.recoveryLeads => (
-        'Your reflection was saved; recovery still leads',
-        'Recent reset signals currently carry more weight than pace suggestions. This reflection can contribute when a repeated pattern forms.',
+        l10n.havenRhythmConnectionRecoveryHeadline,
+        l10n.havenRhythmConnectionRecoveryDetail,
       ),
     };
 
@@ -68,7 +75,11 @@ class HavenRhythmService {
     );
   }
 
-  HavenRhythmInsight createInsight({required List<FocusEvent> recentEvents}) {
+  HavenRhythmInsight createInsight({
+    required List<FocusEvent> recentEvents,
+    AppLocalizations? localizations,
+  }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final recent = [...recentEvents]
       ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
     final bounded = recent.take(_recentEventLimit).toList(growable: false);
@@ -83,11 +94,12 @@ class HavenRhythmService {
     if (latestMeaningful.length >= 2 && recoverySignals >= 2) {
       return HavenRhythmInsight(
         kind: HavenRhythmKind.gentleReturn,
-        headline: 'A gentler return may fit right now',
-        detail:
-            'Recent attempts suggest lowering the starting pressure before trying to optimize your pace.',
-        evidence:
-            '$recoverySignals of the last ${latestMeaningful.length} meaningful attempts needed a reset.',
+        headline: l10n.havenRhythmGentleReturnHeadline,
+        detail: l10n.havenRhythmGentleReturnDetail,
+        evidence: l10n.havenRhythmGentleReturnEvidence(
+          recoverySignals,
+          latestMeaningful.length,
+        ),
         signalCount: latestMeaningful.length,
         usesSessionReflections: false,
         suggestedFocusMinutes: 10,
@@ -127,34 +139,38 @@ class HavenRhythmService {
         return switch (leadingFit) {
           FocusSessionFit.tooMuch => HavenRhythmInsight(
             kind: HavenRhythmKind.gentlerPace,
-            headline: 'Less may fit better right now',
-            detail:
-                'Several recent reflections said the session felt like too much. A shorter next session may lower the pressure.',
-            evidence:
-                '$highestCount of ${reflected.length} recent reflections said “Too much.”',
+            headline: l10n.havenRhythmGentlerPaceHeadline,
+            detail: l10n.havenRhythmGentlerPaceDetail,
+            evidence: l10n.havenRhythmGentlerPaceEvidence(
+              highestCount,
+              reflected.length,
+            ),
             signalCount: reflected.length,
             usesSessionReflections: true,
             suggestedFocusMinutes: _previousFocusOption(center),
           ),
           FocusSessionFit.aboutRight => HavenRhythmInsight(
             kind: HavenRhythmKind.sustainablePace,
-            headline:
-                '${_nearestFocusOption(center)} minutes has felt sustainable',
-            detail:
-                'Recent sessions you marked “About right” cluster near this pace.',
-            evidence:
-                '$highestCount of ${reflected.length} recent reflections said “About right.”',
+            headline: l10n.havenRhythmSustainablePaceHeadline(
+              _nearestFocusOption(center),
+            ),
+            detail: l10n.havenRhythmSustainablePaceDetail,
+            evidence: l10n.havenRhythmSustainablePaceEvidence(
+              highestCount,
+              reflected.length,
+            ),
             signalCount: reflected.length,
             usesSessionReflections: true,
             suggestedFocusMinutes: _nearestFocusOption(center),
           ),
           FocusSessionFit.couldDoMore => HavenRhythmInsight(
             kind: HavenRhythmKind.roomToGrow,
-            headline: 'You may have room for one small step up',
-            detail:
-                'Recent reflections suggest a slightly longer session could fit, while current energy and available time still lead.',
-            evidence:
-                '$highestCount of ${reflected.length} recent reflections said “Could do more.”',
+            headline: l10n.havenRhythmRoomToGrowHeadline,
+            detail: l10n.havenRhythmRoomToGrowDetail,
+            evidence: l10n.havenRhythmRoomToGrowEvidence(
+              highestCount,
+              reflected.length,
+            ),
             signalCount: reflected.length,
             usesSessionReflections: true,
             suggestedFocusMinutes: _nextFocusOption(center),
@@ -165,11 +181,9 @@ class HavenRhythmService {
       if (reflected.length >= _minimumPatternSignals) {
         return HavenRhythmInsight(
           kind: HavenRhythmKind.variablePace,
-          headline: 'Your rhythm changes with the day',
-          detail:
-              'Recent reflections are mixed, so FocusHaven will let current energy and available time lead instead of forcing one pace.',
-          evidence:
-              '${reflected.length} recent reflections do not show one repeated fit yet.',
+          headline: l10n.havenRhythmVariablePaceHeadline,
+          detail: l10n.havenRhythmVariablePaceDetail,
+          evidence: l10n.havenRhythmVariablePaceEvidence(reflected.length),
           signalCount: reflected.length,
           usesSessionReflections: true,
         );
@@ -186,11 +200,11 @@ class HavenRhythmService {
       final pace = _nearestFocusOption(_median(completedDurations));
       return HavenRhythmInsight(
         kind: HavenRhythmKind.completionPattern,
-        headline: 'A completion rhythm is emerging',
-        detail:
-            'Recent completed sessions cluster near $pace minutes. Only your reflections can tell whether that pace actually feels right.',
-        evidence:
-            '${completedDurations.length} recent completed sessions shaped this observation.',
+        headline: l10n.havenRhythmCompletionPatternHeadline,
+        detail: l10n.havenRhythmCompletionPatternDetail(pace),
+        evidence: l10n.havenRhythmCompletionPatternEvidence(
+          completedDurations.length,
+        ),
         signalCount: completedDurations.length,
         usesSessionReflections: false,
         suggestedFocusMinutes: pace,
@@ -199,12 +213,11 @@ class HavenRhythmService {
 
     return HavenRhythmInsight(
       kind: HavenRhythmKind.learning,
-      headline: 'Your Haven Rhythm is still forming',
-      detail:
-          'Complete and optionally reflect on a few sessions. FocusHaven will keep suggestions gentle until a pattern is clear.',
+      headline: l10n.havenRhythmLearningHeadline,
+      detail: l10n.havenRhythmLearningDetail,
       evidence: meaningful.isEmpty
-          ? 'No private focus-attempt signals are available yet.'
-          : '${meaningful.length} recent attempt${meaningful.length == 1 ? '' : 's'} do not show one repeated pattern yet.',
+          ? l10n.havenRhythmLearningNoEvidence
+          : l10n.havenRhythmLearningEvidence(meaningful.length),
       signalCount: meaningful.length,
       usesSessionReflections: reflected.isNotEmpty,
     );

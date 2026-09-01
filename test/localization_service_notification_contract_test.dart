@@ -138,7 +138,7 @@ void main() {
     );
     expect(policy, contains('Phase 215G-B6A'));
     expect(policy, contains('Phase 215G-B is not complete'));
-    expect(roadmap, contains('B1–B6B1 extraction shipped'));
+    expect(roadmap, contains('B1–B6B2 extraction shipped'));
     expect(readme, contains('Phase 215G-B6A'));
     expect(
       locales,

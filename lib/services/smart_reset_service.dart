@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/smart_reset_plan.dart';
 
@@ -13,11 +15,13 @@ class SmartResetService {
     required int plannedDurationSeconds,
     required int focusedDurationSeconds,
     required List<FocusEvent> recentEvents,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     if (plannedDurationSeconds < 2 ||
         focusedDurationSeconds < 0 ||
         focusedDurationSeconds > plannedDurationSeconds) {
-      throw ArgumentError('Smart Reset requires a valid focus attempt.');
+      throw ArgumentError(l10n.smartResetInvalidAttempt);
     }
 
     final recent = [...recentEvents]
@@ -53,11 +57,10 @@ class SmartResetService {
       basis: basis,
       explanation: switch (basis) {
         SmartResetBasis.repeatedRecovery =>
-          'Recent restarts suggest that less pressure may make returning easier.',
+          l10n.smartResetRepeatedRecoveryExplanation,
         SmartResetBasis.meaningfulProgress =>
-          'The focus you already gave still counts. This offers a smaller finish line.',
-        SmartResetBasis.gentleReturn =>
-          'A shorter restart can make the next step feel more reachable.',
+          l10n.smartResetMeaningfulProgressExplanation,
+        SmartResetBasis.gentleReturn => l10n.smartResetGentleReturnExplanation,
       },
     );
   }

@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B6B1 audited extraction contract
+Status: Phase 215G-B6B2 audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -253,16 +253,40 @@ fallback remains explicit until a later reviewed locale-selection boundary.
 
 B6B1 creates no proposal during verification, reads or writes no calendar,
 changes no queue or timer, adds no permission or dependency, contacts no AI or
-translation provider, deploys nothing, and activates no planned locale. Rhythm,
-Forecast, Smart Reset, Journey, Haven Window, and Focus Shield generated
-guidance remains for B6B2. Phase 215G-B is therefore not complete.
+translation provider, deploys nothing, and activates no planned locale.
+
+## B6B2 — Restorative and optional-system guidance
+
+The second generated-guidance sub-slice is now catalog-owned within these
+boundaries:
+
+- Haven Rhythm learning, recovery, pace, evidence, and reflection-connection
+  guidance;
+- Focus Forecast learning, flexible, emerging-window, evidence, range, and
+  reflection-connection guidance;
+- Smart Reset validation and its three deterministic explanation paths;
+- Haven Journey place, completion-connection, validation, and non-punitive
+  progression guidance;
+- Haven Window unsupported, disconnected, denied, invalid, stale, learning,
+  opening, no-opening, range-label, evidence, and duration-validation guidance;
+- Focus Shield consent, permission, private-selection, fail-closed, starting,
+  protecting, paused, break, recovery, and ready guidance.
+
+Private reflections, completion identities, counts before they become bounded
+placeholders, redacted calendar availability boundaries, and native-owned app
+or website selections remain runtime values. They are never copied into ARB
+keys or sent to a translator. The six services retain their deterministic
+rules, thresholds, model types, local ownership, optional-permission behavior,
+and explicit English fallback. English remains the only production locale.
+
+B6B2 reads no calendar during verification, changes no queue or timer, starts
+no protection, adds no permission or dependency, contacts no AI or translation
+provider, deploys nothing, and activates no planned locale. Phase 215G-B is
+therefore not complete.
 
 ## Remaining Phase 215G-B slices
 
-1. **B6B2 — Restorative and optional-system guidance:** Rhythm, Forecast,
-   Smart Reset, Journey, Haven Window, Focus Shield, and related advisory
-   values produced by services.
-2. **B6C — Coaching, action, and remaining service results:** local-Coach
+1. **B6C — Coaching, action, and remaining service results:** local-Coach
    responses, Haven action interpretation/policy/execution copy,
    authentication, store, journal prompts, exports, and remaining
    user-facing service errors and receipts.

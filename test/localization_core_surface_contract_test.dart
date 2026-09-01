@@ -165,11 +165,8 @@ void main() {
 
     expect(policy, contains('215G-B1, B2, B3A, B3B, B3C, B4, and B5'));
     expect(policy, contains('not complete Phase 215G-B'));
-    expect(roadmap, contains('B1–B6B1 extraction shipped'));
-    expect(
-      roadmap,
-      contains('remaining B6 extraction work is now divided into B6B2 and B6C'),
-    );
+    expect(roadmap, contains('B1–B6B2 extraction shipped'));
+    expect(roadmap, contains('remaining B6 extraction work is B6C'));
   });
 }
 

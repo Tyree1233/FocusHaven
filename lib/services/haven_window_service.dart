@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_forecast.dart';
 import '../models/haven_window_suggestion.dart';
 
@@ -20,45 +22,43 @@ class HavenWindowService {
     required PrivateCalendarAvailability availability,
     required DateTime now,
     Duration preferredDuration = const Duration(minutes: 25),
+    AppLocalizations? localizations,
   }) {
-    _validatePreferredDuration(preferredDuration);
+    final l10n = localizations ?? defaultServiceLocalizations();
+    _validatePreferredDuration(preferredDuration, l10n);
 
     switch (availability.status) {
       case PrivateCalendarAvailabilityStatus.unsupported:
-        return const HavenWindowSuggestion(
+        return HavenWindowSuggestion(
           kind: HavenWindowKind.unavailable,
-          headline: 'Calendar availability is unavailable here',
-          detail:
-              'This device does not currently offer a supported private calendar connection.',
-          evidence: 'No calendar availability was read.',
+          headline: l10n.havenWindowUnsupportedHeadline,
+          detail: l10n.havenWindowUnsupportedDetail,
+          evidence: l10n.havenWindowNoAvailabilityEvidence,
         );
       case PrivateCalendarAvailabilityStatus.disconnected:
-        return const HavenWindowSuggestion(
+        return HavenWindowSuggestion(
           kind: HavenWindowKind.unavailable,
-          headline: 'Calendar availability is not connected',
-          detail:
-              'FocusHaven will not infer free time until you explicitly connect a supported device calendar.',
-          evidence: 'No calendar availability was read.',
+          headline: l10n.havenWindowDisconnectedHeadline,
+          detail: l10n.havenWindowDisconnectedDetail,
+          evidence: l10n.havenWindowNoAvailabilityEvidence,
         );
       case PrivateCalendarAvailabilityStatus.denied:
-        return const HavenWindowSuggestion(
+        return HavenWindowSuggestion(
           kind: HavenWindowKind.unavailable,
-          headline: 'Calendar access stays off',
-          detail:
-              'Your choice is respected. FocusHaven can continue without calendar availability.',
-          evidence: 'No calendar availability was read.',
+          headline: l10n.havenWindowDeniedHeadline,
+          detail: l10n.havenWindowDeniedDetail,
+          evidence: l10n.havenWindowNoAvailabilityEvidence,
         );
       case PrivateCalendarAvailabilityStatus.ready:
         break;
     }
 
     if (!_isValidAvailability(availability, now)) {
-      return const HavenWindowSuggestion(
+      return HavenWindowSuggestion(
         kind: HavenWindowKind.unavailable,
-        headline: 'Calendar availability is temporarily unavailable',
-        detail:
-            'The private availability snapshot could not be safely interpreted. Nothing was scheduled or changed.',
-        evidence: 'Malformed or oversized availability data was rejected.',
+        headline: l10n.havenWindowInvalidHeadline,
+        detail: l10n.havenWindowInvalidDetail,
+        evidence: l10n.havenWindowInvalidEvidence,
       );
     }
 
@@ -67,12 +67,11 @@ class HavenWindowService {
     if (now.isBefore(rangeStart) ||
         now.difference(rangeStart) > _maximumSnapshotAge ||
         !rangeEnd.isAfter(now)) {
-      return const HavenWindowSuggestion(
+      return HavenWindowSuggestion(
         kind: HavenWindowKind.unavailable,
-        headline: 'Refresh your private availability',
-        detail:
-            'This redacted calendar snapshot is no longer current enough to suggest an opening. Refresh only if you want FocusHaven to check again.',
-        evidence: 'No calendar content was retained or reread automatically.',
+        headline: l10n.havenWindowStaleHeadline,
+        detail: l10n.havenWindowStaleDetail,
+        evidence: l10n.havenWindowStaleEvidence,
       );
     }
 
@@ -81,12 +80,11 @@ class HavenWindowService {
         forecastWindow == null) {
       return HavenWindowSuggestion(
         kind: HavenWindowKind.learning,
-        headline: 'Your Haven Window is still forming',
-        detail:
-            'FocusHaven will wait for a clear completed-session pattern instead of turning free calendar time into a recommendation.',
+        headline: l10n.havenWindowLearningHeadline,
+        detail: l10n.havenWindowLearningDetail,
         evidence: forecast.isLearning
-            ? 'The private Focus Forecast is still learning.'
-            : 'Recent completed focus remains flexible across the day.',
+            ? l10n.havenWindowForecastLearningEvidence
+            : l10n.havenWindowForecastFlexibleEvidence,
       );
     }
 
@@ -104,11 +102,12 @@ class HavenWindowService {
         final minutes = preferredDuration.inMinutes;
         return HavenWindowSuggestion(
           kind: HavenWindowKind.opening,
-          headline: 'A possible Haven Window is open',
-          detail:
-              'This optional opening overlaps a repeated completed-session window. Review it before deciding whether it fits today.',
-          evidence:
-              'One $minutes-minute opening fits ${_windowLabel(forecastWindow)} using busy-time boundaries only.',
+          headline: l10n.havenWindowOpeningHeadline,
+          detail: l10n.havenWindowOpeningDetail,
+          evidence: l10n.havenWindowOpeningEvidence(
+            minutes,
+            _windowLabel(forecastWindow, l10n),
+          ),
           startsAt: candidate,
           endsAt: candidateEnd,
           forecastWindow: forecastWindow,
@@ -119,23 +118,27 @@ class HavenWindowService {
 
     return HavenWindowSuggestion(
       kind: HavenWindowKind.noOpening,
-      headline: 'No matching Haven Window appears right now',
-      detail:
-          'Nothing needs to be forced. Another time, a smaller session, or no session may fit better today.',
-      evidence:
-          'No ${preferredDuration.inMinutes}-minute opening overlaps ${_windowLabel(forecastWindow)} in the available range.',
+      headline: l10n.havenWindowNoOpeningHeadline,
+      detail: l10n.havenWindowNoOpeningDetail,
+      evidence: l10n.havenWindowNoOpeningEvidence(
+        preferredDuration.inMinutes,
+        _windowLabel(forecastWindow, l10n),
+      ),
       forecastWindow: forecastWindow,
     );
   }
 
-  static void _validatePreferredDuration(Duration duration) {
+  static void _validatePreferredDuration(
+    Duration duration,
+    AppLocalizations l10n,
+  ) {
     if (duration < _minimumDuration ||
         duration > _maximumDuration ||
         duration.inSeconds % _step.inSeconds != 0) {
       throw ArgumentError.value(
         duration,
         'preferredDuration',
-        'must be 5 to 120 minutes in five-minute steps',
+        l10n.havenWindowInvalidPreferredDuration,
       );
     }
   }
@@ -206,11 +209,14 @@ class HavenWindowService {
     return FocusForecastWindow.lateNight;
   }
 
-  static String _windowLabel(FocusForecastWindow window) => switch (window) {
-    FocusForecastWindow.earlyMorning => 'the early-morning forecast window',
-    FocusForecastWindow.morning => 'the morning forecast window',
-    FocusForecastWindow.afternoon => 'the afternoon forecast window',
-    FocusForecastWindow.evening => 'the evening forecast window',
-    FocusForecastWindow.lateNight => 'the late-night forecast window',
+  static String _windowLabel(
+    FocusForecastWindow window,
+    AppLocalizations l10n,
+  ) => switch (window) {
+    FocusForecastWindow.earlyMorning => l10n.havenWindowEarlyMorningLabel,
+    FocusForecastWindow.morning => l10n.havenWindowMorningLabel,
+    FocusForecastWindow.afternoon => l10n.havenWindowAfternoonLabel,
+    FocusForecastWindow.evening => l10n.havenWindowEveningLabel,
+    FocusForecastWindow.lateNight => l10n.havenWindowLateNightLabel,
   };
 }

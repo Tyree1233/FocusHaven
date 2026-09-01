@@ -800,18 +800,24 @@ validation, assumptions, uncertainty explanation, generated queue-item
 templates, session-size suggestion, and no-calendar free-time suggestion.
 User-authored goal text remains an opaque placeholder, planner proposal schema
 and review behavior are unchanged, and the existing English fallback remains
-the only active service catalog. Rhythm, Forecast, Smart Reset, Journey, Haven
-Window, and Focus Shield guidance remains for B6B2.
+the only active service catalog.
+
+Phase 215G-B6B2 now catalog-owns the stable service-generated guidance from
+Haven Rhythm, Focus Forecast, Smart Reset, Haven Journey, Haven Window, and
+Focus Shield. Private reflection values, completion identities, calendar
+availability boundaries, selected apps or websites, and other user-owned data
+remain opaque runtime values rather than translation keys. The services keep
+their deterministic rules, local ownership, validation thresholds, and
+fail-closed behavior; English remains the only active locale.
 
 The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B6B2 and B6C work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, and B6B1 are not a claim that the whole interface
+remaining B6C work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, and B6B2 are not a claim that the whole interface
 is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.
 
-The remaining B6 work is now explicitly divided into B6B2 restorative and
-optional-system guidance and B6C coaching, action, and remaining service
-results.
+The remaining B6 work is B6C coaching, action, authentication, store, journal,
+export, and other remaining service results.
 
 ## Architecture
 

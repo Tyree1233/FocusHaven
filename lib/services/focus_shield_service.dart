@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_shield_state.dart';
 import '../models/system_focus_snapshot.dart';
 
@@ -13,15 +15,17 @@ class FocusShieldService {
   FocusShieldState createState({
     required FocusShieldCapability capability,
     required FocusShieldTimerState timer,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final nativeProtecting =
         capability.nativeStatus == FocusShieldNativeStatus.protecting;
 
     if (!capability.isEnabled) {
       return FocusShieldState(
         phase: FocusShieldPhase.off,
-        headline: 'Focus Shield is off',
-        detail: 'Nothing is restricted until you choose to turn protection on.',
+        headline: l10n.focusShieldOffHeadline,
+        detail: l10n.focusShieldOffDetail,
         shouldProtect: false,
         nativeProtectionReported: nativeProtecting,
         availableActions: capability.nativeSupportAvailable
@@ -34,9 +38,8 @@ class FocusShieldService {
         capability.nativeStatus == FocusShieldNativeStatus.unavailable) {
       return FocusShieldState(
         phase: FocusShieldPhase.unsupported,
-        headline: 'Focus Shield is not available here yet',
-        detail:
-            'This device has no authorized blocking adapter, so FocusHaven will not claim that distractions are restricted.',
+        headline: l10n.focusShieldUnsupportedHeadline,
+        detail: l10n.focusShieldUnsupportedDetail,
         shouldProtect: false,
         nativeProtectionReported: false,
         availableActions: const {FocusShieldAction.disable},
@@ -49,11 +52,11 @@ class FocusShieldService {
       return FocusShieldState(
         phase: FocusShieldPhase.needsAuthorization,
         headline: wasDenied
-            ? 'Focus Shield permission is off'
-            : 'Permission stays in your hands',
+            ? l10n.focusShieldPermissionDeniedHeadline
+            : l10n.focusShieldPermissionRequiredHeadline,
         detail: wasDenied
-            ? 'Protection remains inactive. You can revisit device permission whenever it feels useful.'
-            : 'FocusHaven will ask before using the device tools needed to limit selected distractions.',
+            ? l10n.focusShieldPermissionDeniedDetail
+            : l10n.focusShieldPermissionRequiredDetail,
         shouldProtect: false,
         nativeProtectionReported: nativeProtecting,
         availableActions: const {
@@ -66,9 +69,8 @@ class FocusShieldService {
     if (!capability.hasSelection) {
       return FocusShieldState(
         phase: FocusShieldPhase.needsSelection,
-        headline: 'Choose what feels distracting',
-        detail:
-            'Your private choices stay on this device. Focus Shield remains inactive until you select at least one app or website.',
+        headline: l10n.focusShieldSelectionHeadline,
+        detail: l10n.focusShieldSelectionDetail,
         shouldProtect: false,
         nativeProtectionReported: nativeProtecting,
         availableActions: const {
@@ -87,9 +89,8 @@ class FocusShieldService {
       if (capability.nativeStatus == FocusShieldNativeStatus.failed) {
         return FocusShieldState(
           phase: FocusShieldPhase.needsAttention,
-          headline: 'Focus Shield could not start',
-          detail:
-              'The timer can continue without pretending protection is active. Retry when you are ready.',
+          headline: l10n.focusShieldFailedHeadline,
+          detail: l10n.focusShieldFailedDetail,
           shouldProtect: true,
           nativeProtectionReported: false,
           availableActions: const {
@@ -100,11 +101,10 @@ class FocusShieldService {
         );
       }
       if (!nativeProtecting) {
-        return const FocusShieldState(
+        return FocusShieldState(
           phase: FocusShieldPhase.starting,
-          headline: 'Preparing your Haven',
-          detail:
-              'FocusHaven is waiting for the device to confirm that your selected distractions are restricted.',
+          headline: l10n.focusShieldStartingHeadline,
+          detail: l10n.focusShieldStartingDetail,
           shouldProtect: true,
           nativeProtectionReported: false,
           availableActions: {
@@ -113,11 +113,10 @@ class FocusShieldService {
           },
         );
       }
-      return const FocusShieldState(
+      return FocusShieldState(
         phase: FocusShieldPhase.protecting,
-        headline: 'Your Haven is protected',
-        detail:
-            'Only the distractions you selected are restricted during this focus session.',
+        headline: l10n.focusShieldProtectingHeadline,
+        detail: l10n.focusShieldProtectingDetail,
         shouldProtect: true,
         nativeProtectionReported: true,
         availableActions: {
@@ -132,9 +131,8 @@ class FocusShieldService {
         timer.activity == SystemFocusActivity.running) {
       return FocusShieldState(
         phase: FocusShieldPhase.paused,
-        headline: 'Focus Shield is taking a pause',
-        detail:
-            'You remain in control. Resume protection when it feels supportive.',
+        headline: l10n.focusShieldPausedHeadline,
+        detail: l10n.focusShieldPausedDetail,
         shouldProtect: false,
         nativeProtectionReported: nativeProtecting,
         availableActions: const {
@@ -149,15 +147,15 @@ class FocusShieldService {
     return FocusShieldState(
       phase: FocusShieldPhase.ready,
       headline: isBreak
-          ? 'Breaks stay open by design'
+          ? l10n.focusShieldBreakHeadline
           : isRecovery
-          ? 'Focus Shield can wait with you'
-          : 'Focus Shield is ready',
+          ? l10n.focusShieldRecoveryHeadline
+          : l10n.focusShieldReadyHeadline,
       detail: isBreak
-          ? 'Selected distractions are not restricted during a FocusHaven break.'
+          ? l10n.focusShieldBreakDetail
           : isRecovery
-          ? 'Protection stays inactive while you choose whether to resume or release this attempt.'
-          : 'Protection begins only when you start a focus session.',
+          ? l10n.focusShieldRecoveryDetail
+          : l10n.focusShieldReadyDetail,
       shouldProtect: false,
       nativeProtectionReported: nativeProtecting,
       availableActions: const {

@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/haven_journey_state.dart';
 
@@ -19,7 +21,9 @@ class HavenJourneyService {
     required FocusCompletionIdentity completion,
     required List<FocusEvent> recentEvents,
     required HavenJourneyState journey,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final ordered = [...recentEvents]
       ..sort((a, b) => b.endedAt.compareTo(a.endedAt));
     if (ordered.isEmpty || ordered.first.completionIdentity != completion) {
@@ -33,6 +37,7 @@ class HavenJourneyService {
 
     final verifiedCurrent = createState(
       completedFocusSessions: journey.supportingSessionCount,
+      localizations: l10n,
     );
     if (verifiedCurrent.place != journey.place ||
         verifiedCurrent.headline != journey.headline ||
@@ -42,16 +47,21 @@ class HavenJourneyService {
 
     final previous = createState(
       completedFocusSessions: journey.supportingSessionCount - 1,
+      localizations: l10n,
     );
     final changedPlace = previous.place != journey.place;
     final (headline, detail) = changedPlace
         ? (
-            'This completed Focus session opened a new Haven place',
-            'Your private Journey now rests at ${_placeLabel(journey.place)}. The change comes only from the existing cumulative completion count.',
+            l10n.havenJourneyConnectionChangedHeadline,
+            l10n.havenJourneyConnectionChangedDetail(
+              _placeLabel(journey.place, l10n),
+            ),
           )
         : (
-            'This completed Focus session belongs in your Haven',
-            'Your private Journey remains at ${_placeLabel(journey.place)}. Every completed Focus session is kept equally, without a score or streak requirement.',
+            l10n.havenJourneyConnectionHeldHeadline,
+            l10n.havenJourneyConnectionHeldDetail(
+              _placeLabel(journey.place, l10n),
+            ),
           );
 
     return HavenJourneyCompletionConnection(
@@ -66,66 +76,66 @@ class HavenJourneyService {
     );
   }
 
-  HavenJourneyState createState({required int completedFocusSessions}) {
+  HavenJourneyState createState({
+    required int completedFocusSessions,
+    AppLocalizations? localizations,
+  }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     if (completedFocusSessions < 0) {
       throw ArgumentError.value(
         completedFocusSessions,
         'completedFocusSessions',
-        'A cumulative completion count cannot be negative.',
+        l10n.havenJourneyNegativeCompletionCount,
       );
     }
 
     if (completedFocusSessions >= _sanctuarySessions) {
       return HavenJourneyState(
         place: HavenJourneyPlace.sanctuary,
-        headline: 'Your Haven has become a sanctuary',
-        detail:
-            'Every completed focus moment still belongs here. Rest and difficult days cannot undo what you built.',
+        headline: l10n.havenJourneySanctuaryHeadline,
+        detail: l10n.havenJourneySanctuaryDetail,
         supportingSessionCount: completedFocusSessions,
       );
     }
     if (completedFocusSessions >= _gardenSessions) {
       return HavenJourneyState(
         place: HavenJourneyPlace.garden,
-        headline: 'A gentle garden is growing',
-        detail:
-            'Your completed sessions have made room for something living. The garden keeps its shape without demanding a streak.',
+        headline: l10n.havenJourneyGardenHeadline,
+        detail: l10n.havenJourneyGardenDetail,
         supportingSessionCount: completedFocusSessions,
       );
     }
     if (completedFocusSessions >= _cabinSessions) {
       return HavenJourneyState(
         place: HavenJourneyPlace.cabin,
-        headline: 'Your Haven has a quiet cabin',
-        detail:
-            'Focus has created a place to return to. Pauses and resets never remove anything from it.',
+        headline: l10n.havenJourneyCabinHeadline,
+        detail: l10n.havenJourneyCabinDetail,
         supportingSessionCount: completedFocusSessions,
       );
     }
     if (completedFocusSessions >= _campsiteSessions) {
       return HavenJourneyState(
         place: HavenJourneyPlace.campsite,
-        headline: 'A quiet campsite is taking shape',
-        detail:
-            'One completed session was enough to begin. This place can wait with you for as long as you need.',
+        headline: l10n.havenJourneyCampsiteHeadline,
+        detail: l10n.havenJourneyCampsiteDetail,
         supportingSessionCount: completedFocusSessions,
       );
     }
 
-    return const HavenJourneyState(
+    return HavenJourneyState(
       place: HavenJourneyPlace.lantern,
-      headline: 'Your Haven begins with one whole light',
-      detail:
-          'Nothing is missing and there is nothing to prove. The lantern is ready whenever you choose to focus.',
+      headline: l10n.havenJourneyLanternHeadline,
+      detail: l10n.havenJourneyLanternDetail,
       supportingSessionCount: 0,
     );
   }
 
-  static String _placeLabel(HavenJourneyPlace place) => switch (place) {
-    HavenJourneyPlace.lantern => 'the lantern',
-    HavenJourneyPlace.campsite => 'the campsite',
-    HavenJourneyPlace.cabin => 'the quiet cabin',
-    HavenJourneyPlace.garden => 'the gentle garden',
-    HavenJourneyPlace.sanctuary => 'the sanctuary',
-  };
+  static String _placeLabel(HavenJourneyPlace place, AppLocalizations l10n) =>
+      switch (place) {
+        HavenJourneyPlace.lantern => l10n.havenJourneyLanternLabel,
+        HavenJourneyPlace.campsite => l10n.havenJourneyCampsiteLabel,
+        HavenJourneyPlace.cabin => l10n.havenJourneyCabinLabel,
+        HavenJourneyPlace.garden => l10n.havenJourneyGardenLabel,
+        HavenJourneyPlace.sanctuary => l10n.havenJourneySanctuaryLabel,
+      };
 }

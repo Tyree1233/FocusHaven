@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B6B1 audited extraction contract
+Status: Phase 215G-B6B2 audited extraction contract
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -138,8 +138,13 @@ tasks must still be evaluated from the console's current state.
   Phase 215G-B6B1 moves stable local Haven Planner validation, assumptions,
   uncertainty, generated item templates, and informational suggestions into
   the catalog without translating user-authored goals or changing proposal,
-  review, queue, timer, or calendar behavior. Restorative and optional-system
-  guidance retains its B6B2 owner. B6 remains required through B6B2 and B6C.
+  review, queue, timer, or calendar behavior.
+  Phase 215G-B6B2 moves stable Haven Rhythm, Focus Forecast, Smart Reset,
+  Haven Journey, Haven Window, and Focus Shield guidance into the catalog.
+  Private reflections, completion identities, redacted calendar boundaries,
+  and native-owned app or website selections remain opaque values; no service
+  rule, threshold, permission, platform adapter, timer, queue, or persistence
+  behavior changes. B6 remains required through B6C.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,

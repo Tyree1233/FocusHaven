@@ -3110,5 +3110,436 @@
   "havenPlannerServiceFreeTimeExplanation": "This is informational only. Haven did not read or write a calendar and will not reserve time.",
   "@havenPlannerServiceFreeTimeExplanation": {
     "description": "Safety explanation that the local planner did not access or change a calendar."
-  }
+  },
+  "havenRhythmConnectionLearningHeadline": "One reflection is a beginning, not a pattern",
+  "@havenRhythmConnectionLearningHeadline": {
+    "description": "Headline explaining that one private reflection is not treated as a rhythm pattern."
+  },
+  "havenRhythmConnectionLearningDetail": "Haven Rhythm will wait for repeated private signals before describing a pace.",
+  "@havenRhythmConnectionLearningDetail": {
+    "description": "Detail explaining the repeated-signal threshold for a rhythm pattern."
+  },
+  "havenRhythmConnectionPatternHeadline": "Your private Rhythm has new evidence",
+  "@havenRhythmConnectionPatternHeadline": {
+    "description": "Headline shown when a private reflection contributes to a repeated rhythm pattern."
+  },
+  "havenRhythmConnectionPatternDetail": "This reflection contributed to the current local observation: “{insightHeadline}”",
+  "@havenRhythmConnectionPatternDetail": {
+    "description": "Detail connecting a private reflection to a locally generated rhythm headline.",
+    "placeholders": {
+      "insightHeadline": {
+        "type": "String",
+        "example": "Less may fit better right now"
+      }
+    }
+  },
+  "havenRhythmConnectionRecoveryHeadline": "Your reflection was saved; recovery still leads",
+  "@havenRhythmConnectionRecoveryHeadline": {
+    "description": "Headline shown when recovery evidence remains stronger than pace evidence."
+  },
+  "havenRhythmConnectionRecoveryDetail": "Recent reset signals currently carry more weight than pace suggestions. This reflection can contribute when a repeated pattern forms.",
+  "@havenRhythmConnectionRecoveryDetail": {
+    "description": "Detail preserving recovery precedence over rhythm suggestions."
+  },
+  "havenRhythmGentleReturnHeadline": "A gentler return may fit right now",
+  "@havenRhythmGentleReturnHeadline": {
+    "description": "Local rhythm headline suggested after repeated recovery signals."
+  },
+  "havenRhythmGentleReturnDetail": "Recent attempts suggest lowering the starting pressure before trying to optimize your pace.",
+  "@havenRhythmGentleReturnDetail": {
+    "description": "Local rhythm detail suggested after repeated recovery signals."
+  },
+  "havenRhythmGentleReturnEvidence": "{recoveryCount} of the last {attemptCount} meaningful attempts needed a reset.",
+  "@havenRhythmGentleReturnEvidence": {
+    "description": "Bounded recovery evidence used by Haven Rhythm.",
+    "placeholders": {
+      "recoveryCount": {"type": "int", "example": "2"},
+      "attemptCount": {"type": "int", "example": "3"}
+    }
+  },
+  "havenRhythmGentlerPaceHeadline": "Less may fit better right now",
+  "@havenRhythmGentlerPaceHeadline": {
+    "description": "Local rhythm headline suggested after repeated too-much reflections."
+  },
+  "havenRhythmGentlerPaceDetail": "Several recent reflections said the session felt like too much. A shorter next session may lower the pressure.",
+  "@havenRhythmGentlerPaceDetail": {
+    "description": "Local rhythm detail suggested after repeated too-much reflections."
+  },
+  "havenRhythmGentlerPaceEvidence": "{matchingCount} of {reflectionCount} recent reflections said “Too much.”",
+  "@havenRhythmGentlerPaceEvidence": {
+    "description": "Count evidence for a gentler local rhythm suggestion.",
+    "placeholders": {
+      "matchingCount": {"type": "int", "example": "2"},
+      "reflectionCount": {"type": "int", "example": "3"}
+    }
+  },
+  "havenRhythmSustainablePaceHeadline": "{minutes} minutes has felt sustainable",
+  "@havenRhythmSustainablePaceHeadline": {
+    "description": "Local rhythm headline for a repeatedly comfortable focus duration.",
+    "placeholders": {"minutes": {"type": "int", "example": "25"}}
+  },
+  "havenRhythmSustainablePaceDetail": "Recent sessions you marked “About right” cluster near this pace.",
+  "@havenRhythmSustainablePaceDetail": {
+    "description": "Local rhythm detail for a repeatedly comfortable pace."
+  },
+  "havenRhythmSustainablePaceEvidence": "{matchingCount} of {reflectionCount} recent reflections said “About right.”",
+  "@havenRhythmSustainablePaceEvidence": {
+    "description": "Count evidence for a sustainable local rhythm suggestion.",
+    "placeholders": {
+      "matchingCount": {"type": "int", "example": "2"},
+      "reflectionCount": {"type": "int", "example": "3"}
+    }
+  },
+  "havenRhythmRoomToGrowHeadline": "You may have room for one small step up",
+  "@havenRhythmRoomToGrowHeadline": {
+    "description": "Local rhythm headline after repeated could-do-more reflections."
+  },
+  "havenRhythmRoomToGrowDetail": "Recent reflections suggest a slightly longer session could fit, while current energy and available time still lead.",
+  "@havenRhythmRoomToGrowDetail": {
+    "description": "Local rhythm detail that keeps energy and availability ahead of a longer-session suggestion."
+  },
+  "havenRhythmRoomToGrowEvidence": "{matchingCount} of {reflectionCount} recent reflections said “Could do more.”",
+  "@havenRhythmRoomToGrowEvidence": {
+    "description": "Count evidence for a room-to-grow local rhythm suggestion.",
+    "placeholders": {
+      "matchingCount": {"type": "int", "example": "2"},
+      "reflectionCount": {"type": "int", "example": "3"}
+    }
+  },
+  "havenRhythmVariablePaceHeadline": "Your rhythm changes with the day",
+  "@havenRhythmVariablePaceHeadline": {
+    "description": "Headline shown when private reflections do not support one repeated pace."
+  },
+  "havenRhythmVariablePaceDetail": "Recent reflections are mixed, so FocusHaven will let current energy and available time lead instead of forcing one pace.",
+  "@havenRhythmVariablePaceDetail": {
+    "description": "Detail preserving user context when private rhythm evidence is mixed."
+  },
+  "havenRhythmVariablePaceEvidence": "{reflectionCount} recent reflections do not show one repeated fit yet.",
+  "@havenRhythmVariablePaceEvidence": {
+    "description": "Count evidence for a variable local rhythm.",
+    "placeholders": {"reflectionCount": {"type": "int", "example": "3"}}
+  },
+  "havenRhythmCompletionPatternHeadline": "A completion rhythm is emerging",
+  "@havenRhythmCompletionPatternHeadline": {
+    "description": "Headline for a local completion-duration pattern without reflection evidence."
+  },
+  "havenRhythmCompletionPatternDetail": "Recent completed sessions cluster near {minutes} minutes. Only your reflections can tell whether that pace actually feels right.",
+  "@havenRhythmCompletionPatternDetail": {
+    "description": "Detail for a completion-duration observation that preserves reflection authority.",
+    "placeholders": {"minutes": {"type": "int", "example": "25"}}
+  },
+  "havenRhythmCompletionPatternEvidence": "{sessionCount} recent completed sessions shaped this observation.",
+  "@havenRhythmCompletionPatternEvidence": {
+    "description": "Bounded count evidence for a completion-duration observation.",
+    "placeholders": {"sessionCount": {"type": "int", "example": "3"}}
+  },
+  "havenRhythmLearningHeadline": "Your Haven Rhythm is still forming",
+  "@havenRhythmLearningHeadline": {
+    "description": "Headline while Haven Rhythm lacks repeated private evidence."
+  },
+  "havenRhythmLearningDetail": "Complete and optionally reflect on a few sessions. FocusHaven will keep suggestions gentle until a pattern is clear.",
+  "@havenRhythmLearningDetail": {
+    "description": "Detail while Haven Rhythm lacks repeated private evidence."
+  },
+  "havenRhythmLearningNoEvidence": "No private focus-attempt signals are available yet.",
+  "@havenRhythmLearningNoEvidence": {
+    "description": "Evidence receipt when Haven Rhythm has no private attempt signals."
+  },
+  "havenRhythmLearningEvidence": "{attemptCount, plural, =1{1 recent attempt does not show one repeated pattern yet.} other{{attemptCount} recent attempts do not show one repeated pattern yet.}}",
+  "@havenRhythmLearningEvidence": {
+    "description": "Pluralized evidence receipt while Haven Rhythm is still learning.",
+    "placeholders": {"attemptCount": {"type": "int", "example": "2"}}
+  },
+  "focusForecastConnectionLearningHeadline": "One reflection does not create a timing pattern",
+  "@focusForecastConnectionLearningHeadline": {
+    "description": "Headline explaining that one reflection does not create a forecast pattern."
+  },
+  "focusForecastConnectionLearningDetail": "Focus Forecast is still learning from completed-session timing. Your saved fit adds private context without turning this one session into a prediction.",
+  "@focusForecastConnectionLearningDetail": {
+    "description": "Detail preserving the learning threshold for Focus Forecast."
+  },
+  "focusForecastConnectionFlexibleHeadline": "Your timing still looks flexible",
+  "@focusForecastConnectionFlexibleHeadline": {
+    "description": "Headline connecting a reflection to flexible completion timing."
+  },
+  "focusForecastConnectionFlexibleDetail": "Recent completions move across the day. This saved fit does not rank one time above your current energy or real-life availability.",
+  "@focusForecastConnectionFlexibleDetail": {
+    "description": "Detail preserving energy and availability authority over flexible timing evidence."
+  },
+  "focusForecastConnectionInsideHeadline": "This completion sits inside a possible focus window",
+  "@focusForecastConnectionInsideHeadline": {
+    "description": "Headline when a completed session aligns with a possible local forecast window."
+  },
+  "focusForecastConnectionInsideDetail": "Its completed timing already contributes to the local observation. Your saved fit adds context, not proof that this time will always work.",
+  "@focusForecastConnectionInsideDetail": {
+    "description": "Detail preventing an aligned completion from becoming a prediction."
+  },
+  "focusForecastConnectionOutsideHeadline": "One session can sit outside a possible window",
+  "@focusForecastConnectionOutsideHeadline": {
+    "description": "Headline when a completed session sits outside a possible local forecast window."
+  },
+  "focusForecastConnectionOutsideDetail": "Your saved fit remains valid even when this completion happened at another time. Focus Forecast is an observation, not a rule.",
+  "@focusForecastConnectionOutsideDetail": {
+    "description": "Detail preserving the validity of a reflection outside a possible forecast window."
+  },
+  "focusForecastLearningHeadline": "Your Focus Forecast is still forming",
+  "@focusForecastLearningHeadline": {
+    "description": "Headline while Focus Forecast lacks enough completed timing signals."
+  },
+  "focusForecastLearningDetail": "Complete a few sessions at the times that naturally fit. FocusHaven will wait for a clear pattern instead of guessing.",
+  "@focusForecastLearningDetail": {
+    "description": "Detail while Focus Forecast lacks enough completed timing signals."
+  },
+  "focusForecastLearningNoEvidence": "No completed timing signals are available yet.",
+  "@focusForecastLearningNoEvidence": {
+    "description": "Evidence receipt when Focus Forecast has no completed timing signals."
+  },
+  "focusForecastLearningEvidence": "{signalCount, plural, =1{1 completed timing signal is available; at least {minimumCount} are needed.} other{{signalCount} completed timing signals are available; at least {minimumCount} are needed.}}",
+  "@focusForecastLearningEvidence": {
+    "description": "Pluralized evidence receipt while Focus Forecast is still learning.",
+    "placeholders": {
+      "signalCount": {"type": "int", "example": "5"},
+      "minimumCount": {"type": "int", "example": "6"}
+    }
+  },
+  "focusForecastFlexibleHeadline": "Your completed focus moves across the day",
+  "@focusForecastFlexibleHeadline": {
+    "description": "Headline when completed focus does not gather in one forecast window."
+  },
+  "focusForecastFlexibleDetail": "Recent sessions do not gather around one repeated window. Current energy and real-life availability should keep leading.",
+  "@focusForecastFlexibleDetail": {
+    "description": "Detail preserving current context when timing evidence is flexible."
+  },
+  "focusForecastFlexibleEvidence": "{sessionCount} recent completed sessions are spread across the day; the largest window contains {largestCount}.",
+  "@focusForecastFlexibleEvidence": {
+    "description": "Bounded count evidence for flexible completion timing.",
+    "placeholders": {
+      "sessionCount": {"type": "int", "example": "6"},
+      "largestCount": {"type": "int", "example": "3"}
+    }
+  },
+  "focusForecastEmergingHeadline": "Completed focus often begins {windowLabel}",
+  "@focusForecastEmergingHeadline": {
+    "description": "Headline for an emerging local focus window.",
+    "placeholders": {"windowLabel": {"type": "String", "example": "in the morning"}}
+  },
+  "focusForecastEmergingDetail": "Recent completions have gathered here. Treat this as a possible planning window, not a rule or prediction.",
+  "@focusForecastEmergingDetail": {
+    "description": "Safety detail for an emerging local focus window."
+  },
+  "focusForecastEmergingEvidence": "{matchingCount} of {sessionCount} recent completed sessions began {windowRange} in your local time.",
+  "@focusForecastEmergingEvidence": {
+    "description": "Bounded count and local-time evidence for an emerging focus window.",
+    "placeholders": {
+      "matchingCount": {"type": "int", "example": "4"},
+      "sessionCount": {"type": "int", "example": "6"},
+      "windowRange": {"type": "String", "example": "between 8 AM and noon"}
+    }
+  },
+  "focusForecastEarlyMorningLabel": "early in the morning",
+  "@focusForecastEarlyMorningLabel": {"description": "Phrase naming the early-morning forecast window."},
+  "focusForecastMorningLabel": "in the morning",
+  "@focusForecastMorningLabel": {"description": "Phrase naming the morning forecast window."},
+  "focusForecastAfternoonLabel": "in the afternoon",
+  "@focusForecastAfternoonLabel": {"description": "Phrase naming the afternoon forecast window."},
+  "focusForecastEveningLabel": "in the evening",
+  "@focusForecastEveningLabel": {"description": "Phrase naming the evening forecast window."},
+  "focusForecastLateNightLabel": "late at night",
+  "@focusForecastLateNightLabel": {"description": "Phrase naming the late-night forecast window."},
+  "focusForecastEarlyMorningRange": "between 5 AM and 8 AM",
+  "@focusForecastEarlyMorningRange": {"description": "Local-time range for the early-morning forecast window."},
+  "focusForecastMorningRange": "between 8 AM and noon",
+  "@focusForecastMorningRange": {"description": "Local-time range for the morning forecast window."},
+  "focusForecastAfternoonRange": "between noon and 5 PM",
+  "@focusForecastAfternoonRange": {"description": "Local-time range for the afternoon forecast window."},
+  "focusForecastEveningRange": "between 5 PM and 9 PM",
+  "@focusForecastEveningRange": {"description": "Local-time range for the evening forecast window."},
+  "focusForecastLateNightRange": "between 9 PM and 5 AM",
+  "@focusForecastLateNightRange": {"description": "Local-time range for the late-night forecast window."},
+  "smartResetInvalidAttempt": "Smart Reset requires a valid focus attempt.",
+  "@smartResetInvalidAttempt": {
+    "description": "Validation message when Smart Reset receives an invalid focus attempt."
+  },
+  "smartResetRepeatedRecoveryExplanation": "Recent restarts suggest that less pressure may make returning easier.",
+  "@smartResetRepeatedRecoveryExplanation": {
+    "description": "Smart Reset explanation after repeated private recovery signals."
+  },
+  "smartResetMeaningfulProgressExplanation": "The focus you already gave still counts. This offers a smaller finish line.",
+  "@smartResetMeaningfulProgressExplanation": {
+    "description": "Smart Reset explanation that acknowledges meaningful focused progress."
+  },
+  "smartResetGentleReturnExplanation": "A shorter restart can make the next step feel more reachable.",
+  "@smartResetGentleReturnExplanation": {
+    "description": "Default Smart Reset explanation for a shorter restart."
+  },
+  "havenJourneyConnectionChangedHeadline": "This completed Focus session opened a new Haven place",
+  "@havenJourneyConnectionChangedHeadline": {
+    "description": "Headline when a cumulative completion opens a new local Haven Journey place."
+  },
+  "havenJourneyConnectionChangedDetail": "Your private Journey now rests at {placeLabel}. The change comes only from the existing cumulative completion count.",
+  "@havenJourneyConnectionChangedDetail": {
+    "description": "Detail connecting a cumulative completion to a new local Journey place.",
+    "placeholders": {"placeLabel": {"type": "String", "example": "the campsite"}}
+  },
+  "havenJourneyConnectionHeldHeadline": "This completed Focus session belongs in your Haven",
+  "@havenJourneyConnectionHeldHeadline": {
+    "description": "Headline when a cumulative completion remains within the current Haven Journey place."
+  },
+  "havenJourneyConnectionHeldDetail": "Your private Journey remains at {placeLabel}. Every completed Focus session is kept equally, without a score or streak requirement.",
+  "@havenJourneyConnectionHeldDetail": {
+    "description": "Detail connecting a cumulative completion to the current local Journey place.",
+    "placeholders": {"placeLabel": {"type": "String", "example": "the quiet cabin"}}
+  },
+  "havenJourneyNegativeCompletionCount": "A cumulative completion count cannot be negative.",
+  "@havenJourneyNegativeCompletionCount": {
+    "description": "Validation message for an invalid negative cumulative completion count."
+  },
+  "havenJourneySanctuaryHeadline": "Your Haven has become a sanctuary",
+  "@havenJourneySanctuaryHeadline": {"description": "Headline for the sanctuary Journey place."},
+  "havenJourneySanctuaryDetail": "Every completed focus moment still belongs here. Rest and difficult days cannot undo what you built.",
+  "@havenJourneySanctuaryDetail": {"description": "Non-punitive detail for the sanctuary Journey place."},
+  "havenJourneyGardenHeadline": "A gentle garden is growing",
+  "@havenJourneyGardenHeadline": {"description": "Headline for the garden Journey place."},
+  "havenJourneyGardenDetail": "Your completed sessions have made room for something living. The garden keeps its shape without demanding a streak.",
+  "@havenJourneyGardenDetail": {"description": "Non-streak detail for the garden Journey place."},
+  "havenJourneyCabinHeadline": "Your Haven has a quiet cabin",
+  "@havenJourneyCabinHeadline": {"description": "Headline for the quiet-cabin Journey place."},
+  "havenJourneyCabinDetail": "Focus has created a place to return to. Pauses and resets never remove anything from it.",
+  "@havenJourneyCabinDetail": {"description": "Non-punitive detail for the quiet-cabin Journey place."},
+  "havenJourneyCampsiteHeadline": "A quiet campsite is taking shape",
+  "@havenJourneyCampsiteHeadline": {"description": "Headline for the campsite Journey place."},
+  "havenJourneyCampsiteDetail": "One completed session was enough to begin. This place can wait with you for as long as you need.",
+  "@havenJourneyCampsiteDetail": {"description": "Non-streak detail for the campsite Journey place."},
+  "havenJourneyLanternHeadline": "Your Haven begins with one whole light",
+  "@havenJourneyLanternHeadline": {"description": "Headline for the starting lantern Journey place."},
+  "havenJourneyLanternDetail": "Nothing is missing and there is nothing to prove. The lantern is ready whenever you choose to focus.",
+  "@havenJourneyLanternDetail": {"description": "Non-punitive detail for the starting lantern Journey place."},
+  "havenJourneyLanternLabel": "the lantern",
+  "@havenJourneyLanternLabel": {"description": "Inline label for the lantern Journey place."},
+  "havenJourneyCampsiteLabel": "the campsite",
+  "@havenJourneyCampsiteLabel": {"description": "Inline label for the campsite Journey place."},
+  "havenJourneyCabinLabel": "the quiet cabin",
+  "@havenJourneyCabinLabel": {"description": "Inline label for the quiet-cabin Journey place."},
+  "havenJourneyGardenLabel": "the gentle garden",
+  "@havenJourneyGardenLabel": {"description": "Inline label for the garden Journey place."},
+  "havenJourneySanctuaryLabel": "the sanctuary",
+  "@havenJourneySanctuaryLabel": {"description": "Inline label for the sanctuary Journey place."},
+  "havenWindowUnsupportedHeadline": "Calendar availability is unavailable here",
+  "@havenWindowUnsupportedHeadline": {"description": "Headline when a private calendar adapter is unsupported."},
+  "havenWindowUnsupportedDetail": "This device does not currently offer a supported private calendar connection.",
+  "@havenWindowUnsupportedDetail": {"description": "Detail when a private calendar adapter is unsupported."},
+  "havenWindowDisconnectedHeadline": "Calendar availability is not connected",
+  "@havenWindowDisconnectedHeadline": {"description": "Headline when the optional private calendar connection is disconnected."},
+  "havenWindowDisconnectedDetail": "FocusHaven will not infer free time until you explicitly connect a supported device calendar.",
+  "@havenWindowDisconnectedDetail": {"description": "Consent boundary before an optional private calendar connection is used."},
+  "havenWindowDeniedHeadline": "Calendar access stays off",
+  "@havenWindowDeniedHeadline": {"description": "Headline when optional calendar permission is denied."},
+  "havenWindowDeniedDetail": "Your choice is respected. FocusHaven can continue without calendar availability.",
+  "@havenWindowDeniedDetail": {"description": "Detail preserving app use without optional calendar access."},
+  "havenWindowNoAvailabilityEvidence": "No calendar availability was read.",
+  "@havenWindowNoAvailabilityEvidence": {"description": "Evidence receipt when no private calendar availability was read."},
+  "havenWindowInvalidHeadline": "Calendar availability is temporarily unavailable",
+  "@havenWindowInvalidHeadline": {"description": "Headline when a redacted calendar snapshot fails validation."},
+  "havenWindowInvalidDetail": "The private availability snapshot could not be safely interpreted. Nothing was scheduled or changed.",
+  "@havenWindowInvalidDetail": {"description": "Fail-closed detail for an invalid private availability snapshot."},
+  "havenWindowInvalidEvidence": "Malformed or oversized availability data was rejected.",
+  "@havenWindowInvalidEvidence": {"description": "Evidence receipt for rejected private availability data."},
+  "havenWindowStaleHeadline": "Refresh your private availability",
+  "@havenWindowStaleHeadline": {"description": "Headline when a redacted calendar snapshot is stale."},
+  "havenWindowStaleDetail": "This redacted calendar snapshot is no longer current enough to suggest an opening. Refresh only if you want FocusHaven to check again.",
+  "@havenWindowStaleDetail": {"description": "Consent-preserving detail for a stale private availability snapshot."},
+  "havenWindowStaleEvidence": "No calendar content was retained or reread automatically.",
+  "@havenWindowStaleEvidence": {"description": "Evidence receipt preserving no-retention and no-automatic-reread boundaries."},
+  "havenWindowLearningHeadline": "Your Haven Window is still forming",
+  "@havenWindowLearningHeadline": {"description": "Headline while the private Focus Forecast lacks a clear window."},
+  "havenWindowLearningDetail": "FocusHaven will wait for a clear completed-session pattern instead of turning free calendar time into a recommendation.",
+  "@havenWindowLearningDetail": {"description": "Detail requiring forecast evidence before suggesting a private opening."},
+  "havenWindowForecastLearningEvidence": "The private Focus Forecast is still learning.",
+  "@havenWindowForecastLearningEvidence": {"description": "Evidence receipt when Focus Forecast is still learning."},
+  "havenWindowForecastFlexibleEvidence": "Recent completed focus remains flexible across the day.",
+  "@havenWindowForecastFlexibleEvidence": {"description": "Evidence receipt when Focus Forecast remains flexible."},
+  "havenWindowOpeningHeadline": "A possible Haven Window is open",
+  "@havenWindowOpeningHeadline": {"description": "Headline for one optional redacted-availability opening."},
+  "havenWindowOpeningDetail": "This optional opening overlaps a repeated completed-session window. Review it before deciding whether it fits today.",
+  "@havenWindowOpeningDetail": {"description": "Review-before-action detail for an optional Haven Window."},
+  "havenWindowOpeningEvidence": "One {minutes}-minute opening fits {windowLabel} using busy-time boundaries only.",
+  "@havenWindowOpeningEvidence": {
+    "description": "Bounded evidence for one optional opening derived from busy-time boundaries.",
+    "placeholders": {
+      "minutes": {"type": "int", "example": "25"},
+      "windowLabel": {"type": "String", "example": "the morning forecast window"}
+    }
+  },
+  "havenWindowNoOpeningHeadline": "No matching Haven Window appears right now",
+  "@havenWindowNoOpeningHeadline": {"description": "Headline when no private opening matches a forecast window."},
+  "havenWindowNoOpeningDetail": "Nothing needs to be forced. Another time, a smaller session, or no session may fit better today.",
+  "@havenWindowNoOpeningDetail": {"description": "Non-coercive detail when no matching Haven Window appears."},
+  "havenWindowNoOpeningEvidence": "No {minutes}-minute opening overlaps {windowLabel} in the available range.",
+  "@havenWindowNoOpeningEvidence": {
+    "description": "Bounded evidence when no private opening matches the forecast window.",
+    "placeholders": {
+      "minutes": {"type": "int", "example": "25"},
+      "windowLabel": {"type": "String", "example": "the morning forecast window"}
+    }
+  },
+  "havenWindowInvalidPreferredDuration": "must be 5 to 120 minutes in five-minute steps",
+  "@havenWindowInvalidPreferredDuration": {"description": "Validation message for an unsupported Haven Window duration."},
+  "havenWindowEarlyMorningLabel": "the early-morning forecast window",
+  "@havenWindowEarlyMorningLabel": {"description": "Inline Haven Window label for early morning."},
+  "havenWindowMorningLabel": "the morning forecast window",
+  "@havenWindowMorningLabel": {"description": "Inline Haven Window label for morning."},
+  "havenWindowAfternoonLabel": "the afternoon forecast window",
+  "@havenWindowAfternoonLabel": {"description": "Inline Haven Window label for afternoon."},
+  "havenWindowEveningLabel": "the evening forecast window",
+  "@havenWindowEveningLabel": {"description": "Inline Haven Window label for evening."},
+  "havenWindowLateNightLabel": "the late-night forecast window",
+  "@havenWindowLateNightLabel": {"description": "Inline Haven Window label for late night."},
+  "focusShieldOffHeadline": "Focus Shield is off",
+  "@focusShieldOffHeadline": {"description": "Headline when optional Focus Shield is off."},
+  "focusShieldOffDetail": "Nothing is restricted until you choose to turn protection on.",
+  "@focusShieldOffDetail": {"description": "Consent detail when optional Focus Shield is off."},
+  "focusShieldUnsupportedHeadline": "Focus Shield is not available here yet",
+  "@focusShieldUnsupportedHeadline": {"description": "Headline when no authorized Focus Shield adapter is available."},
+  "focusShieldUnsupportedDetail": "This device has no authorized blocking adapter, so FocusHaven will not claim that distractions are restricted.",
+  "@focusShieldUnsupportedDetail": {"description": "Fail-closed detail when no authorized Focus Shield adapter is available."},
+  "focusShieldPermissionDeniedHeadline": "Focus Shield permission is off",
+  "@focusShieldPermissionDeniedHeadline": {"description": "Headline after optional Focus Shield permission is denied."},
+  "focusShieldPermissionDeniedDetail": "Protection remains inactive. You can revisit device permission whenever it feels useful.",
+  "@focusShieldPermissionDeniedDetail": {"description": "Non-coercive detail after Focus Shield permission is denied."},
+  "focusShieldPermissionRequiredHeadline": "Permission stays in your hands",
+  "@focusShieldPermissionRequiredHeadline": {"description": "Headline before optional Focus Shield permission is requested."},
+  "focusShieldPermissionRequiredDetail": "FocusHaven will ask before using the device tools needed to limit selected distractions.",
+  "@focusShieldPermissionRequiredDetail": {"description": "Consent detail before optional Focus Shield permission is requested."},
+  "focusShieldSelectionHeadline": "Choose what feels distracting",
+  "@focusShieldSelectionHeadline": {"description": "Headline before the user makes a private native Focus Shield selection."},
+  "focusShieldSelectionDetail": "Your private choices stay on this device. Focus Shield remains inactive until you select at least one app or website.",
+  "@focusShieldSelectionDetail": {"description": "On-device privacy and inactive-until-selection detail for Focus Shield."},
+  "focusShieldFailedHeadline": "Focus Shield could not start",
+  "@focusShieldFailedHeadline": {"description": "Headline when native Focus Shield protection fails to start."},
+  "focusShieldFailedDetail": "The timer can continue without pretending protection is active. Retry when you are ready.",
+  "@focusShieldFailedDetail": {"description": "Fail-closed detail when native Focus Shield protection fails."},
+  "focusShieldStartingHeadline": "Preparing your Haven",
+  "@focusShieldStartingHeadline": {"description": "Headline while waiting for native Focus Shield confirmation."},
+  "focusShieldStartingDetail": "FocusHaven is waiting for the device to confirm that your selected distractions are restricted.",
+  "@focusShieldStartingDetail": {"description": "Detail while waiting for native Focus Shield confirmation."},
+  "focusShieldProtectingHeadline": "Your Haven is protected",
+  "@focusShieldProtectingHeadline": {"description": "Headline after native Focus Shield protection is confirmed."},
+  "focusShieldProtectingDetail": "Only the distractions you selected are restricted during this focus session.",
+  "@focusShieldProtectingDetail": {"description": "Scope detail after native Focus Shield protection is confirmed."},
+  "focusShieldPausedHeadline": "Focus Shield is taking a pause",
+  "@focusShieldPausedHeadline": {"description": "Headline while optional Focus Shield protection is paused."},
+  "focusShieldPausedDetail": "You remain in control. Resume protection when it feels supportive.",
+  "@focusShieldPausedDetail": {"description": "User-control detail while Focus Shield is paused."},
+  "focusShieldBreakHeadline": "Breaks stay open by design",
+  "@focusShieldBreakHeadline": {"description": "Headline explaining that Focus Shield does not restrict breaks."},
+  "focusShieldBreakDetail": "Selected distractions are not restricted during a FocusHaven break.",
+  "@focusShieldBreakDetail": {"description": "Detail explaining that Focus Shield does not restrict breaks."},
+  "focusShieldRecoveryHeadline": "Focus Shield can wait with you",
+  "@focusShieldRecoveryHeadline": {"description": "Headline while a user makes a recovery decision."},
+  "focusShieldRecoveryDetail": "Protection stays inactive while you choose whether to resume or release this attempt.",
+  "@focusShieldRecoveryDetail": {"description": "Detail preserving user choice during recovery."},
+  "focusShieldReadyHeadline": "Focus Shield is ready",
+  "@focusShieldReadyHeadline": {"description": "Headline when Focus Shield is configured but no focus session is running."},
+  "focusShieldReadyDetail": "Protection begins only when you start a focus session.",
+  "@focusShieldReadyDetail": {"description": "Detail explaining when configured Focus Shield protection begins."}
 }
