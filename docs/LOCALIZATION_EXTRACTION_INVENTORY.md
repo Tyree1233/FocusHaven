@@ -1,6 +1,6 @@
 # FocusHaven Flutter Localization Extraction Inventory
 
-Status: Phase 215G-B2 audited extraction contract
+Status: Phase 215G-B3A audited extraction contract
 
 This inventory divides the English-source extraction into reviewable slices.
 It prevents one converted screen from being mistaken for a completely
@@ -51,7 +51,8 @@ The following timer-dashboard presentation is now fully catalog-owned:
 - focus-summary copy success and failure receipts plus dashboard tooltips and
   user-facing input guidance inside this boundary.
 
-Planning and recovery cards that happen to appear on the dashboard remain B3.
+Planning and recovery cards outside the completed B3A boundary remain owned by
+B3B and B3C.
 Coach, Haven action, reminder, account, backup, milestone-sheet internals,
 Focus History sheet internals, Queue sheet internals, and service/notification
 messages retain their later owners. Timer notification wording intentionally
@@ -59,18 +60,44 @@ continues to come from `TimerService` until B6. English behavior and all stored
 timer, task, queue, goal, and history values are unchanged. No locale was
 activated by B2.
 
+## B3A — Queue and planning foundation
+
+The first planning-and-recovery sub-slice is now fully catalog-owned within
+these presentation boundaries:
+
+- Focus Queue sheet headings, guidance, empty and completed states, task-action
+  tooltips, completion receipt, add/select/edit/complete/remove errors, and the
+  completed-task history and restore presentation;
+- Haven Plan energy and time choices, preview chrome, duration forms, privacy
+  boundary, acceptance and dismissal actions, dashboard entry, and start
+  receipt;
+- Haven Planner headings, local-only and review boundaries, goal and duration
+  controls, draft and review states, proposal-context labels, uncertainty
+  labels, exact queue confirmation, action states, receipts, and errors;
+- the Plan-to-Focus task-decision card, its fail-closed errors, and the stale
+  recovery-link receipt.
+
+User-authored task titles and goals remain opaque placeholders: they are never
+catalog keys and are not translated or sent anywhere. Planner item titles,
+assumptions, explanations, Haven Plan task/step/explanation values, and other
+service-originated planning text remain B6-owned. B3B and B3C remain required
+for the rest of planning and recovery. English behavior and stored planning
+data are unchanged, no locale was activated, and no permission, dependency,
+backend, deployment, or store setting changed.
+
 ## Remaining Phase 215G-B slices
 
-1. **B3 — Planning and recovery:** Queue, Plan, Planner, Plan-to-Focus,
-   reflection, Rhythm, Forecast, Smart Reset, Journey, Haven Window, Focus
-   Shield, and related advisory boundaries.
-2. **B4 — Coaching and voice:** local Coach, enhanced-AI boundary text,
+1. **B3B — Reflection and restorative guidance:** session reflection, Rhythm,
+   Forecast, Smart Reset, Journey, and their related advisory boundaries.
+2. **B3C — Optional system connections:** Haven Window, Focus Shield, and their
+   permission, platform-truth, and advisory presentation boundaries.
+3. **B4 — Coaching and voice:** local Coach, enhanced-AI boundary text,
    Voice-to-Coach, safe voice commands, permission states, transcript review,
    and Haven action review/confirmation.
-3. **B5 — Account and purchases:** authentication, account settings, backup,
+4. **B5 — Account and purchases:** authentication, account settings, backup,
    deletion, Pro, purchases, journal, profile, reminders, and support/legal
    launch surfaces.
-4. **B6 — Service and notification messages:** user-facing strings produced by
+5. **B6 — Service and notification messages:** user-facing strings produced by
    services plus Flutter-owned notification and recovery copy. Native Apple,
    Android, widget, watch, permission-purpose, policy, support, store-listing,
    and screenshot localization remains Phase 215G-E.

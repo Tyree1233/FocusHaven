@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/haven_action_interpreter.dart';
 import 'package:focushaven/services/haven_planner_service.dart';
@@ -27,6 +28,8 @@ void main() {
     final now = DateTime.utc(2026, 8, 30, 23);
     var actionId = 0;
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: Scaffold(
         body: HavenPlannerSheet(
           timerService: owned.timer,

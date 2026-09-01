@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
@@ -20,6 +21,8 @@ Widget _app({
     timerFocusEventsProvider.overrideWithValue(events),
   ],
   child: MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     theme: ThemeData.dark().copyWith(
       colorScheme: const ColorScheme.dark(
         primary: Color(0xFFF16FBA),

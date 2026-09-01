@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/haven_plan.dart';
 import '../providers/app_providers.dart';
 
@@ -21,11 +22,12 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
   HavenEnergy _energy = HavenEnergy.steady;
   int _availableMinutes = 30;
 
-  String _energyLabel(HavenEnergy energy) => switch (energy) {
-    HavenEnergy.low => 'Low',
-    HavenEnergy.steady => 'Steady',
-    HavenEnergy.strong => 'Strong',
-  };
+  String _energyLabel(BuildContext context, HavenEnergy energy) =>
+      switch (energy) {
+        HavenEnergy.low => context.l10n.havenPlanEnergyLow,
+        HavenEnergy.steady => context.l10n.havenPlanEnergySteady,
+        HavenEnergy.strong => context.l10n.havenPlanEnergyStrong,
+      };
 
   IconData _energyIcon(HavenEnergy energy) => switch (energy) {
     HavenEnergy.low => Icons.spa_outlined,
@@ -39,6 +41,7 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
       havenPlanProvider((energy: _energy, availableMinutes: _availableMinutes)),
     );
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -56,28 +59,31 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
               children: [
                 Icon(Icons.auto_awesome_outlined, color: colors.primary),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Plan a gentle start',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                    l10n.havenPlanTitle,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Close Haven Plan',
+                  tooltip: l10n.havenPlanCloseTooltip,
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(Icons.close),
                 ),
               ],
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Choose what you have right now. FocusHaven will suggest—not decide—your next session.',
-              style: TextStyle(color: Colors.white70, height: 1.35),
+            Text(
+              l10n.havenPlanDescription,
+              style: const TextStyle(color: Colors.white70, height: 1.35),
             ),
             const SizedBox(height: 22),
-            const Text(
-              'How is your energy?',
-              style: TextStyle(fontWeight: FontWeight.w600),
+            Text(
+              l10n.havenPlanEnergyQuestion,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
             Wrap(
@@ -87,7 +93,7 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
                 for (final energy in HavenEnergy.values)
                   ChoiceChip(
                     avatar: Icon(_energyIcon(energy), size: 18),
-                    label: Text(_energyLabel(energy)),
+                    label: Text(_energyLabel(context, energy)),
                     selected: _energy == energy,
                     onSelected: (selected) {
                       if (selected) setState(() => _energy = energy);
@@ -96,9 +102,9 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
               ],
             ),
             const SizedBox(height: 20),
-            const Text(
-              'How much time do you have?',
-              style: TextStyle(fontWeight: FontWeight.w600),
+            Text(
+              l10n.havenPlanTimeQuestion,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
             Wrap(
@@ -107,7 +113,7 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
               children: [
                 for (final minutes in _timeOptions)
                   ChoiceChip(
-                    label: Text('$minutes min'),
+                    label: Text(l10n.durationMinutesShort(minutes)),
                     selected: _availableMinutes == minutes,
                     onSelected: (selected) {
                       if (selected) {
@@ -131,9 +137,9 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'YOUR HAVEN PLAN',
-                      style: TextStyle(
+                    Text(
+                      l10n.havenPlanLabelUpper,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.4,
@@ -162,13 +168,13 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
                       children: [
                         _PlanDetail(
                           icon: Icons.timer_outlined,
-                          label: '${plan.focusMinutes} min focus',
+                          label: l10n.havenPlanFocusMinutes(plan.focusMinutes),
                         ),
                         _PlanDetail(
                           icon: Icons.self_improvement_outlined,
                           label: plan.breakMinutes == 0
-                              ? 'Break when ready'
-                              : '${plan.breakMinutes} min break',
+                              ? l10n.havenPlanBreakWhenReady
+                              : l10n.havenPlanBreakMinutes(plan.breakMinutes),
                         ),
                       ],
                     ),
@@ -185,15 +191,15 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
               ),
             ),
             const SizedBox(height: 14),
-            const Row(
+            Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.lock_outline, size: 17, color: Colors.white60),
-                SizedBox(width: 7),
+                const Icon(Icons.lock_outline, size: 17, color: Colors.white60),
+                const SizedBox(width: 7),
                 Expanded(
                   child: Text(
-                    'Private and temporary. This plan is built on this device and is not saved.',
-                    style: TextStyle(color: Colors.white60, fontSize: 13),
+                    l10n.havenPlanPrivacy,
+                    style: const TextStyle(color: Colors.white60, fontSize: 13),
                   ),
                 ),
               ],
@@ -203,7 +209,7 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
               key: const ValueKey('haven-plan-start'),
               onPressed: () => Navigator.of(context).pop(plan),
               icon: const Icon(Icons.play_arrow_rounded),
-              label: Text('Start ${plan.focusMinutes}-minute focus'),
+              label: Text(l10n.havenPlanStartFocus(plan.focusMinutes)),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
               ),
@@ -211,7 +217,7 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Not right now'),
+              child: Text(l10n.havenPlanNotNow),
             ),
           ],
         ),

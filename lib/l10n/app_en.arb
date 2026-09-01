@@ -551,5 +551,467 @@
   "focusHistoryCleared": "Focus history cleared from this device",
   "@focusHistoryCleared": {
     "description": "Receipt shown after local focus history is cleared."
+  },
+  "focusQueueSheetTitle": "Focus queue",
+  "@focusQueueSheetTitle": {
+    "description": "Heading for the Focus Queue management sheet."
+  },
+  "focusQueueSheetDescription": "Choose a task to make it your current focus intention.",
+  "@focusQueueSheetDescription": {
+    "description": "Explanation shown at the top of the Focus Queue sheet."
+  },
+  "focusQueueCompletedToday": "{count, plural, =1 {1 task tended today — gentle progress.} other {{count} tasks tended today — gentle progress.}}",
+  "@focusQueueCompletedToday": {
+    "description": "Gentle progress summary for queue tasks completed today.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "focusQueueAddHint": "Add a task",
+  "@focusQueueAddHint": {
+    "description": "Input hint for adding a Focus Queue task."
+  },
+  "focusQueueAddTooltip": "Add task",
+  "@focusQueueAddTooltip": {
+    "description": "Tooltip for the Focus Queue add-task control."
+  },
+  "focusQueueEmpty": "Your next task can live here.",
+  "@focusQueueEmpty": {
+    "description": "Empty state shown when Focus Queue has no active tasks."
+  },
+  "focusQueueEditTooltip": "Edit task",
+  "@focusQueueEditTooltip": {
+    "description": "Tooltip for editing a Focus Queue task."
+  },
+  "focusQueueRemoveTooltip": "Remove task",
+  "@focusQueueRemoveTooltip": {
+    "description": "Tooltip for removing a Focus Queue task."
+  },
+  "focusQueueCompletedCount": "Completed ({count})",
+  "@focusQueueCompletedCount": {
+    "description": "Action label showing the number of completed Focus Queue tasks.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "focusQueueAddError": "Task could not be added. Please try again.",
+  "@focusQueueAddError": {
+    "description": "Error shown when a Focus Queue task cannot be added."
+  },
+  "focusQueueCompleteReceipt": "One thing handled. Take a breath.",
+  "@focusQueueCompleteReceipt": {
+    "description": "Receipt shown after a Focus Queue task is completed."
+  },
+  "focusQueueCompleteError": "Task could not be completed. Please try again.",
+  "@focusQueueCompleteError": {
+    "description": "Error shown when a Focus Queue task cannot be completed."
+  },
+  "focusQueueRemoveError": "Task could not be removed. Please try again.",
+  "@focusQueueRemoveError": {
+    "description": "Error shown when a Focus Queue task cannot be removed."
+  },
+  "focusQueueUpdateError": "Task could not be updated. Please try again.",
+  "@focusQueueUpdateError": {
+    "description": "Error shown when a Focus Queue task cannot be updated."
+  },
+  "focusQueueChangedError": "That task changed, so it was not selected.",
+  "@focusQueueChangedError": {
+    "description": "Error shown when a stale Focus Queue task cannot be selected."
+  },
+  "focusQueueSelectError": "Task could not be selected. Please try again.",
+  "@focusQueueSelectError": {
+    "description": "Error shown when a Focus Queue task selection fails."
+  },
+  "focusQueueEditTitle": "Edit task",
+  "@focusQueueEditTitle": {
+    "description": "Heading for the Focus Queue task-edit dialog."
+  },
+  "focusQueueEditSave": "Save",
+  "@focusQueueEditSave": {
+    "description": "Action label for saving a Focus Queue task edit."
+  },
+  "focusQueueTaskHint": "What needs your attention?",
+  "@focusQueueTaskHint": {
+    "description": "Input hint when editing a Focus Queue task."
+  },
+  "completedTasksTitle": "Completed tasks",
+  "@completedTasksTitle": {
+    "description": "Heading for the completed Focus Queue task history sheet."
+  },
+  "completedTasksDescription": "A quiet record of what you handled.",
+  "@completedTasksDescription": {
+    "description": "Supporting copy for completed Focus Queue task history."
+  },
+  "completedTaskLabel": "Completed",
+  "@completedTaskLabel": {
+    "description": "Fallback status for a completed queue task without a completion date."
+  },
+  "completedTaskOnDate": "Completed {date}",
+  "@completedTaskOnDate": {
+    "description": "Completed queue task status followed by a localized date label.",
+    "placeholders": {
+      "date": {
+        "type": "String",
+        "example": "Aug 7"
+      }
+    }
+  },
+  "completedTaskReturnTooltip": "Return to queue",
+  "@completedTaskReturnTooltip": {
+    "description": "Tooltip for restoring a completed task to Focus Queue."
+  },
+  "completedTaskRestoreError": "Task could not be returned to the queue. Please try again.",
+  "@completedTaskRestoreError": {
+    "description": "Error shown when a completed task cannot be restored to Focus Queue."
+  },
+  "havenPlanTitle": "Plan a gentle start",
+  "@havenPlanTitle": {
+    "description": "Heading for the private local Haven Plan sheet."
+  },
+  "havenPlanCloseTooltip": "Close Haven Plan",
+  "@havenPlanCloseTooltip": {
+    "description": "Tooltip for closing the Haven Plan sheet."
+  },
+  "havenPlanDescription": "Choose what you have right now. FocusHaven will suggest—not decide—your next session.",
+  "@havenPlanDescription": {
+    "description": "Agency explanation at the top of the Haven Plan sheet."
+  },
+  "havenPlanEnergyQuestion": "How is your energy?",
+  "@havenPlanEnergyQuestion": {
+    "description": "Prompt for choosing current energy in Haven Plan."
+  },
+  "havenPlanEnergyLow": "Low",
+  "@havenPlanEnergyLow": {
+    "description": "Low-energy choice in Haven Plan."
+  },
+  "havenPlanEnergySteady": "Steady",
+  "@havenPlanEnergySteady": {
+    "description": "Steady-energy choice in Haven Plan."
+  },
+  "havenPlanEnergyStrong": "Strong",
+  "@havenPlanEnergyStrong": {
+    "description": "Strong-energy choice in Haven Plan."
+  },
+  "havenPlanTimeQuestion": "How much time do you have?",
+  "@havenPlanTimeQuestion": {
+    "description": "Prompt for choosing available time in Haven Plan."
+  },
+  "havenPlanLabelUpper": "YOUR HAVEN PLAN",
+  "@havenPlanLabelUpper": {
+    "description": "Uppercase eyebrow label for the generated Haven Plan card."
+  },
+  "havenPlanFocusMinutes": "{count, plural, =1 {1 min focus} other {{count} min focus}}",
+  "@havenPlanFocusMinutes": {
+    "description": "Focus duration shown in a Haven Plan preview.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "havenPlanBreakWhenReady": "Break when ready",
+  "@havenPlanBreakWhenReady": {
+    "description": "Haven Plan break guidance when no fixed break duration is proposed."
+  },
+  "havenPlanBreakMinutes": "{count, plural, =1 {1 min break} other {{count} min break}}",
+  "@havenPlanBreakMinutes": {
+    "description": "Break duration shown in a Haven Plan preview.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "havenPlanPrivacy": "Private and temporary. This plan is built on this device and is not saved.",
+  "@havenPlanPrivacy": {
+    "description": "Privacy boundary shown in the Haven Plan sheet."
+  },
+  "havenPlanStartFocus": "Start {count}-minute focus",
+  "@havenPlanStartFocus": {
+    "description": "Action label for accepting a Haven Plan focus duration.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "havenPlanNotNow": "Not right now",
+  "@havenPlanNotNow": {
+    "description": "Action label for dismissing a Haven Plan without starting it."
+  },
+  "havenPlanEntry": "Plan my next session",
+  "@havenPlanEntry": {
+    "description": "Dashboard action label for opening Haven Plan."
+  },
+  "havenPlanStarted": "Haven Plan started: {count} minutes of focus.",
+  "@havenPlanStarted": {
+    "description": "Receipt shown after a Haven Plan starts a focus session.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "havenPlannerTitle": "Plan a goal",
+  "@havenPlannerTitle": {
+    "description": "Heading and dashboard entry label for Haven Planner."
+  },
+  "havenPlannerLocalOnly": "Local planner foundation • no remote AI",
+  "@havenPlannerLocalOnly": {
+    "description": "Boundary stating that Haven Planner is local and uses no remote AI."
+  },
+  "havenPlannerDescription": "Haven drafts possibilities from only what you enter. Nothing is saved or changed until you review every item and confirm the exact queue additions.",
+  "@havenPlannerDescription": {
+    "description": "Review and mutation boundary at the top of Haven Planner."
+  },
+  "havenPlannerGoalLabel": "What do you want to make progress on?",
+  "@havenPlannerGoalLabel": {
+    "description": "Label for the user-authored Haven Planner goal field."
+  },
+  "havenPlannerGoalHint": "Example: Prepare the first FocusHaven launch",
+  "@havenPlannerGoalHint": {
+    "description": "Example hint for the Haven Planner goal field."
+  },
+  "havenPlannerTimeAvailable": "Time available",
+  "@havenPlannerTimeAvailable": {
+    "description": "Label for Haven Planner available-time choices."
+  },
+  "havenPlannerPreferredFocus": "Preferred focus block",
+  "@havenPlannerPreferredFocus": {
+    "description": "Label for Haven Planner preferred-focus-duration choices."
+  },
+  "havenPlannerCreateDraft": "Create local draft",
+  "@havenPlannerCreateDraft": {
+    "description": "Action label for creating a local Haven Planner draft."
+  },
+  "havenPlannerDraftSemantics": "{count, plural, =1 {Planner draft created with 1 independently reviewable item. Nothing has changed.} other {Planner draft created with {count} independently reviewable items. Nothing has changed.}}",
+  "@havenPlannerDraftSemantics": {
+    "description": "Live-region announcement after a Haven Planner draft is created.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "havenPlannerReviewEach": "Review each item",
+  "@havenPlannerReviewEach": {
+    "description": "Heading above independently reviewable Haven Planner items."
+  },
+  "havenPlannerApplying": "Applying…",
+  "@havenPlannerApplying": {
+    "description": "Progress label while reviewed Haven Planner choices are applied."
+  },
+  "havenPlannerApplyReviewed": "Apply reviewed choices",
+  "@havenPlannerApplyReviewed": {
+    "description": "Action label for applying settled Haven Planner review choices."
+  },
+  "havenPlannerStartOver": "Start over",
+  "@havenPlannerStartOver": {
+    "description": "Action label for discarding a Haven Planner draft and starting again."
+  },
+  "havenPlannerEnterGoal": "Enter one goal to plan.",
+  "@havenPlannerEnterGoal": {
+    "description": "Fallback validation guidance when Haven Planner has no goal."
+  },
+  "havenPlannerQueueItemLengthError": "Each accepted queue item must be 1–100 characters.",
+  "@havenPlannerQueueItemLengthError": {
+    "description": "Validation error for reviewed Haven Planner queue-item text."
+  },
+  "havenPlannerNothingChanged": "Review complete. Nothing was changed.",
+  "@havenPlannerNothingChanged": {
+    "description": "Receipt when every Haven Planner item is rejected."
+  },
+  "havenPlannerConfirmTitle": "Add reviewed tasks?",
+  "@havenPlannerConfirmTitle": {
+    "description": "Heading for the exact Haven Planner queue-addition confirmation."
+  },
+  "havenPlannerConfirmMessage": "{count, plural, =1 {Add only this 1 reviewed item to Focus Queue?\n\n• {items}\n\nThe timer will not start or change, and no calendar event will be created.} other {Add only these {count} reviewed items to Focus Queue?\n\n• {items}\n\nThe timer will not start or change, and no calendar event will be created.}}",
+  "@havenPlannerConfirmMessage": {
+    "description": "Confirmation message listing exact reviewed queue additions while preserving user-authored item text.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      },
+      "items": {
+        "type": "String",
+        "example": "First task\n• Second task"
+      }
+    }
+  },
+  "havenPlannerKeepReviewing": "Keep reviewing",
+  "@havenPlannerKeepReviewing": {
+    "description": "Action label for canceling the Haven Planner queue confirmation."
+  },
+  "havenPlannerAddToQueue": "Add to Focus Queue",
+  "@havenPlannerAddToQueue": {
+    "description": "Action label for confirming reviewed Haven Planner queue additions."
+  },
+  "havenPlannerAddSuccess": "{count, plural, =1 {1 reviewed task was added to Focus Queue. The timer and calendar were unchanged.} other {{count} reviewed tasks were added to Focus Queue. The timer and calendar were unchanged.}}",
+  "@havenPlannerAddSuccess": {
+    "description": "Receipt after all reviewed Haven Planner tasks are added successfully.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "havenPlannerAddPartial": "{added} tasks were added; {failed} could not be added. The timer and calendar were unchanged.",
+  "@havenPlannerAddPartial": {
+    "description": "Receipt after only some reviewed Haven Planner tasks are added.",
+    "placeholders": {
+      "added": {
+        "type": "int",
+        "example": "2"
+      },
+      "failed": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "havenPlannerInputs": "Inputs",
+  "@havenPlannerInputs": {
+    "description": "Heading for Haven Planner input context."
+  },
+  "havenPlannerGoalValue": "Goal: {goal}",
+  "@havenPlannerGoalValue": {
+    "description": "Haven Planner input summary preserving the user-authored goal.",
+    "placeholders": {
+      "goal": {
+        "type": "String",
+        "example": "Prepare the launch"
+      }
+    }
+  },
+  "havenPlannerAvailableMinutes": "Available: {count, plural, =1 {1 minute} other {{count} minutes}}",
+  "@havenPlannerAvailableMinutes": {
+    "description": "Available-time summary in Haven Planner input context.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "60"
+      }
+    }
+  },
+  "havenPlannerPreferredMinutes": "Preferred focus block: {count, plural, =1 {1 minute} other {{count} minutes}}",
+  "@havenPlannerPreferredMinutes": {
+    "description": "Preferred focus duration in Haven Planner input context.",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "25"
+      }
+    }
+  },
+  "havenPlannerAssumptions": "Assumptions",
+  "@havenPlannerAssumptions": {
+    "description": "Heading for Haven Planner assumptions."
+  },
+  "havenPlannerUncertainty": "Uncertainty: {level}",
+  "@havenPlannerUncertainty": {
+    "description": "Haven Planner uncertainty label with a localized level.",
+    "placeholders": {
+      "level": {
+        "type": "String",
+        "example": "medium"
+      }
+    }
+  },
+  "havenPlannerUncertaintyLow": "low",
+  "@havenPlannerUncertaintyLow": {
+    "description": "Low uncertainty level in Haven Planner."
+  },
+  "havenPlannerUncertaintyMedium": "medium",
+  "@havenPlannerUncertaintyMedium": {
+    "description": "Medium uncertainty level in Haven Planner."
+  },
+  "havenPlannerUncertaintyHigh": "high",
+  "@havenPlannerUncertaintyHigh": {
+    "description": "High uncertainty level in Haven Planner."
+  },
+  "havenPlannerAffectedData": "Affected local data: temporary goal draft; Focus Queue only for accepted task items. Timer and calendar: no changes.",
+  "@havenPlannerAffectedData": {
+    "description": "Local-data and authority boundary in Haven Planner."
+  },
+  "havenPlannerReviewedQueueItem": "Reviewed queue item",
+  "@havenPlannerReviewedQueueItem": {
+    "description": "Label for editing a reviewed Haven Planner queue item."
+  },
+  "havenPlannerAccepted": "Accepted",
+  "@havenPlannerAccepted": {
+    "description": "Settled accepted state for a Haven Planner item."
+  },
+  "havenPlannerAccept": "Accept",
+  "@havenPlannerAccept": {
+    "description": "Action label for accepting one Haven Planner item."
+  },
+  "havenPlannerEditing": "Editing",
+  "@havenPlannerEditing": {
+    "description": "Settled editing state for a Haven Planner item."
+  },
+  "havenPlannerEdit": "Edit",
+  "@havenPlannerEdit": {
+    "description": "Action label for editing one Haven Planner queue item."
+  },
+  "havenPlannerRejected": "Rejected",
+  "@havenPlannerRejected": {
+    "description": "Settled rejected state for a Haven Planner item."
+  },
+  "havenPlannerReject": "Reject",
+  "@havenPlannerReject": {
+    "description": "Action label for rejecting one Haven Planner item."
+  },
+  "havenPlannerKindQueueTask": "Possible Focus Queue task",
+  "@havenPlannerKindQueueTask": {
+    "description": "Type label for a proposed Haven Planner queue task."
+  },
+  "havenPlannerKindSession": "Session-size suggestion",
+  "@havenPlannerKindSession": {
+    "description": "Type label for an informational Haven Planner session suggestion."
+  },
+  "havenPlannerKindFreeTime": "Optional free-time suggestion",
+  "@havenPlannerKindFreeTime": {
+    "description": "Type label for an informational Haven Planner free-time suggestion."
+  },
+  "havenLoopTaskChanged": "That task changed, so no queue action was taken.",
+  "@havenLoopTaskChanged": {
+    "description": "Fail-closed explanation when a linked queue task changes before resolution."
+  },
+  "havenLoopQueueUpdateError": "The queue could not be updated. Please try again.",
+  "@havenLoopQueueUpdateError": {
+    "description": "Error shown when a linked Focus Queue task cannot be resolved."
+  },
+  "havenLoopNextStepUpper": "ONE CALM NEXT STEP",
+  "@havenLoopNextStepUpper": {
+    "description": "Uppercase eyebrow label for the Plan-to-Focus task outcome card."
+  },
+  "havenLoopDecisionDescription": "You decide whether this queue task is finished. FocusHaven never completes it automatically.",
+  "@havenLoopDecisionDescription": {
+    "description": "Agency boundary on the linked-task completion card."
+  },
+  "havenLoopMarkComplete": "Mark task complete",
+  "@havenLoopMarkComplete": {
+    "description": "Action label for explicitly completing the linked Focus Queue task."
+  },
+  "havenLoopKeepLater": "Keep for later",
+  "@havenLoopKeepLater": {
+    "description": "Action label for keeping the linked Focus Queue task active."
+  },
+  "havenLoopRecoveryUnlinked": "The queue item changed, so recovery continued without a task link.",
+  "@havenLoopRecoveryUnlinked": {
+    "description": "Receipt when Plan-to-Focus recovery safely drops a stale queue link."
   }
 }

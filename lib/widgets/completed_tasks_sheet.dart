@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 
 typedef CompletedTaskRestorer = Future<void> Function(String id);
@@ -47,11 +48,7 @@ class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Task could not be returned to the queue. Please try again.',
-            ),
-          ),
+          SnackBar(content: Text(context.l10n.completedTaskRestoreError)),
         );
       }
     } finally {
@@ -68,6 +65,7 @@ class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
   @override
   Widget build(BuildContext context) {
     final queueState = ref.watch(focusQueueStateProvider);
+    final l10n = context.l10n;
 
     return SafeArea(
       top: false,
@@ -87,13 +85,13 @@ class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
               ),
               const SizedBox(height: 18),
               Text(
-                'Completed tasks',
+                l10n.completedTasksTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 5),
-              const Text(
-                'A quiet record of what you handled.',
-                style: TextStyle(color: Colors.white70),
+              Text(
+                l10n.completedTasksDescription,
+                style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 12),
               Expanded(
@@ -118,14 +116,16 @@ class _CompletedTasksSheetState extends ConsumerState<CompletedTasksSheet> {
                         title: Text(item.title),
                         subtitle: Text(
                           item.completedAt == null
-                              ? 'Completed'
-                              : 'Completed ${widget.dateLabel(item.completedAt!)}',
+                              ? l10n.completedTaskLabel
+                              : l10n.completedTaskOnDate(
+                                  widget.dateLabel(item.completedAt!),
+                                ),
                         ),
                         trailing: IconButton(
                           key: ValueKey<String>(
                             'completed-task-restore-${item.id}',
                           ),
-                          tooltip: 'Return to queue',
+                          tooltip: l10n.completedTaskReturnTooltip,
                           icon: const Icon(Icons.undo),
                           onPressed: isRestoring
                               ? null

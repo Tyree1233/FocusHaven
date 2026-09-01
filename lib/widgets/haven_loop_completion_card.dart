@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../services/haven_loop_service.dart';
 
 typedef HavenLoopResolutionAction = Future<HavenLoopResolution> Function();
@@ -32,16 +33,12 @@ class _HavenLoopCompletionCardState extends State<HavenLoopCompletionCard> {
       if (!mounted) return;
       if (result != HavenLoopResolution.unavailable) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('That task changed, so no queue action was taken.'),
-        ),
+        SnackBar(content: Text(context.l10n.havenLoopTaskChanged)),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('The queue could not be updated. Please try again.'),
-        ),
+        SnackBar(content: Text(context.l10n.havenLoopQueueUpdateError)),
       );
     } finally {
       if (mounted) setState(() => _isResolving = false);
@@ -51,6 +48,7 @@ class _HavenLoopCompletionCardState extends State<HavenLoopCompletionCard> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return DecoratedBox(
       key: const ValueKey('haven-loop-completion-card'),
       decoration: BoxDecoration(
@@ -63,9 +61,9 @@ class _HavenLoopCompletionCardState extends State<HavenLoopCompletionCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              'ONE CALM NEXT STEP',
-              style: TextStyle(
+            Text(
+              l10n.havenLoopNextStepUpper,
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 1.3,
@@ -77,9 +75,9 @@ class _HavenLoopCompletionCardState extends State<HavenLoopCompletionCard> {
               style: const TextStyle(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 5),
-            const Text(
-              'You decide whether this queue task is finished. FocusHaven never completes it automatically.',
-              style: TextStyle(color: Colors.white70, height: 1.35),
+            Text(
+              l10n.havenLoopDecisionDescription,
+              style: const TextStyle(color: Colors.white70, height: 1.35),
             ),
             const SizedBox(height: 14),
             Wrap(
@@ -92,14 +90,14 @@ class _HavenLoopCompletionCardState extends State<HavenLoopCompletionCard> {
                       ? null
                       : () => _resolve(widget.onMarkComplete),
                   icon: const Icon(Icons.check_rounded),
-                  label: const Text('Mark task complete'),
+                  label: Text(l10n.havenLoopMarkComplete),
                 ),
                 OutlinedButton(
                   key: const ValueKey('haven-loop-keep-for-later'),
                   onPressed: _isResolving
                       ? null
                       : () => _resolve(widget.onKeepForLater),
-                  child: const Text('Keep for later'),
+                  child: Text(l10n.havenLoopKeepLater),
                 ),
               ],
             ),

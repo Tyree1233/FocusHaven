@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/services/haven_loop_service.dart';
 import 'package:focushaven/widgets/haven_loop_completion_card.dart';
 
@@ -9,6 +10,8 @@ void main() {
     required HavenLoopResolutionAction keep,
   }) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(),
       home: Scaffold(
         body: HavenLoopCompletionCard(

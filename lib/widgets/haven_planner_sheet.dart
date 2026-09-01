@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../models/haven_planner_proposal.dart';
 import '../services/focus_queue_service.dart';
 import '../services/haven_action_engine.dart';
@@ -50,10 +51,7 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
       focusQueue: widget.focusQueueService,
       openSurface: (_) async => false,
     );
-    _engine = HavenActionEngine(
-      executor: _executor,
-      clock: widget.actionClock,
-    );
+    _engine = HavenActionEngine(executor: _executor, clock: widget.actionClock);
     _actionService = HavenPlannerActionService(
       interpreter: widget.interpreter ?? HavenActionInterpreter(),
       engine: _engine,
@@ -97,7 +95,8 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
     } on ArgumentError catch (error) {
       setState(() {
         _proposal = null;
-        _message = error.message?.toString() ?? 'Enter one goal to plan.';
+        _message =
+            error.message?.toString() ?? context.l10n.havenPlannerEnterGoal;
       });
     }
   }
@@ -142,25 +141,27 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
     final titles = _acceptedQueueTitles();
     if (titles == null) {
       setState(() {
-        _message = 'Each accepted queue item must be 1–100 characters.';
+        _message = context.l10n.havenPlannerQueueItemLengthError;
       });
       return;
     }
     if (titles.isEmpty) {
       setState(() {
         _proposal = null;
-        _message = 'Review complete. Nothing was changed.';
+        _message = context.l10n.havenPlannerNothingChanged;
       });
       return;
     }
 
     final confirmed = await ConfirmationDialog.show(
       context,
-      title: 'Add reviewed tasks?',
-      message:
-          'Add only these ${titles.length} reviewed ${titles.length == 1 ? 'item' : 'items'} to Focus Queue?\n\n• ${titles.join('\n• ')}\n\nThe timer will not start or change, and no calendar event will be created.',
-      cancelLabel: 'Keep reviewing',
-      confirmLabel: 'Add to Focus Queue',
+      title: context.l10n.havenPlannerConfirmTitle,
+      message: context.l10n.havenPlannerConfirmMessage(
+        titles.length,
+        titles.join('\n• '),
+      ),
+      cancelLabel: context.l10n.havenPlannerKeepReviewing,
+      confirmLabel: context.l10n.havenPlannerAddToQueue,
     );
     if (!confirmed || !mounted) return;
 
@@ -173,8 +174,8 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
       _busy = false;
       _proposal = null;
       _message = failed == 0
-          ? '$added reviewed ${added == 1 ? 'task was' : 'tasks were'} added to Focus Queue. The timer and calendar were unchanged.'
-          : '$added tasks were added; $failed could not be added. The timer and calendar were unchanged.';
+          ? context.l10n.havenPlannerAddSuccess(added)
+          : context.l10n.havenPlannerAddPartial(added, failed);
     });
   }
 
@@ -190,6 +191,7 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
   Widget build(BuildContext context) {
     final proposal = _proposal;
     final colors = Theme.of(context).colorScheme;
+    final l10n = context.l10n;
     return SafeArea(
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
@@ -206,26 +208,27 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
               children: [
                 Icon(Icons.route_outlined, color: colors.primary),
                 const SizedBox(width: 10),
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Plan a goal',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    l10n.havenPlannerTitle,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             Text(
-              'Local planner foundation • no remote AI',
+              l10n.havenPlannerLocalOnly,
               style: TextStyle(
                 color: colors.primary,
                 fontWeight: FontWeight.w600,
               ),
             ),
             const SizedBox(height: 6),
-            const Text(
-              'Haven drafts possibilities from only what you enter. Nothing is saved or changed until you review every item and confirm the exact queue additions.',
-            ),
+            Text(l10n.havenPlannerDescription),
             const SizedBox(height: 18),
             if (proposal == null) ...[
               TextField(
@@ -235,21 +238,21 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
                 maxLength: HavenPlannerService.maxGoalLength,
                 minLines: 2,
                 maxLines: 4,
-                decoration: const InputDecoration(
-                  labelText: 'What do you want to make progress on?',
-                  hintText: 'Example: Prepare the first FocusHaven launch',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.havenPlannerGoalLabel,
+                  hintText: l10n.havenPlannerGoalHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
-              const Text('Time available'),
+              Text(l10n.havenPlannerTimeAvailable),
               Wrap(
                 spacing: 8,
                 children: [
                   for (final minutes in const [30, 60, 90, 120])
                     ChoiceChip(
                       key: ValueKey('havenPlannerAvailable$minutes'),
-                      label: Text('$minutes min'),
+                      label: Text(l10n.durationMinutesShort(minutes)),
                       selected: _availableMinutes == minutes,
                       onSelected: _busy
                           ? null
@@ -258,14 +261,14 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
                 ],
               ),
               const SizedBox(height: 10),
-              const Text('Preferred focus block'),
+              Text(l10n.havenPlannerPreferredFocus),
               Wrap(
                 spacing: 8,
                 children: [
                   for (final minutes in const [10, 15, 25, 45, 60])
                     ChoiceChip(
                       key: ValueKey('havenPlannerFocus$minutes'),
-                      label: Text('$minutes min'),
+                      label: Text(l10n.durationMinutesShort(minutes)),
                       selected: _focusMinutes == minutes,
                       onSelected: _busy
                           ? null
@@ -278,18 +281,20 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
                 key: const ValueKey('createHavenPlannerDraft'),
                 onPressed: _busy ? null : _createDraft,
                 icon: const Icon(Icons.auto_awesome_outlined),
-                label: const Text('Create local draft'),
+                label: Text(l10n.havenPlannerCreateDraft),
               ),
             ] else ...[
               _ProposalContext(proposal: proposal),
               const SizedBox(height: 14),
               Semantics(
                 liveRegion: true,
-                label:
-                    'Planner draft created with ${proposal.items.length} independently reviewable items. Nothing has changed.',
-                child: const Text(
-                  'Review each item',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                label: l10n.havenPlannerDraftSemantics(proposal.items.length),
+                child: Text(
+                  l10n.havenPlannerReviewEach,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -306,12 +311,16 @@ class _HavenPlannerSheetState extends State<HavenPlannerSheet> {
               FilledButton(
                 key: const ValueKey('applyHavenPlannerReview'),
                 onPressed: _busy || !_allItemsSettled ? null : _applyReview,
-                child: Text(_busy ? 'Applying…' : 'Apply reviewed choices'),
+                child: Text(
+                  _busy
+                      ? l10n.havenPlannerApplying
+                      : l10n.havenPlannerApplyReviewed,
+                ),
               ),
               TextButton(
                 key: const ValueKey('startHavenPlannerOver'),
                 onPressed: _busy ? null : _startOver,
-                child: const Text('Start over'),
+                child: Text(l10n.havenPlannerStartOver),
               ),
             ],
             if (_message != null) ...[
@@ -339,7 +348,12 @@ class _ProposalContext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uncertainty = proposal.uncertainty.name;
+    final l10n = context.l10n;
+    final uncertainty = switch (proposal.uncertainty) {
+      HavenPlannerUncertainty.low => l10n.havenPlannerUncertaintyLow,
+      HavenPlannerUncertainty.medium => l10n.havenPlannerUncertaintyMedium,
+      HavenPlannerUncertainty.high => l10n.havenPlannerUncertaintyHigh,
+    };
     return Card(
       key: const ValueKey('havenPlannerProposalContext'),
       child: Padding(
@@ -347,26 +361,36 @@ class _ProposalContext extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('Inputs', style: Theme.of(context).textTheme.titleSmall),
-            Text('Goal: ${proposal.input.goal}'),
-            Text('Available: ${proposal.input.availableMinutes} minutes'),
             Text(
-              'Preferred focus block: ${proposal.input.preferredFocusMinutes} minutes',
+              l10n.havenPlannerInputs,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
+            Text(l10n.havenPlannerGoalValue(proposal.input.goal)),
+            Text(
+              l10n.havenPlannerAvailableMinutes(
+                proposal.input.availableMinutes,
+              ),
+            ),
+            Text(
+              l10n.havenPlannerPreferredMinutes(
+                proposal.input.preferredFocusMinutes,
+              ),
             ),
             const SizedBox(height: 10),
-            Text('Assumptions', style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              l10n.havenPlannerAssumptions,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             for (final assumption in proposal.assumptions)
               Text('• $assumption'),
             const SizedBox(height: 10),
             Text(
-              'Uncertainty: $uncertainty',
+              l10n.havenPlannerUncertainty(uncertainty),
               style: Theme.of(context).textTheme.titleSmall,
             ),
             Text(proposal.uncertaintyExplanation),
             const SizedBox(height: 10),
-            const Text(
-              'Affected local data: temporary goal draft; Focus Queue only for accepted task items. Timer and calendar: no changes.',
-            ),
+            Text(l10n.havenPlannerAffectedData),
           ],
         ),
       ),
@@ -392,6 +416,7 @@ class _PlannerItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEditing = choice == HavenPlannerReviewChoice.edited;
+    final l10n = context.l10n;
     return Card(
       key: ValueKey('havenPlannerItem-${item.id}'),
       child: Padding(
@@ -400,7 +425,7 @@ class _PlannerItemCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              _kindLabel(item.kind),
+              _kindLabel(context, item.kind),
               style: Theme.of(context).textTheme.labelLarge,
             ),
             const SizedBox(height: 4),
@@ -411,9 +436,9 @@ class _PlannerItemCard extends StatelessWidget {
                 enabled: enabled,
                 autofocus: true,
                 maxLength: 100,
-                decoration: const InputDecoration(
-                  labelText: 'Reviewed queue item',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.havenPlannerReviewedQueueItem,
+                  border: const OutlineInputBorder(),
                 ),
               )
             else
@@ -432,8 +457,8 @@ class _PlannerItemCard extends StatelessWidget {
                       : null,
                   child: Text(
                     choice == HavenPlannerReviewChoice.accepted
-                        ? 'Accepted'
-                        : 'Accept',
+                        ? l10n.havenPlannerAccepted
+                        : l10n.havenPlannerAccept,
                   ),
                 ),
                 if (item.canEdit)
@@ -442,7 +467,11 @@ class _PlannerItemCard extends StatelessWidget {
                     onPressed: enabled
                         ? () => onChoice(HavenPlannerReviewChoice.edited)
                         : null,
-                    child: Text(isEditing ? 'Editing' : 'Edit'),
+                    child: Text(
+                      isEditing
+                          ? l10n.havenPlannerEditing
+                          : l10n.havenPlannerEdit,
+                    ),
                   ),
                 OutlinedButton(
                   key: ValueKey('havenPlannerReject-${item.id}'),
@@ -451,8 +480,8 @@ class _PlannerItemCard extends StatelessWidget {
                       : null,
                   child: Text(
                     choice == HavenPlannerReviewChoice.rejected
-                        ? 'Rejected'
-                        : 'Reject',
+                        ? l10n.havenPlannerRejected
+                        : l10n.havenPlannerReject,
                   ),
                 ),
               ],
@@ -463,9 +492,13 @@ class _PlannerItemCard extends StatelessWidget {
     );
   }
 
-  static String _kindLabel(HavenPlannerItemKind kind) => switch (kind) {
-    HavenPlannerItemKind.queueTask => 'Possible Focus Queue task',
-    HavenPlannerItemKind.sessionSuggestion => 'Session-size suggestion',
-    HavenPlannerItemKind.freeTimeSuggestion => 'Optional free-time suggestion',
-  };
+  static String _kindLabel(BuildContext context, HavenPlannerItemKind kind) =>
+      switch (kind) {
+        HavenPlannerItemKind.queueTask =>
+          context.l10n.havenPlannerKindQueueTask,
+        HavenPlannerItemKind.sessionSuggestion =>
+          context.l10n.havenPlannerKindSession,
+        HavenPlannerItemKind.freeTimeSuggestion =>
+          context.l10n.havenPlannerKindFreeTime,
+      };
 }

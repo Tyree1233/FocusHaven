@@ -7,6 +7,7 @@ void main() {
     final model = _read('lib/models/haven_planner_proposal.dart');
     final planner = _read('lib/services/haven_planner_service.dart');
     final sheet = _read('lib/widgets/haven_planner_sheet.dart');
+    final catalog = _read('lib/l10n/app_en.arb');
 
     for (final contract in <String>[
       'HavenPlannerProposal',
@@ -21,11 +22,16 @@ void main() {
     expect(planner, contains('Creates an explainable planning draft'));
     expect(planner, contains('does not know your deadlines'));
     expect(planner, contains('did not read or write a calendar'));
-    expect(sheet, contains('Local planner foundation • no remote AI'));
-    expect(sheet, contains('Nothing is saved or changed'));
-    expect(sheet, contains('Review each item'));
-    expect(sheet, contains('Apply reviewed choices'));
-    expect(sheet, contains('timer and calendar were unchanged'));
+    expect(sheet, contains('l10n.havenPlannerLocalOnly'));
+    expect(sheet, contains('l10n.havenPlannerDescription'));
+    expect(sheet, contains('l10n.havenPlannerReviewEach'));
+    expect(sheet, contains('l10n.havenPlannerApplyReviewed'));
+    expect(sheet, contains('l10n.havenPlannerAddSuccess'));
+    expect(catalog, contains('Local planner foundation • no remote AI'));
+    expect(catalog, contains('Nothing is saved or changed'));
+    expect(catalog, contains('Review each item'));
+    expect(catalog, contains('Apply reviewed choices'));
+    expect(catalog, contains('timer and calendar were unchanged'));
 
     for (final forbidden in <String>[
       'cloud_functions',
@@ -44,6 +50,7 @@ void main() {
       'lib/services/haven_planner_action_service.dart',
     );
     final sheet = _read('lib/widgets/haven_planner_sheet.dart');
+    final catalog = _read('lib/l10n/app_en.arb');
 
     expect(actionService, contains("'add task: \$title'"));
     expect(actionService, contains('executor.snapshot()'));
@@ -61,8 +68,10 @@ void main() {
     ]) {
       expect(sheet, contains(independentlyReviewed));
     }
-    expect(sheet, contains('Add only these'));
-    expect(sheet, contains('Add to Focus Queue'));
+    expect(sheet, contains('l10n.havenPlannerConfirmMessage'));
+    expect(sheet, contains('l10n.havenPlannerAddToQueue'));
+    expect(catalog, contains('Add only these'));
+    expect(catalog, contains('Add to Focus Queue'));
   });
 
   test('planner adds no native permission or remote dependency', () {

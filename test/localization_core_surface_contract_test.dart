@@ -149,7 +149,9 @@ void main() {
       'Spanish, French, German, and Brazilian Portuguese remain planned and inactive',
       'B1 — Core entry and compact controls',
       'B2 — Timer dashboard and session controls',
-      'B3 — Planning and recovery',
+      'B3A — Queue and planning foundation',
+      'B3B — Reflection and restorative guidance',
+      'B3C — Optional system connections',
       'B4 — Coaching and voice',
       'B5 — Account and purchases',
       'B6 — Service and notification messages',
@@ -158,10 +160,10 @@ void main() {
       expect(inventory, contains(required));
     }
 
-    expect(policy, contains('215G-B1 and B2'));
+    expect(policy, contains('215G-B1, B2, and B3A'));
     expect(policy, contains('not complete Phase 215G-B'));
     expect(roadmap, contains('Phase 215G-B1'));
-    expect(roadmap, contains('remaining B3–B6 extraction slices'));
+    expect(roadmap, contains('remaining B3B–B6 extraction slices'));
   });
 }
 

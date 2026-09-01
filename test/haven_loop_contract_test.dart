@@ -11,6 +11,7 @@ void main() {
     final card = File(
       'lib/widgets/haven_loop_completion_card.dart',
     ).readAsStringSync();
+    final catalog = File('lib/l10n/app_en.arb').readAsStringSync();
 
     expect(service, contains("'havenLoopSelectedQueueItemId'"));
     expect(service, contains('HavenLoopRecoveryTicket'));
@@ -29,13 +30,17 @@ void main() {
     expect(screen, contains('reflectOnCompletedFocus'));
     expect(screen, contains('HavenJourneyCompletionConnectionCard'));
     expect(screen, contains('preservesSelectedTask: recoveryTicket != null'));
-    expect(screen, contains('recovery continued without a task link'));
+    expect(screen, contains('havenLoopRecoveryUnlinked'));
     expect(
       screen.indexOf('HavenLoopCompletionCard'),
       lessThan(screen.indexOf('FocusSessionReflectionCard')),
     );
-    expect(card, contains('FocusHaven never completes it automatically.'));
-    expect(card, contains('Mark task complete'));
-    expect(card, contains('Keep for later'));
+    expect(card, contains('l10n.havenLoopDecisionDescription'));
+    expect(card, contains('l10n.havenLoopMarkComplete'));
+    expect(card, contains('l10n.havenLoopKeepLater'));
+    expect(catalog, contains('FocusHaven never completes it automatically.'));
+    expect(catalog, contains('Mark task complete'));
+    expect(catalog, contains('Keep for later'));
+    expect(catalog, contains('recovery continued without a task link'));
   });
 }

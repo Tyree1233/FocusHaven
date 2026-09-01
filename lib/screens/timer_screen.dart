@@ -309,11 +309,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
         : havenLoop.finishSmartResetRecovery(recoveryTicket);
     if (preserved == false && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'The queue item changed, so recovery continued without a task link.',
-          ),
-        ),
+        SnackBar(content: Text(context.l10n.havenLoopRecoveryUnlinked)),
       );
     }
   }
@@ -620,11 +616,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     timer.setCustomMinutes(plan.focusMinutes);
     timer.start();
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Haven Plan started: ${plan.focusMinutes} minutes of focus.',
-        ),
-      ),
+      SnackBar(content: Text(context.l10n.havenPlanStarted(plan.focusMinutes))),
     );
   }
 
@@ -657,10 +649,10 @@ class TimerScreen extends riverpod.ConsumerWidget {
     if (!_canOpenOverlay(context)) return;
     final updated = await TextEntryDialog.show(
       context,
-      title: 'Edit task',
-      confirmLabel: 'Save',
+      title: context.l10n.focusQueueEditTitle,
+      confirmLabel: context.l10n.focusQueueEditSave,
       initialValue: item.title,
-      hintText: 'What needs your attention?',
+      hintText: context.l10n.focusQueueTaskHint,
       maxLength: 100,
       hideCounter: true,
     );
@@ -1298,7 +1290,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                           onPressed: () =>
                               _showHavenPlannerSheet(context, ref, timer),
                           icon: const Icon(Icons.route_outlined, size: 18),
-                          label: const Text('Plan a goal'),
+                          label: Text(l10n.havenPlannerTitle),
                         ),
                         if (timer.canStartHavenPlan)
                           TextButton.icon(
@@ -1309,7 +1301,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                               Icons.auto_awesome_outlined,
                               size: 18,
                             ),
-                            label: const Text('Plan my next session'),
+                            label: Text(l10n.havenPlanEntry),
                           ),
                         if (session.isRunning || hasParkedThoughts)
                           TextButton.icon(

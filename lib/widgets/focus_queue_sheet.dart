@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 import '../services/focus_queue_service.dart';
 
@@ -54,6 +55,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
   Future<void> _addTask() async {
     final title = _textController.text;
     if (_isAdding || title.trim().isEmpty) return;
+    final l10n = context.l10n;
 
     setState(() => _isAdding = true);
     try {
@@ -65,7 +67,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
       }
       if (mounted) _textController.clear();
     } catch (_) {
-      _showActionFailure('Task could not be added. Please try again.');
+      _showActionFailure(l10n.focusQueueAddError);
     } finally {
       if (mounted) setState(() => _isAdding = false);
     }
@@ -84,6 +86,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
 
   Future<void> _completeTask(FocusQueueItem item) async {
     if (!_beginItemAction(item.id)) return;
+    final l10n = context.l10n;
     try {
       final completeTask = widget.completeTask;
       if (completeTask == null) {
@@ -92,12 +95,12 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
         await completeTask(item.id);
       }
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('One thing handled. Take a breath.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.focusQueueCompleteReceipt)));
       }
     } catch (_) {
-      _showActionFailure('Task could not be completed. Please try again.');
+      _showActionFailure(l10n.focusQueueCompleteError);
     } finally {
       _finishItemAction(item.id);
     }
@@ -105,6 +108,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
 
   Future<void> _removeTask(FocusQueueItem item) async {
     if (!_beginItemAction(item.id)) return;
+    final l10n = context.l10n;
     try {
       final removeTask = widget.removeTask;
       if (removeTask == null) {
@@ -113,7 +117,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
         await removeTask(item.id);
       }
     } catch (_) {
-      _showActionFailure('Task could not be removed. Please try again.');
+      _showActionFailure(l10n.focusQueueRemoveError);
     } finally {
       _finishItemAction(item.id);
     }
@@ -121,10 +125,11 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
 
   Future<void> _editTask(FocusQueueItem item) async {
     if (!_beginItemAction(item.id)) return;
+    final l10n = context.l10n;
     try {
       await widget.onEditTask(item);
     } catch (_) {
-      _showActionFailure('Task could not be updated. Please try again.');
+      _showActionFailure(l10n.focusQueueUpdateError);
     } finally {
       _finishItemAction(item.id);
     }
@@ -132,16 +137,17 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
 
   Future<void> _selectTask(FocusQueueItem item) async {
     if (!_beginItemAction(item.id)) return;
+    final l10n = context.l10n;
     try {
       final selected = await widget.onTaskSelected(item);
       if (!mounted) return;
       if (selected) {
         Navigator.pop(context);
       } else {
-        _showActionFailure('That task changed, so it was not selected.');
+        _showActionFailure(l10n.focusQueueChangedError);
       }
     } catch (_) {
-      _showActionFailure('Task could not be selected. Please try again.');
+      _showActionFailure(l10n.focusQueueSelectError);
     } finally {
       _finishItemAction(item.id);
     }
@@ -150,6 +156,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
   @override
   Widget build(BuildContext context) {
     final queueState = ref.watch(focusQueueStateProvider);
+    final l10n = context.l10n;
 
     return SafeArea(
       top: false,
@@ -176,20 +183,18 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Focus queue',
+                  l10n.focusQueueSheetTitle,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 5),
-                const Text(
-                  'Choose a task to make it your current focus intention.',
-                  style: TextStyle(color: Colors.white70),
+                Text(
+                  l10n.focusQueueSheetDescription,
+                  style: const TextStyle(color: Colors.white70),
                 ),
                 if (queueState.completedToday > 0) ...[
                   const SizedBox(height: 5),
                   Text(
-                    '${queueState.completedToday} '
-                    '${queueState.completedToday == 1 ? 'task' : 'tasks'} '
-                    'tended today — gentle progress.',
+                    l10n.focusQueueCompletedToday(queueState.completedToday),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -204,8 +209,8 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
                         maxLength: 100,
                         textInputAction: TextInputAction.done,
                         onSubmitted: (_) => _addTask(),
-                        decoration: const InputDecoration(
-                          hintText: 'Add a task',
+                        decoration: InputDecoration(
+                          hintText: l10n.focusQueueAddHint,
                           counterText: '',
                         ),
                       ),
@@ -215,18 +220,18 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
                       key: const ValueKey<String>('focus-queue-add-task'),
                       onPressed: _isAdding ? null : _addTask,
                       icon: const Icon(Icons.add),
-                      tooltip: 'Add task',
+                      tooltip: l10n.focusQueueAddTooltip,
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 if (queueState.activeItems.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 34),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 34),
                     child: Center(
                       child: Text(
-                        'Your next task can live here.',
-                        style: TextStyle(color: Colors.white60),
+                        l10n.focusQueueEmpty,
+                        style: const TextStyle(color: Colors.white60),
                       ),
                     ),
                   )
@@ -257,7 +262,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
                             ),
                             onPressed: isBusy ? null : () => _editTask(item),
                             icon: const Icon(Icons.edit_outlined),
-                            tooltip: 'Edit task',
+                            tooltip: l10n.focusQueueEditTooltip,
                           ),
                           IconButton(
                             key: ValueKey<String>(
@@ -265,7 +270,7 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
                             ),
                             onPressed: isBusy ? null : () => _removeTask(item),
                             icon: const Icon(Icons.close),
-                            tooltip: 'Remove task',
+                            tooltip: l10n.focusQueueRemoveTooltip,
                           ),
                         ],
                       ),
@@ -278,7 +283,9 @@ class _FocusQueueSheetState extends ConsumerState<FocusQueueSheet> {
                       onPressed: widget.onShowCompleted,
                       icon: const Icon(Icons.history_outlined),
                       label: Text(
-                        'Completed (${queueState.completedItems.length})',
+                        l10n.focusQueueCompletedCount(
+                          queueState.completedItems.length,
+                        ),
                       ),
                     ),
                   ),

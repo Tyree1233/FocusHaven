@@ -739,18 +739,27 @@ tests, plural and placeholder review, human linguistic review, speech-locale
 acceptance where applicable, and country-specific store/disclosure review.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
-Phases 215G-B1 and B2 now move the complete first-run onboarding, appearance
+Phases 215G-B1, B2, and B3A now move the complete first-run onboarding, appearance
 picker, custom-duration chrome, guided breathing, timer accessibility, and the
 bounded timer dashboard/session-control presentation into that English
 catalog. B2 covers session names and encouragement, timer actions and
-saved-session recovery,
-focus-intention and queue entry points, daily goal/challenge progress, recent
+saved-session recovery, focus-intention and queue entry points, daily
+goal/challenge progress, recent
 focus, locale-aware dashboard dates, and dashboard receipts and errors. It
 preserves the exact English behavior and stored timer, task, queue, goal, and
 history values. The
-[extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B3–B6 work; B1 and B2 are not a claim that the whole interface is
-localized. These phases do not translate private content, change the person's
+Phase 215G-B3A boundary additionally catalog-owns Focus Queue management and
+completed-task history, Haven Plan's controls and preview chrome, Haven
+Planner's local proposal and exact review presentation, and the Plan-to-Focus
+task-decision card. User-authored
+task titles and goals remain opaque placeholders. Generated planner items and
+other service-originated planning copy remain B6-owned, so B3A does not claim
+that every planning sentence is localized. English remains the only active
+runtime locale.
+
+The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
+remaining B3B–B6 work; B1, B2, and B3A are not a claim that the whole interface
+is localized. These phases do not translate private content, change the person's
 language setting, activate a planned locale, contact a translation service,
 deploy a build, or change a store listing.
 
