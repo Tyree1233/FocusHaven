@@ -1,7 +1,7 @@
 # FocusHaven Translation Qualification
 
-Status: Phase 215G-C2A review-packet builder prepared; no packet, human review,
-or translated locale is active
+Status: Phase 215G-C2B review packet created and audited; no reviewer, human
+review, or translated locale is active
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 First candidate locale: Spanish (`es`), planned and inactive
 
@@ -32,6 +32,13 @@ audit; preserves descriptions and placeholder schemas; classifies high-risk
 copy; creates batches no larger than 50 entries; and leaves reviewer decisions
 empty. The preparation phase does not create the packet or change the
 `structurally_ready` qualification state.
+
+Phase 215G-C2B uses the exact committed C2A builder to create and independently
+audit the isolated packet. The 884,241-byte packet has SHA-256
+`325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e`,
+contains all 980 locked message pairs in 20 critical-first batches, and leaves
+all 980 reviewer decisions empty. The packet remains unassigned, review has not
+started, and the qualification state remains `structurally_ready`.
 
 ## Locked English source
 
@@ -156,12 +163,12 @@ against the locked English source after explicit authorization of the local
 machine-assisted draft boundary. Human approval remains separate from catalog
 generation and has not started.
 
-Phase 215G-C2A prepares the locked review-packet builder only. A future guarded
-step must generate and digest the isolated packet. A later explicit assignment
-must identify a real qualified reviewer before `status: human_review` or
-`reviewStarted: true` can be recorded. Packet preparation, packet creation,
-reviewer assignment, completed linguistic approval, runtime integration, and
-release qualification are separate states.
+Phase 215G-C2A prepares the locked review-packet builder only. Phase 215G-C2B
+creates and digests the isolated packet without assigning it or starting
+review. A later explicit assignment must identify a real qualified reviewer
+before `status: human_review` or `reviewStarted: true` can be recorded. Packet
+preparation, packet creation, reviewer assignment, completed linguistic
+approval, runtime integration, and release qualification are separate states.
 
 Voice and coaching qualification remains Phase 215G-D. Spanish UI copy alone
 does not authorize Spanish speech recognition, safe-command interpretation,
@@ -188,3 +195,13 @@ change the `structurally_ready` status, copy the candidate into `lib/l10n`,
 activate a locale, translate private content, contact a provider, add a
 dependency or permission, change Firebase or an app store, deploy, upload, or
 make a language or country availability claim.
+
+## Phase 215G-C2B non-actions
+
+This phase does not distribute or assign the packet, contact or impersonate a
+reviewer, begin human review, record a reviewer identity, fill or infer a
+reviewer decision, approve Spanish, change the `structurally_ready` status,
+copy the candidate into `lib/l10n`, activate a locale, translate private
+content, contact a provider, add a dependency or permission, change Firebase
+or an app store, deploy, upload, or make a language or country availability
+claim.

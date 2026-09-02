@@ -72,15 +72,23 @@ void main() {
     expect(placeholderEntry['placeholders'], ['count']);
   });
 
-  test('C2A keeps packet, reviewer, approval, and runtime absent', () {
+  test('C2B records the packet while review and runtime remain absent', () {
     final review = _json('localization/reviews/es/qualification.json');
 
     expect(review['phase'], '215G-C1B');
     expect(review['status'], 'structurally_ready');
     expect(review['reviewPacketPreparationPhase'], '215G-C2A');
     expect(review['reviewPacketPreparationReady'], isTrue);
-    expect(review['reviewPacketPresent'], isFalse);
-    expect(review['reviewPacketSha256'], isNull);
+    expect(review['reviewPacketCreationPhase'], '215G-C2B');
+    expect(review['reviewPacketPresent'], isTrue);
+    expect(
+      review['reviewPacketSha256'],
+      '325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e',
+    );
+    expect(review['reviewPacketBytes'], 884241);
+    expect(review['reviewPacketMessageCount'], 980);
+    expect(review['reviewPacketBatchCount'], 20);
+    expect(review['reviewPacketAuditPassed'], isTrue);
     expect(review['reviewPacketAssigned'], isFalse);
     expect(review['reviewStarted'], isFalse);
     expect(review['humanReviewer'], isNull);
@@ -88,10 +96,9 @@ void main() {
     expect(review['approvedAt'], isNull);
     expect(review['linguisticallyApproved'], isFalse);
     expect(review['runtimeActivated'], isFalse);
-    expect(
-      File('localization/reviews/es/packets/review-packet.json').existsSync(),
-      isFalse,
-    );
+    final packet = File('localization/reviews/es/packets/review-packet.json');
+    expect(packet.existsSync(), isTrue);
+    expect(_sha256(packet.path), review['reviewPacketSha256']);
     expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
     expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
     expect(
@@ -175,5 +182,11 @@ List<Map<String, dynamic>> _entries(Map<String, dynamic> packet) {
 
 Map<String, dynamic> _json(String path) =>
     jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+
+String _sha256(String path) {
+  final result = Process.runSync('shasum', ['-a', '256', path]);
+  expect(result.exitCode, 0);
+  return result.stdout.toString().trim().split(RegExp(r'\s+')).first;
+}
 
 String _normalize(String value) => value.replaceAll(RegExp(r'\s+'), ' ');

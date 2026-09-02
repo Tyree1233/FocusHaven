@@ -1,7 +1,7 @@
 # FocusHaven Spanish Human-Review Packet
 
-Status: Phase 215G-C2A packet-builder preparation; no packet or human review
-has started
+Status: Phase 215G-C2B packet created and audited; reviewer assignment and
+human review have not started
 
 ## Purpose
 
@@ -10,12 +10,17 @@ structurally ready Spanish candidate into an isolated packet for a qualified
 human reviewer. It does not generate that packet, assign or impersonate a
 reviewer, approve any Spanish wording, or activate Spanish.
 
-The future packet may contain only the locked, non-sensitive English catalog,
-the locked isolated Spanish candidate, their localization descriptions and
-placeholder schemas, the committed structural-audit evidence, and empty fields
-for reviewer decisions. It must never contain tasks, journals, reflections,
-transcripts, coaching conversations, account identities, calendar events,
-purchase history, focus history, or other private runtime values.
+Phase 215G-C2B separately creates and audits that isolated packet without
+assigning it or starting review. Packet creation is evidence preparation, not
+a reviewer judgment, linguistic approval, runtime activation, or release
+qualification.
+
+The packet contains only the locked, non-sensitive English catalog, the locked
+isolated Spanish candidate, their localization descriptions and placeholder
+schemas, the committed structural-audit evidence, and empty fields for reviewer
+decisions. It must never contain tasks, journals, reflections, transcripts,
+coaching conversations, account identities, calendar events, purchase history,
+focus history, or other private runtime values.
 
 ## Exact locked inputs
 
@@ -35,7 +40,7 @@ state, private-data boundary, output path, or existing output. It reruns the
 complete catalog parity, metadata, placeholder-schema, ICU-placeholder,
 non-empty, and source-equal-invariant audit before writing anything.
 
-## Isolated future output
+## Isolated packet output
 
 The only allowed output is:
 
@@ -51,13 +56,19 @@ availability.
 Spanish remains outside `lib/l10n`, planned, and runtime inactive throughout
 packet preparation.
 
-Phase 215G-C2A prepares the builder only. The packet path must remain absent
-until a separately guarded creation step verifies the committed C2A builder
-and the exact C1B catalog locks.
+At the Phase 215G-C2A checkpoint, no packet or human review has started. That
+phase does not generate that packet, assign or impersonate a reviewer, or
+approve Spanish. Phase 215G-C2B separately verifies the committed C2A builder
+and exact C1B catalog locks, then creates only the isolated packet above.
+
+The created packet is 884,241 bytes with SHA-256
+`325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e`.
+Its existence does not assign it, start human review, or change the
+`structurally_ready` qualification state.
 
 ## Packet schema
 
-The future packet records:
+The packet records:
 
 - schema version, phase, locale, general-international-Spanish scope, and exact
   source, candidate, and structural-audit locks;
@@ -114,6 +125,20 @@ Elevated entries follow when they concern:
 All other product copy is standard risk. Standard does not mean preapproved;
 every message still requires qualified human review.
 
+## Phase 215G-C2B audit checkpoint
+
+| Field | Audited value |
+| --- | --- |
+| Packet SHA-256 | `325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e` |
+| Packet size | 884,241 bytes |
+| Messages | 980 |
+| Placeholder-bearing messages | 148 |
+| Source-equal invariants | 11 |
+| Risk counts | 433 critical, 251 elevated, 296 standard |
+| Batches | 20, with at most 50 entries each |
+| Pending decisions | 980 |
+| Completed decisions | 0 |
+
 ## Reviewer decisions
 
 Packet preparation cannot supply reviewer judgments. For every message a real
@@ -137,3 +162,13 @@ correct, begin human review, record a reviewer identity, approve a term or
 message, copy Spanish into `lib/l10n`, change runtime locale support, qualify
 voice or coaching, localize native or store surfaces, add a permission or
 dependency, deploy, upload, invoke, or make a public language or country claim.
+
+## Phase 215G-C2B non-actions
+
+This phase does not distribute or assign the packet, contact or impersonate a
+reviewer, begin human review, fill or infer a reviewer decision, approve a term
+or message, change the `structurally_ready` status, copy Spanish into
+`lib/l10n`, activate a locale, qualify voice or coaching, localize native or
+store surfaces, contact a translation provider, use private runtime data, add a
+permission or dependency, deploy, upload, invoke, or make a public language or
+country claim.

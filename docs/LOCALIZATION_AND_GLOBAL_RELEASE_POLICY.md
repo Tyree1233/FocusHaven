@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C2A Spanish review-packet builder prepared; no packet or
-human review started
+Status: Phase 215G-C2B Spanish review packet created and audited; reviewer
+assignment and human review have not started
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -56,6 +56,13 @@ country release readiness.
   structural audit; produces critical-first batches of at most 50 entries; and
   leaves every reviewer decision empty. It does not create the packet, assign a
   reviewer, begin review, approve Spanish, or activate a locale.
+- Phase 215G-C2B separately creates and audits the isolated packet. Its exact
+  SHA-256 is
+  `325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e`;
+  all 980 entries remain pending in 20 bounded batches, and every decision,
+  replacement, and note is empty. The packet is not assigned, human review has
+  not started, and Spanish remains linguistically unapproved, outside
+  `lib/l10n`, and runtime inactive.
 
 ## Catalog authority
 
@@ -204,8 +211,9 @@ tasks must still be evaluated from the console's current state.
   qualification, or release qualification. Phase 215G-C1A adds the guarded
   builder. Phase 215G-C1B creates and structurally audits the complete isolated
   Spanish machine draft. Phase 215G-C2A prepares the locked packet builder
-  without creating a packet or starting review; packet creation, assignment to
-  a real qualified reviewer, and completed human approval remain separate
+  without creating a packet or starting review. Phase 215G-C2B creates and
+  locks the isolated packet without assigning it or starting review. Assignment
+  to a real qualified reviewer and completed human approval remain separate
   required gates.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,
   local coaching, and explicit fallbacks with each qualified locale.

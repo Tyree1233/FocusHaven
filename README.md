@@ -883,6 +883,16 @@ preparation slice creates no packet, assigns no reviewer, and does not start or
 approve human review. Spanish remains outside `lib/l10n`, planned, and runtime
 inactive.
 
+Phase 215G-C2B now creates the one isolated review packet at
+`localization/reviews/es/packets/review-packet.json` with SHA-256
+`325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e`.
+An independent audit confirms all 980 locked source/candidate pairs, 148
+placeholder-bearing entries, 11 source-equal invariants, critical-first risk
+ordering, 20 batches of at most 50 entries, and 980 empty reviewer decisions.
+The packet is unassigned and human review has not started. It does not approve
+or activate Spanish, move the candidate into `lib/l10n`, contact a provider,
+use private runtime data, or make a public support or country claim.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

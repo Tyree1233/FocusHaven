@@ -196,7 +196,7 @@ void main() {
     expect(
       worksheet,
       contains(
-        'Status: Phase 215G-C1B candidate ready for review; review not started',
+        'Status: Phase 215G-C2B packet created but unassigned; review not started',
       ),
     );
     expect(worksheet, contains('No Spanish product term is approved'));

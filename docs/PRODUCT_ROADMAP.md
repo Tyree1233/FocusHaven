@@ -427,6 +427,16 @@ catalogs, structural evidence, review state, output paths, existing output,
 private runtime data, or invented approval. A separate guarded step must create
 and lock the packet before a real qualified reviewer can be assigned.
 
+Phase 215G-C2B creates and independently audits that isolated packet. The
+884,241-byte packet has SHA-256
+`325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e`,
+contains all 980 source/candidate pairs in 20 batches, and preserves 980
+pending entries with empty decisions, replacements, and notes. The packet is
+not distributed or assigned, human review has not started, and Spanish remains
+linguistically unapproved, outside `lib/l10n`, runtime inactive, release
+unqualified, and unsupported publicly. Reviewer assignment and completed
+human review remain later explicit gates.
+
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a
