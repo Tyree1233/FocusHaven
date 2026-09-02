@@ -845,6 +845,14 @@ translate private content, change the person's language setting, activate a
 planned locale, contact a translation service, deploy a build, or change a
 store listing.
 
+Phase 215G-C0 now freezes that complete English catalog for the first Spanish
+translation intake and adds a fail-closed candidate-catalog auditor, an
+inactive review record, and a Spanish terminology worksheet. It creates no
+Spanish ARB candidate and does not activate or advertise Spanish. A complete
+candidate must remain outside `lib/l10n` until structural parity and qualified
+human review are recorded; voice/coaching, native, policy, support, store, and
+country qualification remain later independent gates.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

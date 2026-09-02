@@ -1,0 +1,22 @@
+{
+  "phase": "215G-C0",
+  "locale": "es",
+  "englishName": "Spanish",
+  "nativeName": "Español",
+  "status": "not_started",
+  "sourceCommit": "fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "sourceMessageCount": 980,
+  "sourcePlaceholderMessageCount": 148,
+  "candidateCatalog": "localization/candidates/app_es.arb",
+  "candidatePresent": false,
+  "structuralAuditPassed": false,
+  "humanReviewRequired": true,
+  "humanReviewer": null,
+  "reviewScope": null,
+  "approvedAt": null,
+  "runtimeActivated": false,
+  "voiceAndCoachingQualified": false,
+  "nativeAndStoreQualified": false
+}

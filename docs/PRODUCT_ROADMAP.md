@@ -393,6 +393,15 @@ translating private user content. Phase 215G-E will localize native Apple,
 Android, widget, watch, permission, policy, support, and store surfaces and run
 country-specific release checks.
 
+Phase 215G-C0 translation qualification is implemented as the entry gate for
+that work. It freezes the 980-message English source catalog at the verified
+Phase 215G-B commit, records the 148 placeholder-bearing messages, adds a
+fail-closed parity and placeholder auditor, creates an inactive Spanish review
+record, and supplies a terminology and high-risk-copy worksheet. No Spanish
+candidate exists in the production catalog directory, and no reviewer approval,
+runtime activation, voice qualification, native/store qualification, or country
+claim is implied.
+
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a

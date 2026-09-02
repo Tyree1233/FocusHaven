@@ -34,6 +34,10 @@ country release readiness.
   country-release qualification are not.
 - No runtime translation service is used, and no private user content is sent
   anywhere for translation.
+- Phase 215G-C0 freezes the completed English catalog for Spanish translation
+  intake, adds a fail-closed structural auditor and pending human-review record,
+  and keeps every candidate outside `lib/l10n`. It creates no Spanish catalog,
+  activates no locale, and makes no language or country availability claim.
 
 ## Catalog authority
 
@@ -176,6 +180,10 @@ tasks must still be evaluated from the console's current state.
   availability claim.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
+  Phase 215G-C0 establishes the source lock, candidate isolation, structural
+  parity checks, terminology worksheet, and explicit human-review evidence for
+  Spanish. Structural readiness is not linguistic approval, runtime
+  qualification, or release qualification.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,
   local coaching, and explicit fallbacks with each qualified locale.
 - **215G-E — Native and store surfaces:** complete platform resources, public
