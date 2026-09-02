@@ -3,6 +3,10 @@
 Status: Phase 215G-C2C assignment safeguards prepared; no reviewer is assigned
 and review has not started
 
+Historical note: this named-assignment path was never used. Phase 215G-C2D
+uses a simpler private-validation workflow that stores no reviewer identity or
+contact information in the repository.
+
 ## Purpose
 
 Phase 215G-C2C prepares a deterministic, fail-closed assignment gate for the

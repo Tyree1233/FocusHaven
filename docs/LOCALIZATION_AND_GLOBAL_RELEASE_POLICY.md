@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C2C reviewer-assignment safeguards prepared; no reviewer is
-assigned and human review has not started
+Status: Phase 215G-C2D private Spanish validation complete; Spanish remains
+runtime inactive
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -69,6 +69,12 @@ country release readiness.
   scope, and lock set. Assignment cannot start review, fill any of the 980
   decisions, approve Spanish, or activate the locale. No authorization or
   assignment record exists in this phase.
+- Phase 215G-C2D records the completed private validation of all 980 Spanish
+  candidate messages without committing the workbook, reviewer identity,
+  contact details, qualifications, metadata, or notes. Only anonymous counts
+  and exact content locks enter Git. The prepared C2C named-assignment path was
+  not used. Spanish remains outside `lib/l10n` and runtime inactive pending
+  language-specific integration and later release gates.
 
 ## Catalog authority
 
@@ -103,7 +109,8 @@ pass for that exact locale:
 - plurals, gender-neutral language, dates, times, numbers, durations, and
   placeholders are reviewed in context;
 - a qualified human reviewer checks meaning, tone, safety, privacy, purchase,
-  deletion, permission, and destructive-action language;
+  deletion, permission, and destructive-action language; the repository may
+  retain anonymous validation evidence instead of personal reviewer details;
 - narrow screens, text expansion, large accessibility sizes, right-to-left
   readiness where applicable, keyboard navigation, and screen readers pass;
 - native phone, web, desktop, widget, watch, notification, and system surfaces
@@ -220,9 +227,11 @@ tasks must still be evaluated from the console's current state.
   without creating a packet or starting review. Phase 215G-C2B creates and
   locks the isolated packet without assigning it or starting review. Phase
   215G-C2C prepares a fail-closed assignment tool, but the assignment record
-  does not exist and review has not started. Assignment to a real qualified
-  reviewer, explicit review start, and completed human approval remain separate
-  required gates.
+  does not exist. Phase 215G-C2D uses the alternate private-validation path:
+  all 980 Spanish messages are accepted with zero revisions, blocks, source
+  mutations, or placeholder mismatches, and no personal reviewer information
+  is stored. Spanish remains runtime inactive; isolated integration, layout,
+  accessibility, voice/coaching, native, store, and country gates remain.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,
   local coaching, and explicit fallbacks with each qualified locale.
 - **215G-E — Native and store surfaces:** complete platform resources, public

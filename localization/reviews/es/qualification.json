@@ -52,6 +52,18 @@
   "reviewerAssignmentAuthorizationPresent": false,
   "reviewerAssignmentRecord": "localization/reviews/es/reviewer-assignment.json",
   "reviewerAssignmentRecordPresent": false,
+  "privateHumanValidationPhase": "215G-C2D",
+  "privateHumanValidationRecord": "localization/reviews/es/private-human-validation.json",
+  "privateHumanValidationRecordSha256": "c3f90e6920e7f01a4e8d06e10a2c629b130fbec47e14dca0d948d0d71a86d3e2",
+  "privateHumanValidationPayloadSha256": "8a5ed10840c76b1b0a8a5c6a2597ed36450671ed598011ac8ddbe7b6cd25e8df",
+  "privateHumanValidationComplete": true,
+  "privateHumanValidationMessageCount": 980,
+  "privateHumanValidationDecisionCounts": {
+    "accepted": 980,
+    "revised": 0,
+    "blocked": 0
+  },
+  "privateHumanValidationPersonalDataIncluded": false,
   "reviewPacketAssigned": false,
   "reviewStarted": false,
   "humanReviewRequired": true,

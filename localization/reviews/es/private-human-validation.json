@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "phase": "215G-C2D",
+  "locale": "es",
+  "status": "private_human_validation_complete",
+  "validationMode": "private_human_validation",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f",
+  "reviewPacketSha256": "325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e",
+  "validationPayloadSha256": "8a5ed10840c76b1b0a8a5c6a2597ed36450671ed598011ac8ddbe7b6cd25e8df",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 980,
+    "revised": 0,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 433,
+    "elevated": 251,
+    "standard": 296
+  },
+  "sourceMutationCount": 0,
+  "invalidDecisionCount": 0,
+  "placeholderMismatchCount": 0,
+  "personalDataIncluded": false,
+  "candidateChanged": false,
+  "runtimeActivated": false,
+  "voiceAndCoachingQualified": false,
+  "nativeAndStoreQualified": false
+}

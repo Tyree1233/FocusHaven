@@ -1,7 +1,7 @@
 # FocusHaven Translation Qualification
 
-Status: Phase 215G-C2C reviewer-assignment safeguards prepared; no reviewer,
-human review, or translated locale is active
+Status: Phase 215G-C2D private Spanish validation complete; no translated
+locale is active
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 First candidate locale: Spanish (`es`), planned and inactive
 
@@ -39,6 +39,13 @@ audit the isolated packet. The 884,241-byte packet has SHA-256
 contains all 980 locked message pairs in 20 critical-first batches, and leaves
 all 980 reviewer decisions empty. The packet remains unassigned, review has not
 started, and the qualification state remains `structurally_ready`.
+
+Phase 215G-C2D records the completed private validation workbook without
+committing that workbook or any reviewer identity, contact data, qualifications,
+metadata, notes, or timestamp. All 980 translations are accepted with zero
+revisions, blocks, source mutations, invalid decisions, or placeholder
+mismatches. The accepted text exactly matches the isolated Spanish candidate.
+The C2C named-assignment path was prepared but not used.
 
 ## Locked English source
 
@@ -118,9 +125,11 @@ human reviewer must assess every message in context, including:
 - consistency with the reviewed terminology worksheet; and
 - any source-equal brand or technical term.
 
-The reviewer identity, scope, source checkpoint, completion time, unresolved
-issues, and approval decision must be recorded. Empty reviewer fields or a
-status other than explicit approval cannot authorize runtime integration.
+The source checkpoint, complete decision counts, unresolved issues, and
+validation result must be recorded. Reviewer identity and contact details are
+not required in Git when a private-validation record proves complete locked-
+catalog review and explicitly excludes personal data. Validation never by
+itself authorizes production runtime activation.
 
 ## Privacy boundary
 
@@ -178,6 +187,13 @@ record does not exist in C2C, review has not started, and all 980 decisions
 remain pending. Even a future successful assignment records
 `assigned_not_started`; changing to `human_review` is a separate gate.
 
+Phase 215G-C2D follows the private-validation alternative instead of creating
+that named assignment. The local workbook audit validates every locked row and
+placeholder, while Git receives only the anonymous aggregate record and
+content hashes. The workbook and sanitized 980-row payload remain outside the
+repository. Spanish remains outside `lib/l10n` until the isolated integration
+and runtime-qualification gates pass.
+
 Voice and coaching qualification remains Phase 215G-D. Spanish UI copy alone
 does not authorize Spanish speech recognition, safe-command interpretation,
 Local Coach understanding, Enhanced AI behavior, or an implicit English
@@ -222,3 +238,12 @@ start review; fill a decision; approve Spanish; change the `structurally_ready`
 status; copy the candidate into `lib/l10n`; activate a locale; contact a
 provider; add a dependency or permission; deploy; upload; invoke; or make a
 language or country availability claim.
+
+## Phase 215G-C2D non-actions
+
+This phase does not commit the review workbook or sanitized row payload; record
+or infer reviewer identity, contact details, qualifications, metadata, or
+notes; change the accepted candidate; copy Spanish into `lib/l10n`; activate a
+locale; qualify voice, coaching, native, store, support, policy, screenshot,
+signed-build, or country surfaces; contact a provider; deploy; upload; invoke;
+or make a public language or country availability claim.

@@ -446,6 +446,16 @@ inactive, release unqualified, and unsupported publicly. Reviewer assignment,
 explicit review start, completed message review, and linguistic approval remain
 separate later gates.
 
+Phase 215G-C2D uses the simpler private-validation branch authorized for the
+completed Spanish workbook. A fluent first-language Spanish reviewer accepted
+all 980 locked translations with zero revisions, blocks, source mutations, or
+placeholder mismatches. No reviewer identity, contact information,
+qualification statement, workbook metadata, notes, or private workbook is
+stored in Git. Only anonymous aggregate evidence and exact content hashes are
+recorded. The unused C2C assignment records remain absent. Spanish stays
+outside `lib/l10n` and runtime inactive while isolated integration, layout,
+accessibility, voice/coaching, native, store, and country gates remain pending.
+
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a

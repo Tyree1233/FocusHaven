@@ -903,6 +903,16 @@ pending, and keeps `reviewStarted` false. Human review has not started, and
 Spanish remains linguistically unapproved, outside `lib/l10n`, runtime
 inactive, release unqualified, and unsupported publicly.
 
+Phase 215G-C2D now records the completed private human validation of all 980
+Spanish candidate messages. Every translation was accepted; no replacement,
+source mutation, invalid decision, blocked message, or placeholder mismatch was
+found. The workbook, reviewer identity, contact details, qualifications,
+metadata, and notes are not committed. Git retains only anonymous aggregate
+proof and exact source, candidate, packet, and sanitized-payload hashes. The
+unused C2C assignment records remain absent. This validation checkpoint does
+not move Spanish into `lib/l10n` or qualify runtime, voice/coaching, native,
+store, country, or public-language support; Spanish remains runtime inactive.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.
