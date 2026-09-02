@@ -1,6 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C1B isolated Spanish candidate; human review not started
+Status: Phase 215G-C2A Spanish review-packet builder prepared; no packet or
+human review started
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -50,6 +51,11 @@ country release readiness.
   empty, and Spanish remains planned and inactive. Structural readiness is not
   linguistic, runtime, voice/coaching, native/store, or country qualification.
   No external translation provider or private runtime data was used.
+- Phase 215G-C2A prepares a second fail-closed builder for the future human
+  review packet. It pins the exact English catalog, Spanish candidate, and C1B
+  structural audit; produces critical-first batches of at most 50 entries; and
+  leaves every reviewer decision empty. It does not create the packet, assign a
+  reviewer, begin review, approve Spanish, or activate a locale.
 
 ## Catalog authority
 
@@ -197,7 +203,10 @@ tasks must still be evaluated from the console's current state.
   Spanish. Structural readiness is not linguistic approval, runtime
   qualification, or release qualification. Phase 215G-C1A adds the guarded
   builder. Phase 215G-C1B creates and structurally audits the complete isolated
-  Spanish machine draft; qualified human review remains the next required gate.
+  Spanish machine draft. Phase 215G-C2A prepares the locked packet builder
+  without creating a packet or starting review; packet creation, assignment to
+  a real qualified reviewer, and completed human approval remain separate
+  required gates.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,
   local coaching, and explicit fallbacks with each qualified locale.
 - **215G-E — Native and store surfaces:** complete platform resources, public

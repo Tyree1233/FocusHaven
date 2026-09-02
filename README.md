@@ -873,6 +873,16 @@ approved, runtime activated, voice/coaching qualified, native/store qualified,
 advertised, or publicly supported. No external translation provider or private
 runtime data was used.
 
+Phase 215G-C2A now prepares the deterministic, fail-closed builder for a future
+qualified-human-review packet. The builder is pinned to the exact English and
+Spanish catalog digests and the committed structural audit. It orders all 980
+source/candidate pairs by critical, elevated, then standard review risk; keeps
+placeholder schemas and message context with every entry; limits batches to 50
+entries; and leaves every reviewer decision, replacement, and note empty. This
+preparation slice creates no packet, assigns no reviewer, and does not start or
+approve human review. Spanish remains outside `lib/l10n`, planned, and runtime
+inactive.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

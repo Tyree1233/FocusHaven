@@ -418,6 +418,15 @@ has not received qualified human linguistic review and remains outside
 or country claims. Voice/coaching, runtime, native/store, accessibility, policy,
 support, signed-build, and country gates remain pending.
 
+Phase 215G-C2A prepares the source-locked human-review packet builder without
+creating a packet or beginning review. The future packet will pair every locked
+English and Spanish message with its description, placeholders, deterministic
+risk categories, required checks, and empty decision fields. Critical copy is
+ordered first and batches are limited to 50 entries. The builder refuses changed
+catalogs, structural evidence, review state, output paths, existing output,
+private runtime data, or invented approval. A separate guarded step must create
+and lock the packet before a real qualified reviewer can be assigned.
+
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a

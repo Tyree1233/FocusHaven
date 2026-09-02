@@ -3,6 +3,9 @@
 Status: Phase 215G-C1B candidate ready for review; review not started
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 
+Phase 215G-C2A prepares the locked packet builder only. No review packet has
+been generated or assigned, and this worksheet still records no human review.
+
 No Spanish product term is approved by this worksheet. It records the context
 and constraints that a qualified human reviewer must resolve before the full
 Spanish catalog can be approved.

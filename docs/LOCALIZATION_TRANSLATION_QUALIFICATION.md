@@ -1,6 +1,7 @@
 # FocusHaven Translation Qualification
 
-Status: Phase 215G-C1B Spanish candidate structurally ready; no translated locale is active
+Status: Phase 215G-C2A review-packet builder prepared; no packet, human review,
+or translated locale is active
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 First candidate locale: Spanish (`es`), planned and inactive
 
@@ -24,6 +25,13 @@ the locked, non-sensitive catalog. The complete candidate now exists only at
 `localization/candidates/app_es.arb`; both the builder audit and an independent
 audit report it structurally ready for human review. No qualified human review
 has started, and Spanish remains planned and inactive.
+
+Phase 215G-C2A prepares a deterministic builder for a future isolated human
+review packet. It is locked to the exact C1B source, candidate, and structural
+audit; preserves descriptions and placeholder schemas; classifies high-risk
+copy; creates batches no larger than 50 entries; and leaves reviewer decisions
+empty. The preparation phase does not create the packet or change the
+`structurally_ready` qualification state.
 
 ## Locked English source
 
@@ -148,6 +156,13 @@ against the locked English source after explicit authorization of the local
 machine-assisted draft boundary. Human approval remains separate from catalog
 generation and has not started.
 
+Phase 215G-C2A prepares the locked review-packet builder only. A future guarded
+step must generate and digest the isolated packet. A later explicit assignment
+must identify a real qualified reviewer before `status: human_review` or
+`reviewStarted: true` can be recorded. Packet preparation, packet creation,
+reviewer assignment, completed linguistic approval, runtime integration, and
+release qualification are separate states.
+
 Voice and coaching qualification remains Phase 215G-D. Spanish UI copy alone
 does not authorize Spanish speech recognition, safe-command interpretation,
 Local Coach understanding, Enhanced AI behavior, or an implicit English
@@ -164,3 +179,12 @@ This phase does not approve the Spanish ARB candidate, activate a locale,
 change `supportedLocales`, add a saved language, translate private content,
 contact a provider, add a dependency or permission, change Firebase or an app
 store, deploy, upload, or make a language or country availability claim.
+
+## Phase 215G-C2A non-actions
+
+This phase does not create or distribute a review packet, assign or impersonate
+a reviewer, begin human review, record a reviewer identity, approve Spanish,
+change the `structurally_ready` status, copy the candidate into `lib/l10n`,
+activate a locale, translate private content, contact a provider, add a
+dependency or permission, change Firebase or an app store, deploy, upload, or
+make a language or country availability claim.
