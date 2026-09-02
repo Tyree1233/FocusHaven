@@ -64,6 +64,12 @@
     "blocked": 0
   },
   "privateHumanValidationPersonalDataIncluded": false,
+  "runtimeIntegrationPhase": "215G-C3A",
+  "runtimeIntegrationStatus": "generated_inactive",
+  "runtimeCatalog": "lib/l10n/app_es.arb",
+  "runtimeCatalogSha256": "611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f",
+  "generatedDelegateAvailable": true,
+  "productionLocaleAllowed": false,
   "reviewPacketAssigned": false,
   "reviewStarted": false,
   "humanReviewRequired": true,

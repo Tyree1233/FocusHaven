@@ -149,21 +149,21 @@ void main() {
     );
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.planned,
+      FocusHavenLocaleStatus.integration,
     );
     expect(
       Directory('lib/l10n').listSync().whereType<File>().where(
         (file) => file.path.endsWith('.arb'),
       ),
-      hasLength(1),
+      hasLength(2),
     );
-    expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
+    expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);
     expect(
       main,
-      contains('supportedLocales: AppLocalizations.supportedLocales'),
+      contains('supportedLocales: FocusHavenLocales.productionLocales'),
     );
-    expect(registry, contains("status: FocusHavenLocaleStatus.planned"));
+    expect(registry, contains("status: FocusHavenLocaleStatus.integration"));
     expect(review, contains('"candidatePresent": true'));
     expect(review, contains('"runtimeActivated": false'));
   });

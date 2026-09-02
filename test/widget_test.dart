@@ -38,14 +38,22 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
   });
 
-  testWidgets('exposes only the complete English localization catalog', (
+  testWidgets('exposes only the production-approved English locale', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const FocusHavenApp());
 
     final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(materialApp.supportedLocales, FocusHavenLocales.productionLocales);
-    expect(materialApp.supportedLocales, AppLocalizations.supportedLocales);
+    expect(materialApp.supportedLocales, const <Locale>[Locale('en')]);
+    expect(
+      AppLocalizations.supportedLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
+    expect(
+      materialApp.supportedLocales,
+      isNot(AppLocalizations.supportedLocales),
+    );
     expect(
       materialApp.localizationsDelegates,
       contains(AppLocalizations.delegate),

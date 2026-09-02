@@ -99,11 +99,11 @@ void main() {
     final packet = File('localization/reviews/es/packets/review-packet.json');
     expect(packet.existsSync(), isTrue);
     expect(_sha256(packet.path), review['reviewPacketSha256']);
-    expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
+    expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.planned,
+      FocusHavenLocaleStatus.integration,
     );
   });
 

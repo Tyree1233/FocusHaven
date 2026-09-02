@@ -726,9 +726,9 @@ not cover these capabilities.
 ## Languages and global releases
 
 FocusHaven now has a generated Flutter localization foundation, with English as
-the source catalog and the only production-supported runtime locale. Spanish,
-French, German, and Brazilian Portuguese are the planned first translation
-wave; they are deliberately not advertised by the app or stores until every
+the source catalog and the only production-supported runtime locale. Spanish is
+an exact reviewed integration catalog; French, German, and Brazilian Portuguese
+remain planned. None is advertised by the app or stores until every
 user-visible string, accessibility label, error, permission explanation,
 notification, widget/watch surface, voice path, policy, help resource, and
 store listing required for that locale has been reviewed.
@@ -912,6 +912,16 @@ proof and exact source, candidate, packet, and sanitized-payload hashes. The
 unused C2C assignment records remain absent. This validation checkpoint does
 not move Spanish into `lib/l10n` or qualify runtime, voice/coaching, native,
 store, country, or public-language support; Spanish remains runtime inactive.
+
+Phase 215G-C3A now integrates a byte-identical copy of that reviewed Spanish
+catalog into Flutter's generated-localization pipeline for isolated runtime and
+widget testing. Generated delegates now cover English and Spanish, while the
+production `MaterialApp` is deliberately wired to the separate English-only
+`FocusHavenLocales.productionLocales` allowlist. Spanish therefore remains
+runtime inactive for customers and is not advertised or claimed in stores.
+Voice/coaching, native/store resources, accessibility layouts, signed builds,
+and country-release qualification remain later independent gates. No reviewer
+identity, workbook, private content, or translation-provider data is included.
 
 ## Architecture
 

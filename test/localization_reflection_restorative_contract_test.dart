@@ -252,7 +252,7 @@ void main() {
           .whereType<File>()
           .where((file) => file.path.endsWith('.arb'))
           .length,
-      1,
+      2,
     );
   });
 }

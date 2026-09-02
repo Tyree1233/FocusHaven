@@ -91,11 +91,11 @@ void main() {
     );
     expect(audit['pendingDecisionCount'], 980);
     expect(audit['completedDecisionCount'], 0);
-    expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
+    expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.planned,
+      FocusHavenLocaleStatus.integration,
     );
   });
 }

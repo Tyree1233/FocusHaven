@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C2D private Spanish validation complete; Spanish remains
-runtime inactive
+Status: Phase 215G-C3A reviewed Spanish catalog integration; production remains
+English-only
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -12,9 +12,10 @@ country release readiness.
 
 - English (`en`) is the source catalog and the only production-supported
   runtime locale.
-- Spanish (`es`), French (`fr`), German (`de`), and Brazilian Portuguese
-  (`pt-BR`) form the planned first translation wave.
-- Planned locales are not exposed by `MaterialApp.supportedLocales` and must
+- Spanish (`es`) is a generated integration locale. French (`fr`), German
+  (`de`), and Brazilian Portuguese (`pt-BR`) remain planned.
+- Integration and planned locales are not exposed by the production
+  `MaterialApp.supportedLocales` allowlist and must
   not appear as supported languages in Apple or Google store metadata.
 - Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5 catalog-own onboarding, appearance selection,
   custom-duration chrome, guided breathing, timer accessibility, the bounded
@@ -75,14 +76,23 @@ country release readiness.
   and exact content locks enter Git. The prepared C2C named-assignment path was
   not used. Spanish remains outside `lib/l10n` and runtime inactive pending
   language-specific integration and later release gates.
+- Phase 215G-C3A copies the exact reviewed Spanish catalog into `lib/l10n` so
+  Flutter can generate and test the Spanish delegate, ICU plurals,
+  placeholders, onboarding, and fallback behavior. The copy is byte-identical
+  to the reviewed candidate. The production app uses a separate explicit
+  English-only locale allowlist, so a Spanish device still receives English.
+  This phase does not qualify voice/coaching, native or store resources,
+  accessibility layouts, signed builds, country distribution, advertising, or
+  public Spanish support.
 
 ## Catalog authority
 
 Flutter's generated localization pipeline is the runtime authority. The
 English ARB file is the source catalog, each message requires descriptive
 metadata, and generated Dart files are build artifacts rather than reviewed
-source. Locale definitions separately distinguish `production` from
-`planned`; adding a definition cannot activate a locale.
+source. Locale definitions separately distinguish `production`, generated
+`integration`, and `planned` states; generating a delegate cannot activate a
+locale in the production allowlist.
 
 The following content must be catalog-owned before another locale can be
 considered complete:

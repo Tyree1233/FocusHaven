@@ -50,13 +50,13 @@ void main() {
     expect(builder, isNot(contains('translation provider')));
   });
 
-  test('Spanish stays outside runtime and production catalogs', () {
+  test('Spanish integration stays outside the production allowlist', () {
     expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.planned,
+      FocusHavenLocaleStatus.integration,
     );
-    expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
+    expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);
     expect(
       File('localization/intake/es/translations.json').existsSync(),

@@ -247,3 +247,13 @@ notes; change the accepted candidate; copy Spanish into `lib/l10n`; activate a
 locale; qualify voice, coaching, native, store, support, policy, screenshot,
 signed-build, or country surfaces; contact a provider; deploy; upload; invoke;
 or make a public language or country availability claim.
+
+## Phase 215G-C3A integration boundary
+
+Phase 215G-C3A may copy only the exact reviewed Spanish candidate into
+`lib/l10n` and generate Flutter's Spanish delegate. The production app remains
+wired to the explicit English-only `FocusHavenLocales.productionLocales`
+allowlist. Generation and isolated widget tests do not activate or advertise
+Spanish, qualify voice/coaching or native/store surfaces, change a saved
+language, contact a provider, deploy, upload, or make a language or country
+availability claim.

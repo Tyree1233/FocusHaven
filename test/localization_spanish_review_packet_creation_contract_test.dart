@@ -115,11 +115,11 @@ void main() {
     expect(audit['externalTranslationProviderUsed'], isFalse);
     expect(audit['privateRuntimeDataIncluded'], isFalse);
 
-    expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
+    expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.planned,
+      FocusHavenLocaleStatus.integration,
     );
   });
 

@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-B6C3 English Flutter localization extraction is implemented
+Status: living product contract; Phase 215G-C3A Spanish runtime integration is in verification
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -67,7 +67,7 @@ Every future phase must preserve these rules:
 | Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, and Journey context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add local-coach context as one bounded, reviewable connection. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
-| Global localization | English Flutter extraction shipped | Generated Flutter localization is wired to the English source catalog. Core presentation and all audited Flutter-owned user-facing service results are catalog-owned. English is the only production runtime locale; Spanish, French, German, and Brazilian Portuguese are planned, not current language claims. | Human-review first-wave catalogs, language-aware understanding, and native/store surfaces before qualifying each locale independently. |
+| Global localization | Spanish integration testing | Generated Flutter localization contains the English source and exact reviewed Spanish catalog. The production allowlist remains English-only; French, German, and Brazilian Portuguese remain planned. No additional language is a current public-support claim. | Complete Spanish layout/accessibility, voice/coaching, native/store, signed-build, and country gates before production activation, then reuse the same review pipeline for later locales. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
@@ -300,7 +300,8 @@ additional languages. Locale availability must remain truthful: an incomplete
 catalog is not a supported language.
 
 Status: Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5/B6A/B6B1/B6B2/B6C1/B6C2/B6C3 English Flutter extraction are
-implemented in the current source. Flutter's generated localization pipeline
+implemented in the current source. The English Flutter extraction shipped
+before Spanish integration began. Flutter's generated localization pipeline
 owns the application title plus onboarding, appearance selection,
 custom-duration chrome, guided breathing, and the main timer's complete
 screen-reader description through one English ARB source catalog. B2 adds the
@@ -455,6 +456,16 @@ stored in Git. Only anonymous aggregate evidence and exact content hashes are
 recorded. The unused C2C assignment records remain absent. Spanish stays
 outside `lib/l10n` and runtime inactive while isolated integration, layout,
 accessibility, voice/coaching, native, store, and country gates remain pending.
+
+Phase 215G-C3A begins isolated runtime integration. The exact reviewed Spanish
+catalog is copied byte-for-byte into `lib/l10n`, allowing Flutter generation
+and explicit Spanish widget tests for translated onboarding, ICU plurals,
+placeholders, and catalog lookup. Production locale exposure is no longer tied
+directly to every generated delegate: `FocusHavenApp` uses the separate
+English-only `FocusHavenLocales.productionLocales` allowlist and falls back to
+English on Spanish devices. Spanish is therefore generated but production
+inactive, unadvertised, and still blocked on layout/accessibility,
+voice/coaching, native/store, signed-build, and country-release gates.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

@@ -41,7 +41,7 @@ void main() {
     },
   );
 
-  test('production and planned locale claims remain deliberately separate', () {
+  test('production, integration, and planned locale claims stay separate', () {
     expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
     expect(FocusHavenLocales.production, hasLength(1));
     expect(
@@ -61,7 +61,11 @@ void main() {
       ],
     );
     expect(
-      FocusHavenLocales.firstTranslationWave,
+      FocusHavenLocales.firstTranslationWave.first.status,
+      FocusHavenLocaleStatus.integration,
+    );
+    expect(
+      FocusHavenLocales.firstTranslationWave.skip(1),
       everyElement(
         isA<FocusHavenLocaleDefinition>().having(
           (definition) => definition.status,
@@ -70,6 +74,7 @@ void main() {
         ),
       ),
     );
+    expect(FocusHavenLocales.integrationLocales, const <Locale>[Locale('es')]);
     expect(
       FocusHavenLocales.productionLocales.toSet().intersection(
         FocusHavenLocales.firstTranslationWave
@@ -94,8 +99,9 @@ void main() {
     );
     expect(
       main,
-      contains('supportedLocales: AppLocalizations.supportedLocales'),
+      contains('supportedLocales: FocusHavenLocales.productionLocales'),
     );
+    expect(main, contains("import 'l10n/focus_haven_locales.dart';"));
     expect(main, contains('AppLocalizations.of(context).appTitle'));
     expect(main, isNot(contains("title: 'FocusHaven'")));
 
@@ -114,8 +120,8 @@ void main() {
 
     for (final required in <String>[
       'English (`en`) is the source catalog and the only production-supported runtime locale',
-      'Spanish (`es`), French (`fr`), German (`de`), and Brazilian Portuguese (`pt-BR`)',
-      'Planned locales are not exposed by `MaterialApp.supportedLocales`',
+      'Spanish (`es`) is a generated integration locale',
+      'Integration and planned locales are not exposed by the production `MaterialApp.supportedLocales` allowlist',
       'no private user content is sent anywhere for translation',
       'qualified human reviewer',
       'Voice-to-Coach and safe voice commands',
@@ -127,7 +133,7 @@ void main() {
 
     expect(
       roadmap,
-      contains('| Global localization | English Flutter extraction shipped |'),
+      contains('| Global localization | Spanish integration testing |'),
     );
     expect(
       roadmap,
@@ -140,7 +146,7 @@ void main() {
       contains('Phase 215G-B English Flutter extraction is complete'),
     );
     expect(readme, contains('English as the source catalog'));
-    expect(readme, contains('deliberately not advertised'));
+    expect(readme, contains('None is advertised by the app or stores'));
     expect(readme, contains('docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md'));
   });
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-enum FocusHavenLocaleStatus { production, planned }
+enum FocusHavenLocaleStatus { production, integration, planned }
 
 class FocusHavenLocaleDefinition {
   const FocusHavenLocaleDefinition({
@@ -35,7 +35,7 @@ abstract final class FocusHavenLocales {
       languageCode: 'es',
       englishName: 'Spanish',
       nativeName: 'Español',
-      status: FocusHavenLocaleStatus.planned,
+      status: FocusHavenLocaleStatus.integration,
     ),
     FocusHavenLocaleDefinition(
       languageCode: 'fr',
@@ -59,4 +59,8 @@ abstract final class FocusHavenLocales {
   ];
 
   static const productionLocales = <Locale>[Locale('en')];
+
+  // Catalogs in this list may be generated and exercised by integration tests,
+  // but they are deliberately excluded from the production locale allowlist.
+  static const integrationLocales = <Locale>[Locale('es')];
 }

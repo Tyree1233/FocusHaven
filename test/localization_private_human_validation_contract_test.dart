@@ -81,7 +81,7 @@ void main() {
     );
   });
 
-  test('C2D keeps Spanish isolated and production runtime English-only', () {
+  test('C2D proof remains valid while production stays English-only', () {
     final record = _json(
       'localization/reviews/es/private-human-validation.json',
     );
@@ -96,11 +96,11 @@ void main() {
     expect(record['runtimeActivated'], isFalse);
     expect(record['voiceAndCoachingQualified'], isFalse);
     expect(record['nativeAndStoreQualified'], isFalse);
-    expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
+    expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.planned,
+      FocusHavenLocaleStatus.integration,
     );
     expect(docs, contains('Phase 215G-C2D'));
     expect(docs, contains('private validation'));

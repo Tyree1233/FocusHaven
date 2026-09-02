@@ -52,12 +52,14 @@ unused assignment authorization and assignment record remain absent.
 
 ## Runtime boundary
 
-Private validation does not itself activate Spanish. The candidate remains at
-`localization/candidates/app_es.arb`, outside `lib/l10n`; English remains the
-only production locale. Spanish voice and coaching, native resources, public
-policies, store listings, screenshots, signed builds, and country releases are
-still independently unqualified.
+Private validation does not itself activate Spanish. Phase 215G-C3A may copy
+the exact reviewed candidate into `lib/l10n` for generated-delegate and isolated
+integration testing, but `FocusHavenApp` continues to use the separate
+English-only production locale allowlist. Spanish voice and coaching, native
+resources, public policies, store listings, screenshots, signed builds, and
+country releases remain independently unqualified.
 
-The next phase may build an isolated Spanish integration candidate and run
-Flutter generation, complete tests, layout, accessibility, fallback, and
-real-device checks. Production activation remains a later explicit decision.
+The integration phase runs Flutter generation, complete tests, explicit
+Spanish rendering, ICU plural, fallback, and production-allowlist checks.
+Layout, accessibility, voice, native/store, and real-device qualification still
+remain before a later explicit production-activation decision.
