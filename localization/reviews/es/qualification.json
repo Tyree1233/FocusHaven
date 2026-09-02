@@ -83,6 +83,18 @@
     "haven_actions",
     "account_privacy"
   ],
+  "sessionPathAccessibilityPhase": "215G-C3C",
+  "sessionPathAccessibilityStatus": "expanded_verified",
+  "sessionPathAccessibilityTestWidth": 320,
+  "sessionPathAccessibilityTextScale": 1.6,
+  "sessionPathAccessibilitySurfaces": [
+    "timer_dashboard",
+    "appearance",
+    "custom_duration",
+    "guided_breathing",
+    "focus_queue",
+    "completed_tasks"
+  ],
   "reviewPacketAssigned": false,
   "reviewStarted": false,
   "humanReviewRequired": true,

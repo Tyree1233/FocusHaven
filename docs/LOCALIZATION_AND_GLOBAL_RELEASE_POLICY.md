@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3B critical Spanish layout/accessibility verification;
+Status: Phase 215G-C3C expanded Spanish session-path accessibility verification;
 production remains English-only
 
 FocusHaven is intended to become useful in multiple languages without making
@@ -95,6 +95,15 @@ country release readiness.
   reachable. This gate does not represent complete device, screen-reader,
   voice, native/store, signed-build, or country qualification and does not
   change the production locale allowlist.
+- Phase 215G-C3C expands the bounded 320-pixel, 1.6x-text gate across the
+  everyday session path: the timer dashboard, Appearance, Custom Duration,
+  Mindful Pause, Focus Queue, and Completed Tasks. It verifies translated
+  semantics or tooltips, preserves opaque user-authored task text, and keeps
+  primary controls reachable by scrolling. Custom Duration and Mindful Pause
+  now scroll when translation or text scaling exceeds the available height.
+  This remains an isolated Flutter integration gate, not complete
+  screen-reader, real-device, voice/coaching, native/store, signed-build,
+  country, or production-locale qualification.
 
 ## Catalog authority
 

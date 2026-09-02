@@ -102,7 +102,8 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
     };
     return SafeArea(
       top: false,
-      child: Padding(
+      child: SingleChildScrollView(
+        key: const ValueKey<String>('guided-breathing-scroll'),
         padding: const EdgeInsets.fromLTRB(24, 14, 24, 30),
         child: Column(
           mainAxisSize: MainAxisSize.min,

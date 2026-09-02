@@ -101,7 +101,8 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
         '${_selectedSeconds.toString().padLeft(2, '0')}';
     return SafeArea(
       top: false,
-      child: Padding(
+      child: SingleChildScrollView(
+        key: const ValueKey<String>('custom-duration-scroll'),
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,

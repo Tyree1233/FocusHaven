@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-C3B critical Spanish layout/accessibility verification is in progress
+Status: living product contract; Phase 215G-C3C expanded Spanish session-path accessibility verification is in progress
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -478,6 +478,16 @@ conversation viewport when narrow width or enlarged text would otherwise crowd
 those controls. This is not complete screen-reader, real-device,
 voice/coaching, native/store, signed-build, country, or production-locale
 qualification.
+
+Phase 215G-C3C expands that isolated gate to the everyday session path. At a
+320-pixel phone width and 1.6x text, tests cover the Spanish timer dashboard,
+Appearance, Custom Duration, Mindful Pause, Focus Queue, and Completed Tasks;
+they verify translated controls and accessibility labels, scroll reachability,
+unchanged opaque task text, and no layout exceptions. Custom Duration and
+Mindful Pause gain vertical scrolling for translated or enlarged content. The
+reviewed catalog and English-only production allowlist remain unchanged. This
+is not complete screen-reader, real-device, voice/coaching, native/store,
+signed-build, country, or production-locale qualification.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

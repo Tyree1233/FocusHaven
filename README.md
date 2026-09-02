@@ -935,6 +935,17 @@ a bounded viewport, so the composer and care boundary remain reachable.
 This bounded gate does not activate Spanish or claim complete device,
 screen-reader, voice, native/store, signed-build, or country qualification.
 
+Phase 215G-C3C expands the isolated Spanish accessibility gate to the everyday
+session path at a 320-pixel phone width and 1.6x text. It covers the timer
+dashboard, Appearance, Custom Duration, Mindful Pause, Focus Queue, and
+Completed Tasks; verifies translated controls and accessibility labels; keeps
+synthetic user-authored task text opaque; and checks that primary actions remain
+reachable without layout exceptions. Custom Duration and Mindful Pause now
+scroll when translated or enlarged content exceeds the available height. The
+reviewed Spanish catalog remains byte-identical to its candidate and the
+production locale allowlist remains English-only. Voice/coaching, native/store,
+signed-build, country, and public Spanish support remain separate later gates.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.
