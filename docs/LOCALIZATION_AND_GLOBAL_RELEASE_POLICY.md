@@ -38,6 +38,11 @@ country release readiness.
   intake, adds a fail-closed structural auditor and pending human-review record,
   and keeps every candidate outside `lib/l10n`. It creates no Spanish catalog,
   activates no locale, and makes no language or country availability claim.
+- Phase 215G-C1A adds a deterministic, exact-source-locked Spanish candidate
+  builder. It accepts only complete translation bundles, preserves metadata and
+  placeholders, requires rationales for source-equal values, writes only to the
+  isolated candidate path, and refuses overwrite. It creates no bundle or
+  candidate and does not approve or activate Spanish.
 
 ## Catalog authority
 

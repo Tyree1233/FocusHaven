@@ -402,6 +402,13 @@ candidate exists in the production catalog directory, and no reviewer approval,
 runtime activation, voice qualification, native/store qualification, or country
 claim is implied.
 
+Phase 215G-C1A candidate preparation adds an exact-source-locked, fail-closed
+builder for the future isolated Spanish candidate. It requires complete key
+parity, safe placeholders, non-empty translations, and explicit rationales for
+intentional source-equal values, and it refuses production-directory output or
+overwrite. This preparation slice creates no translation bundle or candidate,
+contacts no translation provider, and leaves Spanish planned and inactive.
+
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a

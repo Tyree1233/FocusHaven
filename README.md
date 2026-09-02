@@ -853,6 +853,14 @@ candidate must remain outside `lib/l10n` until structural parity and qualified
 human review are recorded; voice/coaching, native, policy, support, store, and
 country qualification remain later independent gates.
 
+Phase 215G-C1A now adds the deterministic, fail-closed builder for a future
+isolated Spanish candidate. The builder requires an exact locked source,
+complete translation-key parity, preserved ICU placeholders, non-empty values,
+and explicit rationales for intentional source-equal terms. It can write only
+to `localization/candidates/app_es.arb` and refuses overwrite. This phase does
+not create a translation bundle or Spanish candidate, contact a translation
+provider, approve Spanish wording, or activate or advertise Spanish.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

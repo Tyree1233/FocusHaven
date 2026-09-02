@@ -14,6 +14,11 @@ Phase 215G-C0 establishes that boundary. It does not translate or activate a
 language. Spanish remains planned and inactive. French, German, and Brazilian
 Portuguese remain later members of the planned first wave.
 
+Phase 215G-C1A adds the deterministic candidate builder and controlled input
+contract described in `docs/LOCALIZATION_SPANISH_CANDIDATE_PREPARATION.md`.
+It still creates no translation bundle or Spanish candidate. The builder is a
+fail-closed preparation mechanism, not a translation or approval authority.
+
 ## Locked English source
 
 The Spanish intake starts from the exact English source below:
@@ -126,8 +131,10 @@ No single state silently implies the next one.
 
 ## Remaining gates
 
-Phase 215G-C1 will create and structurally audit the complete Spanish candidate
-against the locked English source. Human approval remains separate from
+Phase 215G-C1A prepares the isolated builder without creating a candidate.
+Phase 215G-C1B will create and structurally audit the complete Spanish candidate
+against the locked English source only after the translation-draft source and
+data boundary are explicitly chosen. Human approval remains separate from
 catalog generation.
 
 Voice and coaching qualification remains Phase 215G-D. Spanish UI copy alone
