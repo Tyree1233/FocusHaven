@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-C3D Spanish automated screen-reader preparation is in progress
+Status: living product contract; Phase 215G-C3E Spanish physical-device integration preparation is in progress
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -499,6 +499,16 @@ pinning the reviewed Spanish catalog and English-only production allowlist.
 The qualification explicitly keeps physical TalkBack/VoiceOver acceptance
 and complete screen-reader qualification false; real-device, voice/coaching,
 native/store, signed-build, country, and activation gates remain separate.
+
+Phase 215G-C3E prepares the real-device half without changing production
+locale exposure. A separate integration entry point is accepted only in debug
+mode with an explicit Spanish-device-test compile-time flag; it pins the locale
+to Spanish and limits delegates to the exact English and reviewed Spanish
+catalogs. The normal entry point continues to pass the literal English-only
+production allowlist. This preparation does not add a language preference,
+permission, dependency, backend, deployment, store claim, or production
+activation, and physical TalkBack acceptance remains false until a person
+completes the bounded checklist on the approved phone.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

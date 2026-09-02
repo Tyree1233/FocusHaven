@@ -26,7 +26,18 @@ import 'widgets/focus_shield_platform_host.dart';
 import 'widgets/haven_window_platform_host.dart';
 import 'widgets/system_focus_platform_host.dart';
 
-Future<void> main() async {
+Future<void> main() =>
+    runFocusHaven(supportedLocales: FocusHavenLocales.productionLocales);
+
+/// Starts the complete application with an explicitly bounded locale surface.
+///
+/// Production passes [FocusHavenLocales.productionLocales]. A separate,
+/// debug-only integration entry point may pass the exact reviewed Spanish test
+/// surface without changing the production allowlist or a saved preference.
+Future<void> runFocusHaven({
+  Locale? locale,
+  required List<Locale> supportedLocales,
+}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final notificationService = NotificationService();
@@ -83,6 +94,8 @@ Future<void> main() async {
       journalService: journalService,
       reminderService: reminderService,
       showOnboarding: showOnboarding,
+      locale: locale,
+      supportedLocales: supportedLocales,
     ),
   );
 }
@@ -100,6 +113,8 @@ class FocusHavenApp extends StatelessWidget {
     this.journalService,
     this.reminderService,
     this.showOnboarding = true,
+    this.locale,
+    this.supportedLocales = FocusHavenLocales.productionLocales,
   });
 
   final AuthService? authService;
@@ -112,6 +127,8 @@ class FocusHavenApp extends StatelessWidget {
   final JournalService? journalService;
   final ReminderService? reminderService;
   final bool showOnboarding;
+  final Locale? locale;
+  final List<Locale> supportedLocales;
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +172,11 @@ class FocusHavenApp extends StatelessWidget {
       child: HavenWindowPlatformHost(
         child: FocusShieldPlatformHost(
           child: SystemFocusPlatformHost(
-            child: _FocusHavenMaterialApp(showOnboarding: showOnboarding),
+            child: _FocusHavenMaterialApp(
+              showOnboarding: showOnboarding,
+              locale: locale,
+              supportedLocales: supportedLocales,
+            ),
           ),
         ),
       ),
@@ -165,9 +186,15 @@ class FocusHavenApp extends StatelessWidget {
 
 /// Rebuilds only the application theme when the selected palette changes.
 class _FocusHavenMaterialApp extends ConsumerWidget {
-  const _FocusHavenMaterialApp({required this.showOnboarding});
+  const _FocusHavenMaterialApp({
+    required this.showOnboarding,
+    required this.locale,
+    required this.supportedLocales,
+  });
 
   final bool showOnboarding;
+  final Locale? locale;
+  final List<Locale> supportedLocales;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -176,7 +203,8 @@ class _FocusHavenMaterialApp extends ConsumerWidget {
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: FocusHavenLocales.productionLocales,
+      locale: locale,
+      supportedLocales: supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,

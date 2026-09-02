@@ -109,6 +109,13 @@
     "focus_queue",
     "completed_tasks"
   ],
+  "deviceIntegrationPreparationPhase": "215G-C3E",
+  "deviceIntegrationPreparationStatus": "debug_target_verified_pending_physical_acceptance",
+  "deviceIntegrationTarget": "lib/main_spanish_integration.dart",
+  "deviceIntegrationCompileFlag": "FOCUSHAVEN_SPANISH_DEVICE_TEST=true",
+  "deviceIntegrationDebugOnly": true,
+  "deviceIntegrationLocale": "es",
+  "deviceIntegrationPhysicalAcceptanceStarted": false,
   "screenReaderPhysicalAcceptancePassed": false,
   "screenReaderQualified": false,
   "reviewPacketAssigned": false,

@@ -956,6 +956,16 @@ announcements and preserve the reviewed catalog lock. Physical TalkBack and
 VoiceOver acceptance, real-device Spanish runtime, voice/coaching,
 native/store, signed-build, country, and production activation remain pending.
 
+Phase 215G-C3E prepares a separate debug-only Spanish device-test target for
+physical TalkBack acceptance. The target requires the explicit
+`FOCUSHAVEN_SPANISH_DEVICE_TEST=true` compile-time authorization, rejects every
+non-debug build, fixes the test locale to Spanish, and exposes only the exact
+reviewed English and Spanish delegates. Normal builds still enter through
+`main.dart` with the English-only production allowlist. This preparation does
+not add a language selector or saved preference, activate or advertise
+Spanish, change permissions or dependencies, or claim that physical acceptance
+has passed.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

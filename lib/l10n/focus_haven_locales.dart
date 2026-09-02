@@ -63,4 +63,8 @@ abstract final class FocusHavenLocales {
   // Catalogs in this list may be generated and exercised by integration tests,
   // but they are deliberately excluded from the production locale allowlist.
   static const integrationLocales = <Locale>[Locale('es')];
+
+  // Exact locale surface for the separately targeted, debug-only Spanish
+  // device-test entry point. Production never reads this list.
+  static const spanishDeviceTestLocales = <Locale>[Locale('en'), Locale('es')];
 }

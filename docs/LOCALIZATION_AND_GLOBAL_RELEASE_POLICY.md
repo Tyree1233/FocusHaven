@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3D Spanish automated screen-reader preparation;
+Status: Phase 215G-C3E Spanish physical-device integration preparation;
 production remains English-only and physical acceptance remains pending
 
 FocusHaven is intended to become useful in multiple languages without making
@@ -114,6 +114,14 @@ country release readiness.
   C3B and C3C. Physical screen-reader acceptance, real-device Spanish runtime,
   voice/coaching, native/store, signed-build, country, and production-locale
   qualification remain false and separate.
+- Phase 215G-C3E adds a separate debug-only Spanish device-test entry point.
+  It requires an explicit compile-time authorization, rejects non-debug mode,
+  fixes the integration locale to `es`, and admits only the exact English and
+  reviewed Spanish delegates. Normal application builds continue through the
+  production entry point and its English-only allowlist. The device-test target
+  is preparation for a human-operated TalkBack check; it does not add a saved
+  language, alter permissions or dependencies, activate or advertise Spanish,
+  or record physical acceptance before that check is completed.
 
 ## Catalog authority
 
