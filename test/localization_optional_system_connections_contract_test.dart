@@ -190,14 +190,20 @@ void main() {
       'Haven Window suggestion headlines, details, and evidence and Focus Shield state headlines and details remain B6-owned',
       'changes no permission prompt, calendar access, calendar write behavior, reminder behavior, Focus Shield rule, platform bridge',
       'No locale was activated by B3C',
-      'B6 remains required',
+      'Phase 215G-B English Flutter extraction is complete',
     ]) {
       expect(inventory, contains(required));
     }
     expect(policy, contains('Phase 215G-B4'));
-    expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('B1–B6C2 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C3'));
+    expect(
+      policy,
+      contains('Phase 215G-B6C3 completes the English Flutter extraction'),
+    );
+    expect(roadmap, contains('English Flutter extraction shipped'));
+    expect(
+      roadmap,
+      contains('Phase 215G-B English Flutter extraction is complete'),
+    );
     expect(readme, contains('Phase 215G-B3C'));
     expect(
       readme,

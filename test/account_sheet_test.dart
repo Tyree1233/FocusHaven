@@ -40,7 +40,9 @@ class _FakeAuthService extends AuthService {
   bool get supportsAppleSignIn => appleSupported;
 
   @override
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle({
+    AppLocalizations? localizations,
+  }) async {
     signInCalls += 1;
     final pending = pendingSignIn;
     if (pending != null) {
@@ -50,7 +52,9 @@ class _FakeAuthService extends AuthService {
   }
 
   @override
-  Future<UserCredential?> signInWithApple() async {
+  Future<UserCredential?> signInWithApple({
+    AppLocalizations? localizations,
+  }) async {
     appleSignInCalls += 1;
     final pending = pendingSignIn;
     if (pending != null) return pending.future;
@@ -58,7 +62,7 @@ class _FakeAuthService extends AuthService {
   }
 
   @override
-  Future<void> signOut() async {
+  Future<void> signOut({AppLocalizations? localizations}) async {
     signOutCalls += 1;
     final pending = pendingSignOut;
     if (pending != null) {

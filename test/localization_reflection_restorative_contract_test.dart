@@ -222,15 +222,21 @@ void main() {
       'B3B — Reflection and restorative guidance',
       'Service-generated headlines, details, evidence, and explanations remain B6-owned',
       'Personal reflection content is never a catalog key',
-      'B6 remains required',
+      'Phase 215G-B English Flutter extraction is complete',
       'No locale was activated by B3B',
     ]) {
       expect(inventory, contains(required));
     }
     expect(policy, contains('Phase 215G-B4'));
-    expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('B1–B6C2 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C3'));
+    expect(
+      policy,
+      contains('Phase 215G-B6C3 completes the English Flutter extraction'),
+    );
+    expect(roadmap, contains('English Flutter extraction shipped'));
+    expect(
+      roadmap,
+      contains('Phase 215G-B English Flutter extraction is complete'),
+    );
     expect(readme, contains('Phase 215G-B3B'));
     expect(
       readme,

@@ -261,11 +261,19 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void> _signInWithGoogle() =>
-      _signIn(() => ref.read(authServiceProvider).signInWithGoogle());
+  Future<void> _signInWithGoogle() {
+    final l10n = context.l10n;
+    return _signIn(
+      () => ref.read(authServiceProvider).signInWithGoogle(localizations: l10n),
+    );
+  }
 
-  Future<void> _signInWithApple() =>
-      _signIn(() => ref.read(authServiceProvider).signInWithApple());
+  Future<void> _signInWithApple() {
+    final l10n = context.l10n;
+    return _signIn(
+      () => ref.read(authServiceProvider).signInWithApple(localizations: l10n),
+    );
+  }
 
   Future<void> _signIn(Future<Object?> Function() authenticate) async {
     if (!_beginAuthAction()) return;
@@ -294,7 +302,7 @@ class _AccountSheetState extends riverpod.ConsumerState<AccountSheet> {
     if (!_beginAuthAction()) return;
     final l10n = context.l10n;
     try {
-      await ref.read(authServiceProvider).signOut();
+      await ref.read(authServiceProvider).signOut(localizations: l10n);
     } catch (_) {
       _showMessage(l10n.accountSignOutFailed);
     } finally {

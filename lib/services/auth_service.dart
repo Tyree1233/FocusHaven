@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import 'privacy_safe_diagnostics.dart';
 
 abstract interface class AuthBackend {
@@ -165,7 +167,10 @@ class AuthService extends ChangeNotifier {
   String? get signInError => _signInError;
 
   bool get isSignedIn => user != null && !user!.isAnonymous;
-  String get displayName => user?.displayName ?? user?.email ?? 'Guest';
+  String get displayName =>
+      user?.displayName ??
+      user?.email ??
+      defaultServiceLocalizations().authServiceGuest;
 
   AuthService({
     this.authBackend,
@@ -214,17 +219,18 @@ class AuthService extends ChangeNotifier {
     } catch (_) {}
   }
 
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<UserCredential?> signInWithGoogle({
+    AppLocalizations? localizations,
+  }) async {
     if (_isDisposed) return null;
+    final l10n = localizations ?? defaultServiceLocalizations();
     try {
       _setSignInError(null);
       final googleBackend = _resolvedGoogleAuthBackend;
       final googleAuth = await googleBackend.authenticate();
       if (_isDisposed) return null;
       if (googleAuth == null) {
-        _setSignInError(
-          'Google sign-in was closed before an account was selected.',
-        );
+        _setSignInError(l10n.authServiceGoogleSignInCancelled);
         PrivacySafeDiagnostics.report(
           FocusHavenDiagnosticEvent.googleSignInCancelled,
         );
@@ -239,11 +245,7 @@ class AuthService extends ChangeNotifier {
       final backend = _resolvedAuthBackend;
       return backend.signInWithCredential(credential);
     } catch (error) {
-      _setSignInError(
-        error is FirebaseAuthException
-            ? (error.message ?? error.code)
-            : 'Google sign-in could not start: ${error.runtimeType}',
-      );
+      _setSignInError(l10n.authServiceGoogleSignInFailed);
       PrivacySafeDiagnostics.report(
         FocusHavenDiagnosticEvent.googleSignIn,
         error: error,
@@ -258,10 +260,13 @@ class AuthService extends ChangeNotifier {
           (defaultTargetPlatform == TargetPlatform.iOS ||
               defaultTargetPlatform == TargetPlatform.macOS));
 
-  Future<UserCredential?> signInWithApple() async {
+  Future<UserCredential?> signInWithApple({
+    AppLocalizations? localizations,
+  }) async {
     if (_isDisposed) return null;
+    final l10n = localizations ?? defaultServiceLocalizations();
     if (!supportsAppleSignIn) {
-      _setSignInError('Sign in with Apple is unavailable on this device.');
+      _setSignInError(l10n.authServiceAppleSignInUnavailable);
       return null;
     }
     try {
@@ -269,19 +274,13 @@ class AuthService extends ChangeNotifier {
       return await _resolvedAuthBackend.signInWithProvider(AppleAuthProvider());
     } catch (error) {
       if (_isProviderCancellation(error)) {
-        _setSignInError(
-          'Apple sign-in was closed before an account was selected.',
-        );
+        _setSignInError(l10n.authServiceAppleSignInCancelled);
         PrivacySafeDiagnostics.report(
           FocusHavenDiagnosticEvent.appleSignInCancelled,
         );
         return null;
       }
-      _setSignInError(
-        error is FirebaseAuthException
-            ? (error.message ?? error.code)
-            : 'Apple sign-in could not start: ${error.runtimeType}',
-      );
+      _setSignInError(l10n.authServiceAppleSignInFailed);
       PrivacySafeDiagnostics.report(
         FocusHavenDiagnosticEvent.appleSignIn,
         error: error,
@@ -370,8 +369,9 @@ class AuthService extends ChangeNotifier {
     await signInAnonymouslyIfNeeded();
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut({AppLocalizations? localizations}) async {
     if (_isDisposed) return;
+    final l10n = localizations ?? defaultServiceLocalizations();
     _setSignInError(null);
     try {
       final backend = _resolvedAuthBackend;
@@ -382,7 +382,7 @@ class AuthService extends ChangeNotifier {
         error: error,
       );
       Error.throwWithStackTrace(
-        StateError('FocusHaven could not sign out of this account.'),
+        StateError(l10n.authServiceSignOutFailed),
         stackTrace,
       );
     }

@@ -164,9 +164,12 @@ void main() {
     }
 
     expect(policy, contains('215G-B1, B2, B3A, B3B, B3C, B4, and B5'));
-    expect(policy, contains('not complete Phase 215G-B'));
-    expect(roadmap, contains('B1–B6C2 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C3'));
+    expect(policy, contains('English Flutter extraction is complete'));
+    expect(roadmap, contains('English Flutter extraction shipped'));
+    expect(
+      roadmap,
+      contains('Phase 215G-B English Flutter extraction is complete'),
+    );
   });
 }
 

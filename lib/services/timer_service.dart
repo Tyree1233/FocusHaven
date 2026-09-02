@@ -13,20 +13,6 @@ import 'notification_service.dart';
 
 enum SessionType { focus, shortBreak, longBreak }
 
-extension SessionTypeDetails on SessionType {
-  String get label => switch (this) {
-    SessionType.focus => 'Focus',
-    SessionType.shortBreak => 'Short break',
-    SessionType.longBreak => 'Long break',
-  };
-
-  String get encouragement => switch (this) {
-    SessionType.focus => 'Give your full attention to one thing.',
-    SessionType.shortBreak => 'Step away and let your mind breathe.',
-    SessionType.longBreak => 'You earned a longer moment to recharge.',
-  };
-}
-
 class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   static const _timerEndsAtKey = 'timerEndsAt';
   static const _pendingResumeKey = 'hasPendingTimerResume';
@@ -132,30 +118,42 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
 
   /// A private, readable summary that can be copied to the user's clipboard.
   /// FocusHaven never sends this text anywhere on its own.
-  String get focusHistoryExport {
+  String get focusHistoryExport => focusHistoryExportFor(_localizations);
+
+  String focusHistoryExportFor(AppLocalizations localizations) {
+    final l10n = localizations;
     final buffer = StringBuffer()
-      ..writeln('FocusHaven focus history')
-      ..writeln('Exported: ${_exportDateTime(DateTime.now())}')
+      ..writeln(l10n.timerServiceExportTitle)
+      ..writeln(l10n.timerServiceExportedAt(_exportDateTime(DateTime.now())))
       ..writeln()
-      ..writeln('Summary')
-      ..writeln('- Total focus time: ${_exportDuration(totalFocusSeconds)}')
-      ..writeln('- Completed sessions: $completedFocusSessions')
+      ..writeln(l10n.timerServiceExportSummaryHeading)
       ..writeln(
-        '- Current streak: $currentStreak ${currentStreak == 1 ? 'day' : 'days'}',
+        l10n.timerServiceExportTotalFocusTime(
+          _exportDuration(totalFocusSeconds, l10n),
+        ),
       )
-      ..writeln('- Daily goal: $dailyGoalMinutes minutes')
+      ..writeln(
+        l10n.timerServiceExportCompletedSessions(completedFocusSessions),
+      )
+      ..writeln(l10n.timerServiceExportCurrentStreak(currentStreak))
+      ..writeln(l10n.timerServiceExportDailyGoal(dailyGoalMinutes))
       ..writeln()
-      ..writeln('Sessions');
+      ..writeln(l10n.timerServiceExportSessionsHeading);
 
     if (_focusHistory.isEmpty) {
-      buffer.writeln('- No completed focus sessions yet.');
+      buffer.writeln(l10n.timerServiceExportNoSessions);
     } else {
       for (final session in recentFocusSessions) {
         final task = session.focusTask?.trim();
-        final taskLabel = task == null || task.isEmpty ? 'Focus session' : task;
+        final taskLabel = task == null || task.isEmpty
+            ? l10n.timerServiceExportFocusSession
+            : task;
         buffer.writeln(
-          '- ${_exportDateTime(session.completedAt)} — '
-          '${_exportDuration(session.durationSeconds)} — $taskLabel',
+          l10n.timerServiceExportSessionRow(
+            _exportDateTime(session.completedAt),
+            _exportDuration(session.durationSeconds, l10n),
+            taskLabel,
+          ),
         );
       }
     }
@@ -1362,17 +1360,18 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
     return '${localDate.year}-$month-$day $hour:$minute';
   }
 
-  static String _exportDuration(int seconds) {
+  static String _exportDuration(int seconds, AppLocalizations localizations) {
     if (seconds < 60) {
-      return '$seconds ${seconds == 1 ? 'second' : 'seconds'}';
+      return localizations.timerServiceExportSeconds(seconds);
     }
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
-    final minuteLabel = '$minutes ${minutes == 1 ? 'minute' : 'minutes'}';
     if (remainingSeconds == 0) {
-      return minuteLabel;
+      return localizations.timerServiceExportMinutes(minutes);
     }
-    return '$minuteLabel $remainingSeconds '
-        '${remainingSeconds == 1 ? 'second' : 'seconds'}';
+    return localizations.timerServiceExportMinutesAndSeconds(
+      minutes,
+      remainingSeconds,
+    );
   }
 }

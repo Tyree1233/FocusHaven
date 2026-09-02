@@ -347,11 +347,47 @@ provider, changes no account, queue, timer, permission, dependency, backend,
 deployment, or store setting, and activates no planned locale. Phase 215G-B
 is therefore not complete.
 
-## Remaining Phase 215G-B slices
+## B6C3 — Remaining service results
 
-1. **B6C3 — Remaining service results:** authentication, store, journal
-   prompts, exports, and all other audited user-facing service errors and
-   receipts.
+The final English Flutter-extraction slice is now catalog-owned within these
+boundaries:
+
+- stable Google and Apple sign-in cancellation, availability, failure, guest,
+  and sign-out service results;
+- stable Pro-product availability, disabled-lifetime, store-query, and
+  purchase-start results without provider diagnostic text;
+- all seven deterministic daily Reflection Journal prompts;
+- private Focus History export headings, labels, rows, durations, counts, and
+  empty state;
+- generated Haven Plan fallback task, first-step, basis, energy-bound, and
+  time-bound guidance; and
+- all Living Lantern headlines and details derived from bounded timer and
+  text-free focus-event state.
+
+Private account identities, store prices, journal entries, moods, task names,
+completed-session data, and focus history remain opaque runtime values. They
+are never copied into catalog keys or sent to a translation provider. Provider
+exception messages and runtime types are no longer rendered as authentication
+or store copy; internal protocol, invariant, storage, platform-bridge, and
+diagnostic strings remain intentionally non-presentational.
+
+The account, store, journal, export, Haven Plan, and Living Lantern production
+paths pass the selected catalog explicitly. Direct service callers retain a
+deterministic English fallback. The unused legacy English `SessionType` label
+extension was removed; session presentation continues through catalog-owned
+UI and notification mappings.
+
+B6C3 changes no authentication provider, entitlement rule, product ID,
+purchase or restore behavior, journal persistence or prompt rotation, export
+destination, plan or lantern rule, timer or queue state, permission,
+dependency, backend, deployment, store setting, or saved language. It contacts
+no authentication, store, AI, or translation provider during verification.
+English remains the only production runtime locale.
+
+Phase 215G-B English Flutter extraction is complete. Phase 215G-C translation
+catalogs, Phase 215G-D language-aware voice and coaching, and Phase 215G-E
+native, policy, support, store-listing, screenshot, and country-release work
+remain independently gated.
 
 Native Apple, Android, widget, watch, permission-purpose, policy, support,
 store-listing, and screenshot localization remains Phase 215G-E.

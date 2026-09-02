@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B6C2 audited extraction contract
+Status: Phase 215G-B6C3 audited English Flutter-extraction contract
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -27,8 +27,11 @@ country release readiness.
   Phase 215G-B6C1 additionally catalog-owns Haven action interpretation,
   policy, and execution copy. Phase 215G-B6C2 catalog-owns deterministic
   Local-Coach responses, enhanced-AI fallback notices, and coaching service
-  errors and cleanup receipts. Remaining service strings are explicitly
-  inventoried for B6C3; this slice does not complete Phase 215G-B.
+  errors and cleanup receipts. Phase 215G-B6C3 catalog-owns the remaining
+  authentication, store, journal-prompt, private-export, Haven Plan, and Living
+  Lantern service results. Phase 215G-B English Flutter extraction is
+  complete; translation, language-aware understanding, native resources, and
+  country-release qualification are not.
 - No runtime translation service is used, and no private user content is sent
   anywhere for translation.
 
@@ -114,7 +117,8 @@ tasks must still be evaluated from the console's current state.
   truthful locale registry, documentation, and contract tests.
 - **215G-B — English extraction:** move all current app-owned Flutter strings
   and semantics into the source catalog without changing behavior. B1, B2,
-  B3A, B3B, B3C, B4, B5, and B6A are audited; later B6 slices remain required. Phase 215G-B3B
+  B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, and B6C3 are audited;
+  the English Flutter extraction is complete. Phase 215G-B3B
   keeps personal reflection content outside the catalog and leaves generated
   restorative guidance with its B6 owner. Phase 215G-B3C catalog-owns optional
   connection chrome, permission and platform truth, and advisory boundaries
@@ -162,7 +166,14 @@ tasks must still be evaluated from the console's current state.
   is deliberately excluded from the Enhanced-AI prompt payload. English
   signal matching and command interpretation remain unchanged until Phase
   215G-D qualifies language-aware understanding.
-  B6 remains required through B6C3.
+  Phase 215G-B6C3 moves stable authentication and store results, daily journal
+  prompts, private Focus History export copy, Haven Plan guidance, and Living
+  Lantern guidance into the catalog. Private identities, prices, journal text,
+  moods, tasks, and history remain opaque values. Provider diagnostics are not
+  rendered as user copy, and all owning service behavior is unchanged.
+  Phase 215G-B6C3 completes the English Flutter extraction. Phase 215G-C,
+  215G-D, and 215G-E remain required before any additional locale or country
+  availability claim.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
   German, and Brazilian Portuguese one locale at a time.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,

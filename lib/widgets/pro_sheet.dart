@@ -16,13 +16,15 @@ class _ProSheetState extends ConsumerState<ProSheet> {
   static const _ink = Color(0xFF211442);
 
   final ScrollController _scrollController = ScrollController();
-  late final Future<String?> _priceFuture;
+  Future<String?>? _priceFuture;
   bool _storeActionInProgress = false;
 
   @override
-  void initState() {
-    super.initState();
-    _priceFuture = ref.read(iapServiceProvider).proPrice();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _priceFuture ??= ref
+        .read(iapServiceProvider)
+        .proPrice(localizations: context.l10n);
   }
 
   @override
@@ -52,7 +54,7 @@ class _ProSheetState extends ConsumerState<ProSheet> {
     if (!_beginStoreAction()) return;
     final l10n = context.l10n;
     try {
-      await ref.read(iapServiceProvider).buyPro();
+      await ref.read(iapServiceProvider).buyPro(localizations: l10n);
       _showMessage(l10n.proCompletePurchase);
     } on StateError catch (error) {
       _showMessage(error.message);

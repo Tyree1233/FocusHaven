@@ -78,6 +78,9 @@ class _ReflectionJournalSheetState
   @override
   Widget build(BuildContext context) {
     final journalState = ref.watch(journalStateProvider);
+    final dailyPrompt = ref
+        .read(journalServiceProvider)
+        .dailyPromptFor(context.l10n);
     final primaryColor = Theme.of(context).colorScheme.primary;
 
     return SafeArea(
@@ -123,9 +126,7 @@ class _ReflectionJournalSheetState
                         child: Padding(
                           padding: const EdgeInsets.all(14),
                           child: Text(
-                            context.l10n.journalTodayPrompt(
-                              journalState.dailyPrompt,
-                            ),
+                            context.l10n.journalTodayPrompt(dailyPrompt),
                             style: const TextStyle(
                               color: Colors.white70,
                               fontStyle: FontStyle.italic,

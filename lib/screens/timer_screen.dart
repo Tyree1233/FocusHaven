@@ -90,7 +90,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     BuildContext context,
     TimerService timer,
   ) async {
-    final summary = timer.focusHistoryExport;
+    final summary = timer.focusHistoryExportFor(context.l10n);
     try {
       final writer = writeClipboard;
       if (writer == null) {
@@ -819,7 +819,6 @@ class TimerScreen extends riverpod.ConsumerWidget {
 
   Future<void> _createJournalEntry(
     BuildContext context,
-    JournalState journalState,
     JournalService journal,
   ) async {
     if (!_canOpenOverlay(context)) return;
@@ -827,7 +826,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       context,
       initialMood: _journalMoods.first,
       initialReflection: '',
-      prompt: journalState.dailyPrompt,
+      prompt: journal.dailyPromptFor(context.l10n),
       moods: _journalMoods,
     );
     if (draft == null) return;
@@ -838,7 +837,6 @@ class TimerScreen extends riverpod.ConsumerWidget {
   Future<void> _editJournalEntry(
     BuildContext context,
     JournalEntry entry,
-    JournalState journalState,
     JournalService journal,
   ) async {
     if (!_canOpenOverlay(context)) return;
@@ -846,7 +844,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       context,
       initialMood: entry.mood,
       initialReflection: entry.reflection,
-      prompt: journalState.dailyPrompt,
+      prompt: journal.dailyPromptFor(context.l10n),
       moods: _journalMoods,
     );
     if (draft == null) return;
@@ -874,13 +872,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
         dateLabel: (date) => _dateLabel(sheetContext, date),
         onCreateEntry: (dialogContext) => _createJournalEntry(
           dialogContext,
-          ref.read(journalStateProvider),
           ref.read(journalServiceProvider),
         ),
         onEditEntry: (dialogContext, entry) => _editJournalEntry(
           dialogContext,
           entry,
-          ref.read(journalStateProvider),
           ref.read(journalServiceProvider),
         ),
       ),
@@ -1088,7 +1084,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final havenWindowController = ref.watch(
       havenWindowPlatformControllerProvider,
     );
-    final livingLantern = ref.watch(livingLanternStateProvider);
+    final livingLantern = ref.watch(localizedLivingLanternStateProvider(l10n));
     final focusShield = ref.watch(focusShieldStateProvider);
     final focusShieldController = ref.watch(
       focusShieldPlatformControllerProvider,

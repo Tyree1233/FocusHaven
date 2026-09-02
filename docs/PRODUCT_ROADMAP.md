@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-B6C2 Local-Coach service localization extraction is implemented
+Status: living product contract; Phase 215G-B6C3 English Flutter localization extraction is implemented
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -67,7 +67,7 @@ Every future phase must preserve these rules:
 | Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, and Journey context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add local-coach context as one bounded, reviewable connection. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
-| Global localization | Foundation plus B1–B6C2 extraction shipped | Generated Flutter localization is wired to the English source catalog. Core presentation, notifications, bounded service receipts, generated guidance, Haven action results, and deterministic Local-Coach results are catalog-owned. English is the only production runtime locale; Spanish, French, German, and Brazilian Portuguese are planned, not current language claims. | Complete B6C3 service results, then human-review catalogs and native surfaces before qualifying each locale independently. |
+| Global localization | English Flutter extraction shipped | Generated Flutter localization is wired to the English source catalog. Core presentation and all audited Flutter-owned user-facing service results are catalog-owned. English is the only production runtime locale; Spanish, French, German, and Brazilian Portuguese are planned, not current language claims. | Human-review first-wave catalogs, language-aware understanding, and native/store surfaces before qualifying each locale independently. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
@@ -299,7 +299,7 @@ Build a release-quality localization system before promoting FocusHaven in
 additional languages. Locale availability must remain truthful: an incomplete
 catalog is not a supported language.
 
-Status: Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5/B6A/B6B1/B6B2/B6C1/B6C2 extraction are
+Status: Phase 215G-A foundation and Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5/B6A/B6B1/B6B2/B6C1/B6C2/B6C3 English Flutter extraction are
 implemented in the current source. Flutter's generated localization pipeline
 owns the application title plus onboarding, appearance selection,
 custom-duration chrome, guided breathing, and the main timer's complete
@@ -345,7 +345,8 @@ notification copy, and presentation mapping for every stable
 account-deletion outcome. It changes no notification or channel identifier,
 schedule, permission behavior, timer state, or deletion result. Generated
 planning/restorative guidance and coaching, action, authentication, store,
-journal, export, and other service results remain for later B6 slices.
+journal, export, and other service results were completed by the later B6
+slices without changing their owning behaviors.
 Phase 215G-B6B1 adds catalog-owned stable local Haven Planner validation,
 assumptions, uncertainty explanation, generated queue-item templates,
 session-size guidance, and no-calendar free-time guidance. User-authored goal
@@ -371,17 +372,20 @@ profiles, messages, and conversation history remain opaque runtime
 placeholders. The selected catalog is in-memory local context only and is not
 included in Enhanced-AI prompt data. English signal recognition, responder
 selection, consent, fallback, persistence, and cleanup behavior are unchanged.
-The Phase 215G-B1/B2/B3A/B3B/B3C/B4/B5 extraction established the earlier
-presentation boundary; B6 remains required after the bounded B6A advance.
+Phase 215G-B6C3 adds catalog-owned authentication and store service results,
+daily journal prompts, private Focus History export copy, Haven Plan guidance,
+and Living Lantern guidance. Private identities, store prices, journal text,
+moods, tasks, and history values remain opaque placeholders. Provider
+diagnostics are not rendered as user copy. Authentication, entitlement,
+purchase, persistence, export, plan, lantern, timer, and queue behavior are
+unchanged. Phase 215G-B English Flutter extraction is complete.
 The locale registry
 records Spanish, French, German, and Brazilian Portuguese as the planned first
 wave without exposing them through `supportedLocales` or making a
 store-language claim.
 
-The remaining B6 extraction work is B6C3. It will move authentication, store,
-journal, export, and remaining
-user-facing service strings. The audited slice
-boundaries are recorded in `docs/LOCALIZATION_EXTRACTION_INVENTORY.md`.
+The completed B6C3 boundary and the earlier extraction slices are recorded in
+`docs/LOCALIZATION_EXTRACTION_INVENTORY.md`.
 Phase 215G-C will add human-reviewed first-wave catalogs and qualify one locale
 at a time. Phase 215G-D will align speech recognition, Voice-to-Coach, Haven
 actions, and local coaching with the selected language without silently
@@ -389,7 +393,7 @@ translating private user content. Phase 215G-E will localize native Apple,
 Android, widget, watch, permission, policy, support, and store surfaces and run
 country-specific release checks.
 
-No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, or B6C2 code changes a saved language, sends text to a
+No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a
 build, or edits a store listing. The detailed release gates are defined in

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 import '../config/feature_flags.dart';
+import '../l10n/app_localizations.dart';
 import '../models/coaching_message.dart';
 import '../models/focus_event.dart';
 import '../models/focus_forecast.dart';
@@ -94,6 +95,11 @@ typedef FocusQueueState = ({
 });
 
 typedef HavenPlanRequest = ({HavenEnergy energy, int availableMinutes});
+typedef LocalizedHavenPlanRequest = ({
+  HavenEnergy energy,
+  int availableMinutes,
+  AppLocalizations localizations,
+});
 
 /// Immutable journal data used by the Reflection Journal sheet.
 typedef JournalState = ({
@@ -655,6 +661,23 @@ final livingLanternStateProvider = Provider<LivingLanternState>((ref) {
       );
 }, name: 'livingLanternStateProvider');
 
+/// Selected-catalog Living Lantern state used by the production surface.
+final localizedLivingLanternStateProvider =
+    Provider.family<LivingLanternState, AppLocalizations>((ref, localizations) {
+      final session = ref.watch(timerSessionStateProvider);
+      final events = ref.watch(timerFocusEventsProvider);
+      return ref
+          .watch(livingLanternServiceProvider)
+          .createState(
+            sessionType: session.sessionType,
+            isRunning: session.isRunning,
+            isComplete: session.isComplete,
+            hasPendingResume: session.hasPendingResume,
+            recentEvents: events,
+            localizations: localizations,
+          );
+    }, name: 'localizedLivingLanternStateProvider');
+
 /// Derives an honest Focus Shield request from narrow timer and native states.
 /// The result cannot invoke native APIs, alter the timer, or receive selected
 /// application and website identities.
@@ -750,6 +773,25 @@ final havenPlanProvider = Provider.family<HavenPlan, HavenPlanRequest>((
         availableMinutes: request.availableMinutes,
       );
 }, name: 'havenPlanProvider');
+
+/// Selected-catalog Haven Plan used by the production planning sheet.
+final localizedHavenPlanProvider =
+    Provider.family<HavenPlan, LocalizedHavenPlanRequest>((ref, request) {
+      final queue = ref.watch(focusQueueStateProvider).activeItems;
+      final events = ref.watch(timerFocusEventsProvider);
+      return ref
+          .watch(havenPlanServiceProvider)
+          .createPlan(
+            queue: [
+              for (final item in queue)
+                HavenTaskCandidate(id: item.id, title: item.title),
+            ],
+            recentEvents: events,
+            energy: request.energy,
+            availableMinutes: request.availableMinutes,
+            localizations: request.localizations,
+          );
+    }, name: 'localizedHavenPlanProvider');
 
 /// Immutable journal snapshot that changes only when entries are loaded,
 /// added, updated, replaced, or cleared.

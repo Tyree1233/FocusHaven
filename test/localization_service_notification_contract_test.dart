@@ -134,8 +134,11 @@ void main() {
     );
     expect(inventory, contains('B6C1 — Haven action service results'));
     expect(policy, contains('Phase 215G-B6A'));
-    expect(policy, contains('Phase 215G-B is not complete'));
-    expect(roadmap, contains('B1–B6C2 extraction shipped'));
+    expect(
+      policy,
+      contains('Phase 215G-B English Flutter extraction is complete'),
+    );
+    expect(roadmap, contains('English Flutter extraction shipped'));
     expect(readme, contains('Phase 215G-B6A'));
     expect(
       locales,

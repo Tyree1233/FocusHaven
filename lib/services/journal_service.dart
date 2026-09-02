@@ -3,20 +3,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/journal_entry.dart';
 import 'privacy_safe_diagnostics.dart';
 
 class JournalService extends ChangeNotifier {
   static const _storageKey = 'journalEntries';
-  static const _prompts = [
-    'What is one thing you are grateful for today?',
-    'What helped you feel focused today?',
-    'What would make tomorrow feel a little lighter?',
-    'What small win are you proud of today?',
-    'What do you want to give yourself permission to release?',
-    'Who or what brought you a moment of calm today?',
-    'What is one kind thing you can do for yourself next?',
-  ];
+  static const _promptCount = 7;
   List<JournalEntry> _entries = [];
   int _journalRevision = 0;
   bool _isDisposed = false;
@@ -56,10 +50,20 @@ class JournalService extends ChangeNotifier {
         .key;
   }
 
-  String get dailyPrompt {
+  String get dailyPrompt => dailyPromptFor(defaultServiceLocalizations());
+
+  String dailyPromptFor(AppLocalizations localizations) {
     final now = DateTime.now();
     final dayOfYear = now.difference(DateTime(now.year)).inDays;
-    return _prompts[dayOfYear % _prompts.length];
+    return switch (dayOfYear % _promptCount) {
+      0 => localizations.journalServicePromptGratitude,
+      1 => localizations.journalServicePromptFocus,
+      2 => localizations.journalServicePromptTomorrow,
+      3 => localizations.journalServicePromptSmallWin,
+      4 => localizations.journalServicePromptRelease,
+      5 => localizations.journalServicePromptCalm,
+      _ => localizations.journalServicePromptKindness,
+    };
   }
 
   /// Appends a new reflection, even when other reflections already exist for

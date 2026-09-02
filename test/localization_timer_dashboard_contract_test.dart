@@ -187,11 +187,20 @@ void main() {
     }
 
     expect(policy, contains('Phase 215G-B4'));
-    expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('B1–B6C2 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C3'));
+    expect(
+      policy,
+      contains('Phase 215G-B6C3 completes the English Flutter extraction'),
+    );
+    expect(roadmap, contains('English Flutter extraction shipped'));
+    expect(
+      roadmap,
+      contains('Phase 215G-B English Flutter extraction is complete'),
+    );
     expect(readme, contains('Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5'));
-    expect(readme, contains('remaining B6 work'));
+    expect(
+      readme,
+      contains('completed Phase 215G-B English Flutter extraction'),
+    );
   });
 }
 

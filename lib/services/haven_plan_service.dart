@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/haven_plan.dart';
 
@@ -28,7 +30,9 @@ class HavenPlanService {
     required List<FocusEvent> recentEvents,
     required HavenEnergy energy,
     required int availableMinutes,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final boundedAvailable = availableMinutes
         .clamp(_minimumAvailableMinutes, _maximumAvailableMinutes)
         .toInt();
@@ -77,15 +81,16 @@ class HavenPlanService {
       availableMinutes: boundedAvailable,
     );
     final selectedTask = _firstValidTask(queue);
-    final taskTitle = selectedTask?.title ?? 'Choose one small next step';
+    final taskTitle =
+        selectedTask?.title ?? l10n.havenPlanServiceChooseSmallStep;
     final wasTimeBound = recommendation.focusMinutes < targetMinutes;
 
     return HavenPlan(
       queueItemId: selectedTask?.id,
       taskTitle: taskTitle,
       firstStep: selectedTask == null
-          ? 'Name one visible action you can finish in this session.'
-          : 'Open “$taskTitle” and begin with its smallest visible action.',
+          ? l10n.havenPlanServiceNameVisibleAction
+          : l10n.havenPlanServiceOpenSmallestAction(taskTitle),
       focusMinutes: recommendation.focusMinutes,
       breakMinutes: recommendation.breakMinutes,
       availableMinutes: boundedAvailable,
@@ -96,6 +101,7 @@ class HavenPlanService {
         sessionFit: reflectedCompletion?.sessionFit,
         wasTimeBound: wasTimeBound,
         wasEnergyBound: wasEnergyBound,
+        localizations: l10n,
       ),
       wasTimeBound: wasTimeBound,
       wasEnergyBound: wasEnergyBound,
@@ -197,31 +203,30 @@ class HavenPlanService {
     required FocusSessionFit? sessionFit,
     required bool wasTimeBound,
     required bool wasEnergyBound,
+    required AppLocalizations localizations,
   }) {
+    final l10n = localizations;
     final base = switch (basis) {
-      HavenPlanBasis.recentRecovery =>
-        'A shorter return can lower the pressure after recent interruptions.',
+      HavenPlanBasis.recentRecovery => l10n.havenPlanServiceRecentRecovery,
       HavenPlanBasis.sessionReflection => switch (sessionFit!) {
-        FocusSessionFit.tooMuch =>
-          'You said your last reflected session felt like too much, so this plan steps down gently.',
-        FocusSessionFit.aboutRight =>
-          'You said your last reflected session felt about right, so this plan stays close to that pace.',
+        FocusSessionFit.tooMuch => l10n.havenPlanServiceReflectionTooMuch,
+        FocusSessionFit.aboutRight => l10n.havenPlanServiceReflectionAboutRight,
         FocusSessionFit.couldDoMore =>
-          'You said you could have done more, so this plan offers one small step up.',
+          l10n.havenPlanServiceReflectionCouldDoMore,
       },
-      HavenPlanBasis.personalRhythm =>
-        'Your recent completed sessions suggest this has been a workable rhythm.',
-      HavenPlanBasis.gentleStart =>
-        'Your check-in calls for a smaller, gentler place to begin.',
+      HavenPlanBasis.personalRhythm => l10n.havenPlanServicePersonalRhythm,
+      HavenPlanBasis.gentleStart => l10n.havenPlanServiceGentleStart,
       HavenPlanBasis.freshStart =>
-        'This is a ${energy == HavenEnergy.strong ? 'spacious' : 'steady'} '
-            'starting point while FocusHaven learns your rhythm.',
+        energy == HavenEnergy.strong
+            ? l10n.havenPlanServiceFreshStartSpacious
+            : l10n.havenPlanServiceFreshStartSteady,
     };
     final details = <String>[
-      if (wasEnergyBound)
-        'It was shortened to respect the energy you have today.',
-      if (wasTimeBound) 'It was also shortened to fit the time you have.',
+      if (wasEnergyBound) l10n.havenPlanServiceEnergyBound,
+      if (wasTimeBound) l10n.havenPlanServiceTimeBound,
     ];
-    return details.isEmpty ? base : '$base ${details.join(' ')}';
+    return details.isEmpty
+        ? base
+        : l10n.havenPlanServiceExplanationWithDetails(base, details.join(' '));
   }
 }

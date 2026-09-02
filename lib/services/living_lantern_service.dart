@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/focus_event.dart';
 import '../models/living_lantern_state.dart';
 import 'timer_service.dart';
@@ -18,65 +20,61 @@ class LivingLanternService {
     required bool isComplete,
     required bool hasPendingResume,
     required List<FocusEvent> recentEvents,
+    AppLocalizations? localizations,
   }) {
+    final l10n = localizations ?? defaultServiceLocalizations();
     if (isRunning && isComplete) {
       throw ArgumentError('The Living Lantern requires a valid timer state.');
     }
 
     if (hasPendingResume) {
-      return const LivingLanternState(
+      return LivingLanternState(
         phase: LivingLanternPhase.gentleReturn,
-        headline: 'Your light is waiting with you',
-        detail:
-            'This attempt can be resumed, reshaped, or released. Nothing about the pause erased your effort.',
+        headline: l10n.livingLanternServicePendingHeadline,
+        detail: l10n.livingLanternServicePendingDetail,
         supportingSignalCount: 0,
       );
     }
 
     if (sessionType != SessionType.focus) {
       if (isRunning) {
-        return const LivingLanternState(
+        return LivingLanternState(
           phase: LivingLanternPhase.resting,
-          headline: 'Rest keeps the light steady',
-          detail:
-              'This break belongs in your rhythm. There is nothing else to earn right now.',
+          headline: l10n.livingLanternServiceBreakRunningHeadline,
+          detail: l10n.livingLanternServiceBreakRunningDetail,
           supportingSignalCount: 0,
         );
       }
       if (isComplete) {
-        return const LivingLanternState(
+        return LivingLanternState(
           phase: LivingLanternPhase.ready,
-          headline: 'Begin again when you choose',
-          detail:
-              'The break is complete, and the lantern can wait without rushing you.',
+          headline: l10n.livingLanternServiceBreakCompleteHeadline,
+          detail: l10n.livingLanternServiceBreakCompleteDetail,
           supportingSignalCount: 0,
         );
       }
-      return const LivingLanternState(
+      return LivingLanternState(
         phase: LivingLanternPhase.resting,
-        headline: 'The lantern can rest too',
-        detail:
-            'A quiet pause is part of sustainable focus, not time taken away from it.',
+        headline: l10n.livingLanternServiceBreakIdleHeadline,
+        detail: l10n.livingLanternServiceBreakIdleDetail,
         supportingSignalCount: 0,
       );
     }
 
     if (isComplete) {
-      return const LivingLanternState(
+      return LivingLanternState(
         phase: LivingLanternPhase.celebrating,
-        headline: 'Your light grew because you showed up',
-        detail:
-            'The session is complete. Its value does not depend on doing anything more.',
+        headline: l10n.livingLanternServiceFocusCompleteHeadline,
+        detail: l10n.livingLanternServiceFocusCompleteDetail,
         supportingSignalCount: 0,
       );
     }
 
     if (isRunning) {
-      return const LivingLanternState(
+      return LivingLanternState(
         phase: LivingLanternPhase.focusing,
-        headline: 'Your light is steady',
-        detail:
-            'One chosen moment has your attention. The lantern is here without keeping score.',
+        headline: l10n.livingLanternServiceFocusRunningHeadline,
+        detail: l10n.livingLanternServiceFocusRunningDetail,
         supportingSignalCount: 0,
       );
     }
@@ -94,19 +92,18 @@ class LivingLanternService {
         recoveryCount >= _repeatedRecoveryThreshold) {
       return LivingLanternState(
         phase: LivingLanternPhase.gentleReturn,
-        headline: 'A smaller return still carries light',
-        detail:
-            'Recent attempts needed room to reset. The lantern stays whole while you choose a gentler next step.',
+        headline: l10n.livingLanternServiceRecoveryHeadline,
+        detail: l10n.livingLanternServiceRecoveryDetail,
         supportingSignalCount: recoveryCount,
       );
     }
 
     return LivingLanternState(
       phase: LivingLanternPhase.ready,
-      headline: 'Your light is ready when you are',
+      headline: l10n.livingLanternServiceReadyHeadline,
       detail: meaningful.any((event) => event.wasCompleted)
-          ? 'Past focus still counts. This next session can begin without proving anything.'
-          : 'Choose one reachable step. The lantern begins with presence, not pressure.',
+          ? l10n.livingLanternServiceReadyWithHistoryDetail
+          : l10n.livingLanternServiceReadyWithoutHistoryDetail,
       supportingSignalCount: meaningful.isEmpty ? 0 : 1,
     );
   }

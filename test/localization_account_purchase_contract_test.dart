@@ -149,7 +149,7 @@ void main() {
       expect(journalMapper, contains(stableMood), reason: stableMood);
     }
     expect(journalSheet, contains('entry.reflection'));
-    expect(journalSheet, contains('journalState.dailyPrompt'));
+    expect(journalSheet, contains('.dailyPromptFor(context.l10n)'));
     expect(journalSheet, contains('localizeJournalMood'));
 
     for (final stableProfile in <String>[
@@ -212,16 +212,25 @@ void main() {
       'Private account identity, journal and reflection content, task names',
       'Stable stored mood and profile identifiers remain unchanged',
       'B5 does not sign in or out, purchase or restore an entitlement',
-      'B6 remains required',
+      'Phase 215G-B English Flutter extraction is complete',
     ]) {
       expect(inventory, contains(required), reason: required);
     }
     expect(policy, contains('Phase 215G-B5'));
-    expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('B1–B6C2 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C3'));
+    expect(
+      policy,
+      contains('Phase 215G-B6C3 completes the English Flutter extraction'),
+    );
+    expect(roadmap, contains('English Flutter extraction shipped'));
+    expect(
+      roadmap,
+      contains('Phase 215G-B English Flutter extraction is complete'),
+    );
     expect(readme, contains('Phase 215G-B5'));
-    expect(readme, contains('remaining B6 work'));
+    expect(
+      readme,
+      contains('completed Phase 215G-B English Flutter extraction'),
+    );
     expect(
       locales,
       contains("static const productionLocales = <Locale>[Locale('en')]"),

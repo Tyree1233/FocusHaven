@@ -793,8 +793,8 @@ timer-completion notification copy, and the presentation of every stable
 account-deletion outcome. Notification and channel IDs, schedules, time-zone
 rules, permission behavior, timer state, and account-deletion status enums are
 unchanged. Generated planner/restorative copy and coaching, action,
-authentication, store, journal, export, and other service-owned results remain
-for later B6 slices. English remains the only active locale.
+authentication, store, journal, export, and other service-owned results were
+completed by the later B6 slices. English remains the only active locale.
 Phase 215G-B6B1 additionally catalog-owns the stable local Haven Planner
 validation, assumptions, uncertainty explanation, generated queue-item
 templates, session-size suggestion, and no-calendar free-time suggestion.
@@ -828,14 +828,22 @@ response context and is excluded from Enhanced-AI prompt data. English signal
 matching, responder selection, consent, fallback, persistence, and cleanup
 behavior are unchanged. English remains the only active locale.
 
-The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
-remaining B6C3 work; B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, and B6C2 are not a claim that the whole interface
-is localized. These phases do not translate private content, change the person's
-language setting, activate a planned locale, contact a translation service,
-deploy a build, or change a store listing.
+Phase 215G-B6C3 now catalog-owns the remaining authentication and store service
+results, seven deterministic daily journal prompts, private Focus History
+export copy, Haven Plan guidance, and Living Lantern guidance. Private account
+identities, store prices, journal entries, moods, tasks, and focus-history
+values remain opaque runtime values. Provider diagnostics are no longer
+rendered as sign-in or store copy. Authentication, entitlement, purchase,
+journal persistence, export, plan, lantern, timer, and queue behavior are
+unchanged. English remains the only active locale.
 
-The remaining B6 work is B6C3 authentication, store, journal, export, and other
-remaining service results.
+The [extraction inventory](docs/LOCALIZATION_EXTRACTION_INVENTORY.md) defines the
+completed Phase 215G-B English Flutter extraction. This is not a claim that an
+additional language, native platform resource, policy, support surface, store
+listing, screenshot set, or country release is localized. These phases do not
+translate private content, change the person's language setting, activate a
+planned locale, contact a translation service, deploy a build, or change a
+store listing.
 
 ## Architecture
 

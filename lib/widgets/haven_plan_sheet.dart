@@ -37,11 +37,15 @@ class _HavenPlanSheetState extends ConsumerState<HavenPlanSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final plan = ref.watch(
-      havenPlanProvider((energy: _energy, availableMinutes: _availableMinutes)),
+      localizedHavenPlanProvider((
+        energy: _energy,
+        availableMinutes: _availableMinutes,
+        localizations: l10n,
+      )),
     );
     final colors = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
 
     return SafeArea(
       child: SingleChildScrollView(

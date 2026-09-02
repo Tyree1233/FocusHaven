@@ -228,14 +228,20 @@ void main() {
       'User-authored messages and recognized transcripts remain opaque values',
       'B6 still owns service-generated user-facing text',
       'B4 records no audio, contacts no local or remote AI',
-      'B6 remains required',
+      'Phase 215G-B English Flutter extraction is complete',
     ]) {
       expect(inventory, contains(required));
     }
     expect(policy, contains('Phase 215G-B4'));
-    expect(policy, contains('B6 remains required'));
-    expect(roadmap, contains('B1–B6C2 extraction shipped'));
-    expect(roadmap, contains('remaining B6 extraction work is B6C3'));
+    expect(
+      policy,
+      contains('Phase 215G-B6C3 completes the English Flutter extraction'),
+    );
+    expect(roadmap, contains('English Flutter extraction shipped'));
+    expect(
+      roadmap,
+      contains('Phase 215G-B English Flutter extraction is complete'),
+    );
     expect(readme, contains('Phase 215G-B4'));
     expect(
       locales,

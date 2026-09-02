@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import '../models/pro_entitlement.dart';
 import '../models/pro_product_catalog.dart';
 
@@ -212,29 +214,30 @@ class IAPService {
     return entitlement.isActiveAt(DateTime.now());
   }
 
-  Future<String?> proPrice() async {
+  Future<String?> proPrice({AppLocalizations? localizations}) async {
     if (_isDisposed || !legacyLifetimePurchasesEnabled) return null;
-    final product = await _loadProProduct();
+    final product = await _loadProProduct(localizations: localizations);
     return product?.price;
   }
 
-  Future<void> buyPro() async {
+  Future<void> buyPro({AppLocalizations? localizations}) async {
+    final l10n = localizations ?? defaultServiceLocalizations();
     if (_isDisposed) {
-      throw StateError('FocusHaven Pro purchasing is no longer available.');
+      throw StateError(l10n.iapServicePurchasingUnavailable);
     }
     if (!legacyLifetimePurchasesEnabled) {
-      throw StateError('New lifetime purchases are no longer available.');
+      throw StateError(l10n.iapServiceLifetimePurchasesUnavailable);
     }
 
-    final product = await _loadProProduct();
+    final product = await _loadProProduct(localizations: l10n);
     if (product == null) {
-      throw StateError('FocusHaven Pro is not available.');
+      throw StateError(l10n.iapServiceProUnavailable);
     }
     final started = await _store.buyNonConsumable(
       purchaseParam: PurchaseParam(productDetails: product),
     );
     if (!started) {
-      throw StateError('The FocusHaven Pro purchase could not be started.');
+      throw StateError(l10n.iapServicePurchaseCouldNotStart);
     }
   }
 
@@ -243,13 +246,14 @@ class IAPService {
     await _store.restorePurchases();
   }
 
-  Future<ProductDetails?> _loadProProduct() async {
+  Future<ProductDetails?> _loadProProduct({
+    AppLocalizations? localizations,
+  }) async {
+    final l10n = localizations ?? defaultServiceLocalizations();
     final response = await _store.queryProductDetails({proProductId});
     final error = response.error;
     if (error != null) {
-      throw StateError(
-        'The store could not load FocusHaven Pro: ${error.message}',
-      );
+      throw StateError(l10n.iapServiceStoreCouldNotLoadPro);
     }
 
     for (final product in response.productDetails) {
