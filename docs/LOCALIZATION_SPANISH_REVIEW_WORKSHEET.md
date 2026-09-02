@@ -1,6 +1,7 @@
 # FocusHaven Spanish Review Worksheet
 
-Status: Phase 215G-C2B packet created but unassigned; review not started
+Status: Phase 215G-C2C assignment safeguards prepared; packet unassigned and
+review not started
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 
 Phase 215G-C2A prepares the locked packet builder only. Phase 215G-C2B creates
@@ -8,6 +9,11 @@ and audits the isolated packet with SHA-256
 `325231a14ff0dfe2b176f6267996292aa0575b5db16d3c084cf453bf5f75737e`.
 The packet has not been distributed or assigned, and this worksheet still
 records no human review.
+
+Phase 215G-C2C prepares a locked assignment gate, but its authorization and
+assignment record do not exist. A later assignment must identify a real
+qualified reviewer and cannot start review. All 980 packet entries remain
+pending; Spanish remains outside `lib/l10n` and runtime inactive.
 
 No Spanish product term is approved by this worksheet. It records the context
 and constraints that a qualified human reviewer must resolve before the full
@@ -101,6 +107,9 @@ events, purchases, or focus history.
 | Open issues | Pending |
 | Final linguistic decision | Not approved |
 | Review completion time | Pending |
+
+Reviewer contact details, identification documents, signatures, credentials,
+and payment information must not be committed to this worksheet or repository.
 
 Until every required field is complete and the final decision is explicit,
 Spanish must remain outside `lib/l10n`, absent from runtime support, and absent

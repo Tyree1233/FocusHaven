@@ -893,6 +893,16 @@ The packet is unassigned and human review has not started. It does not approve
 or activate Spanish, move the candidate into `lib/l10n`, contact a provider,
 use private runtime data, or make a public support or country claim.
 
+Phase 215G-C2C now prepares the deterministic, fail-closed reviewer-assignment
+gate for that exact packet. A later authorization must name a real qualified
+reviewer, document non-sensitive qualification and independence statements,
+accept the exact general-international-Spanish scope, and preserve all catalog
+locks. Assignment remains separate from review start: this phase creates no
+authorization or assignment record, assigns nobody, leaves all 980 decisions
+pending, and keeps `reviewStarted` false. Human review has not started, and
+Spanish remains linguistically unapproved, outside `lib/l10n`, runtime
+inactive, release unqualified, and unsupported publicly.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

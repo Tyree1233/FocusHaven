@@ -437,6 +437,15 @@ linguistically unapproved, outside `lib/l10n`, runtime inactive, release
 unqualified, and unsupported publicly. Reviewer assignment and completed
 human review remain later explicit gates.
 
+Phase 215G-C2C prepares the exact-lock reviewer-assignment safeguard. It can
+accept only a later explicit record for a real qualified reviewer and produces
+an `assigned_not_started` record without filling any of the 980 decisions.
+This phase assigns nobody: the authorization and assignment record do not
+exist, review has not started, and Spanish remains outside `lib/l10n`, runtime
+inactive, release unqualified, and unsupported publicly. Reviewer assignment,
+explicit review start, completed message review, and linguistic approval remain
+separate later gates.
+
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a

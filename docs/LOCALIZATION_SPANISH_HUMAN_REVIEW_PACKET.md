@@ -1,7 +1,7 @@
 # FocusHaven Spanish Human-Review Packet
 
-Status: Phase 215G-C2B packet created and audited; reviewer assignment and
-human review have not started
+Status: Phase 215G-C2C assignment safeguards prepared; no reviewer is assigned
+and human review has not started
 
 ## Purpose
 
@@ -14,6 +14,12 @@ Phase 215G-C2B separately creates and audits that isolated packet without
 assigning it or starting review. Packet creation is evidence preparation, not
 a reviewer judgment, linguistic approval, runtime activation, or release
 qualification.
+
+Phase 215G-C2C prepares the locked reviewer-assignment gate. The assignment
+record does not exist, no real qualified reviewer has been identified in the
+repository, and review has not started. Assignment, review start, message
+decisions, linguistic approval, runtime integration, and release qualification
+remain separate gates.
 
 The packet contains only the locked, non-sensitive English catalog, the locked
 isolated Spanish candidate, their localization descriptions and placeholder
@@ -154,6 +160,10 @@ independence statement.
 Until that happens, the qualification record remains `structurally_ready`, its
 reviewer fields remain null, and `reviewStarted` remains false.
 
+The C2C gate will also refuse to combine assignment with review start. A future
+assignment can only produce `assigned_not_started`; all 980 decisions must
+remain pending until a separately authorized review-start phase.
+
 ## Phase 215G-C2A non-actions
 
 This phase does not create or distribute a review packet, contact a reviewer or
@@ -172,3 +182,11 @@ or message, change the `structurally_ready` status, copy Spanish into
 store surfaces, contact a translation provider, use private runtime data, add a
 permission or dependency, deploy, upload, invoke, or make a public language or
 country claim.
+
+## Phase 215G-C2C non-actions
+
+This phase does not identify, choose, contact, assign, or impersonate a real
+qualified reviewer; create an authorization or assignment record; distribute
+the packet; begin review; fill or infer a decision; approve Spanish; move it
+into `lib/l10n`; activate a locale; use private runtime data; contact a
+provider; deploy; upload; invoke; or make a public language or country claim.

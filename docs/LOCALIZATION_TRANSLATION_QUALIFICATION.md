@@ -1,7 +1,7 @@
 # FocusHaven Translation Qualification
 
-Status: Phase 215G-C2B review packet created and audited; no reviewer, human
-review, or translated locale is active
+Status: Phase 215G-C2C reviewer-assignment safeguards prepared; no reviewer,
+human review, or translated locale is active
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 First candidate locale: Spanish (`es`), planned and inactive
 
@@ -170,6 +170,14 @@ before `status: human_review` or `reviewStarted: true` can be recorded. Packet
 preparation, packet creation, reviewer assignment, completed linguistic
 approval, runtime integration, and release qualification are separate states.
 
+Phase 215G-C2C prepares a fail-closed assignment tool. It requires a later
+explicit authorization naming a real qualified reviewer, exact source,
+candidate, and packet locks, the accepted general-international-Spanish scope,
+and non-sensitive qualification and independence statements. The assignment
+record does not exist in C2C, review has not started, and all 980 decisions
+remain pending. Even a future successful assignment records
+`assigned_not_started`; changing to `human_review` is a separate gate.
+
 Voice and coaching qualification remains Phase 215G-D. Spanish UI copy alone
 does not authorize Spanish speech recognition, safe-command interpretation,
 Local Coach understanding, Enhanced AI behavior, or an implicit English
@@ -205,3 +213,12 @@ copy the candidate into `lib/l10n`, activate a locale, translate private
 content, contact a provider, add a dependency or permission, change Firebase
 or an app store, deploy, upload, or make a language or country availability
 claim.
+
+## Phase 215G-C2C non-actions
+
+This phase does not identify, assign, contact, or impersonate a real qualified
+reviewer; create an assignment authorization or record; distribute the packet;
+start review; fill a decision; approve Spanish; change the `structurally_ready`
+status; copy the candidate into `lib/l10n`; activate a locale; contact a
+provider; add a dependency or permission; deploy; upload; invoke; or make a
+language or country availability claim.

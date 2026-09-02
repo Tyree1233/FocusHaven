@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C2B Spanish review packet created and audited; reviewer
-assignment and human review have not started
+Status: Phase 215G-C2C reviewer-assignment safeguards prepared; no reviewer is
+assigned and human review has not started
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -63,6 +63,12 @@ country release readiness.
   replacement, and note is empty. The packet is not assigned, human review has
   not started, and Spanish remains linguistically unapproved, outside
   `lib/l10n`, and runtime inactive.
+- Phase 215G-C2C prepares the exact-lock reviewer-assignment gate without
+  assigning anyone. A later assignment must identify a real qualified reviewer
+  and preserve a non-sensitive qualification, independence statement, accepted
+  scope, and lock set. Assignment cannot start review, fill any of the 980
+  decisions, approve Spanish, or activate the locale. No authorization or
+  assignment record exists in this phase.
 
 ## Catalog authority
 
@@ -212,8 +218,10 @@ tasks must still be evaluated from the console's current state.
   builder. Phase 215G-C1B creates and structurally audits the complete isolated
   Spanish machine draft. Phase 215G-C2A prepares the locked packet builder
   without creating a packet or starting review. Phase 215G-C2B creates and
-  locks the isolated packet without assigning it or starting review. Assignment
-  to a real qualified reviewer and completed human approval remain separate
+  locks the isolated packet without assigning it or starting review. Phase
+  215G-C2C prepares a fail-closed assignment tool, but the assignment record
+  does not exist and review has not started. Assignment to a real qualified
+  reviewer, explicit review start, and completed human approval remain separate
   required gates.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,
   local coaching, and explicit fallbacks with each qualified locale.
