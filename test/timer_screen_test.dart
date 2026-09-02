@@ -51,6 +51,8 @@ class _CountingNavigatorObserver extends NavigatorObserver {
 Widget _app(
   TimerService timer, {
   NavigatorObserver? observer,
+  Locale? locale,
+  double textScale = 1,
   CoachingService? coachingService,
   Future<bool> Function(Uri uri)? openExternalUrl,
   Future<void> Function(String text)? writeClipboard,
@@ -107,8 +109,17 @@ Widget _app(
         ),
     ],
     child: MaterialApp(
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      builder: textScale == 1
+          ? null
+          : (context, child) => MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: TextScaler.linear(textScale)),
+              child: child!,
+            ),
       theme: ThemeData.dark().copyWith(
         colorScheme: const ColorScheme.dark(
           primary: Color(0xFFF16FBA),
@@ -130,6 +141,50 @@ Future<TimerService> _createTimer(WidgetTester tester) async {
   final timer = TimerService();
   await tester.pump();
   return timer;
+}
+
+void _useNarrowPhone(WidgetTester tester) {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = const Size(320, 720);
+  addTearDown(tester.view.resetDevicePixelRatio);
+  addTearDown(tester.view.resetPhysicalSize);
+}
+
+Future<void> _expectCloudRestoreClearsCoach(
+  WidgetTester tester, {
+  required Locale locale,
+  required String restoreLabel,
+  required String coachLabel,
+}) async {
+  _useNarrowPhone(tester);
+  final timer = await _createTimer(tester);
+
+  await tester.pumpWidget(_app(timer, locale: locale, textScale: 1.6));
+  await tester.pumpAndSettle();
+
+  final dashboardScroll = find.byKey(const ValueKey('timer-dashboard-scroll'));
+  final scrollable = find
+      .descendant(of: dashboardScroll, matching: find.byType(Scrollable))
+      .first;
+  final scrollState = tester.state<ScrollableState>(scrollable);
+  scrollState.position.jumpTo(scrollState.position.maxScrollExtent);
+  await tester.pumpAndSettle();
+
+  final restoreButton = find.ancestor(
+    of: find.text(restoreLabel),
+    matching: find.byType(TextButton),
+  );
+  final coachButton = find.widgetWithText(FloatingActionButton, coachLabel);
+
+  expect(restoreButton, findsOneWidget);
+  expect(restoreButton.hitTestable(), findsOneWidget);
+  expect(coachButton, findsOneWidget);
+
+  final restoreRect = tester.getRect(restoreButton);
+  final coachRect = tester.getRect(coachButton);
+  expect(restoreRect.overlaps(coachRect), isFalse);
+  expect(restoreRect.bottom, lessThan(coachRect.top));
+  expect(tester.takeException(), isNull);
 }
 
 class _TimerContextResponder implements CoachingResponder {
@@ -967,6 +1022,28 @@ void main() {
     expect(responder.context?.isTimerRunning, isFalse);
     expect(find.text('Use the live timer context.'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('English cloud restore clears Focus Coach at the scroll end', (
+    tester,
+  ) async {
+    await _expectCloudRestoreClearsCoach(
+      tester,
+      locale: const Locale('en'),
+      restoreLabel: 'Restore',
+      coachLabel: 'Focus Coach',
+    );
+  });
+
+  testWidgets('Spanish cloud restore clears Local Coach at the scroll end', (
+    tester,
+  ) async {
+    await _expectCloudRestoreClearsCoach(
+      tester,
+      locale: const Locale('es'),
+      restoreLabel: 'Restaurar',
+      coachLabel: 'Coach de enfoque',
+    );
   });
 
   testWidgets('account settings can open and return from nested sheets', (

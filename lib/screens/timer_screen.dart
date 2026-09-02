@@ -1144,10 +1144,15 @@ class TimerScreen extends riverpod.ConsumerWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+            key: const ValueKey('timer-dashboard-scroll'),
+            // Keep the final dashboard actions above the extended Coach FAB,
+            // including when translated labels or large text widen the FAB.
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 112),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: constraints.maxHeight - 40,
+                minHeight: constraints.maxHeight > 124
+                    ? constraints.maxHeight - 124
+                    : 0,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

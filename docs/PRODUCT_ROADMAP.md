@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-C3E Spanish physical-device integration preparation is in progress
+Status: living product contract; Phase 215G-C3F Spanish TalkBack layout correction is pending physical retest
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -509,6 +509,16 @@ production allowlist. This preparation does not add a language preference,
 permission, dependency, backend, deployment, store claim, or production
 activation, and physical TalkBack acceptance remains false until a person
 completes the bounded checklist on the approved phone.
+
+The first Phase 215G-C3F physical TalkBack pass found that the extended Local
+Coach button could cover Cloud Restore at the bottom of the timer dashboard.
+The same shared layout defect was then confirmed in English. The result was not
+recorded as a pass, and the exact normal English-only debug artifact was
+restored without clearing app data. The dashboard correction reserves
+scroll-end clearance beneath its final actions, with 320-pixel, 1.6x-text
+regression tests comparing the real Restore and Coach button bounds in English
+and Spanish. A rebuilt Spanish debug artifact and bounded physical retest
+remain required; production activation is still false.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

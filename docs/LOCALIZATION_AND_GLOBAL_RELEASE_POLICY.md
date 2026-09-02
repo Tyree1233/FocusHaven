@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3E Spanish physical-device integration preparation;
-production remains English-only and physical acceptance remains pending
+Status: Phase 215G-C3F Spanish physical TalkBack correction pending retest;
+production remains English-only and physical acceptance has not passed
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -122,6 +122,15 @@ country release readiness.
   is preparation for a human-operated TalkBack check; it does not add a saved
   language, alter permissions or dependencies, activate or advertise Spanish,
   or record physical acceptance before that check is completed.
+- The first Phase 215G-C3F physical TalkBack pass found one release-blocking
+  layout defect: the extended Local Coach button could overlap Cloud Restore
+  at the end of the timer dashboard. The same shared defect was then confirmed
+  in English. No PASS was attested, and the exact normal English-only debug
+  artifact was restored in place without clearing app data. The correction
+  reserves scroll-end space for the floating action button and adds narrow
+  320-pixel, 1.6x-text button-bounds regression tests for English and Spanish.
+  Physical TalkBack acceptance remains false until the corrected Spanish test
+  artifact passes the bounded manual retest on the approved phone.
 
 ## Catalog authority
 
