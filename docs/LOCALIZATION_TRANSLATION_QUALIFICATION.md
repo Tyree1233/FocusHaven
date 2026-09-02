@@ -1,6 +1,6 @@
 # FocusHaven Translation Qualification
 
-Status: Phase 215G-C0 qualification foundation; no translated locale is active
+Status: Phase 215G-C1B Spanish candidate structurally ready; no translated locale is active
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 First candidate locale: Spanish (`es`), planned and inactive
 
@@ -18,6 +18,12 @@ Phase 215G-C1A adds the deterministic candidate builder and controlled input
 contract described in `docs/LOCALIZATION_SPANISH_CANDIDATE_PREPARATION.md`.
 It still creates no translation bundle or Spanish candidate. The builder is a
 fail-closed preparation mechanism, not a translation or approval authority.
+
+Phase 215G-C1B uses that builder with the authorized machine-assisted draft of
+the locked, non-sensitive catalog. The complete candidate now exists only at
+`localization/candidates/app_es.arb`; both the builder audit and an independent
+audit report it structurally ready for human review. No qualified human review
+has started, and Spanish remains planned and inactive.
 
 ## Locked English source
 
@@ -37,9 +43,9 @@ the source checkpoint must never move silently.
 
 ## Candidate isolation
 
-Before approval, candidate catalogs remain outside `lib/l10n`. The planned
-Spanish intake path is `localization/candidates/app_es.arb`; it does not exist
-in Phase 215G-C0.
+Before approval, candidate catalogs remain outside `lib/l10n`. The Spanish
+candidate now exists at `localization/candidates/app_es.arb` with SHA-256
+`611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f`.
 
 This isolation is intentional. Flutter discovers ARB catalogs in `lib/l10n`
 and generates locale delegates from them. Moving an unfinished candidate there
@@ -64,14 +70,17 @@ An approved source-equal allowlist is for brand names or genuinely invariant
 tokens only. Every allowlisted key still requires a reviewer decision; the
 auditor never assumes that matching English text is correct.
 
-The future candidate command will be:
+The independent candidate command used by Phase 215G-C1B was:
 
 ```bash
 dart run tool/localization_catalog_qualification.dart \
   lib/l10n/app_en.arb \
   localization/candidates/app_es.arb \
   es \
-  appTitle
+  appTitle durationMinutesShort havenWindowHeldSameDay \
+  havenWindowHeldMultiDay accountPro proTitle journalMoodCount \
+  reminderDaySeparator reminderTimeAndDays timerServiceExportSessionRow \
+  havenPlanServiceExplanationWithDetails
 ```
 
 The command producing a zero exit status means only that a candidate is
@@ -113,8 +122,10 @@ as human approval.
 
 ## Qualification states
 
-The Spanish review record starts with `status: not_started` and
-`candidatePresent: false`. Future state changes must be explicit:
+The Spanish review record began with `status: not_started` and
+`candidatePresent: false`. Phase 215G-C1B advances it only to
+`status: structurally_ready` and `candidatePresent: true`. Future state changes
+must remain explicit:
 
 1. `not_started` — no candidate exists.
 2. `drafting` — a candidate exists outside `lib/l10n` and is incomplete.
@@ -132,10 +143,10 @@ No single state silently implies the next one.
 ## Remaining gates
 
 Phase 215G-C1A prepares the isolated builder without creating a candidate.
-Phase 215G-C1B will create and structurally audit the complete Spanish candidate
-against the locked English source only after the translation-draft source and
-data boundary are explicitly chosen. Human approval remains separate from
-catalog generation.
+Phase 215G-C1B creates and structurally audits the complete Spanish candidate
+against the locked English source after explicit authorization of the local
+machine-assisted draft boundary. Human approval remains separate from catalog
+generation and has not started.
 
 Voice and coaching qualification remains Phase 215G-D. Spanish UI copy alone
 does not authorize Spanish speech recognition, safe-command interpretation,
@@ -147,9 +158,9 @@ does not localize iOS, Android, widgets, watches, permission-purpose text,
 privacy policies, support content, store listings, screenshots, or any country
 release.
 
-## Phase 215G-C0 non-actions
+## Phase 215G-C1B non-actions
 
-This foundation does not create a Spanish ARB candidate, activate a locale,
+This phase does not approve the Spanish ARB candidate, activate a locale,
 change `supportedLocales`, add a saved language, translate private content,
 contact a provider, add a dependency or permission, change Firebase or an app
 store, deploy, upload, or make a language or country availability claim.

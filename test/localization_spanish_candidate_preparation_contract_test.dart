@@ -6,21 +6,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/l10n/focus_haven_locales.dart';
 
 void main() {
-  test('C1A records preparation without claiming a Spanish candidate', () {
+  test('C1A preparation remains recorded after the C1B candidate', () {
     final review =
         jsonDecode(_read('localization/reviews/es/qualification.json'))
             as Map<String, dynamic>;
 
-    expect(review['phase'], '215G-C0');
+    expect(review['phase'], '215G-C1B');
     expect(review['candidatePreparationPhase'], '215G-C1A');
+    expect(review['candidateGenerationPhase'], '215G-C1B');
     expect(review['candidatePreparationReady'], isTrue);
     expect(review['translationBundlePresent'], isFalse);
-    expect(review['candidatePresent'], isFalse);
-    expect(review['structuralAuditPassed'], isFalse);
+    expect(review['translationBundleCommitted'], isFalse);
+    expect(review['candidatePresent'], isTrue);
+    expect(review['structuralAuditPassed'], isTrue);
     expect(review['humanReviewer'], isNull);
     expect(review['approvedAt'], isNull);
     expect(review['runtimeActivated'], isFalse);
     expect(review['externalTranslationProviderApproved'], isFalse);
+    expect(review['externalTranslationProviderUsed'], isFalse);
   });
 
   test('candidate builder is isolated, locked, and fail closed', () {
@@ -54,7 +57,7 @@ void main() {
       FocusHavenLocaleStatus.planned,
     );
     expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
-    expect(File('localization/candidates/app_es.arb').existsSync(), isFalse);
+    expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);
     expect(
       File('localization/intake/es/translations.json').existsSync(),
       isFalse,
@@ -89,6 +92,11 @@ void main() {
     expect(policy, contains('Phase 215G-C1A'));
     expect(roadmap, contains('Phase 215G-C1A'));
     expect(readme, contains('Phase 215G-C1A'));
+    expect(preparation, contains('Phase 215G-C1B'));
+    expect(qualification, contains('Phase 215G-C1B'));
+    expect(policy, contains('Phase 215G-C1B'));
+    expect(roadmap, contains('Phase 215G-C1B'));
+    expect(readme, contains('Phase 215G-C1B'));
   });
 }
 

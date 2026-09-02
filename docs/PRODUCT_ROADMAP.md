@@ -409,6 +409,15 @@ intentional source-equal values, and it refuses production-directory output or
 overwrite. This preparation slice creates no translation bundle or candidate,
 contacts no translation provider, and leaves Spanish planned and inactive.
 
+Phase 215G-C1B creates the complete machine-assisted Spanish candidate only in
+the isolated review directory. The guarded builder and independent audit pass
+all 980 messages, 148 placeholder-bearing messages, metadata, ICU placeholder
+use, non-empty values, and 11 documented source-equal invariants. The candidate
+has not received qualified human linguistic review and remains outside
+`lib/l10n`; Spanish is still planned, inactive, and absent from public language
+or country claims. Voice/coaching, runtime, native/store, accessibility, policy,
+support, signed-build, and country gates remain pending.
+
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
 coaching, or account data, adds a permission, changes a backend, deploys a

@@ -24,9 +24,9 @@ void main() {
     expect(source['@@locale'], 'en');
     expect(messages, hasLength(980));
     expect(placeholderMessages, hasLength(148));
-    expect(review['phase'], '215G-C0');
+    expect(review['phase'], '215G-C1B');
     expect(review['locale'], 'es');
-    expect(review['status'], 'not_started');
+    expect(review['status'], 'structurally_ready');
     expect(review['sourceCommit'], 'fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc');
     expect(
       review['sourceCatalogSha256'],
@@ -34,7 +34,8 @@ void main() {
     );
     expect(review['sourceMessageCount'], 980);
     expect(review['sourcePlaceholderMessageCount'], 148);
-    expect(review['candidatePresent'], isFalse);
+    expect(review['candidatePresent'], isTrue);
+    expect(review['structuralAuditPassed'], isTrue);
     expect(review['humanReviewRequired'], isTrue);
     expect(review['humanReviewer'], isNull);
     expect(review['approvedAt'], isNull);
@@ -136,7 +137,7 @@ void main() {
     expect(result.readyForHumanReview(expectedCandidateLocale: 'es'), isFalse);
   });
 
-  test('Spanish remains planned and cannot be generated or selected', () {
+  test('Spanish candidate remains isolated and cannot be selected', () {
     final main = _read('lib/main.dart');
     final registry = _read('lib/l10n/focus_haven_locales.dart');
     final review = _read('localization/reviews/es/qualification.json');
@@ -157,51 +158,58 @@ void main() {
       hasLength(1),
     );
     expect(File('lib/l10n/app_es.arb').existsSync(), isFalse);
-    expect(File('localization/candidates/app_es.arb').existsSync(), isFalse);
+    expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);
     expect(
       main,
       contains('supportedLocales: AppLocalizations.supportedLocales'),
     );
     expect(registry, contains("status: FocusHavenLocaleStatus.planned"));
-    expect(review, contains('"candidatePresent": false'));
+    expect(review, contains('"candidatePresent": true'));
+    expect(review, contains('"runtimeActivated": false'));
   });
 
-  test(
-    'qualification policy requires human review and protects private data',
-    () {
-      final qualification = _normalize(
-        _read('docs/LOCALIZATION_TRANSLATION_QUALIFICATION.md'),
-      );
-      final worksheet = _normalize(
-        _read('docs/LOCALIZATION_SPANISH_REVIEW_WORKSHEET.md'),
-      );
-      final policy = _normalize(
-        _read('docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md'),
-      );
-      final roadmap = _normalize(_read('docs/PRODUCT_ROADMAP.md'));
-      final readme = _normalize(_read('README.md'));
+  test('qualification policy requires human review and protects private data', () {
+    final qualification = _normalize(
+      _read('docs/LOCALIZATION_TRANSLATION_QUALIFICATION.md'),
+    );
+    final worksheet = _normalize(
+      _read('docs/LOCALIZATION_SPANISH_REVIEW_WORKSHEET.md'),
+    );
+    final policy = _normalize(
+      _read('docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md'),
+    );
+    final roadmap = _normalize(_read('docs/PRODUCT_ROADMAP.md'));
+    final readme = _normalize(_read('README.md'));
 
-      for (final required in <String>[
-        'A structurally complete candidate is not an approved translation',
-        'qualified human reviewer',
-        'Tasks, journal entries, reflections, transcripts, coaching conversations, account identities, and other private runtime values',
-        'candidate catalogs remain outside `lib/l10n`',
-        'Spanish remains planned and inactive',
-        'Voice and coaching qualification remains Phase 215G-D',
-        'Native and store qualification remains Phase 215G-E',
-      ]) {
-        expect(qualification, contains(required), reason: required);
-      }
+    for (final required in <String>[
+      'A structurally complete candidate is not an approved translation',
+      'qualified human reviewer',
+      'Tasks, journal entries, reflections, transcripts, coaching conversations, account identities, and other private runtime values',
+      'candidate catalogs remain outside `lib/l10n`',
+      'Spanish remains planned and inactive',
+      'Voice and coaching qualification remains Phase 215G-D',
+      'Native and store qualification remains Phase 215G-E',
+    ]) {
+      expect(qualification, contains(required), reason: required);
+    }
 
-      expect(worksheet, contains('Status: review worksheet only'));
-      expect(worksheet, contains('No Spanish product term is approved'));
-      expect(worksheet, contains('Focus Coach'));
-      expect(worksheet, contains('Smart Reset'));
-      expect(policy, contains('Phase 215G-C0'));
-      expect(roadmap, contains('Phase 215G-C0 translation qualification'));
-      expect(readme, contains('Phase 215G-C0'));
-    },
-  );
+    expect(
+      worksheet,
+      contains(
+        'Status: Phase 215G-C1B candidate ready for review; review not started',
+      ),
+    );
+    expect(worksheet, contains('No Spanish product term is approved'));
+    expect(worksheet, contains('Focus Coach'));
+    expect(worksheet, contains('Smart Reset'));
+    expect(policy, contains('Phase 215G-C0'));
+    expect(roadmap, contains('Phase 215G-C0 translation qualification'));
+    expect(readme, contains('Phase 215G-C0'));
+    expect(qualification, contains('Phase 215G-C1B'));
+    expect(policy, contains('Phase 215G-C1B'));
+    expect(roadmap, contains('Phase 215G-C1B'));
+    expect(readme, contains('Phase 215G-C1B'));
+  });
 }
 
 String _read(String path) => File(path).readAsStringSync();

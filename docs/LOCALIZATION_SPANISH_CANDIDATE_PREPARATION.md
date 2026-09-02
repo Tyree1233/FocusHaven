@@ -1,6 +1,6 @@
 # FocusHaven Spanish Candidate Preparation
 
-Status: Phase 215G-C1A preparation only; Spanish remains planned and inactive
+Status: Phase 215G-C1B candidate structurally ready; human review not started
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 
 ## Purpose
@@ -10,6 +10,14 @@ Spanish translation bundle into an isolated ARB candidate. It does not create a
 Spanish candidate, translate source copy, approve a translation, or activate a
 locale.
 
+Phase 215G-C1B used that path with an authorized machine-assisted draft of only
+the locked, non-sensitive English catalog. It created the isolated candidate at
+`localization/candidates/app_es.arb` and independently audited it. No external
+translation provider or private runtime data was used. This is candidate
+creation, not qualified human approval or locale activation. The result is
+structurally ready for qualified human review only; Spanish remains planned and
+inactive.
+
 The separation is deliberate. A file can be structurally complete while its
 wording is unnatural, unsafe, culturally inappropriate, or misleading. A
 qualified human reviewer must still assess all 980 messages in context before
@@ -17,7 +25,7 @@ any candidate can progress beyond structural readiness.
 
 ## Allowed inputs
 
-The future translation bundle may contain only:
+The uncommitted translation bundle consumed by Phase 215G-C1B contained only:
 
 - the exact locked source commit and catalog digest;
 - locale `es` and preparation phase `215G-C1A`;
@@ -37,7 +45,7 @@ approval.
 
 ## Bundle shape
 
-The future uncommitted input path is
+The controlled uncommitted input path is
 `localization/intake/es/translations.json`. It must use this structure:
 
 ```json
@@ -76,7 +84,7 @@ The builder refuses:
 - output anywhere except `localization/candidates/app_es.arb`; and
 - overwriting an existing candidate.
 
-The future command is:
+The guarded command used was:
 
 ```bash
 dart run tool/localization_spanish_candidate_builder.dart \
@@ -85,15 +93,39 @@ dart run tool/localization_spanish_candidate_builder.dart \
   localization/candidates/app_es.arb
 ```
 
-A zero exit status will mean only that an isolated candidate was created and
-is structurally ready for human review. It will not mean linguistically
+Its zero exit status means only that the isolated candidate was created and is
+structurally ready for human review. It does not mean linguistically
 approved, runtime qualified, release qualified, or publicly supported.
+
+## Phase 215G-C1B structural result
+
+| Field | Verified value |
+| --- | --- |
+| Candidate | `localization/candidates/app_es.arb` |
+| Candidate SHA-256 | `611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f` |
+| Authorized draft-bundle SHA-256 | `192f8c5906d939aa42dd4cf328345d762d8eb701fb9f250cbdbc2bba7964557f` |
+| Messages | 980 |
+| Messages with placeholders | 148 |
+| Approved source-equal invariants | 11 |
+| Missing, extra, or empty values | 0 |
+| Missing metadata | 0 |
+| Placeholder-schema mismatches | 0 |
+| ICU placeholder mismatches | 0 |
+| Human reviewer | Not assigned |
+| Linguistic approval | No |
+| Runtime activation | No |
+
+The structural audit initially exposed a false positive in the C1A auditor for
+ordinary ICU plural-branch text. The corrected scanner distinguishes a branch
+body such as `{thought}` from a declared named placeholder and still discovers
+real placeholders nested inside branch bodies. A focused regression test
+preserves that boundary.
 
 ## Inactive runtime boundary
 
-No Spanish catalog exists in this phase. `lib/l10n` continues to contain only
-the locked English source catalog, and the production locale registry continues
-to expose only English. A future isolated candidate must remain outside
+The Spanish candidate exists only in the isolated review directory. `lib/l10n`
+continues to contain only the locked English source catalog, and the production
+locale registry continues to expose only English. The isolated candidate must remain outside
 `lib/l10n` until explicit linguistic, Flutter runtime, voice and coaching,
 native, store, policy, support, accessibility, and country-release gates pass.
 
@@ -104,3 +136,12 @@ term, activate a locale, change a language setting, translate private runtime
 values, contact an external translation provider, add a dependency or
 permission, change Firebase or store configuration, deploy, upload, or make a
 language or country availability claim.
+
+## Phase 215G-C1B non-actions
+
+Phase 215G-C1B does not claim that the machine-assisted wording is correct,
+assign or impersonate a human reviewer, activate Spanish, move the candidate
+into `lib/l10n`, generate runtime delegates, change a language setting, qualify
+Spanish voice or coaching behavior, localize native or store surfaces, contact
+a provider, use private runtime data, add a dependency or permission, deploy,
+upload, or make a language or country availability claim.

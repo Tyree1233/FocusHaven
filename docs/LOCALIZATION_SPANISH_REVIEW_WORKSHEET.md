@@ -1,6 +1,6 @@
 # FocusHaven Spanish Review Worksheet
 
-Status: review worksheet only; Spanish remains planned and inactive
+Status: Phase 215G-C1B candidate ready for review; review not started
 Source checkpoint: `fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc`
 
 No Spanish product term is approved by this worksheet. It records the context
@@ -23,21 +23,21 @@ wording must be documented rather than silently mixed.
 
 | English source term | Product meaning that must be preserved | Candidate Spanish term | Reviewer decision |
 | --- | --- | --- | --- |
-| FocusHaven | Product name; never a generic place name | Pending | Pending |
-| Focus Coach | Private, local-first coaching surface; not a clinician | Pending | Pending |
-| Haven Plan | Local, reviewable plan proposal | Pending | Pending |
-| Haven Planner | Deterministic local planning tool | Pending | Pending |
-| Focus Queue | User-owned ordered task list | Pending | Pending |
-| Smart Reset | Explicit recovery choice after interruption | Pending | Pending |
-| Haven Rhythm | Advisory pattern summary, never a score | Pending | Pending |
-| Focus Forecast | Possible focus window, never a prediction or rule | Pending | Pending |
-| Haven Journey | Non-punitive progress metaphor | Pending | Pending |
-| Living Lantern | Text-free-state companion metaphor | Pending | Pending |
-| Haven Window | Optional, privacy-bounded calendar suggestion | Pending | Pending |
-| Focus Shield | User-selected focus protection; never implied active | Pending | Pending |
-| Voice-to-Coach | Tap-to-talk editable draft for coaching | Pending | Pending |
-| Review action | Proposal review step before execution | Pending | Pending |
-| Enhanced AI | Separately consented remote coaching option | Pending | Pending |
+| FocusHaven | Product name; never a generic place name | `FocusHaven` | Pending |
+| Focus Coach | Private, local-first coaching surface; not a clinician | `Coach de enfoque` | Pending |
+| Haven Plan | Local, reviewable plan proposal | `Plan Haven` | Pending |
+| Haven Planner | Deterministic local planning tool | Standalone label absent; draft uses `planificador local` | Pending |
+| Focus Queue | User-owned ordered task list | `Cola de enfoque` | Pending |
+| Smart Reset | Explicit recovery choice after interruption | `Reinicio inteligente` | Pending |
+| Haven Rhythm | Advisory pattern summary, never a score | `Ritmo Haven` | Pending |
+| Focus Forecast | Possible focus window, never a prediction or rule | `Pronóstico de enfoque` | Pending |
+| Haven Journey | Non-punitive progress metaphor | `Viaje Haven` | Pending |
+| Living Lantern | Text-free-state companion metaphor | Standalone label absent; draft uses `farol` | Pending |
+| Haven Window | Optional, privacy-bounded calendar suggestion | `Ventana Haven` | Pending |
+| Focus Shield | User-selected focus protection; never implied active | `Escudo de enfoque` | Pending |
+| Voice-to-Coach | Tap-to-talk editable draft for coaching | Standalone label absent; draft uses `transcripción de voz` | Pending |
+| Review action | Proposal review step before execution | `Revisar acción` | Pending |
+| Enhanced AI | Separately consented remote coaching option | `IA mejorada` | Pending |
 
 ## High-risk language review
 
@@ -85,7 +85,7 @@ events, purchases, or focus history.
 | --- | --- |
 | Reviewer name and qualification | Pending |
 | Reviewed source commit | Pending |
-| Reviewed candidate digest | Pending |
+| Reviewed candidate digest | Candidate available: `611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f`; reviewer confirmation pending |
 | Regional scope | Pending |
 | Terminology decisions complete | No |
 | High-risk copy reviewed in context | No |

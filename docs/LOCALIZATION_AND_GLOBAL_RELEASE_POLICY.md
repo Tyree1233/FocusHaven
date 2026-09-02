@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-B6C3 audited English Flutter-extraction contract
+Status: Phase 215G-C1B isolated Spanish candidate; human review not started
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -43,6 +43,13 @@ country release readiness.
   placeholders, requires rationales for source-equal values, writes only to the
   isolated candidate path, and refuses overwrite. It creates no bundle or
   candidate and does not approve or activate Spanish.
+- Phase 215G-C1B uses that guarded builder to create the complete isolated
+  machine-assisted Spanish candidate. Both the builder audit and an independent
+  audit pass all 980 messages and 148 placeholder-bearing messages. The
+  candidate remains outside `lib/l10n`, its qualified-human-review fields are
+  empty, and Spanish remains planned and inactive. Structural readiness is not
+  linguistic, runtime, voice/coaching, native/store, or country qualification.
+  No external translation provider or private runtime data was used.
 
 ## Catalog authority
 
@@ -188,7 +195,9 @@ tasks must still be evaluated from the console's current state.
   Phase 215G-C0 establishes the source lock, candidate isolation, structural
   parity checks, terminology worksheet, and explicit human-review evidence for
   Spanish. Structural readiness is not linguistic approval, runtime
-  qualification, or release qualification.
+  qualification, or release qualification. Phase 215G-C1A adds the guarded
+  builder. Phase 215G-C1B creates and structurally audits the complete isolated
+  Spanish machine draft; qualified human review remains the next required gate.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,
   local coaching, and explicit fallbacks with each qualified locale.
 - **215G-E — Native and store surfaces:** complete platform resources, public

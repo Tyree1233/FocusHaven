@@ -93,6 +93,39 @@ void main() {
     expect(result.qualification.icuPlaceholderMismatches, ['greeting']);
   });
 
+  test('does not mistake plural branch copy for named placeholders', () {
+    final source = <String, dynamic>{
+      '@@locale': 'en',
+      'parkedThoughts':
+          'You have {count, plural, =1 {thought} other {thoughts}}.',
+      '@parkedThoughts': {
+        'description': 'Number of private parked thoughts.',
+        'placeholders': {
+          'count': {'type': 'int'},
+        },
+      },
+    };
+    final bundle = <String, dynamic>{
+      'phase': spanishCandidatePhase,
+      'locale': spanishCandidateLocale,
+      'sourceCommit': spanishSourceCommit,
+      'sourceCatalogSha256': spanishSourceCatalogSha256,
+      'translations': {
+        'parkedThoughts':
+            'Tienes {count, plural, =1 {un pensamiento} other {varios pensamientos}}.',
+      },
+      'approvedSourceEqual': <String, dynamic>{},
+    };
+
+    final result = prepareSpanishCandidate(
+      source: source,
+      translationBundle: bundle,
+    );
+
+    expect(result.readyToWrite, isTrue);
+    expect(result.qualification.icuPlaceholderMismatches, isEmpty);
+  });
+
   test('allows only the isolated Spanish candidate output path', () {
     expect(
       isIsolatedSpanishCandidateOutput('localization/candidates/app_es.arb'),

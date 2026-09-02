@@ -861,6 +861,18 @@ to `localization/candidates/app_es.arb` and refuses overwrite. This phase does
 not create a translation bundle or Spanish candidate, contact a translation
 provider, approve Spanish wording, or activate or advertise Spanish.
 
+Phase 215G-C1B now records the complete machine-assisted Spanish draft as an
+isolated candidate at `localization/candidates/app_es.arb`. The exact locked
+English source and authorized local draft produced 980 candidate messages,
+including 148 placeholder-bearing messages and 11 explicitly documented
+source-equal invariants. The guarded builder and an independent structural
+audit report no missing, extra, empty, metadata, placeholder-schema, or ICU
+placeholder failures. The candidate is structurally ready for qualified human
+review only. It remains outside `lib/l10n`; Spanish is not linguistically
+approved, runtime activated, voice/coaching qualified, native/store qualified,
+advertised, or publicly supported. No external translation provider or private
+runtime data was used.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

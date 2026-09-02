@@ -180,11 +180,148 @@ Set<String> _placeholderNames(Map<String, dynamic>? metadata) =>
     _placeholderSchema(metadata).keys.toSet();
 
 Set<String> _icuPlaceholderNames(String message) {
-  final matches = RegExp(
-    r'\{([A-Za-z_][A-Za-z0-9_]*)\s*(?:,|\})',
-  ).allMatches(message);
-  return matches.map((match) => match.group(1)!).toSet();
+  final names = <String>{};
+  _scanIcuMessage(message, 0, message.length, names);
+  return names;
 }
+
+void _scanIcuMessage(String message, int start, int end, Set<String> names) {
+  var cursor = start;
+  while (cursor < end) {
+    if (message.codeUnitAt(cursor) != 0x7b) {
+      cursor += 1;
+      continue;
+    }
+    final next = _scanIcuArgument(message, cursor, end, names);
+    cursor = next > cursor ? next : cursor + 1;
+  }
+}
+
+int _scanIcuArgument(
+  String message,
+  int openingBrace,
+  int end,
+  Set<String> names,
+) {
+  var cursor = openingBrace + 1;
+  cursor = _skipIcuWhitespace(message, cursor, end);
+  final nameStart = cursor;
+  while (cursor < end && _isIcuIdentifierCodeUnit(message.codeUnitAt(cursor))) {
+    cursor += 1;
+  }
+  if (cursor == nameStart) {
+    return openingBrace + 1;
+  }
+  final name = message.substring(nameStart, cursor);
+  cursor = _skipIcuWhitespace(message, cursor, end);
+  if (cursor >= end) {
+    return end;
+  }
+  if (message.codeUnitAt(cursor) == 0x7d) {
+    names.add(name);
+    return cursor + 1;
+  }
+  if (message.codeUnitAt(cursor) != 0x2c) {
+    return openingBrace + 1;
+  }
+
+  names.add(name);
+  cursor = _skipIcuWhitespace(message, cursor + 1, end);
+  final typeStart = cursor;
+  while (cursor < end && _isIcuIdentifierCodeUnit(message.codeUnitAt(cursor))) {
+    cursor += 1;
+  }
+  final type = message.substring(typeStart, cursor).toLowerCase();
+  cursor = _skipIcuWhitespace(message, cursor, end);
+  if (cursor >= end) {
+    return end;
+  }
+  if (message.codeUnitAt(cursor) == 0x7d) {
+    return cursor + 1;
+  }
+  if (message.codeUnitAt(cursor) != 0x2c ||
+      (type != 'plural' && type != 'selectordinal' && type != 'select')) {
+    return _afterMatchingIcuBrace(message, openingBrace, end);
+  }
+
+  return _scanIcuBranches(message, cursor + 1, end, names);
+}
+
+int _scanIcuBranches(String message, int start, int end, Set<String> names) {
+  var cursor = start;
+  while (cursor < end) {
+    cursor = _skipIcuWhitespace(message, cursor, end);
+    if (cursor >= end || message.codeUnitAt(cursor) == 0x7d) {
+      return cursor < end ? cursor + 1 : end;
+    }
+
+    final selectorStart = cursor;
+    while (cursor < end &&
+        message.codeUnitAt(cursor) != 0x7b &&
+        message.codeUnitAt(cursor) != 0x7d &&
+        !_isIcuWhitespace(message.codeUnitAt(cursor))) {
+      cursor += 1;
+    }
+    final selector = message.substring(selectorStart, cursor);
+    cursor = _skipIcuWhitespace(message, cursor, end);
+    if (selector.startsWith('offset:')) {
+      continue;
+    }
+    if (cursor >= end || message.codeUnitAt(cursor) != 0x7b) {
+      cursor += 1;
+      continue;
+    }
+
+    final branchEnd = _matchingIcuBrace(message, cursor, end);
+    if (branchEnd < 0) {
+      return end;
+    }
+    _scanIcuMessage(message, cursor + 1, branchEnd, names);
+    cursor = branchEnd + 1;
+  }
+  return end;
+}
+
+int _afterMatchingIcuBrace(String message, int openingBrace, int end) {
+  final closingBrace = _matchingIcuBrace(message, openingBrace, end);
+  return closingBrace < 0 ? end : closingBrace + 1;
+}
+
+int _matchingIcuBrace(String message, int openingBrace, int end) {
+  var depth = 0;
+  for (var cursor = openingBrace; cursor < end; cursor += 1) {
+    final codeUnit = message.codeUnitAt(cursor);
+    if (codeUnit == 0x7b) {
+      depth += 1;
+    } else if (codeUnit == 0x7d) {
+      depth -= 1;
+      if (depth == 0) {
+        return cursor;
+      }
+    }
+  }
+  return -1;
+}
+
+int _skipIcuWhitespace(String message, int start, int end) {
+  var cursor = start;
+  while (cursor < end && _isIcuWhitespace(message.codeUnitAt(cursor))) {
+    cursor += 1;
+  }
+  return cursor;
+}
+
+bool _isIcuWhitespace(int codeUnit) =>
+    codeUnit == 0x20 ||
+    codeUnit == 0x09 ||
+    codeUnit == 0x0a ||
+    codeUnit == 0x0d;
+
+bool _isIcuIdentifierCodeUnit(int codeUnit) =>
+    (codeUnit >= 0x41 && codeUnit <= 0x5a) ||
+    (codeUnit >= 0x61 && codeUnit <= 0x7a) ||
+    (codeUnit >= 0x30 && codeUnit <= 0x39) ||
+    codeUnit == 0x5f;
 
 Object? _normalizeJson(Object? value) {
   if (value is Map) {
