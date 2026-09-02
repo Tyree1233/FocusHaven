@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-C3C expanded Spanish session-path accessibility verification is in progress
+Status: living product contract; Phase 215G-C3D Spanish automated screen-reader preparation is in progress
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -488,6 +488,17 @@ Mindful Pause gain vertical scrolling for translated or enlarged content. The
 reviewed catalog and English-only production allowlist remain unchanged. This
 is not complete screen-reader, real-device, voice/coaching, native/store,
 signed-build, country, or production-locale qualification.
+
+Phase 215G-C3D adds the automated half of the Spanish screen-reader gate.
+Custom Duration now presents its minute and second wheels as localized
+adjustable semantic values with increase and decrease actions. Mindful Pause
+marks the localized breathing phase and phase duration as a live region, and
+Appearance announces a failed theme update as a live-region error. Tests
+exercise those semantic values, roles, actions, and announcements while
+pinning the reviewed Spanish catalog and English-only production allowlist.
+The qualification explicitly keeps physical TalkBack/VoiceOver acceptance
+and complete screen-reader qualification false; real-device, voice/coaching,
+native/store, signed-build, country, and activation gates remain separate.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

@@ -95,6 +95,22 @@
     "focus_queue",
     "completed_tasks"
   ],
+  "screenReaderPreparationPhase": "215G-C3D",
+  "screenReaderPreparationStatus": "automated_semantics_verified",
+  "screenReaderAutomatedSurfaces": [
+    "onboarding",
+    "timer_dashboard",
+    "focus_coach",
+    "haven_actions",
+    "account_privacy",
+    "appearance",
+    "custom_duration",
+    "guided_breathing",
+    "focus_queue",
+    "completed_tasks"
+  ],
+  "screenReaderPhysicalAcceptancePassed": false,
+  "screenReaderQualified": false,
   "reviewPacketAssigned": false,
   "reviewStarted": false,
   "humanReviewRequired": true,

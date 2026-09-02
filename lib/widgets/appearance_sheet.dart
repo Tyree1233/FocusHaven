@@ -101,10 +101,16 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
                     ),
                     if (_selectionFailed) ...[
                       const SizedBox(height: 8),
-                      Text(
-                        l10n.appearanceUpdateError,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
+                      Semantics(
+                        key: const ValueKey<String>(
+                          'appearance-update-error-semantics',
+                        ),
+                        liveRegion: true,
+                        child: Text(
+                          l10n.appearanceUpdateError,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
                         ),
                       ),
                     ],

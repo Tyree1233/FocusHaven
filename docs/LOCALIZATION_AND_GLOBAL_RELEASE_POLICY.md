@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3C expanded Spanish session-path accessibility verification;
-production remains English-only
+Status: Phase 215G-C3D Spanish automated screen-reader preparation;
+production remains English-only and physical acceptance remains pending
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -104,6 +104,16 @@ country release readiness.
   This remains an isolated Flutter integration gate, not complete
   screen-reader, real-device, voice/coaching, native/store, signed-build,
   country, or production-locale qualification.
+- Phase 215G-C3D adds an automated Spanish screen-reader preparation gate
+  without claiming physical TalkBack or VoiceOver acceptance. The Custom
+  Duration minute and second wheels expose localized adjustable values plus
+  increase and decrease actions; Mindful Pause exposes its changing Spanish
+  breathing phase as a live region; and Appearance exposes a failed update as
+  a live-region error. Automated tests exercise the localized values, roles,
+  actions, and announcements alongside the semantic labels already covered by
+  C3B and C3C. Physical screen-reader acceptance, real-device Spanish runtime,
+  voice/coaching, native/store, signed-build, country, and production-locale
+  qualification remain false and separate.
 
 ## Catalog authority
 

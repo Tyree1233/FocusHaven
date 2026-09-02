@@ -946,6 +946,16 @@ reviewed Spanish catalog remains byte-identical to its candidate and the
 production locale allowlist remains English-only. Voice/coaching, native/store,
 signed-build, country, and public Spanish support remain separate later gates.
 
+Phase 215G-C3D adds automated Spanish screen-reader preparation without
+claiming physical-device acceptance. The Custom Duration minute and second
+wheels now expose localized adjustable values with increase and decrease
+actions. Mindful Pause exposes its changing Spanish breathing phase and phase
+duration as a live region, while Appearance announces a failed update as a
+live-region error. Automated tests exercise those values, roles, actions, and
+announcements and preserve the reviewed catalog lock. Physical TalkBack and
+VoiceOver acceptance, real-device Spanish runtime, voice/coaching,
+native/store, signed-build, country, and production activation remain pending.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

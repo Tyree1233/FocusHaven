@@ -131,24 +131,37 @@ class _GuidedBreathingSheetState extends State<GuidedBreathingSheet> {
             SizedBox(
               height: 210,
               width: 210,
-              child: Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 900),
-                  curve: Curves.easeInOut,
-                  height: expanded ? 180 : 118,
-                  width: expanded ? 180 : 118,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colors.primary.withValues(alpha: 0.24),
-                    border: Border.all(color: colors.primary, width: 3),
-                  ),
+              child: Semantics(
+                key: const ValueKey<String>(
+                  'guided-breathing-status-semantics',
+                ),
+                container: true,
+                liveRegion: true,
+                label: _isComplete ? l10n.breathingComplete : phaseLabel,
+                value: _isComplete
+                    ? l10n.breathingCompletionMessage
+                    : l10n.durationSeconds(_phaseRemaining),
+                child: ExcludeSemantics(
                   child: Center(
-                    child: Text(
-                      _isComplete ? l10n.breathingComplete : phaseLabel,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 900),
+                      curve: Curves.easeInOut,
+                      height: expanded ? 180 : 118,
+                      width: expanded ? 180 : 118,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: colors.primary.withValues(alpha: 0.24),
+                        border: Border.all(color: colors.primary, width: 3),
+                      ),
+                      child: Center(
+                        child: Text(
+                          _isComplete ? l10n.breathingComplete : phaseLabel,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ),

@@ -84,6 +84,32 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
     setState(() => _selectedSeconds = seconds);
   }
 
+  void _adjustMinutes(int delta) {
+    if (_isClosing) return;
+    final next = (_selectedMinutes + delta)
+        .clamp(0, widget.maximumMinutes)
+        .toInt();
+    if (next == _selectedMinutes) return;
+    setState(() => _selectedMinutes = next);
+    _minutesController.animateToItem(
+      next,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+  }
+
+  void _adjustSeconds(int delta) {
+    if (_isClosing) return;
+    final next = (_selectedSeconds + delta).clamp(0, 59).toInt();
+    if (next == _selectedSeconds) return;
+    setState(() => _selectedSeconds = next);
+    _secondsController.animateToItem(
+      next,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+    );
+  }
+
   void _submit() {
     if (_isClosing) return;
     setState(() => _isClosing = true);
@@ -152,37 +178,91 @@ class _CustomDurationSheetState extends State<CustomDurationSheet> {
               child: Row(
                 children: [
                   Expanded(
-                    child: CupertinoPicker.builder(
-                      scrollController: _minutesController,
-                      itemExtent: 42,
-                      selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
-                        background: widget.sessionColor.withValues(alpha: 0.15),
+                    child: Semantics(
+                      key: const ValueKey<String>(
+                        'custom-duration-minutes-semantics',
                       ),
-                      onSelectedItemChanged: _isClosing ? null : _selectMinutes,
-                      childCount: widget.maximumMinutes + 1,
-                      itemBuilder: (context, index) => Center(
-                        child: Text(
-                          l10n.durationMinutesShort(index),
-                          style: const TextStyle(fontSize: 22),
+                      container: true,
+                      value: l10n.durationMinutes(_selectedMinutes),
+                      increasedValue: _selectedMinutes < widget.maximumMinutes
+                          ? l10n.durationMinutes(_selectedMinutes + 1)
+                          : null,
+                      decreasedValue: _selectedMinutes > 0
+                          ? l10n.durationMinutes(_selectedMinutes - 1)
+                          : null,
+                      onIncrease:
+                          _isClosing ||
+                              _selectedMinutes >= widget.maximumMinutes
+                          ? null
+                          : () => _adjustMinutes(1),
+                      onDecrease: _isClosing || _selectedMinutes <= 0
+                          ? null
+                          : () => _adjustMinutes(-1),
+                      child: ExcludeSemantics(
+                        child: CupertinoPicker.builder(
+                          scrollController: _minutesController,
+                          itemExtent: 42,
+                          selectionOverlay:
+                              CupertinoPickerDefaultSelectionOverlay(
+                                background: widget.sessionColor.withValues(
+                                  alpha: 0.15,
+                                ),
+                              ),
+                          onSelectedItemChanged: _isClosing
+                              ? null
+                              : _selectMinutes,
+                          childCount: widget.maximumMinutes + 1,
+                          itemBuilder: (context, index) => Center(
+                            child: Text(
+                              l10n.durationMinutesShort(index),
+                              style: const TextStyle(fontSize: 22),
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                   Expanded(
-                    child: CupertinoPicker.builder(
-                      scrollController: _secondsController,
-                      itemExtent: 42,
-                      selectionOverlay: CupertinoPickerDefaultSelectionOverlay(
-                        background: widget.sessionColor.withValues(alpha: 0.15),
+                    child: Semantics(
+                      key: const ValueKey<String>(
+                        'custom-duration-seconds-semantics',
                       ),
-                      onSelectedItemChanged: _isClosing ? null : _selectSeconds,
-                      childCount: 60,
-                      itemBuilder: (context, index) => Center(
-                        child: Text(
-                          l10n.durationSecondsShort(
-                            index.toString().padLeft(2, '0'),
+                      container: true,
+                      value: l10n.durationSeconds(_selectedSeconds),
+                      increasedValue: _selectedSeconds < 59
+                          ? l10n.durationSeconds(_selectedSeconds + 1)
+                          : null,
+                      decreasedValue: _selectedSeconds > 0
+                          ? l10n.durationSeconds(_selectedSeconds - 1)
+                          : null,
+                      onIncrease: _isClosing || _selectedSeconds >= 59
+                          ? null
+                          : () => _adjustSeconds(1),
+                      onDecrease: _isClosing || _selectedSeconds <= 0
+                          ? null
+                          : () => _adjustSeconds(-1),
+                      child: ExcludeSemantics(
+                        child: CupertinoPicker.builder(
+                          scrollController: _secondsController,
+                          itemExtent: 42,
+                          selectionOverlay:
+                              CupertinoPickerDefaultSelectionOverlay(
+                                background: widget.sessionColor.withValues(
+                                  alpha: 0.15,
+                                ),
+                              ),
+                          onSelectedItemChanged: _isClosing
+                              ? null
+                              : _selectSeconds,
+                          childCount: 60,
+                          itemBuilder: (context, index) => Center(
+                            child: Text(
+                              l10n.durationSecondsShort(
+                                index.toString().padLeft(2, '0'),
+                              ),
+                              style: const TextStyle(fontSize: 22),
+                            ),
                           ),
-                          style: const TextStyle(fontSize: 22),
                         ),
                       ),
                     ),
