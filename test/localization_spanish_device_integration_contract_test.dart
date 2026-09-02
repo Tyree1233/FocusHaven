@@ -83,7 +83,7 @@ void main() {
     expect(qualification['deviceIntegrationPreparationPhase'], '215G-C3E');
     expect(
       qualification['deviceIntegrationPreparationStatus'],
-      'debug_target_verified_pending_physical_acceptance',
+      'debug_target_verified_android_talkback_accepted',
     );
     expect(qualification['screenReaderPhysicalAcceptancePassed'], isFalse);
     expect(qualification['runtimeActivated'], isFalse);

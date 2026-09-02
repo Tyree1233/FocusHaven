@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-C3F Spanish TalkBack layout correction is pending physical retest
+Status: living product contract; Phase 215G-C3F Spanish Android TalkBack acceptance is complete
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -512,13 +512,15 @@ completes the bounded checklist on the approved phone.
 
 The first Phase 215G-C3F physical TalkBack pass found that the extended Local
 Coach button could cover Cloud Restore at the bottom of the timer dashboard.
-The same shared layout defect was then confirmed in English. The result was not
-recorded as a pass, and the exact normal English-only debug artifact was
-restored without clearing app data. The dashboard correction reserves
-scroll-end clearance beneath its final actions, with 320-pixel, 1.6x-text
-regression tests comparing the real Restore and Coach button bounds in English
-and Spanish. A rebuilt Spanish debug artifact and bounded physical retest
-remain required; production activation is still false.
+The same shared layout defect was then confirmed in English, so that build was
+not accepted. The correction reserves scroll-end clearance beneath the final
+actions, with 320-pixel, 1.6x-text regression tests comparing the real Restore
+and Coach button bounds in both languages. The exact corrected Spanish APK then
+passed all ten bounded TalkBack checks on the approved Moto. The exact corrected
+normal APK was restored without clearing app data, and English Restore passed
+the same physical clearance check. Android TalkBack acceptance is complete;
+physical iOS VoiceOver, voice/coaching, native/store, signed-build, country,
+and production activation remain pending.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

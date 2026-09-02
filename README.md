@@ -969,12 +969,16 @@ has passed.
 The first Phase 215G-C3F physical TalkBack pass correctly remained unaccepted
 after it found that the extended Local Coach button could cover the Cloud
 Restore action at the end of the dashboard. The same shared layout defect was
-then confirmed in English. The normal English-only debug build was restored
-without clearing app data. The dashboard now reserves scroll-end clearance
-below its final actions, and narrow 320-pixel, 1.6x-text regression tests
-compare the actual Restore and Coach button bounds in both English and Spanish.
-Physical TalkBack acceptance remains pending until the corrected Spanish debug
-artifact is rebuilt, installed in place, and the failed path is retested.
+then confirmed in English. The correction reserves scroll-end clearance below
+the final actions, and narrow 320-pixel, 1.6x-text regression tests compare the
+actual Restore and Coach button bounds in both languages. The corrected Spanish
+APK then passed the complete bounded TalkBack checklist on the approved Moto,
+including independently focusable **Restaurar** and **Coach de enfoque**
+controls. The corrected normal APK was restored without clearing app data, and
+its **Restore** and **Focus Coach** controls passed the same physical clearance
+check. Android TalkBack acceptance is complete; physical iOS VoiceOver,
+voice/coaching, native/store, signed-build, country, and production activation
+remain separate pending gates.
 
 ## Architecture
 
