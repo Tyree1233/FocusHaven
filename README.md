@@ -923,6 +923,18 @@ Voice/coaching, native/store resources, accessibility layouts, signed builds,
 and country-release qualification remain later independent gates. No reviewer
 identity, workbook, private content, or translation-provider data is included.
 
+Phase 215G-C3B adds an isolated Spanish critical-surface layout and
+accessibility gate at a 320-pixel phone width with enlarged text. It covers
+onboarding, Focus Coach, Haven Actions, and account/privacy controls, including
+translated semantics and close controls. Onboarding is now vertically
+scrollable so longer translations and accessibility text remain reachable.
+Focus Coach now stacks its header details and composer controls when narrow
+width or enlarged text would otherwise squeeze them into tall, unusable rows;
+the complete sheet becomes vertically scrollable while the conversation keeps
+a bounded viewport, so the composer and care boundary remain reachable.
+This bounded gate does not activate Spanish or claim complete device,
+screen-reader, voice, native/store, signed-build, or country qualification.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

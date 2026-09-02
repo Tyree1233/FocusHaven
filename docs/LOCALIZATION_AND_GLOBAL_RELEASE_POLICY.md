@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3A reviewed Spanish catalog integration; production remains
-English-only
+Status: Phase 215G-C3B critical Spanish layout/accessibility verification;
+production remains English-only
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -84,6 +84,17 @@ country release readiness.
   This phase does not qualify voice/coaching, native or store resources,
   accessibility layouts, signed builds, country distribution, advertising, or
   public Spanish support.
+- Phase 215G-C3B adds a bounded critical-surface layout and accessibility gate
+  at a 320-pixel phone width with 1.6x and 2.0x text. It exercises Spanish
+  onboarding, Focus Coach, Haven Actions, and account/privacy controls,
+  including translated semantics and tooltips. Onboarding becomes vertically
+  scrollable so longer translations and large text remain reachable. Focus
+  Coach stacks its header and composer chrome when narrow width or enlarged
+  text would otherwise crowd those controls; the complete sheet scrolls around
+  a bounded conversation viewport so the composer and care boundary remain
+  reachable. This gate does not represent complete device, screen-reader,
+  voice, native/store, signed-build, or country qualification and does not
+  change the production locale allowlist.
 
 ## Catalog authority
 

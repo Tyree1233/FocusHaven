@@ -386,6 +386,97 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         ? _quickRepliesFor(coachingState.messages, l10n)
         : const <String>[];
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final usesStackedChrome =
+        MediaQuery.sizeOf(context).width <= 360 ||
+        MediaQuery.textScalerOf(context).scale(1) >= 1.4;
+    final coachAvatar = CircleAvatar(
+      backgroundColor: primaryColor.withValues(alpha: 0.16),
+      foregroundColor: primaryColor,
+      child: const Icon(Icons.auto_awesome_outlined),
+    );
+    final coachTitle = Text(
+      l10n.coachTitle,
+      style: Theme.of(context).textTheme.titleLarge,
+    );
+    final coachSubtitle = Text(
+      coachingState.enhancedCoachingEnabled
+          ? l10n.coachSubtitleEnhanced
+          : l10n.coachSubtitlePrivate,
+      style: const TextStyle(color: Colors.white60),
+    );
+    final clearHistoryButton = IconButton(
+      key: const ValueKey<String>('coach-clear-history'),
+      tooltip: l10n.coachClearConversationTooltip,
+      onPressed: coachingState.messages.isEmpty || isBusy
+          ? null
+          : _clearConversation,
+      icon: _isManagingHistory
+          ? const SizedBox.square(
+              dimension: 18,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.delete_outline),
+    );
+    final closeButton = IconButton(
+      tooltip: l10n.coachCloseTooltip,
+      onPressed: () => Navigator.pop(context),
+      icon: const Icon(Icons.close),
+    );
+    final messageInput = TextField(
+      key: const ValueKey<String>('coach-message-input'),
+      controller: _controller,
+      focusNode: _inputFocusNode,
+      enabled: !isCoachBusy && !voiceBlocksSubmission,
+      minLines: 1,
+      maxLines: 4,
+      maxLength: 800,
+      textCapitalization: TextCapitalization.sentences,
+      textInputAction: TextInputAction.send,
+      onSubmitted: canSend ? (_) => _send() : null,
+      decoration: InputDecoration(
+        hintText: l10n.coachInputHint,
+        counterText: '',
+        border: const OutlineInputBorder(),
+      ),
+    );
+    final voiceButton = IconButton.outlined(
+      key: const ValueKey<String>('coach-voice-input'),
+      tooltip: voiceState.isListening
+          ? l10n.coachVoiceStopTooltip
+          : l10n.coachVoiceDictateTooltip,
+      onPressed: isCoachBusy || voiceState.isBusy
+          ? null
+          : voiceState.isListening
+          ? _stopVoiceTranscription
+          : _startVoiceTranscription,
+      icon: voiceState.isBusy
+          ? const SizedBox.square(
+              dimension: 19,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(voiceState.isListening ? Icons.stop : Icons.mic),
+    );
+    final sendButton = IconButton.filled(
+      key: const ValueKey<String>('coach-send-message'),
+      tooltip: l10n.coachSendTooltip,
+      onPressed: canSend ? _send : null,
+      icon: isCoachBusy
+          ? const SizedBox.square(
+              dimension: 19,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : const Icon(Icons.arrow_upward),
+    );
+    final conversationBody = _ConversationBody(
+      messages: coachingState.messages,
+      isResponding: coachingState.isResponding,
+      starterPrompts: _starterPrompts(l10n),
+      primaryColor: primaryColor,
+      scrollController: _scrollController,
+      quickReplies: quickReplies,
+      promptsEnabled: !isBusy,
+      onPromptSelected: _send,
+    );
 
     return SafeArea(
       top: false,
@@ -397,323 +488,291 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
         curve: Curves.easeOut,
         child: SizedBox(
           height: MediaQuery.sizeOf(context).height * 0.88,
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.white24,
-                  borderRadius: BorderRadius.circular(99),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 14, 12, 10),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: primaryColor.withValues(alpha: 0.16),
-                      foregroundColor: primaryColor,
-                      child: const Icon(Icons.auto_awesome_outlined),
+          child: Builder(
+            builder: (context) {
+              final contents = Column(
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 42,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.white24,
+                      borderRadius: BorderRadius.circular(99),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.coachTitle,
-                            style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 14, 12, 10),
+                    child: usesStackedChrome
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  coachAvatar,
+                                  const SizedBox(width: 12),
+                                  Expanded(child: coachTitle),
+                                  clearHistoryButton,
+                                  closeButton,
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              coachSubtitle,
+                            ],
+                          )
+                        : Row(
+                            children: [
+                              coachAvatar,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [coachTitle, coachSubtitle],
+                                ),
+                              ),
+                              clearHistoryButton,
+                              closeButton,
+                            ],
                           ),
-                          Text(
-                            coachingState.enhancedCoachingEnabled
-                                ? l10n.coachSubtitleEnhanced
-                                : l10n.coachSubtitlePrivate,
-                            style: const TextStyle(color: Colors.white60),
-                          ),
-                        ],
+                  ),
+                  const Divider(height: 1),
+                  if (coachingState.enhancedCoachingAvailable) ...[
+                    SwitchListTile.adaptive(
+                      key: const ValueKey<String>('coach-enhanced-ai-toggle'),
+                      value: coachingState.enhancedCoachingEnabled,
+                      onChanged: isBusy ? null : _setEnhancedCoachingEnabled,
+                      secondary: const Icon(Icons.cloud_outlined),
+                      title: Text(l10n.coachEnhancedTitle),
+                      subtitle: Text(
+                        coachingState.enhancedCoachingEnabled
+                            ? l10n.coachEnhancedOnDescription
+                            : l10n.coachEnhancedOffDescription,
                       ),
                     ),
-                    IconButton(
-                      key: const ValueKey<String>('coach-clear-history'),
-                      tooltip: l10n.coachClearConversationTooltip,
-                      onPressed: coachingState.messages.isEmpty || isBusy
-                          ? null
-                          : _clearConversation,
-                      icon: _isManagingHistory
-                          ? const SizedBox.square(
-                              dimension: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.delete_outline),
-                    ),
-                    IconButton(
-                      tooltip: l10n.coachCloseTooltip,
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
+                    const Divider(height: 1),
                   ],
-                ),
-              ),
-              const Divider(height: 1),
-              if (coachingState.enhancedCoachingAvailable) ...[
-                SwitchListTile.adaptive(
-                  key: const ValueKey<String>('coach-enhanced-ai-toggle'),
-                  value: coachingState.enhancedCoachingEnabled,
-                  onChanged: isBusy ? null : _setEnhancedCoachingEnabled,
-                  secondary: const Icon(Icons.cloud_outlined),
-                  title: Text(l10n.coachEnhancedTitle),
-                  subtitle: Text(
-                    coachingState.enhancedCoachingEnabled
-                        ? l10n.coachEnhancedOnDescription
-                        : l10n.coachEnhancedOffDescription,
-                  ),
-                ),
-                const Divider(height: 1),
-              ],
-              Expanded(
-                child: _ConversationBody(
-                  messages: coachingState.messages,
-                  isResponding: coachingState.isResponding,
-                  starterPrompts: _starterPrompts(l10n),
-                  primaryColor: primaryColor,
-                  scrollController: _scrollController,
-                  quickReplies: quickReplies,
-                  promptsEnabled: !isBusy,
-                  onPromptSelected: _send,
-                ),
-              ),
-              if (coachingState.errorMessage != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.errorContainer.withValues(alpha: 0.45),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.info_outline, size: 18),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(coachingState.errorMessage!)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              if (coachingState.noticeMessage != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: DecoratedBox(
-                    key: const ValueKey<String>('coach-fallback-notice'),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.shield_outlined,
-                            size: 18,
-                            color: primaryColor,
+                  if (usesStackedChrome)
+                    SizedBox(
+                      height: MediaQuery.sizeOf(context).height * 0.5,
+                      child: conversationBody,
+                    )
+                  else
+                    Expanded(child: conversationBody),
+                  if (coachingState.errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.errorContainer.withValues(alpha: 0.45),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline, size: 18),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(coachingState.errorMessage!),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(child: Text(coachingState.noticeMessage!)),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              if (coachingState.canRetryResponse)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: TextButton.icon(
-                      key: const ValueKey<String>('coach-retry-response'),
-                      onPressed: isBusy ? null : _retryResponse,
-                      icon: const Icon(Icons.refresh),
-                      label: Text(l10n.coachRetryResponse),
-                    ),
-                  ),
-                ),
-              if (voiceState.isListening || voiceState.isBusy)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Semantics(
-                    liveRegion: true,
-                    child: DecoratedBox(
-                      key: const ValueKey<String>('coach-voice-listening'),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12),
+                  if (coachingState.noticeMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                      child: DecoratedBox(
+                        key: const ValueKey<String>('coach-fallback-notice'),
+                        decoration: BoxDecoration(
+                          color: primaryColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.shield_outlined,
+                                size: 18,
+                                color: primaryColor,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(coachingState.noticeMessage!),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                    ),
+                  if (coachingState.canRetryResponse)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          key: const ValueKey<String>('coach-retry-response'),
+                          onPressed: isBusy ? null : _retryResponse,
+                          icon: const Icon(Icons.refresh),
+                          label: Text(l10n.coachRetryResponse),
+                        ),
+                      ),
+                    ),
+                  if (voiceState.isListening || voiceState.isBusy)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      child: Semantics(
+                        liveRegion: true,
+                        child: DecoratedBox(
+                          key: const ValueKey<String>('coach-voice-listening'),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Icon(Icons.mic, color: primaryColor, size: 20),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    voiceState.isListening
-                                        ? l10n.coachVoiceListening
-                                        : l10n.coachVoicePreparing,
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.mic,
+                                      color: primaryColor,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        voiceState.isListening
+                                            ? l10n.coachVoiceListening
+                                            : l10n.coachVoicePreparing,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Wrap(
+                                    alignment: WrapAlignment.end,
+                                    spacing: 4,
+                                    children: [
+                                      TextButton(
+                                        key: const ValueKey<String>(
+                                          'coach-discard-voice',
+                                        ),
+                                        onPressed: voiceState.isBusy
+                                            ? null
+                                            : _discardVoiceTranscription,
+                                        child: Text(l10n.voiceDiscard),
+                                      ),
+                                      if (voiceState.isListening)
+                                        FilledButton.tonal(
+                                          key: const ValueKey<String>(
+                                            'coach-stop-voice',
+                                          ),
+                                          onPressed: _stopVoiceTranscription,
+                                          child: Text(l10n.coachVoiceStop),
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Wrap(
-                                alignment: WrapAlignment.end,
-                                spacing: 4,
-                                children: [
-                                  TextButton(
-                                    key: const ValueKey<String>(
-                                      'coach-discard-voice',
+                          ),
+                        ),
+                      ),
+                    ),
+                  if (voiceState.noticeCode != null)
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                      child: Semantics(
+                        liveRegion: true,
+                        child: DecoratedBox(
+                          key: const ValueKey<String>('coach-voice-notice'),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.errorContainer
+                                .withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.mic_off_outlined, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    localizeVoiceTranscriptionNotice(
+                                      l10n,
+                                      voiceState.noticeCode!,
                                     ),
-                                    onPressed: voiceState.isBusy
-                                        ? null
-                                        : _discardVoiceTranscription,
-                                    child: Text(l10n.voiceDiscard),
                                   ),
-                                  if (voiceState.isListening)
-                                    FilledButton.tonal(
-                                      key: const ValueKey<String>(
-                                        'coach-stop-voice',
-                                      ),
-                                      onPressed: _stopVoiceTranscription,
-                                      child: Text(l10n.coachVoiceStop),
-                                    ),
+                                ),
+                                IconButton(
+                                  key: const ValueKey<String>(
+                                    'coach-dismiss-voice-notice',
+                                  ),
+                                  tooltip: l10n.voiceDismissNotice,
+                                  onPressed: voiceState.dismissNotice,
+                                  icon: const Icon(Icons.close),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: usesStackedChrome
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              messageInput,
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  voiceButton,
+                                  const SizedBox(width: 10),
+                                  sendButton,
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
+                            ],
+                          )
+                        : Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Expanded(child: messageInput),
+                              const SizedBox(width: 10),
+                              voiceButton,
+                              const SizedBox(width: 10),
+                              sendButton,
+                            ],
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+                    child: Text(
+                      l10n.coachCareBoundary,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 11,
                       ),
                     ),
                   ),
-                ),
-              if (voiceState.noticeCode != null)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                  child: Semantics(
-                    liveRegion: true,
-                    child: DecoratedBox(
-                      key: const ValueKey<String>('coach-voice-notice'),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.errorContainer.withValues(alpha: 0.45),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.mic_off_outlined, size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                localizeVoiceTranscriptionNotice(
-                                  l10n,
-                                  voiceState.noticeCode!,
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              key: const ValueKey<String>(
-                                'coach-dismiss-voice-notice',
-                              ),
-                              tooltip: l10n.voiceDismissNotice,
-                              onPressed: voiceState.dismissNotice,
-                              icon: const Icon(Icons.close),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        key: const ValueKey<String>('coach-message-input'),
-                        controller: _controller,
-                        focusNode: _inputFocusNode,
-                        enabled: !isCoachBusy && !voiceBlocksSubmission,
-                        minLines: 1,
-                        maxLines: 4,
-                        maxLength: 800,
-                        textCapitalization: TextCapitalization.sentences,
-                        textInputAction: TextInputAction.send,
-                        onSubmitted: canSend ? (_) => _send() : null,
-                        decoration: InputDecoration(
-                          hintText: l10n.coachInputHint,
-                          counterText: '',
-                          border: const OutlineInputBorder(),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    IconButton.outlined(
-                      key: const ValueKey<String>('coach-voice-input'),
-                      tooltip: voiceState.isListening
-                          ? l10n.coachVoiceStopTooltip
-                          : l10n.coachVoiceDictateTooltip,
-                      onPressed: isCoachBusy || voiceState.isBusy
-                          ? null
-                          : voiceState.isListening
-                          ? _stopVoiceTranscription
-                          : _startVoiceTranscription,
-                      icon: voiceState.isBusy
-                          ? const SizedBox.square(
-                              dimension: 19,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Icon(
-                              voiceState.isListening ? Icons.stop : Icons.mic,
-                            ),
-                    ),
-                    const SizedBox(width: 10),
-                    IconButton.filled(
-                      key: const ValueKey<String>('coach-send-message'),
-                      tooltip: l10n.coachSendTooltip,
-                      onPressed: canSend ? _send : null,
-                      icon: isCoachBusy
-                          ? const SizedBox.square(
-                              dimension: 19,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.arrow_upward),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-                child: Text(
-                  l10n.coachCareBoundary,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white54, fontSize: 11),
-                ),
-              ),
-            ],
+                ],
+              );
+              return usesStackedChrome
+                  ? SingleChildScrollView(child: contents)
+                  : contents;
+            },
           ),
         ),
       ),

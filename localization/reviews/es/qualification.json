@@ -70,6 +70,19 @@
   "runtimeCatalogSha256": "611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f",
   "generatedDelegateAvailable": true,
   "productionLocaleAllowed": false,
+  "layoutAccessibilityPhase": "215G-C3B",
+  "layoutAccessibilityStatus": "critical_verified",
+  "layoutAccessibilityTestWidth": 320,
+  "layoutAccessibilityTextScales": [
+    1.6,
+    2.0
+  ],
+  "layoutAccessibilitySurfaces": [
+    "onboarding",
+    "focus_coach",
+    "haven_actions",
+    "account_privacy"
+  ],
   "reviewPacketAssigned": false,
   "reviewStarted": false,
   "humanReviewRequired": true,

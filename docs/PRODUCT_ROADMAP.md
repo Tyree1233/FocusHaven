@@ -1,6 +1,6 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-C3A Spanish runtime integration is in verification
+Status: living product contract; Phase 215G-C3B critical Spanish layout/accessibility verification is in progress
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -466,6 +466,18 @@ English-only `FocusHavenLocales.productionLocales` allowlist and falls back to
 English on Spanish devices. Spanish is therefore generated but production
 inactive, unadvertised, and still blocked on layout/accessibility,
 voice/coaching, native/store, signed-build, and country-release gates.
+
+Phase 215G-C3B adds the first critical Spanish layout/accessibility gate. Tests
+render onboarding at 2.0x text and Focus Coach, Haven Actions, and
+account/privacy controls at 1.6x text on a 320-pixel phone width; they verify
+translated controls, semantics or tooltips, reachability, and absence of
+layout exceptions. Onboarding gains bounded vertical scrolling for translation
+and accessibility expansion. Focus Coach gains stacked header and composer
+chrome plus a scrollable whole-sheet accessibility branch around a bounded
+conversation viewport when narrow width or enlarged text would otherwise crowd
+those controls. This is not complete screen-reader, real-device,
+voice/coaching, native/store, signed-build, country, or production-locale
+qualification.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
