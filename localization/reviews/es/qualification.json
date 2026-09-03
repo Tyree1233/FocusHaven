@@ -160,6 +160,19 @@
   "approvedAt": null,
   "linguisticallyApproved": false,
   "runtimeActivated": false,
+  "voiceAndCoachingPhase": "215G-D1",
+  "voiceAndCoachingStatus": "explicit_speech_locale_verified_pending_device_and_language_behavior",
+  "speechRecognitionSupportedLocaleIds": [
+    "en",
+    "es"
+  ],
+  "speechRecognitionLocaleExplicit": true,
+  "speechRecognitionUnsupportedLocaleFailsClosed": true,
+  "speechRecognitionLocaleAutomatedVerificationPassed": true,
+  "speechRecognitionPhysicalAcceptancePassed": false,
+  "spanishLocalCoachQualified": false,
+  "spanishSafeVoiceCommandsQualified": false,
+  "spanishEnhancedAiBehaviorQualified": false,
   "voiceAndCoachingQualified": false,
   "nativeAndStoreQualified": false
 }

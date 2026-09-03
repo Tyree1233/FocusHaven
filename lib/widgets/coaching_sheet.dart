@@ -185,7 +185,9 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     _draftBeforeVoice = _controller.text;
     _draftPrefix = _controller.text.trimRight();
     _lastVoiceTranscript = '';
-    final started = await _voiceTranscription.start();
+    final started = await _voiceTranscription.start(
+      localeId: context.l10n.localeName,
+    );
     if (!started && mounted) _inputFocusNode.requestFocus();
   }
 

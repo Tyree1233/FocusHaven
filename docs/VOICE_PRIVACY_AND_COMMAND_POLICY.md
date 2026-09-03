@@ -1,7 +1,8 @@
 # Voice Privacy and Command Policy
 
 Status: Voice-to-Coach is implemented in Phase 212 and Safe Voice Commands is
-implemented in Phase 213 source
+implemented in Phase 213 source; Phase 215G-D1 adds explicit English/Spanish
+speech-locale propagation while production remains English-only
 
 FocusHaven declares narrowly scoped Android microphone access, iOS microphone
 and speech-recognition purpose strings, and the `speech_to_text` dependency for
@@ -29,6 +30,10 @@ Voice is an optional input method, not an autonomous assistant.
 - Typing remains a complete alternative. No core feature requires speech.
 - Spoken output is separately controlled and never implies the microphone is
   active.
+- Every recognition attempt passes an explicitly admitted locale to the
+  platform recognizer. The current exact set is English (`en`) and Spanish
+  (`es`); an unsupported locale stops before recognizer initialization or
+  permission work and keeps typing available.
 
 ## Transcript-first data flows
 
@@ -190,8 +195,15 @@ The Phase 212 and Phase 213 source and test boundary includes:
 - updated store privacy and data-safety working answers; and
 - disclosure of possible operating-system or provider network processing.
 
+Phase 215G-D1 verifies explicit English/Spanish locale propagation from both
+voice surfaces and fail-closed handling before platform or permission work for
+any unsupported locale. It does not qualify platform locale availability,
+recognition accuracy, Spanish Local Coach responses, Spanish safe-command
+interpretation, or enhanced-AI language behavior.
+
 Fresh Android and Apple release builds, native permission exercises,
-real-device Safe Voice Commands acceptance, accessibility checks, signed
-candidate validation, and final store privacy answers remain required before
-distribution. Prior App Store and Play artifacts are not evidence for this
-changed permission, dependency, and action-input boundary.
+real-device Spanish recognition and Safe Voice Commands acceptance,
+language-aware coaching and action checks, signed candidate validation, and
+final store privacy answers remain required before distribution. Prior App
+Store and Play artifacts are not evidence for this changed permission,
+dependency, and action-input boundary.

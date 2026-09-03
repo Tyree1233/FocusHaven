@@ -1,6 +1,6 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3G Spanish TalkBack and VoiceOver accepted; production
+Status: Phase 215G-D1 explicit Spanish speech-locale preparation; production
 remains English-only
 
 FocusHaven is intended to become useful in multiple languages without making
@@ -152,6 +152,16 @@ country release readiness.
   contains no operator or device identity, screen capture, UI dump, spoken
   content, or app-private data. Production activation remains false and
   voice/coaching, native/store, signed-build, and country gates remain separate.
+- Phase 215G-D1 makes recognition locale selection explicit at both
+  tap-to-talk boundaries. Focus Coach and Haven Actions pass the active catalog
+  locale to the shared recognizer, whose exact admitted locale IDs are `en`
+  and `es`. An unsupported locale fails before recognizer initialization or
+  permission work and preserves typed input. No catalog, permission,
+  dependency, transcript-retention rule, interpreter, Coach response, or
+  enhanced-AI behavior changes. Automated locale propagation is verified, but
+  real-device Spanish recognition and Spanish Local Coach, safe-command, and
+  enhanced-AI behavior remain pending; therefore voice/coaching qualification
+  and production activation remain false.
 
 ## Catalog authority
 
@@ -311,7 +321,10 @@ tasks must still be evaluated from the console's current state.
   is stored. Spanish remains runtime inactive; isolated integration, layout,
   accessibility, voice/coaching, native, store, and country gates remain.
 - **215G-D — Voice and coaching:** align recognition, action interpretation,
-  local coaching, and explicit fallbacks with each qualified locale.
+  local coaching, and explicit fallbacks with each qualified locale. Phase D1
+  establishes exact `en`/`es` speech-locale propagation and fail-closed
+  unsupported-locale handling without claiming real-device or
+  language-behavior qualification.
 - **215G-E — Native and store surfaces:** complete platform resources, public
   policies, screenshots, listings, and country-specific release evidence.
 

@@ -125,6 +125,7 @@ class _HavenActionSheetState extends State<HavenActionSheet> {
       _message = null;
     });
     final started = await _voiceTranscription.start(
+      localeId: context.l10n.localeName,
       purpose: VoiceTranscriptionPurpose.havenAction,
     );
     if (!started && mounted) {

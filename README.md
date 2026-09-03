@@ -998,6 +998,18 @@ information is recorded, and Spanish remains production inactive pending its
 separate voice/coaching, native/store, signed-build, country, and activation
 gates.
 
+Phase 215G-D1 begins the Spanish voice/coaching gate with an explicit,
+fail-closed speech-locale boundary shared by Focus Coach and Haven Actions.
+Each tap-to-talk attempt now passes the active catalog locale to the platform
+recognizer; only exact English (`en`) and Spanish (`es`) locale IDs are
+admitted. Any other locale stops before recognizer initialization or permission
+work and leaves typing available. This slice does not change either reviewed
+catalog, a permission, dependency, interpreter, Coach response, enhanced-AI
+path, or transcript-retention rule. Real-device Spanish recognition and the
+Spanish Local Coach, safe-command, and enhanced-AI behavior gates remain
+pending, so voice/coaching qualification and production activation remain
+false.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

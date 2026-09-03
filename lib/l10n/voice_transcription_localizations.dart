@@ -11,6 +11,8 @@ String localizeVoiceTranscriptionNotice(
 ) => switch (notice) {
   VoiceTranscriptionNotice.recognitionUnavailableOnDevice =>
     l10n.voiceRecognitionUnavailableOnDevice,
+  VoiceTranscriptionNotice.recognitionLocaleUnsupported =>
+    l10n.voiceRecognitionUnavailableNow,
   VoiceTranscriptionNotice.accessNotGranted => l10n.voiceAccessNotGranted,
   VoiceTranscriptionNotice.recognitionDidNotStart =>
     l10n.voiceRecognitionDidNotStart,

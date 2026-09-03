@@ -18,7 +18,7 @@ void main() {
     final adapter = _FakeVoiceRecognitionAdapter();
     final service = VoiceTranscriptionService(adapter: adapter);
 
-    expect(await service.start(), isFalse);
+    expect(await service.start(localeId: 'en'), isFalse);
     expect(service.status, VoiceTranscriptionStatus.idle);
     expect(adapter.initializeCalls, 0);
     expect(adapter.listenCalls, 0);
@@ -35,14 +35,20 @@ void main() {
       isFalse,
     );
     expect(
-      await service.start(purpose: VoiceTranscriptionPurpose.havenAction),
+      await service.start(
+        localeId: 'en',
+        purpose: VoiceTranscriptionPurpose.havenAction,
+      ),
       isFalse,
     );
     expect(adapter.initializeCalls, 0);
 
     service.acknowledgeDisclosure(VoiceTranscriptionPurpose.havenAction);
     expect(
-      await service.start(purpose: VoiceTranscriptionPurpose.havenAction),
+      await service.start(
+        localeId: 'en',
+        purpose: VoiceTranscriptionPurpose.havenAction,
+      ),
       isTrue,
     );
     await service.cancel();
@@ -55,7 +61,7 @@ void main() {
       final service = VoiceTranscriptionService(adapter: adapter)
         ..acknowledgeDisclosure();
 
-      expect(await service.start(), isTrue);
+      expect(await service.start(localeId: 'en'), isTrue);
       expect(service.status, VoiceTranscriptionStatus.listening);
       expect(adapter.initializeCalls, 1);
       expect(adapter.listenCalls, 1);
@@ -72,7 +78,7 @@ void main() {
       expect(service.transcript, 'help me plan the next step');
       expect(adapter.stopCalls, 1);
 
-      expect(await service.start(), isTrue);
+      expect(await service.start(localeId: 'en'), isTrue);
       expect(adapter.initializeCalls, 1);
       expect(adapter.listenCalls, 2);
     },
@@ -85,7 +91,7 @@ void main() {
       final service = VoiceTranscriptionService(adapter: adapter)
         ..acknowledgeDisclosure();
 
-      expect(await service.start(), isTrue);
+      expect(await service.start(localeId: 'en'), isTrue);
       adapter.emitResult('private unfinished thought', isFinal: false);
 
       await service.cancel();
@@ -105,7 +111,7 @@ void main() {
     final service = VoiceTranscriptionService(adapter: adapter)
       ..acknowledgeDisclosure();
 
-    final starting = service.start();
+    final starting = service.start(localeId: 'en');
     expect(service.status, VoiceTranscriptionStatus.preparing);
 
     await service.cancel();
@@ -126,7 +132,7 @@ void main() {
       final service = VoiceTranscriptionService(adapter: adapter)
         ..acknowledgeDisclosure();
 
-      expect(await service.start(), isFalse);
+      expect(await service.start(localeId: 'en'), isFalse);
 
       expect(service.status, VoiceTranscriptionStatus.permissionDenied);
       expect(service.noticeCode, VoiceTranscriptionNotice.accessNotGranted);
@@ -144,7 +150,7 @@ void main() {
     final service = VoiceTranscriptionService(adapter: adapter)
       ..acknowledgeDisclosure();
 
-    expect(await service.start(), isTrue);
+    expect(await service.start(localeId: 'en'), isTrue);
     adapter.emitError('network_secret_vendor_detail', isPermanent: false);
 
     expect(service.status, VoiceTranscriptionStatus.failed);
@@ -156,6 +162,39 @@ void main() {
     expect(service.notice, isNot(contains('network_secret_vendor_detail')));
     expect(adapter.cancelCalls, 1);
   });
+
+  test(
+    'passes the explicitly qualified Spanish locale to recognition',
+    () async {
+      final adapter = _FakeVoiceRecognitionAdapter();
+      final service = VoiceTranscriptionService(adapter: adapter)
+        ..acknowledgeDisclosure();
+
+      expect(await service.start(localeId: 'es'), isTrue);
+      expect(adapter.lastLocaleId, 'es');
+      expect(adapter.initializeCalls, 1);
+      expect(adapter.listenCalls, 1);
+    },
+  );
+
+  test(
+    'unsupported locales fail before initialization or permission work',
+    () async {
+      final adapter = _FakeVoiceRecognitionAdapter();
+      final service = VoiceTranscriptionService(adapter: adapter)
+        ..acknowledgeDisclosure();
+
+      expect(await service.start(localeId: 'fr'), isFalse);
+      expect(service.status, VoiceTranscriptionStatus.unavailable);
+      expect(
+        service.noticeCode,
+        VoiceTranscriptionNotice.recognitionLocaleUnsupported,
+      );
+      expect(service.notice, contains('not available for this language'));
+      expect(adapter.initializeCalls, 0);
+      expect(adapter.listenCalls, 0);
+    },
+  );
 }
 
 class _FakeVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
@@ -174,6 +213,7 @@ class _FakeVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
   int stopCalls = 0;
   int cancelCalls = 0;
   bool listening = false;
+  String? lastLocaleId;
   VoiceRecognitionStatusCallback? _onStatus;
   VoiceRecognitionErrorCallback? _onError;
   VoiceRecognitionResultCallback? _onResult;
@@ -197,9 +237,11 @@ class _FakeVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
 
   @override
   Future<void> listen({
+    required String localeId,
     required VoiceRecognitionResultCallback onResult,
   }) async {
     listenCalls += 1;
+    lastLocaleId = localeId;
     _onResult = onResult;
     listening = true;
   }

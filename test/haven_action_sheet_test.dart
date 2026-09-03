@@ -44,7 +44,9 @@ void main() {
     owned, {
     double textScale = 1,
     double width = 600,
+    Locale? locale,
   }) => MaterialApp(
+    locale: locale,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     home: MediaQuery(
@@ -341,6 +343,24 @@ void main() {
     expect(owned.timer.isRunning, isFalse);
   });
 
+  testWidgets(
+    'Spanish Haven actions pass their explicit locale to recognition',
+    (tester) async {
+      final owned = await services();
+      owned.voice.acknowledgeDisclosure(VoiceTranscriptionPurpose.havenAction);
+      await tester.pumpWidget(app(owned, locale: const Locale('es')));
+
+      await tester.tap(find.byKey(const ValueKey('havenActionVoiceInput')));
+      await tester.pumpAndSettle();
+
+      expect(owned.adapter.listenCalls, 1);
+      expect(owned.adapter.lastLocaleId, 'es');
+      expect(find.byKey(const ValueKey('havenActionProposal')), findsNothing);
+      expect(owned.timer.isRunning, isFalse);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('discard restores the exact typed draft without a proposal', (
     tester,
   ) async {
@@ -406,6 +426,7 @@ class _HavenVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
   int stopCalls = 0;
   int cancelCalls = 0;
   bool listening = false;
+  String? lastLocaleId;
   VoiceRecognitionResultCallback? _onResult;
 
   @override
@@ -425,9 +446,11 @@ class _HavenVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
 
   @override
   Future<void> listen({
+    required String localeId,
     required VoiceRecognitionResultCallback onResult,
   }) async {
     listenCalls += 1;
+    lastLocaleId = localeId;
     _onResult = onResult;
     listening = true;
   }

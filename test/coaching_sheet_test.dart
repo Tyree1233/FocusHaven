@@ -16,6 +16,7 @@ Widget _app(
   CoachingService coach, {
   CoachingContext? coachingContext,
   VoiceTranscriptionService? voiceTranscription,
+  Locale? locale,
 }) {
   return ProviderScope(
     overrides: [
@@ -26,6 +27,7 @@ Widget _app(
         ),
     ],
     child: MaterialApp(
+      locale: locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark().copyWith(
@@ -240,6 +242,27 @@ void main() {
       responder.lastMessage,
       'Context: help me choose one private next step.',
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Spanish Coach passes its explicit locale to recognition', (
+    tester,
+  ) async {
+    final coach = await _createCoach();
+    final adapter = _WidgetVoiceRecognitionAdapter();
+    final voice = VoiceTranscriptionService(adapter: adapter)
+      ..acknowledgeDisclosure();
+
+    await tester.pumpWidget(
+      _app(coach, voiceTranscription: voice, locale: const Locale('es')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('coach-voice-input')));
+    await tester.pumpAndSettle();
+
+    expect(adapter.listenCalls, 1);
+    expect(adapter.lastLocaleId, 'es');
+    expect(coach.messages, isEmpty);
     expect(tester.takeException(), isNull);
   });
 
@@ -1149,6 +1172,7 @@ class _WidgetVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
   int stopCalls = 0;
   int cancelCalls = 0;
   bool listening = false;
+  String? lastLocaleId;
   VoiceRecognitionResultCallback? _onResult;
 
   @override
@@ -1168,9 +1192,11 @@ class _WidgetVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
 
   @override
   Future<void> listen({
+    required String localeId,
     required VoiceRecognitionResultCallback onResult,
   }) async {
     listenCalls += 1;
+    lastLocaleId = localeId;
     _onResult = onResult;
     listening = true;
   }

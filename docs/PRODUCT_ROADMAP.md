@@ -66,9 +66,9 @@ Every future phase must preserve these rules:
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
 | Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, and Journey context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add local-coach context as one bounded, reviewable connection. |
-| Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. | Complete fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
-| Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. | Complete fresh platform builds, real-device command acceptance, accessibility checks, and store-disclosure validation before distribution. |
-| Global localization | Spanish integration testing | Generated Flutter localization contains the English source and exact reviewed Spanish catalog. The production allowlist remains English-only; French, German, and Brazilian Portuguese remain planned. No additional language is a current public-support claim. | Complete Spanish layout/accessibility, voice/coaching, native/store, signed-build, and country gates before production activation, then reuse the same review pipeline for later locales. |
+| Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish now pass an explicit speech locale to the recognizer. | Complete real-device Spanish recognition plus fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
+| Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
+| Global localization | Spanish integration testing | Generated Flutter localization contains the English source and exact reviewed Spanish catalog. The production allowlist remains English-only; French, German, and Brazilian Portuguese remain planned. Spanish screen-reader qualification is complete and explicit speech-locale propagation is automated; no additional language is a current public-support claim. | Complete real-device Spanish recognition, language-aware Coach/action behavior, native/store, signed-build, and country gates before production activation, then reuse the same review pipeline for later locales. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
@@ -537,6 +537,17 @@ TalkBack and iOS VoiceOver acceptance are now complete, so the Spanish
 screen-reader gate is qualified. Spanish remains outside the production locale
 allowlist while voice/coaching, native/store, signed-build, country, and
 activation gates remain separate.
+
+Phase 215G-D1 begins the voice/coaching gate without widening runtime support.
+Focus Coach and Haven Actions now pass the active localization locale into the
+shared speech recognizer. The service admits only exact English (`en`) and
+Spanish (`es`) IDs and rejects any unsupported locale before recognizer
+initialization or permission work, preserving typing as the complete fallback.
+Automated service and widget tests cover Spanish propagation and fail-closed
+handling. This slice changes no catalog, permission, dependency, interpreter,
+Coach response, enhanced-AI path, transcript retention, or production
+allowlist. Real-device Spanish recognition and Spanish Local Coach,
+safe-command, and enhanced-AI behavior qualification remain pending.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

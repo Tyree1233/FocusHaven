@@ -25,6 +25,7 @@ enum VoiceTranscriptionPurpose { coach, havenAction }
 /// treating service-owned English text as localized presentation copy.
 enum VoiceTranscriptionNotice {
   recognitionUnavailableOnDevice,
+  recognitionLocaleUnsupported,
   accessNotGranted,
   recognitionDidNotStart,
   transcriptionCouldNotStart,
@@ -55,7 +56,10 @@ abstract interface class VoiceRecognitionAdapter {
     required VoiceRecognitionErrorCallback onError,
   });
 
-  Future<void> listen({required VoiceRecognitionResultCallback onResult});
+  Future<void> listen({
+    required String localeId,
+    required VoiceRecognitionResultCallback onResult,
+  });
 
   Future<void> stop();
 
@@ -90,6 +94,7 @@ class SpeechToTextVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
 
   @override
   Future<void> listen({
+    required String localeId,
     required VoiceRecognitionResultCallback onResult,
   }) async {
     await _speechToText.listen(
@@ -104,6 +109,7 @@ class SpeechToTextVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
         autoPunctuation: true,
         pauseFor: const Duration(seconds: 4),
         listenFor: const Duration(seconds: 45),
+        localeId: localeId,
       ),
     );
   }
@@ -127,6 +133,8 @@ class VoiceTranscriptionService extends ChangeNotifier {
 
   final VoiceRecognitionAdapter _adapter;
 
+  static const supportedLocaleIds = <String>{'en', 'es'};
+
   VoiceTranscriptionStatus _status = VoiceTranscriptionStatus.idle;
   String _transcript = '';
   VoiceTranscriptionNotice? _noticeCode;
@@ -143,6 +151,8 @@ class VoiceTranscriptionService extends ChangeNotifier {
   String? get notice => switch (_noticeCode) {
     VoiceTranscriptionNotice.recognitionUnavailableOnDevice =>
       'Speech recognition is unavailable on this device.',
+    VoiceTranscriptionNotice.recognitionLocaleUnsupported =>
+      'Voice transcription is not available for this language. You can keep typing instead.',
     VoiceTranscriptionNotice.accessNotGranted =>
       'Microphone or speech-recognition access was not granted. You can keep typing instead.',
     VoiceTranscriptionNotice.recognitionDidNotStart =>
@@ -175,9 +185,20 @@ class VoiceTranscriptionService extends ChangeNotifier {
   }
 
   Future<bool> start({
+    required String localeId,
     VoiceTranscriptionPurpose purpose = VoiceTranscriptionPurpose.coach,
   }) async {
     if (!disclosureAcknowledgedFor(purpose) || isListening || isBusy) {
+      return false;
+    }
+
+    final supportedLocaleId = _supportedLocaleId(localeId);
+    if (supportedLocaleId == null) {
+      _transcript = '';
+      _isFinal = false;
+      _noticeCode = VoiceTranscriptionNotice.recognitionLocaleUnsupported;
+      _acceptPlatformCallbacks = false;
+      _setStatus(VoiceTranscriptionStatus.unavailable);
       return false;
     }
 
@@ -212,7 +233,10 @@ class VoiceTranscriptionService extends ChangeNotifier {
       }
 
       if (!_isCurrentOperation(operationRevision)) return false;
-      await _adapter.listen(onResult: _handleResult);
+      await _adapter.listen(
+        localeId: supportedLocaleId,
+        onResult: _handleResult,
+      );
       if (!_isCurrentOperation(operationRevision)) {
         await _cancelAdapterBestEffort();
         return false;
@@ -308,6 +332,11 @@ class VoiceTranscriptionService extends ChangeNotifier {
 
   bool _isCurrentOperation(int revision) =>
       !_disposed && revision == _operationRevision;
+
+  static String? _supportedLocaleId(String localeId) {
+    final normalized = localeId.trim().toLowerCase();
+    return supportedLocaleIds.contains(normalized) ? normalized : null;
+  }
 
   Future<void> _cancelAdapterBestEffort() async {
     try {
