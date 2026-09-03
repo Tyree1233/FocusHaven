@@ -988,9 +988,15 @@ content. The follow-up correction places Coach in a safe-area-aware bottom
 region that participates in Scaffold layout instead of floating over the
 scrolling dashboard. English and Spanish regressions now model an iPhone safe
 area at 2.0x text and require measurable separation between the real controls.
-Physical VoiceOver acceptance remains pending a short corrected-build retest;
-no personal device or operator information is recorded, and Spanish remains
-production inactive.
+The exact corrected signed Spanish app then passed the short physical VoiceOver
+retest, including separate **Restaurar** and **Coach de enfoque** focus targets
+and a usable Coach round trip. The exact normal English app was restored and
+its Cloud Restore and Local Coach controls passed the same physical clearance
+check. Android TalkBack and iOS VoiceOver acceptance are now complete, so the
+Spanish screen-reader gate is qualified. No personal device or operator
+information is recorded, and Spanish remains production inactive pending its
+separate voice/coaching, native/store, signed-build, country, and activation
+gates.
 
 ## Architecture
 

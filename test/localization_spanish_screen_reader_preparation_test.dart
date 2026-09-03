@@ -170,41 +170,38 @@ void main() {
     }
   });
 
-  test(
-    'C3D records automated semantics without claiming device acceptance',
-    () {
-      final qualification =
-          jsonDecode(
-                File(
-                  'localization/reviews/es/qualification.json',
-                ).readAsStringSync(),
-              )
-              as Map<String, dynamic>;
+  test('C3D automated semantics remain exact after physical acceptance', () {
+    final qualification =
+        jsonDecode(
+              File(
+                'localization/reviews/es/qualification.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>;
 
-      expect(qualification['screenReaderPreparationPhase'], '215G-C3D');
-      expect(
-        qualification['screenReaderPreparationStatus'],
-        'automated_semantics_verified',
-      );
-      expect(qualification['screenReaderAutomatedSurfaces'], [
-        'onboarding',
-        'timer_dashboard',
-        'focus_coach',
-        'haven_actions',
-        'account_privacy',
-        'appearance',
-        'custom_duration',
-        'guided_breathing',
-        'focus_queue',
-        'completed_tasks',
-      ]);
-      expect(qualification['screenReaderPhysicalAcceptancePassed'], isFalse);
-      expect(qualification['screenReaderQualified'], isFalse);
-      expect(qualification['productionLocaleAllowed'], isFalse);
-      expect(qualification['runtimeActivated'], isFalse);
-      expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
-    },
-  );
+    expect(qualification['screenReaderPreparationPhase'], '215G-C3D');
+    expect(
+      qualification['screenReaderPreparationStatus'],
+      'automated_semantics_verified',
+    );
+    expect(qualification['screenReaderAutomatedSurfaces'], [
+      'onboarding',
+      'timer_dashboard',
+      'focus_coach',
+      'haven_actions',
+      'account_privacy',
+      'appearance',
+      'custom_duration',
+      'guided_breathing',
+      'focus_queue',
+      'completed_tasks',
+    ]);
+    expect(qualification['screenReaderPhysicalAcceptancePassed'], isTrue);
+    expect(qualification['screenReaderQualified'], isTrue);
+    expect(qualification['productionLocaleAllowed'], isFalse);
+    expect(qualification['runtimeActivated'], isFalse);
+    expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
+  });
 }
 
 Widget _spanishApp(Widget home) => MaterialApp(

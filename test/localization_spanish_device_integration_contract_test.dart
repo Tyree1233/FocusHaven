@@ -83,9 +83,10 @@ void main() {
     expect(qualification['deviceIntegrationPreparationPhase'], '215G-C3E');
     expect(
       qualification['deviceIntegrationPreparationStatus'],
-      'debug_target_verified_android_talkback_accepted',
+      'debug_target_verified_screen_readers_accepted',
     );
-    expect(qualification['screenReaderPhysicalAcceptancePassed'], isFalse);
+    expect(qualification['screenReaderPhysicalAcceptancePassed'], isTrue);
+    expect(qualification['screenReaderQualified'], isTrue);
     expect(qualification['runtimeActivated'], isFalse);
     expect(qualification['productionLocaleAllowed'], isFalse);
   });

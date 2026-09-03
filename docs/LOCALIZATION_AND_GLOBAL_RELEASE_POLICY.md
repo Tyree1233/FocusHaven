@@ -1,8 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3F Spanish Android TalkBack accepted; the shared iOS
-Coach/Restore correction awaits physical VoiceOver retest; production remains
-English-only
+Status: Phase 215G-C3G Spanish TalkBack and VoiceOver accepted; production
+remains English-only
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -139,14 +138,20 @@ country release readiness.
 - The first Phase 215G-C3G physical VoiceOver pass completed nine Spanish
   checklist items but found that Coach still covered Cloud Restore on the
   iPhone. The exact normal English app reproduced the same obstruction, so no
-  Spanish or English iOS PASS was recorded. The shared correction moves Coach
+  Spanish or English iOS PASS was recorded for that build. The shared
+  correction moves Coach
   from an overlaying Scaffold slot into a safe-area-aware bottom region that
   reserves its own layout space. English and Spanish widget regressions model
   an iPhone safe area with 2.0x text and require a real gap between Restore and
-  Coach. Physical VoiceOver acceptance and complete screen-reader
-  qualification remain false until the corrected signed apps pass the bounded
-  iPhone retest. The failure record contains no operator or device identity,
-  screen capture, UI dump, spoken content, or app-private data.
+  Coach. The exact corrected signed Spanish app subsequently passed the short
+  physical VoiceOver retest, including separate **Restaurar** and **Coach de
+  enfoque** focus targets and a usable Coach round trip. The exact normal
+  English app was then restored in place and passed the same physical
+  Coach/Restore clearance check. With Android TalkBack and iOS VoiceOver both
+  accepted, the Spanish screen-reader gate is qualified. The acceptance record
+  contains no operator or device identity, screen capture, UI dump, spoken
+  content, or app-private data. Production activation remains false and
+  voice/coaching, native/store, signed-build, and country gates remain separate.
 
 ## Catalog authority
 

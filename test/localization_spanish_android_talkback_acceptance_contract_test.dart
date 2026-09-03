@@ -19,7 +19,7 @@ void main() {
       expect(qualification['talkBackPhysicalAcceptanceStatus'], 'accepted');
       expect(
         qualification['deviceIntegrationPreparationStatus'],
-        'debug_target_verified_android_talkback_accepted',
+        'debug_target_verified_screen_readers_accepted',
       );
       expect(
         qualification['talkBackPhysicalAcceptanceDevice'],
@@ -46,26 +46,29 @@ void main() {
     },
   );
 
-  test('keeps broader and production release gates closed', () {
-    final qualification =
-        jsonDecode(
-              File(
-                'localization/reviews/es/qualification.json',
-              ).readAsStringSync(),
-            )
-            as Map<String, dynamic>;
-    final localePolicy = File(
-      'lib/l10n/focus_haven_locales.dart',
-    ).readAsStringSync();
+  test(
+    'keeps production release gates closed after screen-reader acceptance',
+    () {
+      final qualification =
+          jsonDecode(
+                File(
+                  'localization/reviews/es/qualification.json',
+                ).readAsStringSync(),
+              )
+              as Map<String, dynamic>;
+      final localePolicy = File(
+        'lib/l10n/focus_haven_locales.dart',
+      ).readAsStringSync();
 
-    expect(qualification['screenReaderPhysicalAcceptancePassed'], isFalse);
-    expect(qualification['screenReaderQualified'], isFalse);
-    expect(qualification['runtimeActivated'], isFalse);
-    expect(qualification['voiceAndCoachingQualified'], isFalse);
-    expect(qualification['nativeAndStoreQualified'], isFalse);
-    expect(
-      localePolicy,
-      contains("static const productionLocales = <Locale>[Locale('en')];"),
-    );
-  });
+      expect(qualification['screenReaderPhysicalAcceptancePassed'], isTrue);
+      expect(qualification['screenReaderQualified'], isTrue);
+      expect(qualification['runtimeActivated'], isFalse);
+      expect(qualification['voiceAndCoachingQualified'], isFalse);
+      expect(qualification['nativeAndStoreQualified'], isFalse);
+      expect(
+        localePolicy,
+        contains("static const productionLocales = <Locale>[Locale('en')];"),
+      );
+    },
+  );
 }
