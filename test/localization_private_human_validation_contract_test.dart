@@ -97,10 +97,13 @@ void main() {
     expect(record['voiceAndCoachingQualified'], isFalse);
     expect(record['nativeAndStoreQualified'], isFalse);
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
-    expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const [
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
     expect(docs, contains('Phase 215G-C2D'));
     expect(docs, contains('private validation'));

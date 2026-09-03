@@ -42,11 +42,20 @@ void main() {
   );
 
   test('production, integration, and planned locale claims stay separate', () {
-    expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
-    expect(FocusHavenLocales.production, hasLength(1));
+    expect(FocusHavenLocales.productionLocales, const <Locale>[
+      Locale('en'),
+      Locale('es'),
+    ]);
+    expect(FocusHavenLocales.production, hasLength(2));
     expect(
-      FocusHavenLocales.production.single.status,
-      FocusHavenLocaleStatus.production,
+      FocusHavenLocales.production,
+      everyElement(
+        isA<FocusHavenLocaleDefinition>().having(
+          (definition) => definition.status,
+          'status',
+          FocusHavenLocaleStatus.production,
+        ),
+      ),
     );
 
     expect(
@@ -62,7 +71,7 @@ void main() {
     );
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
     expect(
       FocusHavenLocales.firstTranslationWave.skip(1),
@@ -74,10 +83,11 @@ void main() {
         ),
       ),
     );
-    expect(FocusHavenLocales.integrationLocales, const <Locale>[Locale('es')]);
+    expect(FocusHavenLocales.integrationLocales, isEmpty);
     expect(
       FocusHavenLocales.productionLocales.toSet().intersection(
         FocusHavenLocales.firstTranslationWave
+            .skip(1)
             .map((definition) => definition.locale)
             .toSet(),
       ),
@@ -119,12 +129,12 @@ void main() {
     final readme = _normalize(_read('README.md'));
 
     for (final required in <String>[
-      'English (`en`) is the source catalog and the only production-supported runtime locale',
-      'Spanish (`es`) is a generated integration locale',
-      'Integration and planned locales are not exposed by the production `MaterialApp.supportedLocales` allowlist',
+      'English (`en`) is the source catalog and fallback production locale',
+      'Spanish (`es`) is a reviewed production runtime locale',
+      'Planned locales are not exposed by the production `MaterialApp.supportedLocales` allowlist',
       'no private user content is sent anywhere for translation',
       'qualified human reviewer',
-      'Voice-to-Coach and safe voice commands',
+      'voice features use an explicitly supported speech locale',
       'A translated interface does not by itself authorize distribution in a new country',
       'Google Play contact-number verification is an account checkpoint',
     ]) {
@@ -133,7 +143,7 @@ void main() {
 
     expect(
       roadmap,
-      contains('| Global localization | Spanish integration testing |'),
+      contains('| Global localization | Spanish active in app |'),
     );
     expect(
       roadmap,
@@ -145,8 +155,11 @@ void main() {
       roadmap,
       contains('Phase 215G-B English Flutter extraction is complete'),
     );
-    expect(readme, contains('English as the source catalog'));
-    expect(readme, contains('None is advertised by the app or stores'));
+    expect(readme, contains('English as the source and fallback catalog'));
+    expect(
+      readme,
+      contains('Store-language promotion remains a separate release decision'),
+    );
     expect(readme, contains('docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md'));
   });
 }

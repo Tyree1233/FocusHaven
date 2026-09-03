@@ -76,7 +76,7 @@ void main() {
     final review = _json('localization/reviews/es/qualification.json');
 
     expect(review['phase'], '215G-C1B');
-    expect(review['status'], 'structurally_ready');
+    expect(review['status'], 'production_active');
     expect(review['reviewPacketPreparationPhase'], '215G-C2A');
     expect(review['reviewPacketPreparationReady'], isTrue);
     expect(review['reviewPacketCreationPhase'], '215G-C2B');
@@ -94,16 +94,19 @@ void main() {
     expect(review['humanReviewer'], isNull);
     expect(review['reviewScope'], isNull);
     expect(review['approvedAt'], isNull);
-    expect(review['linguisticallyApproved'], isFalse);
-    expect(review['runtimeActivated'], isFalse);
+    expect(review['linguisticallyApproved'], isTrue);
+    expect(review['runtimeActivated'], isTrue);
     final packet = File('localization/reviews/es/packets/review-packet.json');
     expect(packet.existsSync(), isTrue);
     expect(_sha256(packet.path), review['reviewPacketSha256']);
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
-    expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const [
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
   });
 

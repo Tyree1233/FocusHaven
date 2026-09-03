@@ -9,7 +9,7 @@ void main() {
   test('prepares an assignment record without starting review', () {
     final result = prepareSpanishReviewerAssignment(
       authorization: _validAuthorization(),
-      qualification: _json('localization/reviews/es/qualification.json'),
+      qualification: _preAssignmentQualification(),
       packetAudit: _json('localization/reviews/es/packet-audit.json'),
       packet: _json('localization/reviews/es/packets/review-packet.json'),
     );
@@ -136,3 +136,10 @@ Map<String, dynamic> _validAuthorization() => {
 
 Map<String, dynamic> _json(String path) =>
     jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+
+Map<String, dynamic> _preAssignmentQualification() =>
+    _json('localization/reviews/es/qualification.json')
+      ..['status'] = 'structurally_ready'
+      ..['humanReviewRequired'] = true
+      ..['linguisticallyApproved'] = false
+      ..['runtimeActivated'] = false;

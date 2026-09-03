@@ -1,3 +1,5 @@
+import 'dart:ui' show Locale;
+
 import 'package:flutter/material.dart' show TimeOfDay;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -39,6 +41,7 @@ import '../services/haven_window_service.dart';
 import '../services/haven_window_platform_bridge.dart';
 import '../services/iap_service.dart';
 import '../services/journal_service.dart';
+import '../services/locale_service.dart';
 import '../services/living_lantern_service.dart';
 import '../services/notification_service.dart';
 import '../services/remote_coaching_responder.dart';
@@ -411,6 +414,11 @@ final voiceTranscriptionServiceProvider =
 final themeServiceProvider = ChangeNotifierProvider<ThemeService>(
   (ref) => ThemeService(),
   name: 'themeServiceProvider',
+);
+
+final localeServiceProvider = ChangeNotifierProvider<LocaleService>(
+  (ref) => LocaleService(),
+  name: 'localeServiceProvider',
 );
 
 final cloudSyncServiceProvider = Provider<CloudSyncService>(
@@ -856,6 +864,16 @@ final authIsSignedInProvider = Provider<bool>(
 final selectedThemeProvider = Provider<FocusHavenTheme>(
   (ref) => ref.watch(themeServiceProvider).selectedTheme,
   name: 'selectedThemeProvider',
+);
+
+final selectedLanguageChoiceProvider = Provider<FocusHavenLanguageChoice>(
+  (ref) => ref.watch(localeServiceProvider).selectedChoice,
+  name: 'selectedLanguageChoiceProvider',
+);
+
+final selectedLocaleProvider = Provider<Locale?>(
+  (ref) => ref.watch(localeServiceProvider).selectedLocale,
+  name: 'selectedLocaleProvider',
 );
 
 /// Exposes the saved focus profile without rebuilding for unrelated service

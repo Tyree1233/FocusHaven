@@ -142,7 +142,9 @@ void main() {
     expect(readme, contains('Phase 215G-B6A'));
     expect(
       locales,
-      contains("static const productionLocales = <Locale>[Locale('en')]"),
+      contains(
+        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
+      ),
     );
     expect(
       Directory('lib/l10n')

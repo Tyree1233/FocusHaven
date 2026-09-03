@@ -3,12 +3,10 @@ import 'dart:ui' show Locale;
 import '../services/account_deletion_service.dart';
 import 'app_localizations.dart';
 
-/// English remains the only production locale until a later locale is
-/// independently reviewed and activated.
-///
-/// Services accept an [AppLocalizations] instance so future locale activation
-/// can provide the selected catalog without giving business logic a widget
-/// context. This fallback preserves today's single-locale runtime behavior.
+/// Services accept an [AppLocalizations] instance so the active English or
+/// Spanish catalog can reach business logic without giving it a widget
+/// context. English remains the deterministic fallback when no UI locale is
+/// available.
 AppLocalizations defaultServiceLocalizations() =>
     lookupAppLocalizations(const Locale('en'));
 

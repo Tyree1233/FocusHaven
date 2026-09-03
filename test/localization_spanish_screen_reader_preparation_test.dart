@@ -153,12 +153,18 @@ void main() {
         isTrue,
       );
 
-      await tester.tap(find.text('Azul sereno'));
+      final calmBlue = find.text('Azul sereno');
+      await tester.ensureVisible(calmBlue);
+      await tester.pumpAndSettle();
+      await tester.tap(calmBlue);
       await tester.pumpAndSettle();
 
-      final error = tester.getSemantics(
-        find.byKey(const ValueKey<String>('appearance-update-error-semantics')),
+      final errorFinder = find.byKey(
+        const ValueKey<String>('appearance-update-error-semantics'),
       );
+      await tester.ensureVisible(errorFinder);
+      await tester.pumpAndSettle();
+      final error = tester.getSemantics(errorFinder);
       expect(
         error.label,
         'No se pudo actualizar la apariencia. Inténtalo de nuevo.',
@@ -198,9 +204,12 @@ void main() {
     ]);
     expect(qualification['screenReaderPhysicalAcceptancePassed'], isTrue);
     expect(qualification['screenReaderQualified'], isTrue);
-    expect(qualification['productionLocaleAllowed'], isFalse);
-    expect(qualification['runtimeActivated'], isFalse);
-    expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
+    expect(qualification['productionLocaleAllowed'], isTrue);
+    expect(qualification['runtimeActivated'], isTrue);
+    expect(FocusHavenLocales.productionLocales, const <Locale>[
+      Locale('en'),
+      Locale('es'),
+    ]);
   });
 }
 

@@ -362,6 +362,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final havenLoop = ref.read(havenLoopServiceProvider);
     final profile = ref.read(focusProfileServiceProvider);
     final themes = ref.read(themeServiceProvider);
+    final locales = ref.read(localeServiceProvider);
     final confirmed = await ConfirmationDialog.show(
       context,
       title: context.l10n.deleteLocalDataTitle,
@@ -386,6 +387,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
       focusQueue.clearLocalData(),
       profile.clearLocalData(),
       themes.clearLocalData(),
+      locales.clearLocalData(),
       preferences.remove('hasCompletedOnboarding'),
     ]);
     if (!context.mounted) return;

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' show Locale;
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/models/coaching_message.dart';
 import 'package:focushaven/services/coaching_service.dart';
 
@@ -111,6 +113,36 @@ void main() {
       expect(response, contains('someone you trust'));
       expect(response, isNot(contains('Keep working')));
     }
+  });
+
+  test('recognizes immediate safety and boundaries in Spanish', () async {
+    const responder = LocalCoachingResponder();
+    final l10n = lookupAppLocalizations(const Locale('es'));
+
+    for (final message in const [
+      'Quiero matarme.',
+      'No quiero vivir.',
+      'Estoy pensando en suicidarme.',
+    ]) {
+      final response = await responder.respond(
+        message: message,
+        context: CoachingContext(
+          focusTask: 'Terminar el informe',
+          localizations: l10n,
+        ),
+        conversation: const [],
+      );
+
+      expect(response, contains('Tu seguridad importa'));
+      expect(response, isNot(contains('Terminar el informe')));
+    }
+
+    final boundaryResponse = await responder.respond(
+      message: 'Ahora no. Necesito espacio.',
+      context: CoachingContext(localizations: l10n),
+      conversation: const [],
+    );
+    expect(boundaryResponse, contains('espacio'));
   });
 
   test('responds to setbacks without turning them into identity', () async {

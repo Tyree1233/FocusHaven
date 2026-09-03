@@ -12,13 +12,15 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('production app remains English-only by default', (tester) async {
+  testWidgets('production app supports English and Spanish by default', (
+    tester,
+  ) async {
     await tester.pumpWidget(const FocusHavenApp());
 
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(app.locale, isNull);
     expect(app.supportedLocales, FocusHavenLocales.productionLocales);
-    expect(app.supportedLocales, const <Locale>[Locale('en')]);
+    expect(app.supportedLocales, const <Locale>[Locale('en'), Locale('es')]);
     expect(find.text('Welcome to FocusHaven'), findsOneWidget);
     expect(find.text('Te damos la bienvenida a FocusHaven'), findsNothing);
   });
@@ -73,9 +75,14 @@ void main() {
     );
     expect(
       registry,
-      contains('static const productionLocales = <Locale>[Locale(\'en\')]'),
+      contains(
+        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
+      ),
     );
-    expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const <Locale>[
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(FocusHavenLocales.spanishDeviceTestLocales, const <Locale>[
       Locale('en'),
       Locale('es'),
@@ -87,7 +94,7 @@ void main() {
     );
     expect(qualification['screenReaderPhysicalAcceptancePassed'], isTrue);
     expect(qualification['screenReaderQualified'], isTrue);
-    expect(qualification['runtimeActivated'], isFalse);
-    expect(qualification['productionLocaleAllowed'], isFalse);
+    expect(qualification['runtimeActivated'], isTrue);
+    expect(qualification['productionLocaleAllowed'], isTrue);
   });
 }

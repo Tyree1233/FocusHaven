@@ -726,19 +726,26 @@ not cover these capabilities.
 ## Languages and global releases
 
 FocusHaven now has a generated Flutter localization foundation, with English as
-the source catalog and the only production-supported runtime locale. Spanish is
-an exact reviewed integration catalog; French, German, and Brazilian Portuguese
-remain planned. None is advertised by the app or stores until every
-user-visible string, accessibility label, error, permission explanation,
-notification, widget/watch surface, voice path, policy, help resource, and
-store listing required for that locale has been reviewed.
+the source and fallback catalog. Spanish is an exact reviewed production
+runtime catalog; French, German, and Brazilian Portuguese remain planned.
+FocusHaven follows a supported device language by default and provides local,
+reversible Device, English, and Español choices in Appearance. Store-language
+promotion remains a separate release decision.
 
-Adding a locale is a release decision, not a file-copy exercise. A production
-locale must pass native and Flutter formatting checks, layout and large-text
-tests, plural and placeholder review, human linguistic review, speech-locale
-acceptance where applicable, and country-specific store/disclosure review.
+Adding a locale still requires a complete catalog, placeholder validation,
+fluent review, focused layout checks, and green application tests and builds.
+After this foundation, ordinary locales use one compact integration and
+activation pass. Physical-device, speech, right-to-left, font, and store work
+is added only where the language or an enabled feature materially requires it.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
+
+Phase 215G-E1 activates the unchanged reviewed 980-message Spanish catalog in
+the normal app. English remains the fallback for unsupported device locales.
+The saved language preference stays local and outside account and cloud data.
+Spanish Local Coach recognizes a bounded fail-safe set of immediate-safety and
+stop/space phrases; unsupported Spanish action commands fail closed, and
+Enhanced AI remains disabled rather than blocking the translated interface.
 Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5 now move the complete first-run onboarding, appearance
 picker, custom-duration chrome, guided breathing, timer accessibility, and the
 bounded timer dashboard/session-control presentation into that English

@@ -66,11 +66,13 @@ void main() {
     expect(qualification['spanishSafeVoiceCommandsQualified'], isFalse);
     expect(qualification['spanishEnhancedAiBehaviorQualified'], isFalse);
     expect(qualification['voiceAndCoachingQualified'], isFalse);
-    expect(qualification['runtimeActivated'], isFalse);
-    expect(qualification['productionLocaleAllowed'], isFalse);
+    expect(qualification['runtimeActivated'], isTrue);
+    expect(qualification['productionLocaleAllowed'], isTrue);
     expect(
       registry,
-      contains("static const productionLocales = <Locale>[Locale('en')]"),
+      contains(
+        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
+      ),
     );
   });
 }

@@ -271,8 +271,11 @@ void main() {
         '611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f';
     expect(_sha256('lib/l10n/app_es.arb'), digest);
     expect(_sha256('localization/candidates/app_es.arb'), digest);
-    expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
-    expect(FocusHavenLocales.integrationLocales, const <Locale>[Locale('es')]);
+    expect(FocusHavenLocales.productionLocales, const <Locale>[
+      Locale('en'),
+      Locale('es'),
+    ]);
+    expect(FocusHavenLocales.integrationLocales, isEmpty);
   });
 
   test('C3C records a bounded session-path qualification', () {
@@ -299,8 +302,8 @@ void main() {
       'focus_queue',
       'completed_tasks',
     ]);
-    expect(qualification['productionLocaleAllowed'], isFalse);
-    expect(qualification['runtimeActivated'], isFalse);
+    expect(qualification['productionLocaleAllowed'], isTrue);
+    expect(qualification['runtimeActivated'], isTrue);
     expect(qualification['voiceAndCoachingQualified'], isFalse);
     expect(qualification['nativeAndStoreQualified'], isFalse);
   });

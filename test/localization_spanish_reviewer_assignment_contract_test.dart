@@ -29,8 +29,8 @@ void main() {
     expect(review['reviewStarted'], isFalse);
     expect(review['humanReviewer'], isNull);
     expect(review['reviewScope'], isNull);
-    expect(review['linguisticallyApproved'], isFalse);
-    expect(review['runtimeActivated'], isFalse);
+    expect(review['linguisticallyApproved'], isTrue);
+    expect(review['runtimeActivated'], isTrue);
 
     expect(
       File('localization/intake/es/reviewer-assignment.json').existsSync(),
@@ -92,10 +92,13 @@ void main() {
     expect(audit['pendingDecisionCount'], 980);
     expect(audit['completedDecisionCount'], 0);
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
-    expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const [
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
   });
 }

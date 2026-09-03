@@ -3,14 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 
 import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
+import '../services/locale_service.dart';
 import '../services/theme_service.dart';
 
 typedef AppearanceThemeSetter = Future<void> Function(FocusHavenTheme theme);
+typedef AppearanceLanguageSetter =
+    Future<void> Function(FocusHavenLanguageChoice choice);
 
 class AppearanceSheet extends riverpod.ConsumerStatefulWidget {
-  const AppearanceSheet({this.setTheme, super.key});
+  const AppearanceSheet({this.setTheme, this.setLanguage, super.key});
 
   final AppearanceThemeSetter? setTheme;
+  final AppearanceLanguageSetter? setLanguage;
 
   @override
   riverpod.ConsumerState<AppearanceSheet> createState() =>
@@ -43,9 +47,32 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
     }
   }
 
+  Future<void> _selectLanguage(FocusHavenLanguageChoice? choice) async {
+    if (choice == null || _selectionInProgress) return;
+    setState(() {
+      _selectionInProgress = true;
+      _selectionFailed = false;
+    });
+    try {
+      final setLanguage = widget.setLanguage;
+      if (setLanguage == null) {
+        await ref.read(localeServiceProvider).setLanguage(choice);
+      } else {
+        await setLanguage(choice);
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() => _selectionFailed = true);
+      }
+    } finally {
+      if (mounted) setState(() => _selectionInProgress = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final selectedTheme = ref.watch(selectedThemeProvider);
+    final selectedLanguage = ref.watch(selectedLanguageChoiceProvider);
     final l10n = context.l10n;
 
     String themeLabel(FocusHavenTheme theme) => switch (theme) {
@@ -115,6 +142,47 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
                       ),
                     ],
                     const SizedBox(height: 14),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 10,
+                        children: [
+                          const Icon(Icons.language),
+                          Text(
+                            'English / Español',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                    RadioGroup<FocusHavenLanguageChoice>(
+                      groupValue: selectedLanguage,
+                      onChanged: _selectLanguage,
+                      child: Column(
+                        children: [
+                          RadioListTile<FocusHavenLanguageChoice>(
+                            contentPadding: EdgeInsets.zero,
+                            value: FocusHavenLanguageChoice.system,
+                            title: const Text('Device / Dispositivo'),
+                            secondary: const Icon(Icons.language),
+                          ),
+                          const RadioListTile<FocusHavenLanguageChoice>(
+                            contentPadding: EdgeInsets.zero,
+                            value: FocusHavenLanguageChoice.english,
+                            title: Text('English'),
+                            secondary: Icon(Icons.translate),
+                          ),
+                          const RadioListTile<FocusHavenLanguageChoice>(
+                            contentPadding: EdgeInsets.zero,
+                            value: FocusHavenLanguageChoice.spanish,
+                            title: Text('Español'),
+                            secondary: Icon(Icons.translate),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Divider(height: 32),
                     ...FocusHavenTheme.values.map(
                       (theme) => RadioListTile<FocusHavenTheme>(
                         contentPadding: EdgeInsets.zero,

@@ -14,6 +14,7 @@ import 'package:focushaven/services/auth_service.dart';
 import 'package:focushaven/services/focus_profile_service.dart';
 import 'package:focushaven/services/focus_queue_service.dart';
 import 'package:focushaven/services/journal_service.dart';
+import 'package:focushaven/services/locale_service.dart';
 import 'package:focushaven/services/notification_service.dart';
 import 'package:focushaven/services/reminder_service.dart';
 import 'package:focushaven/services/theme_service.dart';
@@ -38,22 +39,22 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
   });
 
-  testWidgets('exposes only the production-approved English locale', (
+  testWidgets('exposes the production-approved English and Spanish locales', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const FocusHavenApp());
 
     final materialApp = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(materialApp.supportedLocales, FocusHavenLocales.productionLocales);
-    expect(materialApp.supportedLocales, const <Locale>[Locale('en')]);
+    expect(materialApp.supportedLocales, const <Locale>[
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       AppLocalizations.supportedLocales,
       containsAll(const <Locale>[Locale('en'), Locale('es')]),
     );
-    expect(
-      materialApp.supportedLocales,
-      isNot(AppLocalizations.supportedLocales),
-    );
+    expect(materialApp.supportedLocales, AppLocalizations.supportedLocales);
     expect(
       materialApp.localizationsDelegates,
       contains(AppLocalizations.delegate),
@@ -87,6 +88,27 @@ void main() {
     expect(preferences.getBool('hasCompletedOnboarding'), isTrue);
     expect(find.text('Welcome to FocusHaven'), findsNothing);
     expect(find.text('Timer destination'), findsOneWidget);
+  });
+
+  testWidgets('restores Spanish and falls back to English when unsupported', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'es'});
+    final localeService = LocaleService();
+    await localeService.initialized;
+
+    await tester.pumpWidget(FocusHavenApp(localeService: localeService));
+    await tester.pump();
+    expect(find.text('Te damos la bienvenida a FocusHaven'), findsOneWidget);
+
+    await localeService.setLanguage(FocusHavenLanguageChoice.system);
+    tester.platformDispatcher.localeTestValue = const Locale('fr');
+    addTearDown(tester.platformDispatcher.clearLocaleTestValue);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Welcome to FocusHaven'), findsOneWidget);
+    expect(find.text('Te damos la bienvenida a FocusHaven'), findsNothing);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('uses the pre-initialized timer supplied at app startup', (

@@ -45,7 +45,7 @@ void main() {
     expect(result.emptyTranslations, isEmpty);
     expect(result.sourceEqualTranslations, isEmpty);
     expect(result.readyForHumanReview(expectedCandidateLocale: 'es'), isTrue);
-    expect(review['status'], 'structurally_ready');
+    expect(review['status'], 'production_active');
     expect(
       review['candidateCatalogSha256'],
       evidence['candidateCatalogSha256'],
@@ -70,18 +70,21 @@ void main() {
     final review = _json('localization/reviews/es/qualification.json');
     final evidence = _json('localization/reviews/es/structural-audit.json');
 
-    expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const [
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
     expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
-    expect(review['humanReviewRequired'], isTrue);
+    expect(review['humanReviewRequired'], isFalse);
     expect(review['humanReviewer'], isNull);
     expect(review['approvedAt'], isNull);
-    expect(review['linguisticallyApproved'], isFalse);
-    expect(review['runtimeActivated'], isFalse);
+    expect(review['linguisticallyApproved'], isTrue);
+    expect(review['runtimeActivated'], isTrue);
     expect(review['voiceAndCoachingQualified'], isFalse);
     expect(review['nativeAndStoreQualified'], isFalse);
     expect(evidence['externalTranslationProviderUsed'], isFalse);

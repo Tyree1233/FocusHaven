@@ -177,6 +177,16 @@ class LocalCoachingResponder implements CoachingResponder {
     'taking my life',
     "don't want to live",
     'do not want to live',
+    'quiero matarme',
+    'hacerme daño',
+    'hacerme dano',
+    'terminar con mi vida',
+    'suicidio',
+    'suicidarme',
+    'quiero morir',
+    'no quiero vivir',
+    'estar muerto',
+    'estar muerta',
   ];
   static const _boundarySignals = <String>[
     'stop coaching',
@@ -190,6 +200,13 @@ class LocalCoachingResponder implements CoachingResponder {
     "don't push me",
     'do not push me',
     'no more advice',
+    'ahora no',
+    'déjame en paz',
+    'dejame en paz',
+    'necesito espacio',
+    'no me presiones',
+    'no más consejos',
+    'no mas consejos',
   ];
   static const _repairSignals = <String>[
     "that's not what i meant",

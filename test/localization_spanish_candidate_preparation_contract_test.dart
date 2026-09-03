@@ -21,7 +21,7 @@ void main() {
     expect(review['structuralAuditPassed'], isTrue);
     expect(review['humanReviewer'], isNull);
     expect(review['approvedAt'], isNull);
-    expect(review['runtimeActivated'], isFalse);
+    expect(review['runtimeActivated'], isTrue);
     expect(review['externalTranslationProviderApproved'], isFalse);
     expect(review['externalTranslationProviderUsed'], isFalse);
   });
@@ -51,10 +51,13 @@ void main() {
   });
 
   test('Spanish integration stays outside the production allowlist', () {
-    expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const [
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);

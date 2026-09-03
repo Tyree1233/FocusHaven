@@ -5,18 +5,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
+import 'package:focushaven/services/locale_service.dart';
 import 'package:focushaven/services/theme_service.dart';
 import 'package:focushaven/widgets/appearance_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Widget _app(ThemeService service, {AppearanceThemeSetter? setTheme}) {
+Widget _app(
+  ThemeService service, {
+  LocaleService? localeService,
+  AppearanceThemeSetter? setTheme,
+  AppearanceLanguageSetter? setLanguage,
+}) {
   return ProviderScope(
-    overrides: [themeServiceProvider.overrideWith((ref) => service)],
+    overrides: [
+      themeServiceProvider.overrideWith((ref) => service),
+      if (localeService != null)
+        localeServiceProvider.overrideWith((ref) => localeService),
+    ],
     child: MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       theme: ThemeData.dark(),
-      home: Scaffold(body: AppearanceSheet(setTheme: setTheme)),
+      home: Scaffold(
+        body: AppearanceSheet(setTheme: setTheme, setLanguage: setLanguage),
+      ),
     ),
   );
 }
@@ -73,7 +85,10 @@ void main() {
     await tester.pumpWidget(_app(service));
     await tester.pump();
 
-    await tester.tap(find.text('Forest'));
+    final forest = find.text('Forest');
+    await tester.ensureVisible(forest);
+    await tester.pumpAndSettle();
+    await tester.tap(forest);
     await tester.pump();
 
     expect(service.selectedTheme, FocusHavenTheme.forest);
@@ -83,6 +98,32 @@ void main() {
       preferences.getString('focusHavenTheme'),
       FocusHavenTheme.forest.name,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('selecting Spanish updates the app and persists locally', (
+    tester,
+  ) async {
+    final themeService = ThemeService();
+    final localeService = LocaleService();
+    await Future.wait([themeService.initialized, localeService.initialized]);
+
+    await tester.pumpWidget(_app(themeService, localeService: localeService));
+    await tester.pump();
+
+    expect(find.text('English / Español'), findsOneWidget);
+    expect(find.text('Device / Dispositivo'), findsOneWidget);
+    expect(find.text('English'), findsOneWidget);
+    expect(find.text('Español'), findsOneWidget);
+
+    await tester.tap(find.text('Español'));
+    await tester.pumpAndSettle();
+
+    expect(localeService.selectedChoice, FocusHavenLanguageChoice.spanish);
+    expect(find.text('English / Español'), findsOneWidget);
+    expect(find.text('Device / Dispositivo'), findsOneWidget);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString(LocaleService.storageKey), 'es');
     expect(tester.takeException(), isNull);
   });
 
@@ -147,7 +188,10 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('Forest'));
+    final forest = find.text('Forest');
+    await tester.ensureVisible(forest);
+    await tester.pumpAndSettle();
+    await tester.tap(forest);
     await tester.pumpAndSettle();
 
     expect(

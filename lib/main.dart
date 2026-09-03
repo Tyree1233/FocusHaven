@@ -16,6 +16,7 @@ import 'services/coaching_service.dart';
 import 'services/focus_profile_service.dart';
 import 'services/focus_queue_service.dart';
 import 'services/journal_service.dart';
+import 'services/locale_service.dart';
 import 'services/notification_service.dart';
 import 'services/privacy_safe_diagnostics.dart';
 import 'services/remote_coaching_responder.dart';
@@ -31,9 +32,9 @@ Future<void> main() =>
 
 /// Starts the complete application with an explicitly bounded locale surface.
 ///
-/// Production passes [FocusHavenLocales.productionLocales]. A separate,
-/// debug-only integration entry point may pass the exact reviewed Spanish test
-/// surface without changing the production allowlist or a saved preference.
+/// Production passes [FocusHavenLocales.productionLocales]. Explicit debug
+/// entry points can still pin one locale for reproducible device checks without
+/// changing the person's saved production preference.
 Future<void> runFocusHaven({
   Locale? locale,
   required List<Locale> supportedLocales,
@@ -65,6 +66,7 @@ Future<void> runFocusHaven({
   );
   final timerService = TimerService(notificationService: notificationService);
   final themeService = ThemeService();
+  final localeService = LocaleService();
   final focusProfileService = FocusProfileService();
   final focusQueueService = FocusQueueService();
   final journalService = JournalService();
@@ -76,6 +78,7 @@ Future<void> runFocusHaven({
     coachingService.initialized,
     timerService.initialized,
     themeService.initialized,
+    localeService.initialized,
     focusProfileService.initialized,
     focusQueueService.initialized,
     journalService.initialized,
@@ -89,6 +92,7 @@ Future<void> runFocusHaven({
       notificationService: notificationService,
       timerService: timerService,
       themeService: themeService,
+      localeService: localeService,
       focusProfileService: focusProfileService,
       focusQueueService: focusQueueService,
       journalService: journalService,
@@ -108,6 +112,7 @@ class FocusHavenApp extends StatelessWidget {
     this.notificationService,
     this.timerService,
     this.themeService,
+    this.localeService,
     this.focusProfileService,
     this.focusQueueService,
     this.journalService,
@@ -122,6 +127,7 @@ class FocusHavenApp extends StatelessWidget {
   final NotificationService? notificationService;
   final TimerService? timerService;
   final ThemeService? themeService;
+  final LocaleService? localeService;
   final FocusProfileService? focusProfileService;
   final FocusQueueService? focusQueueService;
   final JournalService? journalService;
@@ -138,6 +144,7 @@ class FocusHavenApp extends StatelessWidget {
         notificationService ?? NotificationService();
     final activeTimerService = timerService;
     final activeThemeService = themeService;
+    final activeLocaleService = localeService;
     final activeFocusProfileService = focusProfileService;
     final activeFocusQueueService = focusQueueService;
     final activeJournalService = journalService;
@@ -156,6 +163,8 @@ class FocusHavenApp extends StatelessWidget {
           timerServiceProvider.overrideWith((ref) => activeTimerService),
         if (activeThemeService != null)
           themeServiceProvider.overrideWith((ref) => activeThemeService),
+        if (activeLocaleService != null)
+          localeServiceProvider.overrideWith((ref) => activeLocaleService),
         if (activeFocusProfileService != null)
           focusProfileServiceProvider.overrideWith(
             (ref) => activeFocusProfileService,
@@ -199,11 +208,12 @@ class _FocusHavenMaterialApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedTheme = ref.watch(selectedThemeProvider);
+    final selectedLocale = ref.watch(selectedLocaleProvider);
 
     return MaterialApp(
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      locale: locale,
+      locale: locale ?? selectedLocale,
       supportedLocales: supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

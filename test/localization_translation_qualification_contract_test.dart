@@ -26,7 +26,7 @@ void main() {
     expect(placeholderMessages, hasLength(148));
     expect(review['phase'], '215G-C1B');
     expect(review['locale'], 'es');
-    expect(review['status'], 'structurally_ready');
+    expect(review['status'], 'production_active');
     expect(review['sourceCommit'], 'fed1c9a2e6096d86f76bc458d4ccc47870f6e0fc');
     expect(
       review['sourceCatalogSha256'],
@@ -36,7 +36,7 @@ void main() {
     expect(review['sourcePlaceholderMessageCount'], 148);
     expect(review['candidatePresent'], isTrue);
     expect(review['structuralAuditPassed'], isTrue);
-    expect(review['humanReviewRequired'], isTrue);
+    expect(review['humanReviewRequired'], isFalse);
     expect(review['humanReviewer'], isNull);
     expect(review['approvedAt'], isNull);
   });
@@ -137,19 +137,22 @@ void main() {
     expect(result.readyForHumanReview(expectedCandidateLocale: 'es'), isFalse);
   });
 
-  test('Spanish candidate remains isolated and cannot be selected', () {
+  test('reviewed Spanish catalog is active without changing its candidate', () {
     final main = _read('lib/main.dart');
     final registry = _read('lib/l10n/focus_haven_locales.dart');
     final review = _read('localization/reviews/es/qualification.json');
 
-    expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const [
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.locale,
       const Locale('es'),
     );
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
     expect(
       Directory('lib/l10n').listSync().whereType<File>().where(
@@ -163,9 +166,9 @@ void main() {
       main,
       contains('supportedLocales: FocusHavenLocales.productionLocales'),
     );
-    expect(registry, contains("status: FocusHavenLocaleStatus.integration"));
+    expect(registry, contains("status: FocusHavenLocaleStatus.production"));
     expect(review, contains('"candidatePresent": true'));
-    expect(review, contains('"runtimeActivated": false'));
+    expect(review, contains('"runtimeActivated": true'));
   });
 
   test('qualification policy requires human review and protects private data', () {

@@ -28,6 +28,12 @@ abstract final class FocusHavenLocales {
       nativeName: 'English',
       status: FocusHavenLocaleStatus.production,
     ),
+    FocusHavenLocaleDefinition(
+      languageCode: 'es',
+      englishName: 'Spanish',
+      nativeName: 'Español',
+      status: FocusHavenLocaleStatus.production,
+    ),
   ];
 
   static const firstTranslationWave = <FocusHavenLocaleDefinition>[
@@ -35,7 +41,7 @@ abstract final class FocusHavenLocales {
       languageCode: 'es',
       englishName: 'Spanish',
       nativeName: 'Español',
-      status: FocusHavenLocaleStatus.integration,
+      status: FocusHavenLocaleStatus.production,
     ),
     FocusHavenLocaleDefinition(
       languageCode: 'fr',
@@ -58,13 +64,12 @@ abstract final class FocusHavenLocales {
     ),
   ];
 
-  static const productionLocales = <Locale>[Locale('en')];
+  static const productionLocales = <Locale>[Locale('en'), Locale('es')];
 
-  // Catalogs in this list may be generated and exercised by integration tests,
-  // but they are deliberately excluded from the production locale allowlist.
-  static const integrationLocales = <Locale>[Locale('es')];
+  // Generated catalogs still awaiting production activation belong here.
+  static const integrationLocales = <Locale>[];
 
-  // Exact locale surface for the separately targeted, debug-only Spanish
-  // device-test entry point. Production never reads this list.
+  // Exact locale surface retained for the reproducible debug-only Spanish
+  // device-test entry point.
   static const spanishDeviceTestLocales = <Locale>[Locale('en'), Locale('es')];
 }

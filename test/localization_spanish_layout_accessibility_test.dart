@@ -182,9 +182,12 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  test('C3B does not change the production locale allowlist', () {
-    expect(FocusHavenLocales.productionLocales, const <Locale>[Locale('en')]);
-    expect(FocusHavenLocales.integrationLocales, const <Locale>[Locale('es')]);
+  test('reviewed Spanish remains available after the C3B layout gate', () {
+    expect(FocusHavenLocales.productionLocales, const <Locale>[
+      Locale('en'),
+      Locale('es'),
+    ]);
+    expect(FocusHavenLocales.integrationLocales, isEmpty);
     expect(
       AppLocalizations.supportedLocales,
       containsAll(const <Locale>[Locale('en'), Locale('es')]),
@@ -210,8 +213,8 @@ void main() {
       'haven_actions',
       'account_privacy',
     ]);
-    expect(qualification['productionLocaleAllowed'], isFalse);
-    expect(qualification['runtimeActivated'], isFalse);
+    expect(qualification['productionLocaleAllowed'], isTrue);
+    expect(qualification['runtimeActivated'], isTrue);
   });
 }
 

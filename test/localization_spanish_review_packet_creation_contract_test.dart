@@ -98,14 +98,14 @@ void main() {
     final audit = _json('localization/reviews/es/packet-audit.json');
 
     expect(review['phase'], '215G-C1B');
-    expect(review['status'], 'structurally_ready');
+    expect(review['status'], 'production_active');
     expect(review['reviewPacketAssigned'], isFalse);
     expect(review['reviewStarted'], isFalse);
     expect(review['humanReviewer'], isNull);
     expect(review['reviewScope'], isNull);
     expect(review['approvedAt'], isNull);
-    expect(review['linguisticallyApproved'], isFalse);
-    expect(review['runtimeActivated'], isFalse);
+    expect(review['linguisticallyApproved'], isTrue);
+    expect(review['runtimeActivated'], isTrue);
     expect(audit['reviewPacketAssigned'], isFalse);
     expect(audit['reviewStarted'], isFalse);
     expect(audit['assignedReviewer'], isNull);
@@ -116,10 +116,13 @@ void main() {
     expect(audit['privateRuntimeDataIncluded'], isFalse);
 
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
-    expect(FocusHavenLocales.productionLocales, const [Locale('en')]);
+    expect(FocusHavenLocales.productionLocales, const [
+      Locale('en'),
+      Locale('es'),
+    ]);
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.integration,
+      FocusHavenLocaleStatus.production,
     );
   });
 

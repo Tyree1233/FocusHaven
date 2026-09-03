@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-D2 physical Spanish recognition accepted on Android and iOS;
-production remains English-only
+Status: Phase 215G-E1 Spanish in-app production activation; English remains the
+fallback and store promotion remains separate
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -10,13 +10,12 @@ country release readiness.
 
 ## Current truth
 
-- English (`en`) is the source catalog and the only production-supported
-  runtime locale.
-- Spanish (`es`) is a generated integration locale. French (`fr`), German
-  (`de`), and Brazilian Portuguese (`pt-BR`) remain planned.
-- Integration and planned locales are not exposed by the production
-  `MaterialApp.supportedLocales` allowlist and must
-  not appear as supported languages in Apple or Google store metadata.
+- English (`en`) is the source catalog and fallback production locale.
+- Spanish (`es`) is a reviewed production runtime locale. French (`fr`),
+  German (`de`), and Brazilian Portuguese (`pt-BR`) remain planned.
+- Planned locales are not exposed by the production
+  `MaterialApp.supportedLocales` allowlist. In-app locale support and localized
+  Apple or Google store promotion are separate decisions.
 - Phases 215G-B1, B2, B3A, B3B, B3C, B4, and B5 catalog-own onboarding, appearance selection,
   custom-duration chrome, guided breathing, timer accessibility, the bounded
   timer dashboard/session-control presentation, Focus Queue management and
@@ -184,6 +183,15 @@ source. Locale definitions separately distinguish `production`, generated
 `integration`, and `planned` states; generating a delegate cannot activate a
 locale in the production allowlist.
 
+Phase 215G-E1 activates the exact reviewed Spanish catalog without changing
+its 980 messages. FocusHaven follows a supported device language by default
+and provides locally stored, reversible Device, English, and Español choices
+inside Appearance. Unsupported device languages fall back to English. Spanish
+Local Coach adds a bounded fail-safe set for immediate-safety and stop/space
+requests. Spanish Haven actions continue to reject unrecognized commands, and
+Enhanced AI remains disabled; those limited features do not prevent the
+reviewed interface from being used in Spanish.
+
 The following content must be catalog-owned before another locale can be
 considered complete:
 
@@ -213,17 +221,17 @@ pass for that exact locale:
   retain anonymous validation evidence instead of personal reviewer details;
 - narrow screens, text expansion, large accessibility sizes, right-to-left
   readiness where applicable, keyboard navigation, and screen readers pass;
-- native phone, web, desktop, widget, watch, notification, and system surfaces
-  either match the locale or truthfully declare a documented limitation;
-- Voice-to-Coach and safe voice commands use an explicitly supported speech
-  locale and pass real-device recognition, editing, discard, confirmation,
-  background-stop, and no-duplicate tests;
-- local Coach and rule-based interpretation are reviewed in that language;
-  unsupported enhanced-AI language behavior fails safely and honestly;
+- enabled native, web, notification, and system surfaces either match the
+  locale or truthfully retain a documented fallback or limitation;
+- voice features use an explicitly supported speech locale when they are
+  exposed for that language; otherwise the complete typed path remains usable;
+- local Coach recognizes immediate-safety and stop/space language before it is
+  exposed; unqualified command grammars fail closed and unsupported Enhanced
+  AI remains disabled;
 - public policies, support paths, store questionnaires, screenshots, and
-  listings are consistent for every country where that locale is promoted;
-- fresh signed builds and store candidates complete the applicable privacy,
-  accessibility, platform, and release validations.
+  listings are consistent before the locale is separately promoted in a
+  store or country;
+- fresh application tests and builds pass for the production locale set.
 
 Machine translation can help draft non-sensitive copy only after a separate
 review approves the provider and data boundary. It cannot receive tasks,
@@ -233,12 +241,22 @@ for production copy.
 
 ## Locale selection and fallback
 
-Initially FocusHaven follows the operating-system locale. A future in-app
-language selector must be explicit, reversible, locally stored, accessible in
-every supported language, and independent of account or cloud backup. If the
+FocusHaven follows the operating-system locale by default. Its in-app language
+selector is explicit, reversible, locally stored, accessible through bilingual
+language names, and independent of account or cloud backup. If the
 device language is not supported, Flutter falls back to the complete English
 catalog. FocusHaven must never show a partly translated locale mixed with
 unreviewed safety-critical English merely to claim wider coverage.
+
+## Streamlined locale delivery
+
+After the localization foundation has been proven, an ordinary additional
+locale uses one compact path: complete candidate, private fluent review,
+structural validation, focused layout and behavior checks, production
+allowlist activation, complete tests and builds, then one CI verification.
+Physical-device, speech, right-to-left, font, or store-promotion work is added
+only when the locale or feature materially requires it. A safely disabled or
+fail-closed optional feature does not block the translated core interface.
 
 ## Store and country boundary
 

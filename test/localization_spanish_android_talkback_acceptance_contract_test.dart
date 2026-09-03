@@ -62,12 +62,14 @@ void main() {
 
       expect(qualification['screenReaderPhysicalAcceptancePassed'], isTrue);
       expect(qualification['screenReaderQualified'], isTrue);
-      expect(qualification['runtimeActivated'], isFalse);
+      expect(qualification['runtimeActivated'], isTrue);
       expect(qualification['voiceAndCoachingQualified'], isFalse);
       expect(qualification['nativeAndStoreQualified'], isFalse);
       expect(
         localePolicy,
-        contains("static const productionLocales = <Locale>[Locale('en')];"),
+        contains(
+          "static const productionLocales = <Locale>[Locale('en'), Locale('es')];",
+        ),
       );
     },
   );
