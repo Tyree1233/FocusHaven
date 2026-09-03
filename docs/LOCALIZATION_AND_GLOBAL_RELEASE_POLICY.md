@@ -1,7 +1,8 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-C3F Spanish Android TalkBack accepted; production remains
-English-only and physical iOS VoiceOver acceptance remains pending
+Status: Phase 215G-C3F Spanish Android TalkBack accepted; the shared iOS
+Coach/Restore correction awaits physical VoiceOver retest; production remains
+English-only
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -135,6 +136,17 @@ country release readiness.
   phone. Only anonymous results, the non-personal device model, and exact source
   and APK locks are retained. Android TalkBack acceptance is complete; the
   broader screen-reader gate remains false pending physical iOS VoiceOver.
+- The first Phase 215G-C3G physical VoiceOver pass completed nine Spanish
+  checklist items but found that Coach still covered Cloud Restore on the
+  iPhone. The exact normal English app reproduced the same obstruction, so no
+  Spanish or English iOS PASS was recorded. The shared correction moves Coach
+  from an overlaying Scaffold slot into a safe-area-aware bottom region that
+  reserves its own layout space. English and Spanish widget regressions model
+  an iPhone safe area with 2.0x text and require a real gap between Restore and
+  Coach. Physical VoiceOver acceptance and complete screen-reader
+  qualification remain false until the corrected signed apps pass the bounded
+  iPhone retest. The failure record contains no operator or device identity,
+  screen capture, UI dump, spoken content, or app-private data.
 
 ## Catalog authority
 

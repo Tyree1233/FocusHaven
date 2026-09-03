@@ -1100,14 +1100,34 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
     final tertiaryColor = Theme.of(context).colorScheme.tertiary;
+    final reservesCoachLayoutSpace =
+        Theme.of(context).platform == TargetPlatform.iOS;
+    final coachButton = FloatingActionButton.extended(
+      tooltip: l10n.coachTitle,
+      onPressed: () => _showCoachingSheet(context, ref),
+      icon: const Icon(Icons.auto_awesome_outlined),
+      label: Text(l10n.coachTitle),
+    );
+    final dashboardBottomPadding = reservesCoachLayoutSpace ? 24.0 : 112.0;
+    final dashboardVerticalPadding = 12.0 + dashboardBottomPadding;
 
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        tooltip: l10n.coachTitle,
-        onPressed: () => _showCoachingSheet(context, ref),
-        icon: const Icon(Icons.auto_awesome_outlined),
-        label: Text(l10n.coachTitle),
-      ),
+      floatingActionButton: reservesCoachLayoutSpace ? null : coachButton,
+      // iOS accessibility can give the extended Coach control a larger
+      // effective footprint than a floating overlay can reserve reliably.
+      // Put it in the Scaffold layout on iOS so dashboard actions always end
+      // above it, while preserving the accepted Android presentation.
+      bottomNavigationBar: reservesCoachLayoutSpace
+          ? SafeArea(
+              top: false,
+              minimum: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Align(
+                alignment: Alignment.centerRight,
+                heightFactor: 1,
+                child: coachButton,
+              ),
+            )
+          : null,
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
@@ -1145,13 +1165,11 @@ class TimerScreen extends riverpod.ConsumerWidget {
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
             key: const ValueKey('timer-dashboard-scroll'),
-            // Keep the final dashboard actions above the extended Coach FAB,
-            // including when translated labels or large text widen the FAB.
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 112),
+            padding: EdgeInsets.fromLTRB(24, 12, 24, dashboardBottomPadding),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: constraints.maxHeight > 124
-                    ? constraints.maxHeight - 124
+                minHeight: constraints.maxHeight > dashboardVerticalPadding
+                    ? constraints.maxHeight - dashboardVerticalPadding
                     : 0,
               ),
               child: Column(

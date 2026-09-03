@@ -980,6 +980,18 @@ check. Android TalkBack acceptance is complete; physical iOS VoiceOver,
 voice/coaching, native/store, signed-build, country, and production activation
 remain separate pending gates.
 
+The first Phase 215G-C3G physical VoiceOver pass preserved nine successful
+Spanish checklist results but correctly remained unaccepted after the iPhone
+showed the same Coach/Cloud Restore obstruction. The normal English app then
+reproduced the shared defect, confirming that it was independent of translated
+content. The follow-up correction places Coach in a safe-area-aware bottom
+region that participates in Scaffold layout instead of floating over the
+scrolling dashboard. English and Spanish regressions now model an iPhone safe
+area at 2.0x text and require measurable separation between the real controls.
+Physical VoiceOver acceptance remains pending a short corrected-build retest;
+no personal device or operator information is recorded, and Spanish remains
+production inactive.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

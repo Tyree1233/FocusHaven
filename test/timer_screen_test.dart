@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -143,11 +144,17 @@ Future<TimerService> _createTimer(WidgetTester tester) async {
   return timer;
 }
 
-void _useNarrowPhone(WidgetTester tester) {
+void _useNarrowPhone(
+  WidgetTester tester, {
+  Size size = const Size(320, 720),
+  FakeViewPadding padding = FakeViewPadding.zero,
+}) {
   tester.view.devicePixelRatio = 1;
-  tester.view.physicalSize = const Size(320, 720);
+  tester.view.physicalSize = size;
+  tester.view.padding = padding;
   addTearDown(tester.view.resetDevicePixelRatio);
   addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetPadding);
 }
 
 Future<void> _expectCloudRestoreClearsCoach(
@@ -155,36 +162,65 @@ Future<void> _expectCloudRestoreClearsCoach(
   required Locale locale,
   required String restoreLabel,
   required String coachLabel,
+  Size size = const Size(320, 720),
+  FakeViewPadding padding = FakeViewPadding.zero,
+  double textScale = 1.6,
+  double minimumGap = 1,
+  TargetPlatform? platform,
 }) async {
-  _useNarrowPhone(tester);
-  final timer = await _createTimer(tester);
+  _useNarrowPhone(tester, size: size, padding: padding);
+  if (platform != null) {
+    debugDefaultTargetPlatformOverride = platform;
+  }
+  try {
+    final timer = await _createTimer(tester);
 
-  await tester.pumpWidget(_app(timer, locale: locale, textScale: 1.6));
-  await tester.pumpAndSettle();
+    await tester.pumpWidget(_app(timer, locale: locale, textScale: textScale));
+    await tester.pumpAndSettle();
 
-  final dashboardScroll = find.byKey(const ValueKey('timer-dashboard-scroll'));
-  final scrollable = find
-      .descendant(of: dashboardScroll, matching: find.byType(Scrollable))
-      .first;
-  final scrollState = tester.state<ScrollableState>(scrollable);
-  scrollState.position.jumpTo(scrollState.position.maxScrollExtent);
-  await tester.pumpAndSettle();
+    final dashboardScroll = find.byKey(
+      const ValueKey('timer-dashboard-scroll'),
+    );
+    final scrollable = find
+        .descendant(of: dashboardScroll, matching: find.byType(Scrollable))
+        .first;
+    final scrollState = tester.state<ScrollableState>(scrollable);
+    scrollState.position.jumpTo(scrollState.position.maxScrollExtent);
+    await tester.pumpAndSettle();
 
-  final restoreButton = find.ancestor(
-    of: find.text(restoreLabel),
-    matching: find.byType(TextButton),
-  );
-  final coachButton = find.widgetWithText(FloatingActionButton, coachLabel);
+    final restoreButton = find.ancestor(
+      of: find.text(restoreLabel),
+      matching: find.byType(TextButton),
+    );
+    final coachButton = find.widgetWithText(FloatingActionButton, coachLabel);
 
-  expect(restoreButton, findsOneWidget);
-  expect(restoreButton.hitTestable(), findsOneWidget);
-  expect(coachButton, findsOneWidget);
+    expect(restoreButton, findsOneWidget);
+    expect(restoreButton.hitTestable(), findsOneWidget);
+    expect(coachButton, findsOneWidget);
+    expect(coachButton.hitTestable(), findsOneWidget);
 
-  final restoreRect = tester.getRect(restoreButton);
-  final coachRect = tester.getRect(coachButton);
-  expect(restoreRect.overlaps(coachRect), isFalse);
-  expect(restoreRect.bottom, lessThan(coachRect.top));
-  expect(tester.takeException(), isNull);
+    final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
+    if (platform == TargetPlatform.iOS) {
+      expect(scaffold.floatingActionButton, isNull);
+      expect(scaffold.bottomNavigationBar, isNotNull);
+    } else {
+      expect(scaffold.floatingActionButton, isNotNull);
+      expect(scaffold.bottomNavigationBar, isNull);
+    }
+
+    final restoreRect = tester.getRect(restoreButton);
+    final coachRect = tester.getRect(coachButton);
+    expect(restoreRect.overlaps(coachRect), isFalse);
+    expect(
+      coachRect.top - restoreRect.bottom,
+      greaterThanOrEqualTo(minimumGap),
+    );
+    expect(tester.takeException(), isNull);
+  } finally {
+    if (platform != null) {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  }
 }
 
 class _TimerContextResponder implements CoachingResponder {
@@ -1043,6 +1079,38 @@ void main() {
       locale: const Locale('es'),
       restoreLabel: 'Restaurar',
       coachLabel: 'Coach de enfoque',
+    );
+  });
+
+  testWidgets('iPhone safe area keeps English Restore clear of Focus Coach', (
+    tester,
+  ) async {
+    await _expectCloudRestoreClearsCoach(
+      tester,
+      locale: const Locale('en'),
+      restoreLabel: 'Restore',
+      coachLabel: 'Focus Coach',
+      size: const Size(393, 852),
+      padding: const FakeViewPadding(top: 59, bottom: 34),
+      textScale: 2,
+      minimumGap: 24,
+      platform: TargetPlatform.iOS,
+    );
+  });
+
+  testWidgets('iPhone safe area keeps Spanish Restore clear of Local Coach', (
+    tester,
+  ) async {
+    await _expectCloudRestoreClearsCoach(
+      tester,
+      locale: const Locale('es'),
+      restoreLabel: 'Restaurar',
+      coachLabel: 'Coach de enfoque',
+      size: const Size(393, 852),
+      padding: const FakeViewPadding(top: 59, bottom: 34),
+      textScale: 2,
+      minimumGap: 24,
+      platform: TargetPlatform.iOS,
     );
   });
 

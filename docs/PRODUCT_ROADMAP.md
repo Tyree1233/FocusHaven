@@ -1,6 +1,7 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Phase 215G-C3F Spanish Android TalkBack acceptance is complete
+Status: living product contract; Android TalkBack is accepted and the shared
+iOS Coach/Restore correction awaits physical VoiceOver retest
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -521,6 +522,16 @@ normal APK was restored without clearing app data, and English Restore passed
 the same physical clearance check. Android TalkBack acceptance is complete;
 physical iOS VoiceOver, voice/coaching, native/store, signed-build, country,
 and production activation remain pending.
+
+The first Phase 215G-C3G physical VoiceOver pass preserved nine successful
+Spanish checks but found the same Coach/Cloud Restore obstruction on the
+iPhone; the normal English app reproduced it as well. No iOS acceptance was
+recorded. The shared correction now gives Coach a safe-area-aware bottom layout
+region instead of allowing it to float over dashboard content, and English and
+Spanish tests model an iPhone safe area at 2.0x text with explicit clearance
+between the real controls. A corrected signed-build retest is still required
+before physical VoiceOver and broader screen-reader qualification can pass.
+Spanish remains outside the production locale allowlist.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,
