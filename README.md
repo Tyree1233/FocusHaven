@@ -1010,6 +1010,19 @@ Spanish Local Coach, safe-command, and enhanced-AI behavior gates remain
 pending, so voice/coaching qualification and production activation remain
 false.
 
+Phase 215G-D2 completes bounded physical Spanish recognition acceptance on one
+approved Android phone and one redacted trusted iPhone using exact artifacts
+built from the GitHub-verified D1 source. On both platforms, two fixed public
+Spanish phrases produced one recognizable editable draft in Focus Coach and
+Haven Actions; stopping, editing, discarding, and background cancellation
+worked without automatic sending, proposal creation, or execution. The exact
+normal English artifacts were restored afterward. The anonymous record stores
+artifact identities and outcomes but no operator identity, phone identifier,
+live transcript, screenshot, UI dump, or app-private data. This recognition
+gate does not approve Spanish Local Coach response quality, Spanish action
+interpretation or execution, Enhanced AI behavior, or production activation;
+those gates remain false and separate.
+
 ## Architecture
 
 The application uses Riverpod as its dependency and state-management boundary.

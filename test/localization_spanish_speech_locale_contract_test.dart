@@ -31,7 +31,7 @@ void main() {
     );
   });
 
-  test('D1 remains preparation rather than voice or production approval', () {
+  test('D1 locale safeguards remain after bounded D2 acceptance', () {
     final qualification =
         jsonDecode(
               File(
@@ -43,10 +43,10 @@ void main() {
       'lib/l10n/focus_haven_locales.dart',
     ).readAsStringSync();
 
-    expect(qualification['voiceAndCoachingPhase'], '215G-D1');
+    expect(qualification['voiceAndCoachingPhase'], '215G-D2');
     expect(
       qualification['voiceAndCoachingStatus'],
-      'explicit_speech_locale_verified_pending_device_and_language_behavior',
+      'physical_spanish_recognition_accepted_pending_language_behavior',
     );
     expect(qualification['speechRecognitionSupportedLocaleIds'], <String>[
       'en',
@@ -61,7 +61,7 @@ void main() {
       qualification['speechRecognitionLocaleAutomatedVerificationPassed'],
       isTrue,
     );
-    expect(qualification['speechRecognitionPhysicalAcceptancePassed'], isFalse);
+    expect(qualification['speechRecognitionPhysicalAcceptancePassed'], isTrue);
     expect(qualification['spanishLocalCoachQualified'], isFalse);
     expect(qualification['spanishSafeVoiceCommandsQualified'], isFalse);
     expect(qualification['spanishEnhancedAiBehaviorQualified'], isFalse);

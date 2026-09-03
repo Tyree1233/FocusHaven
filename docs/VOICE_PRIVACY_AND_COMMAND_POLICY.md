@@ -1,8 +1,8 @@
 # Voice Privacy and Command Policy
 
 Status: Voice-to-Coach is implemented in Phase 212 and Safe Voice Commands is
-implemented in Phase 213 source; Phase 215G-D1 adds explicit English/Spanish
-speech-locale propagation while production remains English-only
+implemented in Phase 213 source; Phase 215G-D2 records bounded physical Spanish
+recognition acceptance while production remains English-only
 
 FocusHaven declares narrowly scoped Android microphone access, iOS microphone
 and speech-recognition purpose strings, and the `speech_to_text` dependency for
@@ -201,9 +201,18 @@ any unsupported locale. It does not qualify platform locale availability,
 recognition accuracy, Spanish Local Coach responses, Spanish safe-command
 interpretation, or enhanced-AI language behavior.
 
+Phase 215G-D2 accepts bounded physical Spanish recognition on an approved
+Android phone and a redacted trusted iPhone using exact D1 artifacts and two
+fixed public phrases per platform. Both voice surfaces produced one
+recognizable editable draft; stop, discard, and background cancellation passed
+without automatic sending, proposal creation, or execution. Exact normal
+English artifacts were restored afterward. The anonymous result stores no
+operator identity, phone identifier, live transcript, screenshot, UI dump, or
+app-private data. It does not qualify Spanish Local Coach responses, Spanish
+safe-command interpretation or execution, or Enhanced AI language behavior.
+
 Fresh Android and Apple release builds, native permission exercises,
-real-device Spanish recognition and Safe Voice Commands acceptance,
-language-aware coaching and action checks, signed candidate validation, and
-final store privacy answers remain required before distribution. Prior App
-Store and Play artifacts are not evidence for this changed permission,
-dependency, and action-input boundary.
+Safe Voice Commands acceptance, language-aware coaching and action checks,
+signed candidate validation, and final store privacy answers remain required
+before distribution. Prior App Store and Play artifacts are not evidence for
+this changed permission, dependency, and action-input boundary.

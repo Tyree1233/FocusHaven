@@ -1,7 +1,7 @@
 # FocusHaven Product Roadmap
 
-Status: living product contract; Spanish Android TalkBack and iOS VoiceOver
-acceptance are complete while production remains English-only
+Status: living product contract; Spanish screen-reader and physical speech
+recognition acceptance are complete while production remains English-only
 Roadmap baseline: August 30, 2026
 Source baseline: `8b27408` (`Define AI and voice product roadmap`)
 
@@ -66,9 +66,9 @@ Every future phase must preserve these rules:
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
 | Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, and Journey context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add local-coach context as one bounded, reviewable connection. |
-| Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish now pass an explicit speech locale to the recognizer. | Complete real-device Spanish recognition plus fresh Android and Apple release, permission, and store-disclosure validation before distribution. |
+| Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
-| Global localization | Spanish integration testing | Generated Flutter localization contains the English source and exact reviewed Spanish catalog. The production allowlist remains English-only; French, German, and Brazilian Portuguese remain planned. Spanish screen-reader qualification is complete and explicit speech-locale propagation is automated; no additional language is a current public-support claim. | Complete real-device Spanish recognition, language-aware Coach/action behavior, native/store, signed-build, and country gates before production activation, then reuse the same review pipeline for later locales. |
+| Global localization | Spanish integration testing | Generated Flutter localization contains the English source and exact reviewed Spanish catalog. The production allowlist remains English-only; French, German, and Brazilian Portuguese remain planned. Spanish screen-reader and bounded physical recognition qualification are complete; no additional language is a current public-support claim. | Complete language-aware Coach/action behavior, native/store, signed-build, and country gates before production activation, then reuse the same review pipeline for later locales. |
 | Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
@@ -548,6 +548,18 @@ handling. This slice changes no catalog, permission, dependency, interpreter,
 Coach response, enhanced-AI path, transcript retention, or production
 allowlist. Real-device Spanish recognition and Spanish Local Coach,
 safe-command, and enhanced-AI behavior qualification remain pending.
+
+Phase 215G-D2 accepts bounded physical Spanish speech recognition on one
+approved Android phone and one redacted trusted iPhone. Exact D1 artifacts were
+used on both platforms. Two fixed public Spanish phrases produced recognizable,
+single, editable drafts in Focus Coach and Haven Actions; stop, discard, and
+background cancellation passed without automatic sending, proposal creation,
+or execution. Exact normal English artifacts were restored after both checks.
+The anonymous record contains no operator identity, phone identifier, live
+transcript, screenshot, UI dump, or app-private data. Spanish Local Coach
+response quality, safe-command interpretation and execution, Enhanced AI
+behavior, native/store readiness, and production activation remain separate
+pending gates.
 
 No Phase 215G-A, B1, B2, B3A, B3B, B3C, B4, B5, B6A, B6B1, B6B2, B6C1, B6C2, or B6C3 code changes a saved language, sends text to a
 translation provider, translates tasks, reflections, journals, transcripts,

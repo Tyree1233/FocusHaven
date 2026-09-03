@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-D1 explicit Spanish speech-locale preparation; production
-remains English-only
+Status: Phase 215G-D2 physical Spanish recognition accepted on Android and iOS;
+production remains English-only
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -162,6 +162,18 @@ country release readiness.
   real-device Spanish recognition and Spanish Local Coach, safe-command, and
   enhanced-AI behavior remain pending; therefore voice/coaching qualification
   and production activation remain false.
+- Phase 215G-D2 records bounded, anonymous physical Spanish recognition
+  acceptance on one approved Android phone and one redacted trusted iPhone.
+  Exact debug artifacts built from the GitHub-verified D1 source accepted two
+  fixed public phrases per platform as single recognizable editable drafts in
+  Focus Coach and Haven Actions. Stop, edit, discard, and background
+  cancellation passed; no message, proposal, or action occurred automatically.
+  The exact normal English artifacts were restored after each platform check.
+  The record contains artifact identities and outcomes but no operator or phone
+  identifier, live transcript, screenshot, UI dump, or app-private data. This
+  closes only recognition acceptance: Spanish Local Coach language behavior,
+  safe-command interpretation and execution, Enhanced AI behavior,
+  native/store qualification, and production activation remain false.
 
 ## Catalog authority
 
