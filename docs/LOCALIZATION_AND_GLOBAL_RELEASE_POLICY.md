@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Phase 215G-E1 Spanish in-app production activation; English remains the
-fallback and store promotion remains separate
+Status: Spanish and streamlined French in-app production activation; English
+remains the fallback and store promotion remains separate
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -11,8 +11,8 @@ country release readiness.
 ## Current truth
 
 - English (`en`) is the source catalog and fallback production locale.
-- Spanish (`es`) is a reviewed production runtime locale. French (`fr`),
-  German (`de`), and Brazilian Portuguese (`pt-BR`) remain planned.
+- Spanish (`es`) and French (`fr`) are reviewed production runtime locales.
+  German (`de`) and Brazilian Portuguese (`pt-BR`) remain planned.
 - Planned locales are not exposed by the production
   `MaterialApp.supportedLocales` allowlist. In-app locale support and localized
   Apple or Google store promotion are separate decisions.
@@ -185,12 +185,22 @@ locale in the production allowlist.
 
 Phase 215G-E1 activates the exact reviewed Spanish catalog without changing
 its 980 messages. FocusHaven follows a supported device language by default
-and provides locally stored, reversible Device, English, and Español choices
-inside Appearance. Unsupported device languages fall back to English. Spanish
+and provides locally stored, reversible Device, English, Español, and Français
+choices inside Appearance. Unsupported device languages fall back to English. Spanish
 Local Coach adds a bounded fail-safe set for immediate-safety and stop/space
 requests. Spanish Haven actions continue to reject unrecognized commands, and
 Enhanced AI remains disabled; those limited features do not prevent the
 reviewed interface from being used in Spanish.
+
+French is the first production locale completed through the streamlined
+post-Spanish path. Its exact 980-message candidate received 654 anonymous
+acceptances, 326 anonymous revisions, zero blocks, and eight explicit
+review-approved source-equal decisions. The approved catalog is integrated
+byte-for-byte and the registry-driven picker exposes it without a bespoke
+control. The plan requires no right-to-left, special-font, physical
+screen-reader, physical-speech, or store-promotion gate. French voice remains
+fail-closed because French speech recognition is not claimed by this in-app
+activation, and localized store or country promotion remains separate.
 
 The following content must be catalog-owned before another locale can be
 considered complete:

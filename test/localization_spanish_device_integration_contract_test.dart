@@ -12,7 +12,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('production app supports English and Spanish by default', (
+  testWidgets('production app retains English and Spanish support', (
     tester,
   ) async {
     await tester.pumpWidget(const FocusHavenApp());
@@ -20,7 +20,10 @@ void main() {
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
     expect(app.locale, isNull);
     expect(app.supportedLocales, FocusHavenLocales.productionLocales);
-    expect(app.supportedLocales, const <Locale>[Locale('en'), Locale('es')]);
+    expect(
+      app.supportedLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(find.text('Welcome to FocusHaven'), findsOneWidget);
     expect(find.text('Te damos la bienvenida a FocusHaven'), findsNothing);
   });
@@ -73,16 +76,11 @@ void main() {
       deviceMain,
       contains('supportedLocales: FocusHavenLocales.spanishDeviceTestLocales'),
     );
+    expect(registry, contains("languageCode: 'es'"));
     expect(
-      registry,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
-      ),
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
     );
-    expect(FocusHavenLocales.productionLocales, const <Locale>[
-      Locale('en'),
-      Locale('es'),
-    ]);
     expect(FocusHavenLocales.spanishDeviceTestLocales, const <Locale>[
       Locale('en'),
       Locale('es'),

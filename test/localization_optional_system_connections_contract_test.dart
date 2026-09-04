@@ -211,19 +211,14 @@ void main() {
         'Haven Window suggestion text and Focus Shield state text remain opaque B6-owned service values',
       ),
     );
-    expect(
-      locales,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
-      ),
-    );
+    expect(locales, contains("languageCode: 'es'"));
     expect(
       Directory('lib/l10n')
           .listSync()
           .whereType<File>()
           .where((file) => file.path.endsWith('.arb'))
           .length,
-      2,
+      greaterThanOrEqualTo(2),
     );
   });
 }

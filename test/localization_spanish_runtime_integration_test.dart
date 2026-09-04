@@ -43,10 +43,10 @@ void main() {
       containsAll(const <Locale>[Locale('en'), Locale('es')]),
     );
     expect(FocusHavenLocales.integrationLocales, isEmpty);
-    expect(FocusHavenLocales.productionLocales, const <Locale>[
-      Locale('en'),
-      Locale('es'),
-    ]);
+    expect(
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
       FocusHavenLocaleStatus.production,
@@ -107,7 +107,10 @@ void main() {
     await tester.pumpAndSettle();
 
     final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
-    expect(app.supportedLocales, const <Locale>[Locale('en'), Locale('es')]);
+    expect(
+      app.supportedLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(find.byType(OnboardingScreen), findsOneWidget);
     expect(find.text('Welcome to FocusHaven'), findsNothing);
     expect(find.text('Te damos la bienvenida a FocusHaven'), findsOneWidget);

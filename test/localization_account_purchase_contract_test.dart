@@ -231,19 +231,14 @@ void main() {
       readme,
       contains('completed Phase 215G-B English Flutter extraction'),
     );
-    expect(
-      locales,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
-      ),
-    );
+    expect(locales, contains("languageCode: 'es'"));
     expect(
       Directory('lib/l10n')
           .listSync()
           .whereType<File>()
           .where((file) => file.path.endsWith('.arb'))
           .length,
-      2,
+      greaterThanOrEqualTo(2),
     );
   });
 }

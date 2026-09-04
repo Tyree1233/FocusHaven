@@ -100,10 +100,10 @@ void main() {
     expect(packet.existsSync(), isTrue);
     expect(_sha256(packet.path), review['reviewPacketSha256']);
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
-    expect(FocusHavenLocales.productionLocales, const [
-      Locale('en'),
-      Locale('es'),
-    ]);
+    expect(
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
       FocusHavenLocaleStatus.production,

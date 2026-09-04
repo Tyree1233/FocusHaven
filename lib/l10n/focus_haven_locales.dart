@@ -42,6 +42,12 @@ abstract final class FocusHavenLocales {
       nativeName: 'Español',
       status: FocusHavenLocaleStatus.production,
     ),
+    FocusHavenLocaleDefinition(
+      languageCode: 'fr',
+      englishName: 'French',
+      nativeName: 'Français',
+      status: FocusHavenLocaleStatus.production,
+    ),
   ];
 
   static const firstTranslationWave = <FocusHavenLocaleDefinition>[
@@ -55,7 +61,7 @@ abstract final class FocusHavenLocales {
       languageCode: 'fr',
       englishName: 'French',
       nativeName: 'Français',
-      status: FocusHavenLocaleStatus.planned,
+      status: FocusHavenLocaleStatus.production,
     ),
     FocusHavenLocaleDefinition(
       languageCode: 'de',
@@ -72,7 +78,11 @@ abstract final class FocusHavenLocales {
     ),
   ];
 
-  static const productionLocales = <Locale>[Locale('en'), Locale('es')];
+  static const productionLocales = <Locale>[
+    Locale('en'),
+    Locale('es'),
+    Locale('fr'),
+  ];
 
   // Generated catalogs still awaiting production activation belong here.
   static const integrationLocales = <Locale>[];

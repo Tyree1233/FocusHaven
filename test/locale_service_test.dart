@@ -1,3 +1,5 @@
+import 'dart:ui' show Locale;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/l10n/focus_haven_locales.dart';
 import 'package:focushaven/services/locale_service.dart';
@@ -30,6 +32,21 @@ void main() {
     expect(service.selectedLocale?.languageCode, 'es');
   });
 
+  test('restores an explicit French preference from the registry', () async {
+    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'fr'});
+    final service = LocaleService();
+    await service.initialized;
+
+    final french = FocusHavenLocales.production.singleWhere(
+      (definition) => definition.languageCode == 'fr',
+    );
+    expect(
+      service.selectedChoice,
+      FocusHavenLanguageChoice.forDefinition(french),
+    );
+    expect(service.selectedLocale, const Locale('fr'));
+  });
+
   test(
     'derives available choices from the production locale registry',
     () async {
@@ -50,13 +67,13 @@ void main() {
     () async {
       final service = LocaleService();
       await service.initialized;
-      final plannedFrench = FocusHavenLocales.firstTranslationWave.singleWhere(
-        (definition) => definition.languageCode == 'fr',
+      final plannedGerman = FocusHavenLocales.firstTranslationWave.singleWhere(
+        (definition) => definition.languageCode == 'de',
       );
 
       await expectLater(
         service.setLanguage(
-          FocusHavenLanguageChoice.forDefinition(plannedFrench),
+          FocusHavenLanguageChoice.forDefinition(plannedGerman),
         ),
         throwsArgumentError,
       );
@@ -75,6 +92,13 @@ void main() {
     preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(LocaleService.storageKey), 'es');
 
+    final french = FocusHavenLocales.production.singleWhere(
+      (definition) => definition.languageCode == 'fr',
+    );
+    await service.setLanguage(FocusHavenLanguageChoice.forDefinition(french));
+    preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString(LocaleService.storageKey), 'fr');
+
     await service.setLanguage(FocusHavenLanguageChoice.system);
     preferences = await SharedPreferences.getInstance();
     expect(preferences.containsKey(LocaleService.storageKey), isFalse);
@@ -82,7 +106,7 @@ void main() {
   });
 
   test('repairs an unsupported saved language to device default', () async {
-    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'fr'});
+    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'ja'});
     final service = LocaleService();
     await service.initialized;
 

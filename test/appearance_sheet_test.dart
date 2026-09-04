@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/l10n/app_localizations.dart';
+import 'package:focushaven/l10n/focus_haven_locales.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/locale_service.dart';
 import 'package:focushaven/services/theme_service.dart';
@@ -101,7 +102,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('selecting Spanish updates the app and persists locally', (
+  testWidgets('production languages update the app and persist locally', (
     tester,
   ) async {
     final themeService = ThemeService();
@@ -111,19 +112,34 @@ void main() {
     await tester.pumpWidget(_app(themeService, localeService: localeService));
     await tester.pump();
 
-    expect(find.text('English / Español'), findsOneWidget);
+    expect(find.text('English / Español / Français'), findsOneWidget);
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     expect(find.text('English'), findsOneWidget);
     expect(find.text('Español'), findsOneWidget);
+    expect(find.text('Français'), findsOneWidget);
 
     await tester.tap(find.text('Español'));
     await tester.pumpAndSettle();
 
     expect(localeService.selectedChoice, FocusHavenLanguageChoice.spanish);
-    expect(find.text('English / Español'), findsOneWidget);
+    expect(find.text('English / Español / Français'), findsOneWidget);
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(LocaleService.storageKey), 'es');
+
+    await tester.tap(find.text('Français'));
+    await tester.pumpAndSettle();
+
+    final french = FocusHavenLocales.production.singleWhere(
+      (definition) => definition.languageCode == 'fr',
+    );
+    expect(
+      localeService.selectedChoice,
+      FocusHavenLanguageChoice.forDefinition(french),
+    );
+    expect(find.text('English / Español / Français'), findsOneWidget);
+    expect(find.text('Device / Dispositivo'), findsOneWidget);
+    expect(preferences.getString(LocaleService.storageKey), 'fr');
     expect(tester.takeException(), isNull);
   });
 

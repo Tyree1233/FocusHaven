@@ -116,10 +116,10 @@ void main() {
     expect(audit['privateRuntimeDataIncluded'], isFalse);
 
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
-    expect(FocusHavenLocales.productionLocales, const [
-      Locale('en'),
-      Locale('es'),
-    ]);
+    expect(
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
       FocusHavenLocaleStatus.production,

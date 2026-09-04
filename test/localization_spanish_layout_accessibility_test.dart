@@ -183,10 +183,10 @@ void main() {
   });
 
   test('reviewed Spanish remains available after the C3B layout gate', () {
-    expect(FocusHavenLocales.productionLocales, const <Locale>[
-      Locale('en'),
-      Locale('es'),
-    ]);
+    expect(
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(FocusHavenLocales.integrationLocales, isEmpty);
     expect(
       AppLocalizations.supportedLocales,

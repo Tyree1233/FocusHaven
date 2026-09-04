@@ -39,7 +39,7 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
   });
 
-  testWidgets('exposes the production-approved English and Spanish locales', (
+  testWidgets('exposes every production-approved locale', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const FocusHavenApp());
@@ -49,10 +49,11 @@ void main() {
     expect(materialApp.supportedLocales, const <Locale>[
       Locale('en'),
       Locale('es'),
+      Locale('fr'),
     ]);
     expect(
       AppLocalizations.supportedLocales,
-      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+      containsAll(const <Locale>[Locale('en'), Locale('es'), Locale('fr')]),
     );
     expect(materialApp.supportedLocales, AppLocalizations.supportedLocales);
     expect(
@@ -90,24 +91,24 @@ void main() {
     expect(find.text('Timer destination'), findsOneWidget);
   });
 
-  testWidgets('restores Spanish and falls back to English when unsupported', (
+  testWidgets('restores French and falls back to English when unsupported', (
     tester,
   ) async {
-    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'es'});
+    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'fr'});
     final localeService = LocaleService();
     await localeService.initialized;
 
     await tester.pumpWidget(FocusHavenApp(localeService: localeService));
     await tester.pump();
-    expect(find.text('Te damos la bienvenida a FocusHaven'), findsOneWidget);
+    expect(find.text('Bienvenue à FocusHaven'), findsOneWidget);
 
     await localeService.setLanguage(FocusHavenLanguageChoice.system);
-    tester.platformDispatcher.localeTestValue = const Locale('fr');
+    tester.platformDispatcher.localeTestValue = const Locale('ja');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
     await tester.pumpAndSettle();
 
     expect(find.text('Welcome to FocusHaven'), findsOneWidget);
-    expect(find.text('Te damos la bienvenida a FocusHaven'), findsNothing);
+    expect(find.text('Bienvenue à FocusHaven'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

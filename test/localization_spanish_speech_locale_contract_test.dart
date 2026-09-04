@@ -68,11 +68,6 @@ void main() {
     expect(qualification['voiceAndCoachingQualified'], isFalse);
     expect(qualification['runtimeActivated'], isTrue);
     expect(qualification['productionLocaleAllowed'], isTrue);
-    expect(
-      registry,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
-      ),
-    );
+    expect(registry, contains("languageCode: 'es'"));
   });
 }

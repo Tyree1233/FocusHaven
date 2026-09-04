@@ -189,19 +189,14 @@ void main() {
       contains('Phase 215G-B English Flutter extraction is complete'),
     );
     expect(readme, contains('Phase 215G-B6B2'));
-    expect(
-      locales,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
-      ),
-    );
+    expect(locales, contains("languageCode: 'es'"));
     expect(
       Directory('lib/l10n')
           .listSync()
           .whereType<File>()
           .where((file) => file.path.endsWith('.arb'))
           .length,
-      2,
+      greaterThanOrEqualTo(2),
     );
   });
 }

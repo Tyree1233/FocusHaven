@@ -2,6 +2,11 @@
 
 Status: reusable workflow for locales added after the Spanish foundation
 
+First completed use: French (`fr`), with 980 anonymously reviewed messages and
+no blocked decisions. Its integration proves that ordinary future locales can
+reuse the shared registry, picker, fallback, layout, semantics, privacy, test,
+and build gates without replaying the Spanish foundation phases.
+
 ## Goal
 
 An ordinary new language should take one compact product pass, not a replay of

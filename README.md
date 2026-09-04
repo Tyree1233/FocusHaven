@@ -726,11 +726,11 @@ not cover these capabilities.
 ## Languages and global releases
 
 FocusHaven now has a generated Flutter localization foundation, with English as
-the source and fallback catalog. Spanish is an exact reviewed production
-runtime catalog; French, German, and Brazilian Portuguese remain planned.
+the source and fallback catalog. Spanish and French are exact reviewed
+production runtime catalogs; German and Brazilian Portuguese remain planned.
 FocusHaven follows a supported device language by default and provides local,
-reversible Device, English, and Español choices in Appearance. Store-language
-promotion remains a separate release decision.
+reversible Device, English, Español, and Français choices in Appearance.
+Store-language promotion remains a separate release decision.
 
 Adding a locale still requires a complete catalog, placeholder validation,
 fluent review, focused layout checks, and green application tests and builds.
@@ -747,6 +747,14 @@ The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
 The exact reusable commands and private-review format are documented in the
 [streamlined locale workflow](docs/LOCALIZATION_STREAMLINED_LOCALE_WORKFLOW.md).
+
+French is the first locale delivered through that streamlined path. Its exact
+980-message candidate received a complete anonymous fluent review: 654 entries
+were accepted, 326 were revised, none were blocked, and eight intentional
+source-equal product or shared-language values were explicitly approved. The
+reviewed catalog is copied unchanged into the runtime and exposed through the
+registry-driven language picker. French speech recognition, localized store
+promotion, and country distribution are not claimed by this in-app activation.
 
 Phase 215G-E1 activates the unchanged reviewed 980-message Spanish catalog in
 the normal app. English remains the fallback for unsupported device locales.

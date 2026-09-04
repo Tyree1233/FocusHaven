@@ -70,10 +70,10 @@ void main() {
     final review = _json('localization/reviews/es/qualification.json');
     final evidence = _json('localization/reviews/es/structural-audit.json');
 
-    expect(FocusHavenLocales.productionLocales, const [
-      Locale('en'),
-      Locale('es'),
-    ]);
+    expect(
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(
       FocusHavenLocales.firstTranslationWave.first.status,
       FocusHavenLocaleStatus.production,

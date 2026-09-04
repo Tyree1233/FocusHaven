@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "fr",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "general_french",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "769892e965a4e98a6779b75673369a711d2c81e0f67dfd3814924f222642bce9",
+  "approvedCatalogSha256": "adcf146b7ddb1129a07c2388e5435dea771cc10f3a2fc8ecebf2372a6540a68e",
+  "privateReviewPayloadSha256": "519fa9e177496ea5bfc834dab16e9581882bc6bbf23491eb0bc8558e0705db87",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 654,
+    "revised": 326,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "coachTitle",
+    "focusHistoryWeeklySummary",
+    "havenActionServiceSessionFocus",
+    "havenJourneyEyebrow",
+    "havenWindowEyebrow",
+    "sessionFocus",
+    "timerDurationMinutesUpper",
+    "timerSessionFocusLabel"
+  ],
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

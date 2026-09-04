@@ -142,10 +142,10 @@ void main() {
     final registry = _read('lib/l10n/focus_haven_locales.dart');
     final review = _read('localization/reviews/es/qualification.json');
 
-    expect(FocusHavenLocales.productionLocales, const [
-      Locale('en'),
-      Locale('es'),
-    ]);
+    expect(
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
     expect(
       FocusHavenLocales.firstTranslationWave.first.locale,
       const Locale('es'),
@@ -158,7 +158,7 @@ void main() {
       Directory('lib/l10n').listSync().whereType<File>().where(
         (file) => file.path.endsWith('.arb'),
       ),
-      hasLength(2),
+      hasLength(FocusHavenLocales.production.length),
     );
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);

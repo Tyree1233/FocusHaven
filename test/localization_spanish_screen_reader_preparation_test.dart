@@ -206,10 +206,10 @@ void main() {
     expect(qualification['screenReaderQualified'], isTrue);
     expect(qualification['productionLocaleAllowed'], isTrue);
     expect(qualification['runtimeActivated'], isTrue);
-    expect(FocusHavenLocales.productionLocales, const <Locale>[
-      Locale('en'),
-      Locale('es'),
-    ]);
+    expect(
+      FocusHavenLocales.productionLocales,
+      containsAll(const <Locale>[Locale('en'), Locale('es')]),
+    );
   });
 }
 

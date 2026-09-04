@@ -242,19 +242,14 @@ void main() {
       readme,
       contains('service-generated restorative copy remains B6-owned'),
     );
-    expect(
-      locales,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')]",
-      ),
-    );
+    expect(locales, contains("languageCode: 'es'"));
     expect(
       Directory('lib/l10n')
           .listSync()
           .whereType<File>()
           .where((file) => file.path.endsWith('.arb'))
           .length,
-      2,
+      greaterThanOrEqualTo(2),
     );
   });
 }

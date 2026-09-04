@@ -94,12 +94,7 @@ void main() {
     expect(qualification['nativeAndStoreQualified'], isFalse);
     expect(qualification['runtimeActivated'], isTrue);
     expect(qualification['productionLocaleAllowed'], isTrue);
-    expect(
-      localePolicy,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')];",
-      ),
-    );
+    expect(localePolicy, contains("languageCode: 'es'"));
   });
 
   test('documents physical recognition without a public support claim', () {

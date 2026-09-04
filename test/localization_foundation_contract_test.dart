@@ -45,8 +45,9 @@ void main() {
     expect(FocusHavenLocales.productionLocales, const <Locale>[
       Locale('en'),
       Locale('es'),
+      Locale('fr'),
     ]);
-    expect(FocusHavenLocales.production, hasLength(2));
+    expect(FocusHavenLocales.production, hasLength(3));
     expect(
       FocusHavenLocales.production,
       everyElement(
@@ -70,11 +71,17 @@ void main() {
       ],
     );
     expect(
-      FocusHavenLocales.firstTranslationWave.first.status,
-      FocusHavenLocaleStatus.production,
+      FocusHavenLocales.firstTranslationWave.take(2),
+      everyElement(
+        isA<FocusHavenLocaleDefinition>().having(
+          (definition) => definition.status,
+          'status',
+          FocusHavenLocaleStatus.production,
+        ),
+      ),
     );
     expect(
-      FocusHavenLocales.firstTranslationWave.skip(1),
+      FocusHavenLocales.firstTranslationWave.skip(2),
       everyElement(
         isA<FocusHavenLocaleDefinition>().having(
           (definition) => definition.status,
@@ -99,7 +106,7 @@ void main() {
     expect(
       FocusHavenLocales.productionLocales.toSet().intersection(
         FocusHavenLocales.firstTranslationWave
-            .skip(1)
+            .skip(2)
             .map((definition) => definition.locale)
             .toSet(),
       ),
@@ -142,7 +149,7 @@ void main() {
 
     for (final required in <String>[
       'English (`en`) is the source catalog and fallback production locale',
-      'Spanish (`es`) is a reviewed production runtime locale',
+      'Spanish (`es`) and French (`fr`) are reviewed production runtime locales',
       'Planned locales are not exposed by the production `MaterialApp.supportedLocales` allowlist',
       'no private user content is sent anywhere for translation',
       'qualified human reviewer',
@@ -155,9 +162,7 @@ void main() {
 
     expect(
       roadmap,
-      contains(
-        '| Global localization | Spanish active; streamlined next-locale pipeline implemented |',
-      ),
+      contains('| Global localization | English, Spanish, and French active |'),
     );
     expect(
       roadmap,

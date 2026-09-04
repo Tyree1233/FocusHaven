@@ -77,11 +77,6 @@ void main() {
     expect(qualification['runtimeActivated'], isTrue);
     expect(qualification['voiceAndCoachingQualified'], isFalse);
     expect(qualification['nativeAndStoreQualified'], isFalse);
-    expect(
-      localePolicy,
-      contains(
-        "static const productionLocales = <Locale>[Locale('en'), Locale('es')];",
-      ),
-    );
+    expect(localePolicy, contains("languageCode: 'es'"));
   });
 }
