@@ -114,7 +114,12 @@ name, email address, signature, qualifications, timestamp, notes, or contact
 information is requested or stored in Git.
 
 A blocked row stops the pipeline. A revised row becomes part of the reviewed
-catalog only after its placeholders and ICU structure pass again.
+catalog only after its placeholders and ICU structure pass again. If a fluent
+reviewer deliberately enters the exact English source as a `REVISE`
+replacement—for example, for a product label or a word that is legitimately
+identical in both languages—the pipeline records that message key as an
+explicit review-approved source-equal value. This decision is anonymous and
+does not require a reviewer note or identity.
 
 ## 4. Accept and verify the review
 
@@ -129,7 +134,8 @@ dart run tool/localization_streamlined_pipeline.dart verify \
 
 `accept` verifies that all immutable worksheet columns still match the locked
 source and candidate, requires one valid decision per message, applies
-revisions, reruns structural qualification, and writes only:
+revisions, records any explicit review-approved source-equal message keys,
+reruns structural qualification, and writes only:
 
 - the reviewed ARB catalog; and
 - an anonymous aggregate validation record containing content hashes, counts,

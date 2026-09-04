@@ -86,6 +86,36 @@ void main() {
     expect(result.passed, isTrue);
     expect(result.approvedCatalog['privacy'], privacy['replacement']);
     expect(result.decisionCounts, {'accepted': 2, 'revised': 1, 'blocked': 0});
+    expect(result.reviewApprovedSourceEqual, isEmpty);
+  });
+
+  test('records an explicit reviewed source-equal revision as intentional', () {
+    final source = _source();
+    final prepared = prepareStreamlinedLocale(
+      plan: _plan(),
+      source: source,
+      translationBundle: _bundle(),
+    );
+    final rows = prepared.reviewRows;
+    for (final row in rows) {
+      row['decision'] = 'ACCEPT';
+    }
+    final privacy = rows.singleWhere((row) => row['key'] == 'privacy');
+    privacy['decision'] = 'REVISE';
+    privacy['replacement'] = source['privacy'] as String;
+
+    final result = acceptStreamlinedLocaleReview(
+      plan: _plan(),
+      source: source,
+      candidate: prepared.candidate,
+      approvedSourceEqual: prepared.approvedSourceEqual,
+      reviewRows: rows,
+    );
+
+    expect(result.passed, isTrue);
+    expect(result.approvedCatalog['privacy'], source['privacy']);
+    expect(result.reviewApprovedSourceEqual, ['privacy']);
+    expect(result.qualification.sourceEqualTranslations, isEmpty);
   });
 
   test('rejects changed worksheet copy and any blocked decision', () {

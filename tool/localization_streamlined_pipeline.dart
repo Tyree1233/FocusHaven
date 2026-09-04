@@ -307,6 +307,7 @@ final class StreamlinedAcceptanceResult {
     required this.qualification,
     required this.decisionCounts,
     required this.riskCounts,
+    required this.reviewApprovedSourceEqual,
   });
 
   final List<String> errors;
@@ -314,6 +315,7 @@ final class StreamlinedAcceptanceResult {
   final CatalogQualificationResult qualification;
   final Map<String, int> decisionCounts;
   final Map<String, int> riskCounts;
+  final List<String> reviewApprovedSourceEqual;
 
   bool get passed => errors.isEmpty;
 
@@ -326,6 +328,7 @@ final class StreamlinedAcceptanceResult {
     'messageCount': qualification.sourceMessageCount,
     'decisionCounts': decisionCounts,
     'riskCounts': riskCounts,
+    'reviewApprovedSourceEqualCount': reviewApprovedSourceEqual.length,
   };
 }
 
@@ -341,6 +344,7 @@ StreamlinedAcceptanceResult acceptStreamlinedLocaleReview({
   final candidateKeys = _messageKeys(candidate);
   final seen = <String>{};
   final replacements = <String, String>{};
+  final reviewApprovedSourceEqual = <String>{};
   final orderedKeys = sourceKeys.toList()
     ..sort((left, right) {
       final leftMetadata =
@@ -423,6 +427,10 @@ StreamlinedAcceptanceResult acceptStreamlinedLocaleReview({
           errors.add('invalid_replacement:$key');
         } else {
           replacements[key] = replacement;
+          if (replacement == source[key] &&
+              !approvedSourceEqual.containsKey(key)) {
+            reviewApprovedSourceEqual.add(key);
+          }
         }
         break;
       case 'BLOCK':
@@ -444,7 +452,10 @@ StreamlinedAcceptanceResult acceptStreamlinedLocaleReview({
   final qualification = auditLocalizationCandidate(
     source: source,
     candidate: approved,
-    approvedSourceEqualKeys: approvedSourceEqual.keys.toSet(),
+    approvedSourceEqualKeys: {
+      ...approvedSourceEqual.keys,
+      ...reviewApprovedSourceEqual,
+    },
   );
   if (!qualification.readyForHumanReview(
     expectedCandidateLocale: plan.arbLocale,
@@ -463,6 +474,7 @@ StreamlinedAcceptanceResult acceptStreamlinedLocaleReview({
     qualification: qualification,
     decisionCounts: decisions,
     riskCounts: risks,
+    reviewApprovedSourceEqual: reviewApprovedSourceEqual.toList()..sort(),
   );
 }
 
@@ -696,6 +708,7 @@ void _acceptCommand(String planPath, String reviewPath) {
     'messageCount': result.qualification.sourceMessageCount,
     'decisionCounts': result.decisionCounts,
     'riskCounts': result.riskCounts,
+    'reviewApprovedSourceEqual': result.reviewApprovedSourceEqual,
     'placeholderMismatchCount': 0,
     'sourceMutationCount': 0,
     'personalDataIncluded': false,
@@ -715,13 +728,40 @@ void _verifyCommand(String planPath) {
   _verifyPreparationLocks(plan, audit);
   final record = _jsonObject(plan.validationRecord);
   final approved = _jsonObject(plan.approvedCatalog);
+  final source = _jsonObject(plan.sourceCatalog);
   final approvedSourceEqual = _stringMap(audit['approvedSourceEqual']);
-  final qualification = auditLocalizationCandidate(
-    source: _jsonObject(plan.sourceCatalog),
-    candidate: approved,
-    approvedSourceEqualKeys: approvedSourceEqual.keys.toSet(),
-  );
   final errors = <String>[];
+  final reviewApprovedSourceEqualValue = record['reviewApprovedSourceEqual'];
+  final reviewApprovedSourceEqual = <String>{};
+  if (reviewApprovedSourceEqualValue is! List ||
+      reviewApprovedSourceEqualValue.any((value) => value is! String)) {
+    errors.add('review_source_equal_schema_mismatch');
+  } else {
+    final values = reviewApprovedSourceEqualValue.cast<String>();
+    final sortedValues = values.toList()..sort();
+    if (values.toSet().length != values.length ||
+        !_listEqual(values, sortedValues)) {
+      errors.add('review_source_equal_schema_mismatch');
+    } else {
+      reviewApprovedSourceEqual.addAll(values);
+      for (final key in values) {
+        if (!source.containsKey(key) ||
+            key.startsWith('@') ||
+            approvedSourceEqual.containsKey(key) ||
+            approved[key] != source[key]) {
+          errors.add('invalid_review_source_equal:$key');
+        }
+      }
+    }
+  }
+  final qualification = auditLocalizationCandidate(
+    source: source,
+    candidate: approved,
+    approvedSourceEqualKeys: {
+      ...approvedSourceEqual.keys,
+      ...reviewApprovedSourceEqual,
+    },
+  );
   if (!qualification.readyForHumanReview(
     expectedCandidateLocale: plan.arbLocale,
   )) {
