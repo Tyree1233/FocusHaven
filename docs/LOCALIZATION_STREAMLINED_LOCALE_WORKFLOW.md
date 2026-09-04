@@ -42,6 +42,88 @@ accept   Apply the completed anonymous review and create its aggregate proof.
 verify   Confirm the exact reviewed catalog is ready for runtime integration.
 ```
 
+## Batch several independent locales
+
+`tool/localization_streamlined_batch.dart` runs those same four operations for
+one to ten locale entries from a locked batch manifest. It is an orchestrator,
+not a second translation or approval system: each child operation is delegated
+to `tool/localization_streamlined_pipeline.dart`, each locale keeps its own
+plan, candidate, structural audit, private worksheet, reviewed catalog, and
+anonymous validation record, and the batch never approves one locale because
+another passed.
+
+The manifest contains no translation, reviewer identity, or private review
+path. It locks the common English source and supplies only public locale
+metadata:
+
+```json
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_batch_v1",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "the current English catalog digest",
+  "maxParallelism": 3,
+  "locales": [
+    {
+      "locale": "de",
+      "englishName": "German",
+      "nativeName": "Deutsch",
+      "reviewScope": "general_german"
+    },
+    {
+      "locale": "pt-BR",
+      "englishName": "Brazilian Portuguese",
+      "nativeName": "Português (Brasil)",
+      "reviewScope": "brazilian_portuguese"
+    }
+  ]
+}
+```
+
+The batch is deliberately bounded to ten locales and five simultaneous child
+operations. Three locales with `maxParallelism: 3` is the recommended first
+wave. Every operation performs a complete batch preflight before starting a
+child command, so missing inputs or existing outputs cause a no-write stop.
+Once execution begins, a structural or review failure is isolated to its
+locale; the remaining locale checks finish and the final JSON summary reports
+each result. Successful locales are never rolled back, and failed locales are
+never treated as approved.
+
+Run the batch commands from the repository root:
+
+```bash
+dart run tool/localization_streamlined_batch.dart init \
+  /path/to/locale-batch.json
+
+dart run tool/localization_streamlined_batch.dart prepare \
+  /path/to/locale-batch.json \
+  /private/path/translation-bundles \
+  /private/path/review-worksheets
+
+dart run tool/localization_streamlined_batch.dart accept \
+  /path/to/locale-batch.json \
+  /private/path/review-worksheets
+
+dart run tool/localization_streamlined_batch.dart verify \
+  /path/to/locale-batch.json
+```
+
+Private bundle directories and review directories must be outside the
+repository. File names are deterministic:
+
+- `focushaven-<locale>-translations.json` for the machine-assisted bundle;
+- `focushaven-<locale>-review.csv` for the private review worksheet.
+
+There is one private review worksheet per locale. Fluent decisions remain
+independent, and an incomplete language may be left out of a later activation
+wave while completed languages continue. If execution—not preflight—produces
+a partial batch, use the ordinary single-locale command to repair or complete
+only the failed locale; existing successful outputs are never overwritten.
+
+Batch verification establishes content readiness only. Runtime catalog copies,
+registry edits, shared tests and builds, the activation commit, CI, speech,
+store promotion, and country distribution remain explicit later steps.
+
 It never activates a locale, edits the production registry, copies a catalog
 into `lib/l10n`, contacts a translation provider, reads private FocusHaven
 content, records a reviewer identity, deploys, publishes, or changes a store.

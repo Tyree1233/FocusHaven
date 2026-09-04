@@ -743,6 +743,11 @@ validation record, and final integration-readiness result without recording a
 reviewer identity. The Appearance language choices are derived from the
 production locale registry, so future production languages do not need a new
 hard-coded picker control.
+The companion batch orchestrator can run the same locked initialization,
+preparation, acceptance, and verification operations for up to ten locales,
+with bounded parallelism and one independent private review worksheet and
+approval result per language. It performs a complete no-write preflight before
+the wave and never allows one locale's success to approve another locale.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
 The exact reusable commands and private-review format are documented in the
