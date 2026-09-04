@@ -737,8 +737,16 @@ fluent review, focused layout checks, and green application tests and builds.
 After this foundation, ordinary locales use one compact integration and
 activation pass. Physical-device, speech, right-to-left, font, and store work
 is added only where the language or an enabled feature materially requires it.
+The generic streamlined tool now creates the isolated candidate, structural
+audit, private Excel-compatible CSV worksheet, reviewed catalog, anonymous
+validation record, and final integration-readiness result without recording a
+reviewer identity. The Appearance language choices are derived from the
+production locale registry, so future production languages do not need a new
+hard-coded picker control.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
+The exact reusable commands and private-review format are documented in the
+[streamlined locale workflow](docs/LOCALIZATION_STREAMLINED_LOCALE_WORKFLOW.md).
 
 Phase 215G-E1 activates the unchanged reviewed 980-message Spanish catalog in
 the normal app. English remains the fallback for unsupported device locales.

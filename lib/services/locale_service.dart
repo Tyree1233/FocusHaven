@@ -5,14 +5,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../l10n/focus_haven_locales.dart';
 
-enum FocusHavenLanguageChoice { system, english, spanish }
+@immutable
+class FocusHavenLanguageChoice {
+  const FocusHavenLanguageChoice._(this.languageTag);
 
-extension FocusHavenLanguageChoiceLocale on FocusHavenLanguageChoice {
-  Locale? get locale => switch (this) {
-    FocusHavenLanguageChoice.system => null,
-    FocusHavenLanguageChoice.english => const Locale('en'),
-    FocusHavenLanguageChoice.spanish => const Locale('es'),
-  };
+  static const system = FocusHavenLanguageChoice._(null);
+  static const english = FocusHavenLanguageChoice._('en');
+  static const spanish = FocusHavenLanguageChoice._('es');
+
+  factory FocusHavenLanguageChoice.forDefinition(
+    FocusHavenLocaleDefinition definition,
+  ) => FocusHavenLanguageChoice._(definition.languageTag);
+
+  final String? languageTag;
+
+  Locale? get locale {
+    final tag = languageTag;
+    if (tag == null) return null;
+    return FocusHavenLocales.productionDefinitionForTag(tag)?.locale;
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is FocusHavenLanguageChoice && other.languageTag == languageTag;
+
+  @override
+  int get hashCode => languageTag.hashCode;
 }
 
 /// Owns the person's local, reversible language preference.
@@ -37,13 +55,18 @@ class LocaleService extends ChangeNotifier {
 
   Locale? get selectedLocale => _selectedChoice.locale;
 
+  List<FocusHavenLanguageChoice> get availableChoices => [
+    FocusHavenLanguageChoice.system,
+    ...FocusHavenLocales.production.map(FocusHavenLanguageChoice.forDefinition),
+  ];
+
   Future<void> setLanguage(FocusHavenLanguageChoice choice) async {
     await initialized;
     if (_isDisposed || _selectedChoice == choice) return;
 
+    final tag = choice.languageTag;
     final locale = choice.locale;
-    if (locale != null &&
-        !FocusHavenLocales.productionLocales.contains(locale)) {
+    if (tag != null && locale == null) {
       throw ArgumentError.value(choice, 'choice', 'Unsupported language');
     }
 
@@ -51,7 +74,7 @@ class LocaleService extends ChangeNotifier {
     if (choice == FocusHavenLanguageChoice.system) {
       await preferences.remove(storageKey);
     } else {
-      await preferences.setString(storageKey, locale!.languageCode);
+      await preferences.setString(storageKey, tag!);
     }
     if (_isDisposed) return;
 
@@ -79,11 +102,12 @@ class LocaleService extends ChangeNotifier {
 
       final savedValue = preferences.get(storageKey);
       final savedLanguage = savedValue is String ? savedValue : null;
-      final choice = switch (savedLanguage) {
-        'en' => FocusHavenLanguageChoice.english,
-        'es' => FocusHavenLanguageChoice.spanish,
-        _ => FocusHavenLanguageChoice.system,
-      };
+      final definition = savedLanguage == null
+          ? null
+          : FocusHavenLocales.productionDefinitionForTag(savedLanguage);
+      final choice = definition == null
+          ? FocusHavenLanguageChoice.system
+          : FocusHavenLanguageChoice.forDefinition(definition);
       if (savedValue != null && choice == FocusHavenLanguageChoice.system) {
         await preferences.remove(storageKey);
       }

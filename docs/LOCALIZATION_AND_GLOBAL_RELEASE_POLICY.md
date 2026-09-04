@@ -258,6 +258,16 @@ Physical-device, speech, right-to-left, font, or store-promotion work is added
 only when the locale or feature materially requires it. A safely disabled or
 fail-closed optional feature does not block the translated core interface.
 
+The reusable implementation is defined in
+`docs/LOCALIZATION_STREAMLINED_LOCALE_WORKFLOW.md` and
+`tool/localization_streamlined_pipeline.dart`. Candidate preparation,
+structural audit, private worksheet creation, anonymous fluent-review
+acceptance, and exact-lock verification are generic locale operations. The
+private worksheet is refused inside the repository, and only aggregate review
+evidence enters Git. Production language choices are derived from the locale
+registry, so a reviewed locale does not require another hard-coded picker enum
+or radio button.
+
 ## Store and country boundary
 
 A translated interface does not by itself authorize distribution in a new

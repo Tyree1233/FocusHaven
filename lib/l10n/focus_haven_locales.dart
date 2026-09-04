@@ -18,6 +18,14 @@ class FocusHavenLocaleDefinition {
   final FocusHavenLocaleStatus status;
 
   Locale get locale => Locale(languageCode, countryCode);
+
+  /// Stable BCP-47-shaped value used for local preference persistence.
+  String get languageTag =>
+      countryCode == null ? languageCode : '$languageCode-$countryCode';
+
+  /// Locale identifier used by Flutter ARB filenames and `@@locale` values.
+  String get arbLocale =>
+      countryCode == null ? languageCode : '${languageCode}_$countryCode';
 }
 
 abstract final class FocusHavenLocales {
@@ -72,4 +80,11 @@ abstract final class FocusHavenLocales {
   // Exact locale surface retained for the reproducible debug-only Spanish
   // device-test entry point.
   static const spanishDeviceTestLocales = <Locale>[Locale('en'), Locale('es')];
+
+  static FocusHavenLocaleDefinition? productionDefinitionForTag(String tag) {
+    for (final definition in production) {
+      if (definition.languageTag == tag) return definition;
+    }
+    return null;
+  }
 }

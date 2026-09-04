@@ -85,6 +85,18 @@ void main() {
     );
     expect(FocusHavenLocales.integrationLocales, isEmpty);
     expect(
+      FocusHavenLocales.firstTranslationWave.map(
+        (definition) => definition.languageTag,
+      ),
+      ['es', 'fr', 'de', 'pt-BR'],
+    );
+    expect(
+      FocusHavenLocales.firstTranslationWave.map(
+        (definition) => definition.arbLocale,
+      ),
+      ['es', 'fr', 'de', 'pt_BR'],
+    );
+    expect(
       FocusHavenLocales.productionLocales.toSet().intersection(
         FocusHavenLocales.firstTranslationWave
             .skip(1)
@@ -143,7 +155,9 @@ void main() {
 
     expect(
       roadmap,
-      contains('| Global localization | Spanish active in app |'),
+      contains(
+        '| Global localization | Spanish active; streamlined next-locale pipeline implemented |',
+      ),
     );
     expect(
       roadmap,

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:focushaven/l10n/focus_haven_locales.dart';
 import 'package:focushaven/services/locale_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -28,6 +29,39 @@ void main() {
     expect(service.selectedChoice, FocusHavenLanguageChoice.spanish);
     expect(service.selectedLocale?.languageCode, 'es');
   });
+
+  test(
+    'derives available choices from the production locale registry',
+    () async {
+      final service = LocaleService();
+      await service.initialized;
+
+      expect(service.availableChoices, [
+        FocusHavenLanguageChoice.system,
+        ...FocusHavenLocales.production.map(
+          FocusHavenLanguageChoice.forDefinition,
+        ),
+      ]);
+    },
+  );
+
+  test(
+    'rejects a locale until its registry state becomes production',
+    () async {
+      final service = LocaleService();
+      await service.initialized;
+      final plannedFrench = FocusHavenLocales.firstTranslationWave.singleWhere(
+        (definition) => definition.languageCode == 'fr',
+      );
+
+      await expectLater(
+        service.setLanguage(
+          FocusHavenLanguageChoice.forDefinition(plannedFrench),
+        ),
+        throwsArgumentError,
+      );
+    },
+  );
 
   test('persists and clears a reversible explicit preference', () async {
     final service = LocaleService();

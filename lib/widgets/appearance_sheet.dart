@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 
+import '../l10n/focus_haven_locales.dart';
 import '../l10n/focus_haven_localizations.dart';
 import '../providers/app_providers.dart';
 import '../services/locale_service.dart';
@@ -150,7 +151,9 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
                         children: [
                           const Icon(Icons.language),
                           Text(
-                            'English / Español',
+                            FocusHavenLocales.production
+                                .map((definition) => definition.nativeName)
+                                .join(' / '),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ],
@@ -167,17 +170,16 @@ class _AppearanceSheetState extends riverpod.ConsumerState<AppearanceSheet> {
                             title: const Text('Device / Dispositivo'),
                             secondary: const Icon(Icons.language),
                           ),
-                          const RadioListTile<FocusHavenLanguageChoice>(
-                            contentPadding: EdgeInsets.zero,
-                            value: FocusHavenLanguageChoice.english,
-                            title: Text('English'),
-                            secondary: Icon(Icons.translate),
-                          ),
-                          const RadioListTile<FocusHavenLanguageChoice>(
-                            contentPadding: EdgeInsets.zero,
-                            value: FocusHavenLanguageChoice.spanish,
-                            title: Text('Español'),
-                            secondary: Icon(Icons.translate),
+                          ...FocusHavenLocales.production.map(
+                            (definition) =>
+                                RadioListTile<FocusHavenLanguageChoice>(
+                                  contentPadding: EdgeInsets.zero,
+                                  value: FocusHavenLanguageChoice.forDefinition(
+                                    definition,
+                                  ),
+                                  title: Text(definition.nativeName),
+                                  secondary: const Icon(Icons.translate),
+                                ),
                           ),
                         ],
                       ),
