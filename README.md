@@ -726,11 +726,11 @@ not cover these capabilities.
 ## Languages and global releases
 
 FocusHaven now has a generated Flutter localization foundation, with English as
-the source and fallback catalog. Spanish and French are exact reviewed
-production runtime catalogs; German and Brazilian Portuguese remain planned.
-FocusHaven follows a supported device language by default and provides local,
-reversible Device, English, Español, and Français choices in Appearance.
-Store-language promotion remains a separate release decision.
+the source and fallback catalog. Spanish, French, German, and Brazilian
+Portuguese are exact reviewed production runtime catalogs. FocusHaven follows a
+supported device language by default and provides local, reversible Device,
+English, Español, Français, Deutsch, and Português (Brasil) choices in
+Appearance. Store-language promotion remains a separate release decision.
 
 Adding a locale still requires a complete catalog, placeholder validation,
 fluent review, focused layout checks, and green application tests and builds.
@@ -747,7 +747,14 @@ The companion batch orchestrator can run the same locked initialization,
 preparation, acceptance, and verification operations for up to ten locales,
 with bounded parallelism and one independent private review worksheet and
 approval result per language. It performs a complete no-write preflight before
-the wave and never allows one locale's success to approve another locale.
+the wave and never allows one locale's success to approve another locale. The
+first bounded batch uses that path for German and Brazilian Portuguese, with
+separate 980-message fluent reviews, anonymous validation records, and exact
+reviewed-to-runtime catalog locks.
+Flutter also generates from a mechanically derived `pt` fallback ARB because
+its localization tool requires a base locale for `pt-BR`. That fallback differs
+from the exact reviewed Brazilian Portuguese runtime catalog only in
+`@@locale`; it is not a sixth language choice or a separate translation.
 The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
 The exact reusable commands and private-review format are documented in the

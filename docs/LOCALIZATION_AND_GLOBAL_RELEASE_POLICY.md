@@ -1,7 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Spanish and streamlined French in-app production activation; English
-remains the fallback and store promotion remains separate
+Status: Spanish, French, German, and Brazilian Portuguese in-app production
+activation; English remains the fallback and store promotion remains separate
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -11,8 +11,8 @@ country release readiness.
 ## Current truth
 
 - English (`en`) is the source catalog and fallback production locale.
-- Spanish (`es`) and French (`fr`) are reviewed production runtime locales.
-  German (`de`) and Brazilian Portuguese (`pt-BR`) remain planned.
+- Spanish (`es`), French (`fr`), German (`de`), and Brazilian Portuguese
+  (`pt-BR`) are reviewed production runtime locales.
 - Planned locales are not exposed by the production
   `MaterialApp.supportedLocales` allowlist. In-app locale support and localized
   Apple or Google store promotion are separate decisions.
@@ -185,12 +185,13 @@ locale in the production allowlist.
 
 Phase 215G-E1 activates the exact reviewed Spanish catalog without changing
 its 980 messages. FocusHaven follows a supported device language by default
-and provides locally stored, reversible Device, English, Español, and Français
-choices inside Appearance. Unsupported device languages fall back to English. Spanish
-Local Coach adds a bounded fail-safe set for immediate-safety and stop/space
-requests. Spanish Haven actions continue to reject unrecognized commands, and
-Enhanced AI remains disabled; those limited features do not prevent the
-reviewed interface from being used in Spanish.
+and provides locally stored, reversible Device, English, Español, Français,
+Deutsch, and Português (Brasil) choices inside Appearance. Unsupported device
+languages fall back to English. Spanish Local Coach adds a bounded fail-safe
+set for immediate-safety and stop/space requests. Spanish Haven actions
+continue to reject unrecognized commands, and Enhanced AI remains disabled;
+those limited features do not prevent the reviewed interface from being used
+in Spanish.
 
 French is the first production locale completed through the streamlined
 post-Spanish path. Its exact 980-message candidate received 654 anonymous
@@ -201,6 +202,20 @@ control. The plan requires no right-to-left, special-font, physical
 screen-reader, physical-speech, or store-promotion gate. French voice remains
 fail-closed because French speech recognition is not claimed by this in-app
 activation, and localized store or country promotion remains separate.
+
+German and Brazilian Portuguese are the first production batch completed by
+the reusable orchestrator. Each exact 980-message candidate has an independent
+private fluent review, reviewed catalog, anonymous validation record, and
+reviewed-to-runtime content lock. German records 623 acceptances, 357
+revisions, zero blocks, and nine explicit review-approved source-equal values.
+Brazilian Portuguese records 735 acceptances, 245 revisions, zero blocks, and
+six explicit review-approved source-equal values. Both left-to-right locales
+reuse the shared layout and accessibility coverage. Speech recognition and
+store or country promotion remain separate and fail closed where unsupported.
+Flutter's required base `pt` fallback catalog is mechanically derived from the
+exact reviewed `pt-BR` catalog and differs only in its `@@locale` identity. It
+does not create another user-facing language choice or weaken the reviewed
+Brazilian Portuguese runtime lock.
 
 The following content must be catalog-owned before another locale can be
 considered complete:
@@ -355,7 +370,8 @@ tasks must still be evaluated from the console's current state.
   215G-D, and 215G-E remain required before any additional locale or country
   availability claim.
 - **215G-C — First translation wave:** complete and qualify Spanish, French,
-  German, and Brazilian Portuguese one locale at a time.
+  German, and Brazilian Portuguese through independently accepted reviews and
+  bounded single-locale or batch orchestration.
   Phase 215G-C0 establishes the source lock, candidate isolation, structural
   parity checks, terminology worksheet, and explicit human-review evidence for
   Spanish. Structural readiness is not linguistic approval, runtime

@@ -94,7 +94,10 @@ void main() {
       (plan['exceptionalGates'] as Map<String, dynamic>).values,
       everyElement(isFalse),
     );
-    expect(roadmap, contains('German and Brazilian Portuguese remain planned'));
+    expect(
+      roadmap,
+      contains('German and Brazilian Portuguese are the first bounded'),
+    );
     expect(policy, contains('In-app locale support and localized'));
     expect(policy, contains('store promotion are separate decisions'));
   });

@@ -158,8 +158,9 @@ void main() {
       Directory('lib/l10n').listSync().whereType<File>().where(
         (file) => file.path.endsWith('.arb'),
       ),
-      hasLength(FocusHavenLocales.production.length),
+      hasLength(FocusHavenLocales.production.length + 1),
     );
+    expect(File('lib/l10n/app_pt.arb').existsSync(), isTrue);
     expect(File('lib/l10n/app_es.arb').existsSync(), isTrue);
     expect(File('localization/candidates/app_es.arb').existsSync(), isTrue);
     expect(

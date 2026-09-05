@@ -50,12 +50,24 @@ void main() {
       Locale('en'),
       Locale('es'),
       Locale('fr'),
+      Locale('de'),
+      Locale('pt', 'BR'),
     ]);
     expect(
       AppLocalizations.supportedLocales,
-      containsAll(const <Locale>[Locale('en'), Locale('es'), Locale('fr')]),
+      containsAll(const <Locale>[
+        Locale('en'),
+        Locale('es'),
+        Locale('fr'),
+        Locale('de'),
+        Locale('pt'),
+        Locale('pt', 'BR'),
+      ]),
     );
-    expect(materialApp.supportedLocales, AppLocalizations.supportedLocales);
+    expect(
+      materialApp.supportedLocales,
+      everyElement(isIn(AppLocalizations.supportedLocales)),
+    );
     expect(
       materialApp.localizationsDelegates,
       contains(AppLocalizations.delegate),

@@ -253,6 +253,18 @@ production definition therefore becomes an in-app choice automatically; the
 picker and local-preference service do not need another language-specific enum
 or manually added radio button.
 
+The first production batch applies this same activation boundary independently
+to German and Brazilian Portuguese. Each locale keeps its own reviewed catalog,
+anonymous validation record, exact runtime identity, and verification result;
+the shared commit does not merge their approval evidence or let one language's
+result stand in for the other.
+
+For a region-specific ARB such as `app_pt_BR.arb`, Flutter requires the matching
+base fallback (`app_pt.arb`) during generation. The base fallback must be a
+mechanical copy of the reviewed regional catalog with only `@@locale` changed;
+it remains an implementation fallback and must not become another production
+registry choice.
+
 ## Exceptional gates
 
 The following are not repeated automatically for every language:

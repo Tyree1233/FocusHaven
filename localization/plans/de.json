@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "de",
+  "englishName": "German",
+  "nativeName": "Deutsch",
+  "reviewScope": "general_german",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalog": "localization/candidates/app_de.arb",
+  "structuralAudit": "localization/reviews/de/structural-audit.json",
+  "approvedCatalog": "localization/reviews/de/app_de.approved.arb",
+  "validationRecord": "localization/reviews/de/private-human-validation.json",
+  "runtimeCatalog": "lib/l10n/app_de.arb",
+  "exceptionalGates": {
+    "rightToLeft": false,
+    "fontCoverage": false,
+    "physicalScreenReader": false,
+    "physicalSpeechRecognition": false,
+    "storePromotion": false
+  }
+}

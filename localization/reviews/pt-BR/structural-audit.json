@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "pt-BR",
+  "status": "structurally_ready_for_private_review",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalog": "localization/candidates/app_pt_BR.arb",
+  "candidateCatalogSha256": "d51f5b549acddaff3a9382685a4445502a10779dbea4677825c4d9156b69eb8a",
+  "messageCount": 980,
+  "placeholderMessageCount": 148,
+  "approvedSourceEqual": {
+    "appTitle": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "durationMinutesShort": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "themeTwilight": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "timerDurationSecondsShortUpper": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "timerResetTooltip": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "statMinutesCompact": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "havenWindowHeldSameDay": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "havenWindowHeldMultiDay": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "accountPro": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "proTitle": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "journalMoodCount": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "profileTypeDeepDiver": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "weekdayWednesdayShort": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "weekdayThursdayShort": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "reminderDaySeparator": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "reminderTimeAndDays": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "milestoneMomentumTitle": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "milestoneGoalGetterTitle": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "havenActionServiceSurfaceSmartReset": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "timerServiceExportSessionRow": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it.",
+    "havenPlanServiceExplanationWithDetails": "The machine-assisted draft retained this locale-neutral or invariant text; the private fluent reviewer must confirm it."
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "humanReviewRequired": true,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

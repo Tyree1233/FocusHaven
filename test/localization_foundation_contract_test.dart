@@ -46,8 +46,10 @@ void main() {
       Locale('en'),
       Locale('es'),
       Locale('fr'),
+      Locale('de'),
+      Locale('pt', 'BR'),
     ]);
-    expect(FocusHavenLocales.production, hasLength(3));
+    expect(FocusHavenLocales.production, hasLength(5));
     expect(
       FocusHavenLocales.production,
       everyElement(
@@ -71,22 +73,12 @@ void main() {
       ],
     );
     expect(
-      FocusHavenLocales.firstTranslationWave.take(2),
+      FocusHavenLocales.firstTranslationWave,
       everyElement(
         isA<FocusHavenLocaleDefinition>().having(
           (definition) => definition.status,
           'status',
           FocusHavenLocaleStatus.production,
-        ),
-      ),
-    );
-    expect(
-      FocusHavenLocales.firstTranslationWave.skip(2),
-      everyElement(
-        isA<FocusHavenLocaleDefinition>().having(
-          (definition) => definition.status,
-          'status',
-          FocusHavenLocaleStatus.planned,
         ),
       ),
     );
@@ -104,13 +96,12 @@ void main() {
       ['es', 'fr', 'de', 'pt_BR'],
     );
     expect(
-      FocusHavenLocales.productionLocales.toSet().intersection(
-        FocusHavenLocales.firstTranslationWave
-            .skip(2)
-            .map((definition) => definition.locale)
-            .toSet(),
+      FocusHavenLocales.productionLocales,
+      containsAll(
+        FocusHavenLocales.firstTranslationWave.map(
+          (definition) => definition.locale,
+        ),
       ),
-      isEmpty,
     );
   });
 
@@ -149,7 +140,7 @@ void main() {
 
     for (final required in <String>[
       'English (`en`) is the source catalog and fallback production locale',
-      'Spanish (`es`) and French (`fr`) are reviewed production runtime locales',
+      'Spanish (`es`), French (`fr`), German (`de`), and Brazilian Portuguese (`pt-BR`) are reviewed production runtime locales',
       'Planned locales are not exposed by the production `MaterialApp.supportedLocales` allowlist',
       'no private user content is sent anywhere for translation',
       'qualified human reviewer',
@@ -162,7 +153,10 @@ void main() {
 
     expect(
       roadmap,
-      contains('| Global localization | English, Spanish, and French active |'),
+      contains(
+        '| Global localization | English, Spanish, French, German, and '
+        'Brazilian Portuguese active |',
+      ),
     );
     expect(
       roadmap,

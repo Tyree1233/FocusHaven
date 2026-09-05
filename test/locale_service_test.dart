@@ -62,23 +62,21 @@ void main() {
     },
   );
 
-  test(
-    'rejects a locale until its registry state becomes production',
-    () async {
-      final service = LocaleService();
-      await service.initialized;
-      final plannedGerman = FocusHavenLocales.firstTranslationWave.singleWhere(
-        (definition) => definition.languageCode == 'de',
-      );
+  test('rejects a locale absent from the production registry', () async {
+    final service = LocaleService();
+    await service.initialized;
+    const unsupported = FocusHavenLocaleDefinition(
+      languageCode: 'ja',
+      englishName: 'Japanese',
+      nativeName: '日本語',
+      status: FocusHavenLocaleStatus.planned,
+    );
 
-      await expectLater(
-        service.setLanguage(
-          FocusHavenLanguageChoice.forDefinition(plannedGerman),
-        ),
-        throwsArgumentError,
-      );
-    },
-  );
+    await expectLater(
+      service.setLanguage(FocusHavenLanguageChoice.forDefinition(unsupported)),
+      throwsArgumentError,
+    );
+  });
 
   test('persists and clears a reversible explicit preference', () async {
     final service = LocaleService();

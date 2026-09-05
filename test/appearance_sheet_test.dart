@@ -112,22 +112,33 @@ void main() {
     await tester.pumpWidget(_app(themeService, localeService: localeService));
     await tester.pump();
 
-    expect(find.text('English / Español / Français'), findsOneWidget);
+    expect(
+      find.text('English / Español / Français / Deutsch / Português (Brasil)'),
+      findsOneWidget,
+    );
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     expect(find.text('English'), findsOneWidget);
     expect(find.text('Español'), findsOneWidget);
     expect(find.text('Français'), findsOneWidget);
+    expect(find.text('Deutsch'), findsOneWidget);
+    expect(find.text('Português (Brasil)'), findsOneWidget);
 
     await tester.tap(find.text('Español'));
     await tester.pumpAndSettle();
 
     expect(localeService.selectedChoice, FocusHavenLanguageChoice.spanish);
-    expect(find.text('English / Español / Français'), findsOneWidget);
+    expect(
+      find.text('English / Español / Français / Deutsch / Português (Brasil)'),
+      findsOneWidget,
+    );
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(LocaleService.storageKey), 'es');
 
-    await tester.tap(find.text('Français'));
+    final frenchOption = find.text('Français');
+    await tester.ensureVisible(frenchOption);
+    await tester.pumpAndSettle();
+    await tester.tap(frenchOption);
     await tester.pumpAndSettle();
 
     final french = FocusHavenLocales.production.singleWhere(
@@ -137,7 +148,10 @@ void main() {
       localeService.selectedChoice,
       FocusHavenLanguageChoice.forDefinition(french),
     );
-    expect(find.text('English / Español / Français'), findsOneWidget);
+    expect(
+      find.text('English / Español / Français / Deutsch / Português (Brasil)'),
+      findsOneWidget,
+    );
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     expect(preferences.getString(LocaleService.storageKey), 'fr');
     expect(tester.takeException(), isNull);

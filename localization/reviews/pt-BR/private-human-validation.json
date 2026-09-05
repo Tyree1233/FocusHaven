@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "pt-BR",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "brazilian_portuguese",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "d51f5b549acddaff3a9382685a4445502a10779dbea4677825c4d9156b69eb8a",
+  "approvedCatalogSha256": "24221743751b2209f095ec74b0324e4f221ecb8e52c396de892a114792310907",
+  "privateReviewPayloadSha256": "c8e689daa247048aaa4ca18aa178181470fd6d094279b6c05b6d623e962419a6",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 735,
+    "revised": 245,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "coachTitle",
+    "focusForecastEyebrow",
+    "focusShieldEyebrow",
+    "havenJourneyEyebrow",
+    "havenRhythmEyebrow",
+    "havenWindowEyebrow"
+  ],
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

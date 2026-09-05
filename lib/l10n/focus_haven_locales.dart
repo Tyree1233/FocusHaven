@@ -48,6 +48,19 @@ abstract final class FocusHavenLocales {
       nativeName: 'Français',
       status: FocusHavenLocaleStatus.production,
     ),
+    FocusHavenLocaleDefinition(
+      languageCode: 'de',
+      englishName: 'German',
+      nativeName: 'Deutsch',
+      status: FocusHavenLocaleStatus.production,
+    ),
+    FocusHavenLocaleDefinition(
+      languageCode: 'pt',
+      countryCode: 'BR',
+      englishName: 'Brazilian Portuguese',
+      nativeName: 'Português (Brasil)',
+      status: FocusHavenLocaleStatus.production,
+    ),
   ];
 
   static const firstTranslationWave = <FocusHavenLocaleDefinition>[
@@ -67,14 +80,14 @@ abstract final class FocusHavenLocales {
       languageCode: 'de',
       englishName: 'German',
       nativeName: 'Deutsch',
-      status: FocusHavenLocaleStatus.planned,
+      status: FocusHavenLocaleStatus.production,
     ),
     FocusHavenLocaleDefinition(
       languageCode: 'pt',
       countryCode: 'BR',
       englishName: 'Brazilian Portuguese',
       nativeName: 'Português (Brasil)',
-      status: FocusHavenLocaleStatus.planned,
+      status: FocusHavenLocaleStatus.production,
     ),
   ];
 
@@ -82,6 +95,8 @@ abstract final class FocusHavenLocales {
     Locale('en'),
     Locale('es'),
     Locale('fr'),
+    Locale('de'),
+    Locale('pt', 'BR'),
   ];
 
   // Generated catalogs still awaiting production activation belong here.
