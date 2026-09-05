@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../tool/localization_streamlined_batch.dart';
+import '../tool/localization_streamlined_pipeline.dart';
 
 const _sourceDigest =
     'ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87';
@@ -16,6 +17,10 @@ void main() {
       expect(manifest.maxParallelism, 2);
       expect(manifest.locales.map((entry) => entry.locale), ['de', 'pt-BR']);
       expect(manifest.locales.last.arbLocale, 'pt_BR');
+      expect(
+        manifest.locales.first.exceptionalGates,
+        streamlinedLocaleClosedExceptionalGates,
+      );
       expect(
         manifest.locales.last.runtimeCatalogPath,
         'lib/l10n/app_pt_BR.arb',
@@ -39,6 +44,61 @@ void main() {
       () => StreamlinedLocaleBatchManifest.fromJson(unexpected),
       throwsFormatException,
     );
+  });
+
+  test('locks an explicit CJK coverage gate into init arguments', () {
+    final json = _manifestJson();
+    json['locales'] = [
+      {
+        'locale': 'ja',
+        'englishName': 'Japanese',
+        'nativeName': '日本語',
+        'reviewScope': 'japanese_cjk',
+        'exceptionalGates': {
+          ...streamlinedLocaleClosedExceptionalGates,
+          'fontCoverage': true,
+        },
+      },
+    ];
+    final japanese = StreamlinedLocaleBatchManifest.fromJson(
+      json,
+    ).locales.single;
+
+    expect(japanese.exceptionalGates['rightToLeft'], isFalse);
+    expect(japanese.exceptionalGates['fontCoverage'], isTrue);
+    expect(
+      streamlinedLocaleBatchArguments(
+        operation: StreamlinedLocaleBatchOperation.init,
+        entry: japanese,
+      ),
+      [
+        'init',
+        'ja',
+        'Japanese',
+        '日本語',
+        'japanese_cjk',
+        '{"rightToLeft":false,"fontCoverage":true,"physicalScreenReader":false,"physicalSpeechRecognition":false,"storePromotion":false}',
+      ],
+    );
+  });
+
+  test('rejects incomplete or non-boolean exceptional gate schemas', () {
+    for (final exceptionalGates in [
+      {'fontCoverage': true},
+      {...streamlinedLocaleClosedExceptionalGates, 'fontCoverage': 'required'},
+    ]) {
+      final json = _manifestJson();
+      final locale = Map<String, dynamic>.from(
+        (json['locales'] as List<dynamic>).first as Map,
+      );
+      locale['exceptionalGates'] = exceptionalGates;
+      json['locales'] = [locale];
+
+      expect(
+        () => StreamlinedLocaleBatchManifest.fromJson(json),
+        throwsFormatException,
+      );
+    }
   });
 
   test('builds deterministic private paths for each batch operation', () {

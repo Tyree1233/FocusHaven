@@ -16,15 +16,17 @@ final class StreamlinedLocaleBatchEntry {
     required this.englishName,
     required this.nativeName,
     required this.reviewScope,
+    required this.exceptionalGates,
   });
 
   factory StreamlinedLocaleBatchEntry.fromJson(Map<String, dynamic> json) {
-    _requireExactKeys(json, const {
-      'locale',
-      'englishName',
-      'nativeName',
-      'reviewScope',
-    }, 'locale entry');
+    const requiredKeys = {'locale', 'englishName', 'nativeName', 'reviewScope'};
+    const allowedKeys = {...requiredKeys, 'exceptionalGates'};
+    final actualKeys = json.keys.toSet();
+    if (requiredKeys.difference(actualKeys).isNotEmpty ||
+        actualKeys.difference(allowedKeys).isNotEmpty) {
+      throw const FormatException('locale entry has an invalid schema.');
+    }
     final locale = _requiredString(json, 'locale');
     if (!RegExp(r'^[a-z]{2,3}(?:-[A-Z]{2})?$').hasMatch(locale)) {
       throw const FormatException(
@@ -36,6 +38,10 @@ final class StreamlinedLocaleBatchEntry {
       englishName: _requiredString(json, 'englishName'),
       nativeName: _requiredString(json, 'nativeName'),
       reviewScope: _requiredString(json, 'reviewScope'),
+      exceptionalGates: parseStreamlinedLocaleExceptionalGates(
+        json['exceptionalGates'],
+        allowAbsent: true,
+      ),
     );
   }
 
@@ -43,6 +49,7 @@ final class StreamlinedLocaleBatchEntry {
   final String englishName;
   final String nativeName;
   final String reviewScope;
+  final Map<String, bool> exceptionalGates;
 
   String get planPath => 'localization/plans/$locale.json';
 
@@ -216,6 +223,8 @@ List<String> streamlinedLocaleBatchArguments({
     entry.englishName,
     entry.nativeName,
     entry.reviewScope,
+    if (!_exceptionalGatesAreClosed(entry.exceptionalGates))
+      jsonEncode(entry.exceptionalGates),
   ],
   StreamlinedLocaleBatchOperation.prepare => [
     'prepare',
@@ -414,7 +423,11 @@ List<String> _preflight({
             plan.nativeName != entry.nativeName ||
             plan.reviewScope != entry.reviewScope ||
             plan.sourceCatalog != manifest.sourceCatalog ||
-            plan.sourceCatalogSha256 != manifest.sourceCatalogSha256) {
+            plan.sourceCatalogSha256 != manifest.sourceCatalogSha256 ||
+            !_exceptionalGatesEqual(
+              plan.exceptionalGates,
+              entry.exceptionalGates,
+            )) {
           errors.add('${entry.locale}:plan_manifest_lock_mismatch');
         }
       } on Object {
@@ -465,6 +478,13 @@ List<String> _preflight({
   }
   return errors;
 }
+
+bool _exceptionalGatesAreClosed(Map<String, bool> gates) =>
+    _exceptionalGatesEqual(gates, streamlinedLocaleClosedExceptionalGates);
+
+bool _exceptionalGatesEqual(Map<String, bool> left, Map<String, bool> right) =>
+    left.length == right.length &&
+    left.entries.every((entry) => right[entry.key] == entry.value);
 
 void _verifySourceLock(StreamlinedLocaleBatchManifest manifest) {
   final source = File(manifest.sourceCatalog);

@@ -75,10 +75,31 @@ metadata:
       "englishName": "Brazilian Portuguese",
       "nativeName": "Português (Brasil)",
       "reviewScope": "brazilian_portuguese"
+    },
+    {
+      "locale": "ja",
+      "englishName": "Japanese",
+      "nativeName": "日本語",
+      "reviewScope": "japanese_cjk",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": true,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      }
     }
   ]
 }
 ```
+
+`exceptionalGates` is optional for an ordinary locale and defaults to all five
+closed (`false`). When present, it must contain all five boolean gates. This
+lets one mixed batch declare locale-specific work before initialization. For
+example, Japanese and Korean remain left-to-right in the app but set
+`fontCoverage` to `true` so glyph coverage, fallback fonts, wrapping, and CJK
+line breaking require explicit evidence before activation. A locale that needs
+right-to-left layout instead sets `rightToLeft` to `true`.
 
 The batch is deliberately bounded to ten locales and five simultaneous child
 operations. Three locales with `maxParallelism: 3` is the recommended first
@@ -136,6 +157,11 @@ Run from the repository root. French is shown only as an example:
 dart run tool/localization_streamlined_pipeline.dart \
   init fr French Français general_french
 ```
+
+The optional final argument is a quoted JSON object containing all five
+exceptional gates. The batch orchestrator supplies it automatically whenever a
+locale has a non-default gate; direct single-locale initialization normally
+omits it.
 
 This creates `localization/plans/fr.json` with the exact current English
 catalog hash and deterministic candidate, audit, approval, and runtime paths.

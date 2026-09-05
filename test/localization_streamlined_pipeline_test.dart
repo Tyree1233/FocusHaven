@@ -164,6 +164,30 @@ void main() {
     expect(plan.arbLocale, 'pt_BR');
     expect(plan.runtimeCatalog, 'lib/l10n/app_pt_BR.arb');
   });
+
+  test('parses only complete boolean exceptional locale gates', () {
+    final cjkGates = {
+      ...streamlinedLocaleClosedExceptionalGates,
+      'fontCoverage': true,
+    };
+
+    expect(parseStreamlinedLocaleExceptionalGates(cjkGates), cjkGates);
+    expect(
+      parseStreamlinedLocaleExceptionalGates(null, allowAbsent: true),
+      streamlinedLocaleClosedExceptionalGates,
+    );
+    expect(
+      () => parseStreamlinedLocaleExceptionalGates({'fontCoverage': true}),
+      throwsFormatException,
+    );
+    expect(
+      () => parseStreamlinedLocaleExceptionalGates({
+        ...streamlinedLocaleClosedExceptionalGates,
+        'rightToLeft': 'false',
+      }),
+      throwsFormatException,
+    );
+  });
 }
 
 StreamlinedLocalePlan _plan() => StreamlinedLocalePlan.fromJson({

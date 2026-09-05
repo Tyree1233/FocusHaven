@@ -5,6 +5,46 @@ import 'localization_catalog_qualification.dart';
 
 const streamlinedLocaleWorkflow = 'focus_haven_streamlined_locale_v1';
 const streamlinedLocaleSourceCatalog = 'lib/l10n/app_en.arb';
+const streamlinedLocaleExceptionalGateNames = {
+  'rightToLeft',
+  'fontCoverage',
+  'physicalScreenReader',
+  'physicalSpeechRecognition',
+  'storePromotion',
+};
+const streamlinedLocaleClosedExceptionalGates = {
+  'rightToLeft': false,
+  'fontCoverage': false,
+  'physicalScreenReader': false,
+  'physicalSpeechRecognition': false,
+  'storePromotion': false,
+};
+
+Map<String, bool> parseStreamlinedLocaleExceptionalGates(
+  Object? value, {
+  bool allowAbsent = false,
+}) {
+  if (value == null && allowAbsent) {
+    return Map<String, bool>.of(streamlinedLocaleClosedExceptionalGates);
+  }
+  if (value is! Map<String, dynamic>) {
+    throw const FormatException('exceptionalGates must be an object.');
+  }
+  if (value.keys
+          .toSet()
+          .difference(streamlinedLocaleExceptionalGateNames)
+          .isNotEmpty ||
+      streamlinedLocaleExceptionalGateNames
+          .difference(value.keys.toSet())
+          .isNotEmpty ||
+      value.values.any((gate) => gate is! bool)) {
+    throw const FormatException('exceptionalGates has an invalid schema.');
+  }
+  return {
+    for (final name in streamlinedLocaleExceptionalGateNames)
+      name: value[name] as bool,
+  };
+}
 
 enum LocaleReviewRisk { critical, elevated, standard }
 
@@ -45,27 +85,9 @@ final class StreamlinedLocalePlan {
       throw const FormatException('Locale must be a canonical language tag.');
     }
 
-    final exceptionalGatesValue = json['exceptionalGates'];
-    if (exceptionalGatesValue is! Map<String, dynamic>) {
-      throw const FormatException('exceptionalGates must be an object.');
-    }
-    const exceptionalGateNames = {
-      'rightToLeft',
-      'fontCoverage',
-      'physicalScreenReader',
-      'physicalSpeechRecognition',
-      'storePromotion',
-    };
-    if (exceptionalGatesValue.keys
-            .toSet()
-            .difference(exceptionalGateNames)
-            .isNotEmpty ||
-        exceptionalGateNames
-            .difference(exceptionalGatesValue.keys.toSet())
-            .isNotEmpty ||
-        exceptionalGatesValue.values.any((value) => value is! bool)) {
-      throw const FormatException('exceptionalGates has an invalid schema.');
-    }
+    final exceptionalGates = parseStreamlinedLocaleExceptionalGates(
+      json['exceptionalGates'],
+    );
 
     final plan = StreamlinedLocalePlan(
       locale: locale,
@@ -79,9 +101,7 @@ final class StreamlinedLocalePlan {
       approvedCatalog: _requiredString(json, 'approvedCatalog'),
       validationRecord: _requiredString(json, 'validationRecord'),
       runtimeCatalog: _requiredString(json, 'runtimeCatalog'),
-      exceptionalGates: exceptionalGatesValue.map(
-        (key, value) => MapEntry(key, value as bool),
-      ),
+      exceptionalGates: exceptionalGates,
     );
     plan._validatePaths();
     return plan;
@@ -535,7 +555,7 @@ void main(List<String> arguments) {
   try {
     switch (arguments.first) {
       case 'init':
-        if (arguments.length != 5) {
+        if (arguments.length != 5 && arguments.length != 6) {
           _badUsage();
           return;
         }
@@ -544,6 +564,9 @@ void main(List<String> arguments) {
           englishName: arguments[2],
           nativeName: arguments[3],
           reviewScope: arguments[4],
+          exceptionalGates: arguments.length == 6
+              ? parseStreamlinedLocaleExceptionalGates(jsonDecode(arguments[5]))
+              : Map<String, bool>.of(streamlinedLocaleClosedExceptionalGates),
         );
         return;
       case 'prepare':
@@ -582,6 +605,7 @@ void _initializePlan({
   required String englishName,
   required String nativeName,
   required String reviewScope,
+  required Map<String, bool> exceptionalGates,
 }) {
   if (!RegExp(r'^[a-z]{2,3}(?:-[A-Z]{2})?$').hasMatch(locale)) {
     throw const FormatException('Locale must look like fr or pt-BR.');
@@ -606,13 +630,7 @@ void _initializePlan({
     validationRecord:
         'localization/reviews/$locale/private-human-validation.json',
     runtimeCatalog: 'lib/l10n/app_$arb.arb',
-    exceptionalGates: const {
-      'rightToLeft': false,
-      'fontCoverage': false,
-      'physicalScreenReader': false,
-      'physicalSpeechRecognition': false,
-      'storePromotion': false,
-    },
+    exceptionalGates: exceptionalGates,
   );
   File(path).parent.createSync(recursive: true);
   File(path).writeAsStringSync(_prettyJson(plan.toJson()));
@@ -1064,7 +1082,7 @@ void _badUsage() {
 void _usage() {
   stderr.writeln('''
 Usage:
-  dart run tool/localization_streamlined_pipeline.dart init <locale> <English name> <native name> <review scope>
+  dart run tool/localization_streamlined_pipeline.dart init <locale> <English name> <native name> <review scope> [exceptional-gates.json]
   dart run tool/localization_streamlined_pipeline.dart prepare <plan.json> <translations.json> <private-review.csv>
   dart run tool/localization_streamlined_pipeline.dart accept <plan.json> <completed-private-review.csv>
   dart run tool/localization_streamlined_pipeline.dart verify <plan.json>
