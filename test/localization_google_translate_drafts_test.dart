@@ -171,6 +171,108 @@ void main() {
     );
   });
 
+  test('reports every source-equal configuration mismatch in one pass', () {
+    expect(
+      () => buildGoogleTranslationDraftBundleFromTranslations(
+        plan: _plan('id'),
+        localeConfig: const GoogleTranslationDraftLocaleConfig(
+          targetLanguageCode: 'id',
+          glossary:
+              'projects/focushaven-l10n/locations/us-central1/glossaries/focus-id',
+          approvedSourceEqual: {
+            'duration': 'A human approved this source-equal value.',
+          },
+        ),
+        source: _source(),
+        translations: const {
+          'appTitle': 'FocusHaven',
+          'greeting': 'Hello, {name}',
+          'duration': 'Jeda selama 60 menit',
+        },
+      ),
+      throwsA(
+        isA<GoogleTranslationDraftFailure>()
+            .having((error) => error.allCodes, 'allCodes', const [
+              'unapproved_source_equal:appTitle',
+              'stale_source_equal_approval:duration',
+              'unapproved_source_equal:greeting',
+            ]),
+      ),
+    );
+  });
+
+  test('private quarantine is exact, complete, and provider-bound', () {
+    final manifest = _sixLocaleManifest();
+    final config = GoogleTranslationDraftConfig.fromJson(
+      _providerConfigJson(manifest),
+    );
+    final plan = _plan('id');
+    final localeConfig = config.locales['id']!;
+    const translations = {
+      'appTitle': 'FocusHaven',
+      'greeting': 'Halo, {name}',
+      'duration': 'Jeda selama 60 menit',
+    };
+    final quarantine = buildGoogleTranslationDraftQuarantine(
+      plan: plan,
+      config: config,
+      localeConfig: localeConfig,
+      translations: translations,
+    );
+
+    expect(
+      verifyGoogleTranslationDraftQuarantine(
+        quarantine: quarantine,
+        plan: plan,
+        config: config,
+        localeConfig: localeConfig,
+        source: _source(),
+      ),
+      translations,
+    );
+    expect(quarantine['workflow'], googleTranslationDraftQuarantineWorkflow);
+    expect(quarantine.containsKey('createdAt'), isFalse);
+
+    final changed = Map<String, dynamic>.of(quarantine)
+      ..['projectId'] = 'another-project';
+    expect(
+      () => verifyGoogleTranslationDraftQuarantine(
+        quarantine: changed,
+        plan: plan,
+        config: config,
+        localeConfig: localeConfig,
+        source: _source(),
+      ),
+      throwsA(
+        isA<GoogleTranslationDraftFailure>().having(
+          (error) => error.code,
+          'code',
+          'quarantine_binding_mismatch',
+        ),
+      ),
+    );
+  });
+
+  test('locale result exposes safe diagnostics and recovery state', () {
+    const result = GoogleTranslationDraftLocaleResult(
+      locale: 'id',
+      passed: false,
+      requestCount: 11,
+      messageCount: 980,
+      codePointCount: 46873,
+      errorCode: 'unapproved_source_equal:accountPro',
+      diagnosticCodes: [
+        'unapproved_source_equal:accountPro',
+        'unapproved_source_equal:proTitle',
+      ],
+      quarantineState: 'preserved',
+    );
+
+    expect(result.toJson()['quarantineState'], 'preserved');
+    expect(result.toJson()['diagnosticCodes'], hasLength(2));
+    expect(result.toJson().toString(), isNot(contains('translatedText')));
+  });
+
   test(
     'rejects malformed provider output without exposing response text',
     () async {

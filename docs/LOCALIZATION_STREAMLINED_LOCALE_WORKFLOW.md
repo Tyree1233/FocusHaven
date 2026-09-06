@@ -185,8 +185,14 @@ The adapter deliberately keeps provider access outside the repository:
 - it chunks the 980 messages into requests of no more than 5,000 code points;
 - it never prints source copy, translations, access tokens, provider response
   bodies, or provider request identifiers;
-- it refuses existing outputs and writes a bundle only after the complete
-  locale passes the ordinary structural and content-safety preparation gate;
+- it refuses existing state before a new provider run, privately checkpoints
+  each complete provider response before local policy checks, and restricts
+  both checkpoints and accepted bundles to the local account;
+- it reports every source-equal or content-safety diagnostic key from a
+  completed response instead of stopping at the first mismatch;
+- it writes the ordinary bundle only after the complete locale passes the
+  structural and content-safety preparation gate, then removes its consumed
+  checkpoint;
 - one provider or safety failure remains isolated to that locale; and
 - every generated draft still requires the complete private fluent review,
   acceptance, integration, test, build, and activation gates below.
@@ -238,6 +244,26 @@ dart run tool/localization_google_translate_drafts.dart translate \
   /private/path/google-translation-config.json \
   /private/path/translation-bundles
 ```
+
+If Google completed a locale but a local source-equal or content-safety rule
+refused it, the locale's complete response remains outside Git as
+`focushaven-<locale>-quarantine.json`. Correct only the private policy input,
+then revalidate every preserved response without spending more provider quota:
+
+```bash
+dart run tool/localization_google_translate_drafts.dart resume \
+  /private/path/locale-batch.json \
+  /private/path/google-translation-config.json \
+  /private/path/translation-bundles
+```
+
+`resume` never authenticates to Google or sends a request. It requires each
+locale to have exactly one accepted bundle or one provider-bound quarantine,
+rechecks the source, project, location, model, glossary, locale, message set,
+source-equal configuration, structural rules, and content-safety rules, and
+keeps a refused quarantine intact. Existing accepted bundles are verified and
+reused. Quarantines never contain app runtime data, but they can contain
+unapproved machine translations and therefore remain private and outside Git.
 
 The output names remain
 `focushaven-<locale>-translations.json`, so the ordinary batch `prepare`

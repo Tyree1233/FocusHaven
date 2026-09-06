@@ -755,8 +755,11 @@ reviewed-to-runtime catalog locks.
 An optional development-only Google Cloud Translation Advanced adapter can now
 create those private machine-assisted input bundles from the locked public
 English catalog. It requires one locale-specific glossary, refuses API keys
-and repository-local output, keeps provider failures isolated, and applies the
-same structural and content-safety gate before writing any bundle. Google
+and repository-local output, keeps provider failures isolated, and privately
+checkpoints completed provider responses before applying the same structural
+and content-safety gate. A local-only resume pass revalidates those checkpoints
+after a policy correction without another paid request, and reports all safe
+diagnostic keys at once instead of revealing translation text. Google
 output remains an unapproved draft: every message still requires private
 fluent review, and the adapter cannot create a runtime catalog or activate a
 language.

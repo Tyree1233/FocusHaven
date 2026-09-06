@@ -7,14 +7,25 @@ import 'localization_streamlined_pipeline.dart';
 
 const googleTranslationDraftWorkflow =
     'focus_haven_google_translation_drafts_v1';
+const googleTranslationDraftQuarantineWorkflow =
+    'focus_haven_google_translation_quarantine_v1';
 const googleTranslationDraftLocation = 'us-central1';
 const googleTranslationDraftModel = 'general/nmt';
 const googleTranslationRecommendedCodePointLimit = 5000;
 
 final class GoogleTranslationDraftFailure implements Exception {
-  const GoogleTranslationDraftFailure(this.code);
+  const GoogleTranslationDraftFailure(this.code) : diagnosticCodes = const [];
+
+  GoogleTranslationDraftFailure.withDiagnostics(List<String> codes)
+    : assert(codes.isNotEmpty),
+      code = codes.first,
+      diagnosticCodes = List<String>.unmodifiable(codes);
 
   final String code;
+  final List<String> diagnosticCodes;
+
+  List<String> get allCodes =>
+      diagnosticCodes.isEmpty ? <String>[code] : diagnosticCodes;
 
   @override
   String toString() => code;
@@ -189,6 +200,9 @@ final class GoogleTranslationDraftLocaleResult {
     required this.messageCount,
     required this.codePointCount,
     required this.errorCode,
+    this.diagnosticCodes = const [],
+    this.quarantineState = 'not_created',
+    this.reusedExistingBundle = false,
   });
 
   final String locale;
@@ -197,6 +211,9 @@ final class GoogleTranslationDraftLocaleResult {
   final int messageCount;
   final int codePointCount;
   final String? errorCode;
+  final List<String> diagnosticCodes;
+  final String quarantineState;
+  final bool reusedExistingBundle;
 
   Map<String, dynamic> toJson() => {
     'locale': locale,
@@ -205,6 +222,9 @@ final class GoogleTranslationDraftLocaleResult {
     'messageCount': messageCount,
     'codePointCount': codePointCount,
     if (errorCode != null) 'errorCode': errorCode,
+    if (diagnosticCodes.isNotEmpty) 'diagnosticCodes': diagnosticCodes,
+    'quarantineState': quarantineState,
+    'reusedExistingBundle': reusedExistingBundle,
   };
 }
 
@@ -270,7 +290,7 @@ List<GoogleTranslationDraftChunk> buildGoogleTranslationDraftChunks({
   return chunks;
 }
 
-Future<Map<String, dynamic>> buildGoogleTranslationDraftBundle({
+Future<Map<String, String>> fetchGoogleTranslationDraftTranslations({
   required StreamlinedLocalePlan plan,
   required GoogleTranslationDraftLocaleConfig localeConfig,
   required Map<String, dynamic> source,
@@ -278,13 +298,17 @@ Future<Map<String, dynamic>> buildGoogleTranslationDraftBundle({
   required GoogleTranslationDraftSender sender,
 }) async {
   final sourceKeys = source.keys.where((key) => !key.startsWith('@')).toSet();
-  final configuredSourceEqualKeys = localeConfig.approvedSourceEqual.keys
-      .toSet();
-  for (final key
-      in configuredSourceEqualKeys.difference(sourceKeys).toList()..sort()) {
-    throw GoogleTranslationDraftFailure('unknown_source_equal_key:$key');
+  final unknownSourceEqualKeys =
+      localeConfig.approvedSourceEqual.keys
+          .toSet()
+          .difference(sourceKeys)
+          .toList()
+        ..sort();
+  if (unknownSourceEqualKeys.isNotEmpty) {
+    throw GoogleTranslationDraftFailure.withDiagnostics([
+      for (final key in unknownSourceEqualKeys) 'unknown_source_equal_key:$key',
+    ]);
   }
-
   final translations = <String, String>{};
   final chunks = buildGoogleTranslationDraftChunks(
     source: source,
@@ -310,17 +334,47 @@ Future<Map<String, dynamic>> buildGoogleTranslationDraftBundle({
       translations[key] = value;
     }
   }
+  return translations;
+}
+
+Map<String, dynamic> buildGoogleTranslationDraftBundleFromTranslations({
+  required StreamlinedLocalePlan plan,
+  required GoogleTranslationDraftLocaleConfig localeConfig,
+  required Map<String, dynamic> source,
+  required Map<String, String> translations,
+}) {
+  final sourceKeys = source.keys.where((key) => !key.startsWith('@')).toSet();
+  final translationKeys = translations.keys.toSet();
+  final configuredSourceEqualKeys = localeConfig.approvedSourceEqual.keys
+      .toSet();
+  final diagnostics = <String>[
+    for (final key
+        in configuredSourceEqualKeys.difference(sourceKeys).toList()..sort())
+      'unknown_source_equal_key:$key',
+    for (final key in sourceKeys.difference(translationKeys).toList()..sort())
+      'missing_provider_translation:$key',
+    for (final key in translationKeys.difference(sourceKeys).toList()..sort())
+      'extra_provider_translation:$key',
+  ];
 
   for (final key in sourceKeys.toList()..sort()) {
     final sourceText = source[key];
     final translation = translations[key];
+    if (translation == null) continue;
+    if (translation.trim().isEmpty || translation.contains('\u0000')) {
+      diagnostics.add('invalid_provider_value:$key');
+      continue;
+    }
     final configured = configuredSourceEqualKeys.contains(key);
     if (translation == sourceText && !configured) {
-      throw GoogleTranslationDraftFailure('unapproved_source_equal:$key');
+      diagnostics.add('unapproved_source_equal:$key');
     }
     if (translation != sourceText && configured) {
-      throw GoogleTranslationDraftFailure('stale_source_equal_approval:$key');
+      diagnostics.add('stale_source_equal_approval:$key');
     }
+  }
+  if (diagnostics.isNotEmpty) {
+    throw GoogleTranslationDraftFailure.withDiagnostics(diagnostics);
   }
 
   final bundle = <String, dynamic>{
@@ -337,12 +391,103 @@ Future<Map<String, dynamic>> buildGoogleTranslationDraftBundle({
     translationBundle: bundle,
   );
   if (!prepared.passed) {
-    final first = prepared.errors.isEmpty
-        ? 'unknown'
-        : prepared.errors.first.replaceAll(':', '_');
-    throw GoogleTranslationDraftFailure('draft_safety_refused:$first');
+    final errors = prepared.errors.isEmpty
+        ? const ['draft_safety_refused:unknown']
+        : [
+            for (final error in prepared.errors)
+              'draft_safety_refused:${error.replaceAll(':', '_')}',
+          ];
+    throw GoogleTranslationDraftFailure.withDiagnostics(errors);
   }
   return bundle;
+}
+
+Future<Map<String, dynamic>> buildGoogleTranslationDraftBundle({
+  required StreamlinedLocalePlan plan,
+  required GoogleTranslationDraftLocaleConfig localeConfig,
+  required Map<String, dynamic> source,
+  required int maxCodePointsPerRequest,
+  required GoogleTranslationDraftSender sender,
+}) async {
+  final translations = await fetchGoogleTranslationDraftTranslations(
+    plan: plan,
+    localeConfig: localeConfig,
+    source: source,
+    maxCodePointsPerRequest: maxCodePointsPerRequest,
+    sender: sender,
+  );
+  return buildGoogleTranslationDraftBundleFromTranslations(
+    plan: plan,
+    localeConfig: localeConfig,
+    source: source,
+    translations: translations,
+  );
+}
+
+Map<String, dynamic> buildGoogleTranslationDraftQuarantine({
+  required StreamlinedLocalePlan plan,
+  required GoogleTranslationDraftConfig config,
+  required GoogleTranslationDraftLocaleConfig localeConfig,
+  required Map<String, String> translations,
+}) => {
+  'schemaVersion': 1,
+  'workflow': googleTranslationDraftQuarantineWorkflow,
+  'locale': plan.locale,
+  'sourceCatalogSha256': plan.sourceCatalogSha256,
+  'provider': 'google_cloud_translation_advanced_v3',
+  'projectId': config.projectId,
+  'location': config.location,
+  'model': config.model,
+  'glossary': localeConfig.glossary,
+  'translations': translations,
+};
+
+Map<String, String> verifyGoogleTranslationDraftQuarantine({
+  required Map<String, dynamic> quarantine,
+  required StreamlinedLocalePlan plan,
+  required GoogleTranslationDraftConfig config,
+  required GoogleTranslationDraftLocaleConfig localeConfig,
+  required Map<String, dynamic> source,
+}) {
+  _requireExactKeys(quarantine, const {
+    'schemaVersion',
+    'workflow',
+    'locale',
+    'sourceCatalogSha256',
+    'provider',
+    'projectId',
+    'location',
+    'model',
+    'glossary',
+    'translations',
+  }, 'Google translation quarantine');
+  if (quarantine['schemaVersion'] != 1 ||
+      quarantine['workflow'] != googleTranslationDraftQuarantineWorkflow ||
+      quarantine['locale'] != plan.locale ||
+      quarantine['sourceCatalogSha256'] != plan.sourceCatalogSha256 ||
+      quarantine['provider'] != 'google_cloud_translation_advanced_v3' ||
+      quarantine['projectId'] != config.projectId ||
+      quarantine['location'] != config.location ||
+      quarantine['model'] != config.model ||
+      quarantine['glossary'] != localeConfig.glossary) {
+    throw const GoogleTranslationDraftFailure('quarantine_binding_mismatch');
+  }
+  final translations = _strictStringMap(
+    quarantine['translations'],
+    'quarantine translations',
+  );
+  final sourceKeys = source.keys.where((key) => !key.startsWith('@')).toSet();
+  final translationKeys = translations.keys.toSet();
+  if (sourceKeys.length != translationKeys.length ||
+      !sourceKeys.containsAll(translationKeys) ||
+      translations.values.any(
+        (value) => value.trim().isEmpty || value.contains('\u0000'),
+      )) {
+    throw const GoogleTranslationDraftFailure(
+      'quarantine_translation_schema_mismatch',
+    );
+  }
+  return translations;
 }
 
 void verifyGoogleTranslationDraftConfiguration({
@@ -361,7 +506,7 @@ void verifyGoogleTranslationDraftConfiguration({
 
 Future<void> main(List<String> arguments) async {
   if (arguments.length != 4 ||
-      !const {'preflight', 'translate'}.contains(arguments.first)) {
+      !const {'preflight', 'translate', 'resume'}.contains(arguments.first)) {
     _usage();
     exitCode = 64;
     return;
@@ -382,7 +527,11 @@ Future<void> main(List<String> arguments) async {
     );
     _verifySourceAndPlans(manifest);
     _requirePrivateDirectory(outputDirectory);
-    _refuseExistingOutputs(manifest, outputDirectory);
+    if (operation == 'resume') {
+      _requireResumableDraftState(manifest, outputDirectory);
+    } else {
+      _refuseExistingDraftState(manifest, outputDirectory);
+    }
     final source = _jsonObject(manifest.sourceCatalog);
     final chunks = buildGoogleTranslationDraftChunks(
       source: source,
@@ -413,71 +562,138 @@ Future<void> main(List<String> arguments) async {
           'humanReviewRequired': true,
           'runtimeActivated': false,
           'externalRequestMade': false,
+          'recoverablePrivateQuarantineEnabled': true,
         }),
       );
       return;
     }
 
-    final accessToken = await _googleAccessToken();
-    final client = _GoogleTranslationRestClient(
-      projectId: config.projectId,
-      location: config.location,
-      modelResource: config.modelResource,
-      accessToken: accessToken,
-    );
+    final client = operation == 'translate'
+        ? _GoogleTranslationRestClient(
+            projectId: config.projectId,
+            location: config.location,
+            modelResource: config.modelResource,
+            accessToken: await _googleAccessToken(),
+          )
+        : null;
     final results = await _concurrentMap(
       manifest.locales,
       manifest.maxParallelism,
       (entry) async {
         final outputPath = entry.translationBundlePath(outputDirectory);
+        final quarantinePath = _quarantinePath(outputDirectory, entry.locale);
         try {
           final plan = StreamlinedLocalePlan.fromJson(
             _jsonObject(entry.planPath),
           );
-          final bundle = await buildGoogleTranslationDraftBundle(
+          final localeConfig = config.locales[entry.locale]!;
+          if (operation == 'resume' && File(outputPath).existsSync()) {
+            final existing = _jsonObject(outputPath);
+            final translations = _strictStringMap(
+              existing['translations'],
+              '${entry.locale} existing bundle translations',
+            );
+            final expected = buildGoogleTranslationDraftBundleFromTranslations(
+              plan: plan,
+              localeConfig: localeConfig,
+              source: source,
+              translations: translations,
+            );
+            if (_prettyJson(existing) != _prettyJson(expected)) {
+              throw const GoogleTranslationDraftFailure(
+                'existing_bundle_lock_mismatch',
+              );
+            }
+            return GoogleTranslationDraftLocaleResult(
+              locale: entry.locale,
+              passed: true,
+              requestCount: 0,
+              messageCount: translations.length,
+              codePointCount: codePointCount,
+              errorCode: null,
+              quarantineState: 'not_present',
+              reusedExistingBundle: true,
+            );
+          }
+
+          late final Map<String, String> translations;
+          if (operation == 'translate') {
+            translations = await fetchGoogleTranslationDraftTranslations(
+              plan: plan,
+              localeConfig: localeConfig,
+              source: source,
+              maxCodePointsPerRequest: config.maxCodePointsPerRequest,
+              sender: client!.translate,
+            );
+            final quarantine = buildGoogleTranslationDraftQuarantine(
+              plan: plan,
+              config: config,
+              localeConfig: localeConfig,
+              translations: translations,
+            );
+            _writePrivateNew(quarantinePath, _prettyJson(quarantine));
+          } else {
+            translations = verifyGoogleTranslationDraftQuarantine(
+              quarantine: _jsonObject(quarantinePath),
+              plan: plan,
+              config: config,
+              localeConfig: localeConfig,
+              source: source,
+            );
+          }
+          final bundle = buildGoogleTranslationDraftBundleFromTranslations(
             plan: plan,
-            localeConfig: config.locales[entry.locale]!,
+            localeConfig: localeConfig,
             source: source,
-            maxCodePointsPerRequest: config.maxCodePointsPerRequest,
-            sender: client.translate,
+            translations: translations,
           );
-          _writeNew(outputPath, _prettyJson(bundle));
+          _writePrivateNew(outputPath, _prettyJson(bundle));
+          File(quarantinePath).deleteSync();
           return GoogleTranslationDraftLocaleResult(
             locale: entry.locale,
             passed: true,
-            requestCount: chunks.length,
+            requestCount: operation == 'translate' ? chunks.length : 0,
             messageCount: source.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
             codePointCount: codePointCount,
             errorCode: null,
+            quarantineState: 'consumed',
           );
         } on GoogleTranslationDraftFailure catch (error) {
           return GoogleTranslationDraftLocaleResult(
             locale: entry.locale,
             passed: false,
-            requestCount: chunks.length,
+            requestCount: operation == 'translate' ? chunks.length : 0,
             messageCount: source.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
             codePointCount: codePointCount,
             errorCode: error.code,
+            diagnosticCodes: error.allCodes,
+            quarantineState: File(quarantinePath).existsSync()
+                ? 'preserved'
+                : 'not_created',
           );
         } on Object {
           return GoogleTranslationDraftLocaleResult(
             locale: entry.locale,
             passed: false,
-            requestCount: chunks.length,
+            requestCount: operation == 'translate' ? chunks.length : 0,
             messageCount: source.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
             codePointCount: codePointCount,
             errorCode: 'unexpected_local_failure',
+            diagnosticCodes: const ['unexpected_local_failure'],
+            quarantineState: File(quarantinePath).existsSync()
+                ? 'preserved'
+                : 'not_created',
           );
         }
       },
     );
-    client.close();
+    client?.close();
     final passed = results.every((result) => result.passed);
     stdout.writeln(
       _prettyJson({
@@ -492,11 +708,15 @@ Future<void> main(List<String> arguments) async {
         'locales': results.map((result) => result.toJson()).toList(),
         'humanReviewRequired': true,
         'runtimeActivated': false,
+        'externalRequestMade': operation == 'translate',
+        'recoverablePrivateQuarantineEnabled': true,
       }),
     );
     if (!passed) exitCode = 65;
   } on GoogleTranslationDraftFailure catch (error) {
-    stderr.writeln('Google translation draft failed: ${error.code}');
+    stderr.writeln(
+      'Google translation draft failed: ${error.allCodes.join(',')}',
+    );
     exitCode = 65;
   } on Object {
     stderr.writeln('Google translation draft failed: invalid_local_input');
@@ -647,15 +867,45 @@ void _requirePrivateFile(String path) {
   }
 }
 
-void _refuseExistingOutputs(
+String _quarantinePath(String outputDirectory, String locale) =>
+    '${Directory(outputDirectory).absolute.path}'
+    '${Platform.pathSeparator}focushaven-$locale-quarantine.json';
+
+void _refuseExistingDraftState(
   StreamlinedLocaleBatchManifest manifest,
   String outputDirectory,
 ) {
   for (final entry in manifest.locales) {
-    final path = entry.translationBundlePath(outputDirectory);
-    if (File(path).existsSync() || Directory(path).existsSync()) {
+    final outputPath = entry.translationBundlePath(outputDirectory);
+    final quarantinePath = _quarantinePath(outputDirectory, entry.locale);
+    if (File(outputPath).existsSync() || Directory(outputPath).existsSync()) {
       throw GoogleTranslationDraftFailure(
         'refusing_existing_output:${entry.locale}',
+      );
+    }
+    if (File(quarantinePath).existsSync() ||
+        Directory(quarantinePath).existsSync()) {
+      throw GoogleTranslationDraftFailure(
+        'refusing_existing_quarantine:${entry.locale}',
+      );
+    }
+  }
+}
+
+void _requireResumableDraftState(
+  StreamlinedLocaleBatchManifest manifest,
+  String outputDirectory,
+) {
+  for (final entry in manifest.locales) {
+    final outputPath = entry.translationBundlePath(outputDirectory);
+    final quarantinePath = _quarantinePath(outputDirectory, entry.locale);
+    final hasOutput = File(outputPath).existsSync();
+    final hasQuarantine = File(quarantinePath).existsSync();
+    if (Directory(outputPath).existsSync() ||
+        Directory(quarantinePath).existsSync() ||
+        hasOutput == hasQuarantine) {
+      throw GoogleTranslationDraftFailure(
+        'invalid_resume_state:${entry.locale}',
       );
     }
   }
@@ -670,6 +920,18 @@ void _writeNew(String path, String contents) {
   } on Object {
     if (file.existsSync()) file.deleteSync();
     rethrow;
+  }
+}
+
+void _writePrivateNew(String path, String contents) {
+  _writeNew(path, contents);
+  final result = Process.runSync('chmod', ['600', path]);
+  if (result.exitCode != 0) {
+    final file = File(path);
+    if (file.existsSync()) file.deleteSync();
+    throw const GoogleTranslationDraftFailure(
+      'private_output_permission_failure',
+    );
   }
 }
 
@@ -749,5 +1011,6 @@ void _usage() {
 Usage:
   dart run tool/localization_google_translate_drafts.dart preflight <batch.json> <private-provider-config.json> <private-output-directory>
   dart run tool/localization_google_translate_drafts.dart translate <batch.json> <private-provider-config.json> <private-output-directory>
+  dart run tool/localization_google_translate_drafts.dart resume <batch.json> <private-provider-config.json> <private-output-directory>
 ''');
 }
