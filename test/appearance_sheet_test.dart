@@ -113,7 +113,7 @@ void main() {
     await tester.pump();
 
     const languageSummary =
-        'English / Español / Français / Deutsch / Português (Brasil) / 日本語 / 한국어';
+        'English / Español / Français / Deutsch / Português (Brasil) / 日本語 / 한국어 / Italiano / Polski / Nederlands';
     expect(find.text(languageSummary), findsOneWidget);
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     expect(find.text('English'), findsOneWidget);
@@ -123,6 +123,9 @@ void main() {
     expect(find.text('Português (Brasil)'), findsOneWidget);
     expect(find.text('日本語'), findsOneWidget);
     expect(find.text('한국어'), findsOneWidget);
+    expect(find.text('Italiano'), findsOneWidget);
+    expect(find.text('Polski'), findsOneWidget);
+    expect(find.text('Nederlands'), findsOneWidget);
 
     await tester.tap(find.text('Español'));
     await tester.pumpAndSettle();

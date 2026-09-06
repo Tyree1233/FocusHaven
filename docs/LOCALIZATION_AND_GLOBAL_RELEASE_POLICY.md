@@ -1,8 +1,8 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Spanish, French, German, Brazilian Portuguese, Japanese, and Korean
-in-app production activation; English remains the fallback and store promotion
-remains separate
+Status: Spanish, French, German, Brazilian Portuguese, Japanese, Korean,
+Italian, Polish, and Dutch in-app production activation; English remains the
+fallback and store promotion remains separate
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -13,8 +13,8 @@ country release readiness.
 
 - English (`en`) is the source catalog and fallback production locale.
 - Spanish (`es`), French (`fr`), German (`de`), Brazilian Portuguese
-  (`pt-BR`), Japanese (`ja`), and Korean (`ko`) are reviewed production
-  runtime locales.
+  (`pt-BR`), Japanese (`ja`), Korean (`ko`), Italian (`it`), Polish (`pl`),
+  and Dutch (`nl`) are reviewed production runtime locales.
 - Planned locales are not exposed by the production
   `MaterialApp.supportedLocales` allowlist. In-app locale support and localized
   Apple or Google store promotion are separate decisions.
@@ -188,8 +188,9 @@ locale in the production allowlist.
 Phase 215G-E1 activates the exact reviewed Spanish catalog without changing
 its 980 messages. FocusHaven follows a supported device language by default
 and provides locally stored, reversible Device, English, Español, Français,
-Deutsch, and Português (Brasil) choices inside Appearance. Unsupported device
-languages fall back to English. Spanish Local Coach adds a bounded fail-safe
+Deutsch, Português (Brasil), 日本語, 한국어, Italiano, Polski, and Nederlands
+choices inside Appearance. Unsupported device languages fall back to English.
+Spanish Local Coach adds a bounded fail-safe
 set for immediate-safety and stop/space requests. Spanish Haven actions
 continue to reject unrecognized commands, and Enhanced AI remains disabled;
 those limited features do not prevent the reviewed interface from being used
@@ -232,6 +233,22 @@ fail-closed. The correction changed no translation or Android debug behavior.
 Normal production artifacts were restored and audited on both platforms.
 Japanese and Korean are therefore active in the registry-driven in-app picker;
 speech recognition remains fail-closed, and store and country promotion remain separate.
+
+Italian, Polish, and Dutch form the first three-locale Latin-script production
+batch after the content-safety pipeline was hardened from the Japanese and
+Korean review findings. Each exact 980-message candidate received a complete
+independent fluent review and anonymous validation record. Italian records 596
+acceptances, 384 revisions, zero blocks, and seven explicitly approved
+source-equal values. Polish records 620 acceptances, 360 revisions, zero
+blocks, and four explicitly approved source-equal values. Dutch records 753
+acceptances, 227 revisions, zero blocks, and five explicitly approved
+source-equal values. The final four-row correction merge changed only one
+Italian, two Polish, and one Dutch translation cell; all 2,940 rows then passed
+placeholder, boundary, and deterministic content-safety verification. These
+left-to-right Latin-script locales require no exceptional font or
+right-to-left gate, and their runtime catalogs are byte-identical to the exact
+reviewed approvals. Speech recognition, screen-reader qualification, store
+promotion, and country distribution remain separate.
 
 The following content must be catalog-owned before another locale can be
 considered complete:

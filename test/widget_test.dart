@@ -54,6 +54,9 @@ void main() {
       Locale('pt', 'BR'),
       Locale('ja'),
       Locale('ko'),
+      Locale('it'),
+      Locale('pl'),
+      Locale('nl'),
     ]);
     expect(
       AppLocalizations.supportedLocales,
@@ -66,6 +69,9 @@ void main() {
         Locale('pt', 'BR'),
         Locale('ja'),
         Locale('ko'),
+        Locale('it'),
+        Locale('pl'),
+        Locale('nl'),
       ]),
     );
     expect(

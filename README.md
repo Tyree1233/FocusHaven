@@ -727,11 +727,11 @@ not cover these capabilities.
 
 FocusHaven now has a generated Flutter localization foundation, with English as
 the source and fallback catalog. Spanish, French, German, Brazilian Portuguese,
-Japanese, and Korean are exact reviewed production runtime catalogs. FocusHaven
-follows a supported device language by default and provides local, reversible
-Device, English, Español, Français, Deutsch, Português (Brasil), 日本語, and
-한국어 choices in Appearance. Store-language promotion remains a separate
-release decision.
+Japanese, Korean, Italian, Polish, and Dutch are exact reviewed production
+runtime catalogs. FocusHaven follows a supported device language by default and
+provides local, reversible Device, English, Español, Français, Deutsch,
+Português (Brasil), 日本語, 한국어, Italiano, Polski, and Nederlands choices in
+Appearance. Store-language promotion remains a separate release decision.
 
 Adding a locale still requires a complete catalog, placeholder validation,
 fluent review, focused layout checks, and green application tests and builds.
@@ -769,6 +769,15 @@ branding, repetition, contamination, and control-clearance checks. The normal
 five-language artifacts were restored after each platform check before the
 registry expanded to seven. Japanese and Korean speech recognition remains
 fail-closed, and store and country promotion remain separate.
+
+Italian, Polish, and Dutch are the first three-locale Latin-script activation
+completed after the reusable content-safety hardening. Each exact 980-message
+catalog passed an independent fluent review, anonymous validation, placeholder
+and boundary checks, and the deterministic identifier, protected-term, reuse,
+repetition, script, number, and time-unit screens. Their runtime catalogs remain
+byte-identical to the reviewed approvals. Speech recognition, localized store
+promotion, and country distribution remain separate and fail closed where
+unsupported.
 
 French is the first locale delivered through that streamlined path. Its exact
 980-message candidate received a complete anonymous fluent review: 654 entries

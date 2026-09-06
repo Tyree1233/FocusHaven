@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "nl",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "general_dutch",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "06d6ee0a9a9cf2e24c6b7af4d51764b99ffaa3cd4d9a5c49b36caf1723b9d8aa",
+  "approvedCatalogSha256": "15568a1035d399f934bf8aeebbaafccff77e8c62271afaddfad997b4e99f5d6f",
+  "privateReviewPayloadSha256": "4f471e989c794e34a11d6a996ff76f165b5f0d46f39e7ec7f8d77ca6f68b66d5",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 753,
+    "revised": 227,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "havenActionServiceSurfaceFocusQueue",
+    "havenActionServiceSurfaceHavenPlan",
+    "havenRhythmEyebrow",
+    "havenWindowEyebrow",
+    "havenWindowSemantics"
+  ],
+  "contentSafetyIssueCount": 0,
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

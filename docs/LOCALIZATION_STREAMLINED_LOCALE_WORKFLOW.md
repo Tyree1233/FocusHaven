@@ -7,6 +7,11 @@ no blocked decisions. Its integration proves that ordinary future locales can
 reuse the shared registry, picker, fallback, layout, semantics, privacy, test,
 and build gates without replaying the Spanish foundation phases.
 
+The first two-locale batch activated German and Brazilian Portuguese. The
+later three-locale Latin-script batch activated Italian, Polish, and Dutch only
+after independent complete fluent reviews, a focused four-row correction
+merge, and zero-issue content-safety verification across all 2,940 messages.
+
 ## Goal
 
 An ordinary new language should take one compact product pass, not a replay of
