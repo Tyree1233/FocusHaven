@@ -214,6 +214,21 @@ and refuses to overwrite any existing output. The CSV opens normally in Excel
 and sorts safety-, privacy-, deletion-, permission-, purchase-, AI-, and
 action-related copy first.
 
+Candidate preparation also runs a deterministic content-safety screen before
+creating any output. It fails closed when a translation introduces an email or
+URL absent from the matching English source, changes the protected
+`FocusHaven` product name, changes literal numbers, swaps minutes and seconds,
+contains runaway word or CJK repetition, introduces an unexpected writing
+system, or reuses one identical translation for eight or more distinct source
+messages. These checks catch high-confidence corruption and cross-contamination;
+they do not replace fluent review or claim that machine-generated copy is
+linguistically correct.
+
+If an older prepared candidate predates these checks, its private worksheet can
+still be reviewed and repaired. `accept` applies all reviewed revisions first
+and then runs the same content-safety screen on the proposed approved catalog.
+Unrepaired corruption therefore cannot become an approval or runtime catalog.
+
 ## 3. Complete the private fluent review
 
 The fluent reviewer changes only the final two CSV columns:
@@ -227,8 +242,10 @@ name, email address, signature, qualifications, timestamp, notes, or contact
 information is requested or stored in Git.
 
 A blocked row stops the pipeline. A revised row becomes part of the reviewed
-catalog only after its placeholders and ICU structure pass again. If a fluent
-reviewer deliberately enters the exact English source as a `REVISE`
+catalog only after its placeholders, ICU structure, and intentional leading or
+trailing whitespace pass again. Boundary whitespace matters when one localized
+message is appended to another. If a fluent reviewer deliberately enters the
+exact English source as a `REVISE`
 replacement—for example, for a product label or a word that is legitimately
 identical in both languages—the pipeline records that message key as an
 explicit review-approved source-equal value. This decision is anonymous and
@@ -248,15 +265,17 @@ dart run tool/localization_streamlined_pipeline.dart verify \
 `accept` verifies that all immutable worksheet columns still match the locked
 source and candidate, requires one valid decision per message, applies
 revisions, records any explicit review-approved source-equal message keys,
-reruns structural qualification, and writes only:
+reruns structural qualification and the deterministic content-safety screen,
+and writes only:
 
 - the reviewed ARB catalog; and
 - an anonymous aggregate validation record containing content hashes, counts,
   scope, and closed runtime boundaries.
 
 The private worksheet remains outside Git. `verify` checks every source,
-candidate, review, and approved-catalog lock and reports whether the locale is
-ready for integration.
+candidate, review, and approved-catalog lock, reruns the content-safety screen
+on the exact approved catalog, and reports whether the locale is ready for
+integration.
 
 ## 5. One integration and activation pass
 

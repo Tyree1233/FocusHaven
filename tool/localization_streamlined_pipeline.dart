@@ -172,6 +172,7 @@ final class StreamlinedPreparationResult {
     required this.errors,
     required this.candidate,
     required this.qualification,
+    required this.contentSafety,
     required this.reviewRows,
     required this.approvedSourceEqual,
   });
@@ -179,6 +180,7 @@ final class StreamlinedPreparationResult {
   final List<String> errors;
   final Map<String, dynamic> candidate;
   final CatalogQualificationResult qualification;
+  final StreamlinedContentSafetyResult contentSafety;
   final List<Map<String, String>> reviewRows;
   final Map<String, String> approvedSourceEqual;
 
@@ -193,8 +195,115 @@ final class StreamlinedPreparationResult {
     'messageCount': qualification.sourceMessageCount,
     'placeholderMessageCount': qualification.sourcePlaceholderMessageCount,
     'sourceEqualInvariantCount': approvedSourceEqual.length,
+    'contentSafety': contentSafety.summary(),
     'riskCounts': _riskCounts(reviewRows),
   };
+}
+
+final class StreamlinedContentSafetyResult {
+  const StreamlinedContentSafetyResult({
+    required this.errors,
+    required this.issueCounts,
+  });
+
+  final List<String> errors;
+  final Map<String, int> issueCounts;
+
+  bool get passed => errors.isEmpty;
+
+  Map<String, dynamic> summary() => {
+    'passed': passed,
+    'issueCount': errors.length,
+    'issueCounts': issueCounts,
+  };
+}
+
+/// Detects deterministic, high-confidence corruption that ICU and placeholder
+/// validation cannot see. This is intentionally a safety net, not a machine
+/// translation quality score; fluent review remains required for every row.
+StreamlinedContentSafetyResult auditStreamlinedLocaleContent({
+  required StreamlinedLocalePlan plan,
+  required Map<String, dynamic> source,
+  required Map<String, dynamic> candidate,
+}) {
+  final errors = <String>[];
+  final issueCounts = <String, int>{
+    'introducedIdentifier': 0,
+    'protectedTerm': 0,
+    'suspiciousReuse': 0,
+    'runawayRepetition': 0,
+    'unexpectedScript': 0,
+    'numberDrift': 0,
+    'timeUnitDrift': 0,
+  };
+
+  void record(String category, String error) {
+    issueCounts[category] = issueCounts[category]! + 1;
+    errors.add(error);
+  }
+
+  final reuse = <String, List<(String, String)>>{};
+  final keys = _messageKeys(
+    source,
+  ).intersection(_messageKeys(candidate)).toList()..sort();
+  for (final key in keys) {
+    final sourceText = source[key];
+    final candidateText = candidate[key];
+    if (sourceText is! String || candidateText is! String) continue;
+
+    final introducedIdentifiers = _extractExternalIdentifiers(
+      candidateText,
+    ).difference(_extractExternalIdentifiers(sourceText));
+    if (introducedIdentifiers.isNotEmpty) {
+      record('introducedIdentifier', 'candidate_introduced_identifier:$key');
+    }
+
+    for (final term in const ['FocusHaven']) {
+      if (_countOccurrences(sourceText, term) !=
+          _countOccurrences(candidateText, term)) {
+        record('protectedTerm', 'candidate_protected_term_changed:$key:$term');
+      }
+    }
+
+    if (_hasHighConfidenceNumberDrift(sourceText, candidateText)) {
+      record('numberDrift', 'candidate_number_drift:$key');
+    }
+    if (_hasTimeUnitDrift(sourceText, candidateText, plan.locale)) {
+      record('timeUnitDrift', 'candidate_time_unit_drift:$key');
+    }
+    if (_hasRunawayRepetition(candidateText)) {
+      record('runawayRepetition', 'candidate_runaway_repetition:$key');
+    }
+    if (_hasUnexpectedScript(sourceText, candidateText, plan.locale)) {
+      record('unexpectedScript', 'candidate_unexpected_script:$key');
+    }
+
+    final normalizedCandidate = _normalizedContent(candidateText);
+    final normalizedSource = _normalizedContent(sourceText);
+    if (normalizedCandidate.isNotEmpty &&
+        normalizedCandidate != normalizedSource &&
+        _containsLetterOrNumber(normalizedCandidate)) {
+      reuse.putIfAbsent(normalizedCandidate, () => <(String, String)>[]).add((
+        key,
+        normalizedSource,
+      ));
+    }
+  }
+
+  for (final entries in reuse.values) {
+    final distinctSources = entries.map((entry) => entry.$2).toSet();
+    if (distinctSources.length < 8) continue;
+    final keys = entries.map((entry) => entry.$1).toList()..sort();
+    record(
+      'suspiciousReuse',
+      'candidate_suspicious_reuse:${keys.first}:${distinctSources.length}',
+    );
+  }
+
+  return StreamlinedContentSafetyResult(
+    errors: errors.toSet().toList()..sort(),
+    issueCounts: issueCounts,
+  );
 }
 
 StreamlinedPreparationResult prepareStreamlinedLocale({
@@ -275,6 +384,12 @@ StreamlinedPreparationResult prepareStreamlinedLocale({
   )) {
     errors.add('candidate_not_structurally_ready');
   }
+  final contentSafety = auditStreamlinedLocaleContent(
+    plan: plan,
+    source: source,
+    candidate: candidate,
+  );
+  errors.addAll(contentSafety.errors);
 
   final rows = <Map<String, String>>[];
   for (final key in sourceKeys) {
@@ -315,6 +430,7 @@ StreamlinedPreparationResult prepareStreamlinedLocale({
     errors: errors.toSet().toList()..sort(),
     candidate: candidate,
     qualification: qualification,
+    contentSafety: contentSafety,
     reviewRows: rows,
     approvedSourceEqual: approvedSourceEqual,
   );
@@ -325,6 +441,7 @@ final class StreamlinedAcceptanceResult {
     required this.errors,
     required this.approvedCatalog,
     required this.qualification,
+    required this.contentSafety,
     required this.decisionCounts,
     required this.riskCounts,
     required this.reviewApprovedSourceEqual,
@@ -333,6 +450,7 @@ final class StreamlinedAcceptanceResult {
   final List<String> errors;
   final Map<String, dynamic> approvedCatalog;
   final CatalogQualificationResult qualification;
+  final StreamlinedContentSafetyResult contentSafety;
   final Map<String, int> decisionCounts;
   final Map<String, int> riskCounts;
   final List<String> reviewApprovedSourceEqual;
@@ -349,6 +467,7 @@ final class StreamlinedAcceptanceResult {
     'decisionCounts': decisionCounts,
     'riskCounts': riskCounts,
     'reviewApprovedSourceEqualCount': reviewApprovedSourceEqual.length,
+    'contentSafety': contentSafety.summary(),
   };
 }
 
@@ -446,6 +565,11 @@ StreamlinedAcceptanceResult acceptStreamlinedLocaleReview({
         if (replacement.trim().isEmpty || replacement.contains('\u0000')) {
           errors.add('invalid_replacement:$key');
         } else {
+          final sourceText = source[key];
+          if (sourceText is String &&
+              !_sameBoundaryWhitespace(sourceText, replacement)) {
+            errors.add('replacement_boundary_whitespace_mismatch:$key');
+          }
           replacements[key] = replacement;
           if (replacement == source[key] &&
               !approvedSourceEqual.containsKey(key)) {
@@ -482,6 +606,12 @@ StreamlinedAcceptanceResult acceptStreamlinedLocaleReview({
   )) {
     errors.add('reviewed_catalog_not_structurally_ready');
   }
+  final contentSafety = auditStreamlinedLocaleContent(
+    plan: plan,
+    source: source,
+    candidate: approved,
+  );
+  errors.addAll(contentSafety.errors);
   if (decisions['blocked'] != 0 ||
       decisions.values.fold<int>(0, (sum, value) => sum + value) !=
           sourceKeys.length) {
@@ -492,6 +622,7 @@ StreamlinedAcceptanceResult acceptStreamlinedLocaleReview({
     errors: errors.toSet().toList()..sort(),
     approvedCatalog: approved,
     qualification: qualification,
+    contentSafety: contentSafety,
     decisionCounts: decisions,
     riskCounts: risks,
     reviewApprovedSourceEqual: reviewApprovedSourceEqual.toList()..sort(),
@@ -675,6 +806,7 @@ void _prepareCommand(String planPath, String bundlePath, String reviewPath) {
     'placeholderMessageCount':
         result.qualification.sourcePlaceholderMessageCount,
     'approvedSourceEqual': result.approvedSourceEqual,
+    'contentSafety': result.contentSafety.summary(),
     'riskCounts': _riskCounts(result.reviewRows),
     'humanReviewRequired': true,
     'personalDataIncluded': false,
@@ -727,6 +859,7 @@ void _acceptCommand(String planPath, String reviewPath) {
     'decisionCounts': result.decisionCounts,
     'riskCounts': result.riskCounts,
     'reviewApprovedSourceEqual': result.reviewApprovedSourceEqual,
+    'contentSafetyIssueCount': result.contentSafety.errors.length,
     'placeholderMismatchCount': 0,
     'sourceMutationCount': 0,
     'personalDataIncluded': false,
@@ -785,6 +918,12 @@ void _verifyCommand(String planPath) {
   )) {
     errors.add('approved_catalog_not_structurally_ready');
   }
+  final contentSafety = auditStreamlinedLocaleContent(
+    plan: plan,
+    source: source,
+    candidate: approved,
+  );
+  errors.addAll(contentSafety.errors);
   if (record['schemaVersion'] != 1 ||
       record['workflow'] != streamlinedLocaleWorkflow ||
       record['locale'] != plan.locale ||
@@ -815,6 +954,7 @@ void _verifyCommand(String planPath) {
       'passed': errors.isEmpty,
       'errors': errors,
       'messageCount': qualification.sourceMessageCount,
+      'contentSafety': contentSafety.summary(),
       'runtimeState': runtimeState,
       'readyForIntegration': errors.isEmpty && runtimeState == 'not_integrated',
       'exceptionalGates': plan.exceptionalGates,
@@ -984,6 +1124,199 @@ LocaleReviewRisk _riskFromLabel(String label) =>
 
 bool _containsAny(String value, List<String> needles) =>
     needles.any(value.contains);
+
+bool _sameBoundaryWhitespace(String source, String candidate) {
+  String leading(String value) =>
+      RegExp(r'^\s*').firstMatch(value)?.group(0) ?? '';
+  String trailing(String value) =>
+      RegExp(r'\s*$').firstMatch(value)?.group(0) ?? '';
+  return leading(source) == leading(candidate) &&
+      trailing(source) == trailing(candidate);
+}
+
+Set<String> _extractExternalIdentifiers(String value) {
+  final identifiers = <String>{};
+  for (final match in RegExp(
+    r'[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,63}',
+  ).allMatches(value)) {
+    identifiers.add(match.group(0)!.toLowerCase());
+  }
+  for (final match in RegExp(
+    r'''(?:https?://|www\.)[^\s<>"']+''',
+    caseSensitive: false,
+  ).allMatches(value)) {
+    identifiers.add(match.group(0)!.toLowerCase());
+  }
+  return identifiers;
+}
+
+int _countOccurrences(String value, String needle) {
+  if (needle.isEmpty) return 0;
+  var count = 0;
+  var start = 0;
+  while (true) {
+    final index = value.indexOf(needle, start);
+    if (index < 0) return count;
+    count += 1;
+    start = index + needle.length;
+  }
+}
+
+bool _hasHighConfidenceNumberDrift(String source, String candidate) {
+  if (RegExp(r'\b(?:AM|PM)\b', caseSensitive: false).hasMatch(source)) {
+    return false;
+  }
+  final sourceNumbers = RegExp(
+    r'[0-9]+',
+  ).allMatches(source).map((match) => match.group(0)!).toList();
+  final candidateNumbers = RegExp(
+    r'[0-9]+',
+  ).allMatches(candidate).map((match) => match.group(0)!).toList();
+  return sourceNumbers.length == 1 &&
+      candidateNumbers.length == 1 &&
+      sourceNumbers.single != candidateNumbers.single;
+}
+
+bool _hasTimeUnitDrift(String source, String candidate, String locale) {
+  final sourceHasMinutes = RegExp(
+    r'\bminutes?\b',
+    caseSensitive: false,
+  ).hasMatch(source);
+  final sourceHasSeconds = RegExp(
+    r'\bseconds?\b',
+    caseSensitive: false,
+  ).hasMatch(source);
+  if (sourceHasMinutes == sourceHasSeconds) return false;
+  final language = locale.split('-').first;
+  return sourceHasMinutes
+      ? _containsTranslatedTimeUnit(candidate, language, seconds: true)
+      : _containsTranslatedTimeUnit(candidate, language, seconds: false);
+}
+
+bool _containsTranslatedTimeUnit(
+  String value,
+  String language, {
+  required bool seconds,
+}) {
+  if (language == 'ja' || language == 'ko') {
+    final unit = switch ((language, seconds)) {
+      ('ja', true) => '秒',
+      ('ja', false) => '分',
+      ('ko', true) => '초',
+      ('ko', false) => '분',
+      _ => throw StateError('Unsupported time-unit branch.'),
+    };
+    return RegExp(
+      '(?:[0-9]+|\\{[A-Za-z][A-Za-z0-9_]*\\})\\s*$unit',
+    ).hasMatch(value);
+  }
+
+  final pattern = switch ((language, seconds)) {
+    ('fr', true) => r'\bseconde',
+    ('fr', false) => r'\bminute',
+    ('es', true) => r'\bsegundo',
+    ('es', false) => r'\bminuto',
+    ('de', true) => r'\bsekund',
+    ('de', false) => r'\bminut',
+    ('pt', true) => r'\bsegundo',
+    ('pt', false) => r'\bminuto',
+    ('it', true) => r'\bsecond',
+    ('it', false) => r'\bminut',
+    ('pl', true) => r'\bsekund',
+    ('pl', false) => r'\bminut',
+    ('nl', true) => r'\bsecon',
+    ('nl', false) => r'\bminu',
+    ('en', true) => r'\bsecond',
+    ('en', false) => r'\bminute',
+    _ => null,
+  };
+  return pattern != null &&
+      RegExp(pattern, caseSensitive: false).hasMatch(value);
+}
+
+bool _hasUnexpectedScript(String source, String candidate, String locale) {
+  final language = locale.split('-').first;
+  final han = RegExp(r'[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]');
+  final kana = RegExp(r'[\u3040-\u30FF\u31F0-\u31FF]');
+  final hangul = RegExp(r'[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]');
+
+  bool introduced(RegExp script) =>
+      script.hasMatch(candidate) && !script.hasMatch(source);
+
+  if (language == 'ja') return introduced(hangul);
+  if (language == 'ko') return introduced(han) || introduced(kana);
+  if (const {
+    'en',
+    'es',
+    'fr',
+    'de',
+    'pt',
+    'it',
+    'pl',
+    'nl',
+  }.contains(language)) {
+    return introduced(han) || introduced(kana) || introduced(hangul);
+  }
+  return false;
+}
+
+bool _hasRunawayRepetition(String value) {
+  final tokens = value
+      .split(RegExp(r'[\s,.;:!?…，。！？、()\[\]{}<>/\\|]+'))
+      .where((token) => token.isNotEmpty)
+      .map((token) => token.toLowerCase())
+      .toList();
+  var repeatedTokens = 1;
+  for (var index = 1; index < tokens.length; index += 1) {
+    if (tokens[index] == tokens[index - 1]) {
+      repeatedTokens += 1;
+      if (repeatedTokens >= 4) return true;
+    } else {
+      repeatedTokens = 1;
+    }
+  }
+
+  final compact = value.replaceAll(
+    RegExp(r'[\s,.;:!?…，。！？、()\[\]{}<>/\\|]+'),
+    '',
+  );
+  final runes = compact.runes.toList();
+  final maximumUnit = runes.length ~/ 4 < 12 ? runes.length ~/ 4 : 12;
+  for (var unit = 1; unit <= maximumUnit; unit += 1) {
+    for (var start = 0; start + unit * 4 <= runes.length; start += 1) {
+      var repeats = 1;
+      while (start + unit * (repeats + 1) <= runes.length &&
+          _runeSlicesEqual(runes, start, start + unit * repeats, unit)) {
+        repeats += 1;
+        if (repeats >= 4) return true;
+      }
+    }
+  }
+
+  if (runes.length >= 4 && runes.length.isEven) {
+    final half = runes.length ~/ 2;
+    final first = String.fromCharCodes(runes.take(half));
+    final hasCjk = RegExp(
+      r'[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]',
+    ).hasMatch(first);
+    if (hasCjk && _runeSlicesEqual(runes, 0, half, half)) return true;
+  }
+  return false;
+}
+
+bool _runeSlicesEqual(List<int> runes, int left, int right, int length) {
+  for (var offset = 0; offset < length; offset += 1) {
+    if (runes[left + offset] != runes[right + offset]) return false;
+  }
+  return true;
+}
+
+String _normalizedContent(String value) =>
+    value.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
+
+bool _containsLetterOrNumber(String value) => RegExp(
+  r'[A-Za-z0-9\u00C0-\u02AF\u0370-\u052F\u3040-\u30FF\u3400-\u9FFF\uAC00-\uD7AF]',
+).hasMatch(value);
 
 Map<String, int> _riskCounts(List<Map<String, String>> rows) {
   final counts = <String, int>{

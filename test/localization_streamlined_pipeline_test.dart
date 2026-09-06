@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -144,6 +145,152 @@ void main() {
     expect(result.errors, contains('blocked_translation:${rows.first['key']}'));
   });
 
+  test(
+    'fails closed on identifiers, brands, drift, repetition, and scripts',
+    () {
+      final source = <String, dynamic>{
+        '@@locale': 'en',
+        'brand': 'Welcome to FocusHaven',
+        'contact': 'Add to Focus Queue',
+        'duration': 'Pause for 60 minutes',
+        'repeat': 'One step',
+        'weekday': 'Tuesday',
+        for (var index = 0; index < 8; index += 1)
+          'distinct$index': 'Distinct source $index',
+      };
+      final candidate = <String, dynamic>{
+        '@@locale': 'ja',
+        'brand': 'FateHavenへようこそ',
+        'contact': 'sales@cccue.com',
+        'duration': '61秒間一時停止',
+        'repeat': '一歩一歩一歩一歩',
+        'weekday': '한국어',
+        for (var index = 0; index < 8; index += 1) 'distinct$index': 'クーポン',
+      };
+
+      final result = auditStreamlinedLocaleContent(
+        plan: _planForLocale('ja'),
+        source: source,
+        candidate: candidate,
+      );
+
+      expect(result.passed, isFalse);
+      expect(
+        result.errors,
+        contains('candidate_protected_term_changed:brand:FocusHaven'),
+      );
+      expect(
+        result.errors,
+        contains('candidate_introduced_identifier:contact'),
+      );
+      expect(result.errors, contains('candidate_number_drift:duration'));
+      expect(result.errors, contains('candidate_time_unit_drift:duration'));
+      expect(result.errors, contains('candidate_runaway_repetition:repeat'));
+      expect(result.errors, contains('candidate_unexpected_script:weekday'));
+      expect(result.errors, contains('candidate_suspicious_reuse:distinct0:8'));
+    },
+  );
+
+  test('flags Korean cross-script and runaway repeated content', () {
+    final result = auditStreamlinedLocaleContent(
+      plan: _planForLocale('ko'),
+      source: {'@@locale': 'en', 'weekday': 'Tuesday'},
+      candidate: {'@@locale': 'ko', 'weekday': '日本日本日本日本日本日本日本日本'},
+    );
+
+    expect(result.errors, contains('candidate_unexpected_script:weekday'));
+    expect(result.errors, contains('candidate_runaway_repetition:weekday'));
+  });
+
+  test('content screen accepts every existing reviewed production catalog', () {
+    final source =
+        jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())
+            as Map<String, dynamic>;
+    for (final entry in const {
+      'es': 'lib/l10n/app_es.arb',
+      'fr': 'lib/l10n/app_fr.arb',
+      'de': 'lib/l10n/app_de.arb',
+      'pt-BR': 'lib/l10n/app_pt_BR.arb',
+    }.entries) {
+      final candidate =
+          jsonDecode(File(entry.value).readAsStringSync())
+              as Map<String, dynamic>;
+
+      final result = auditStreamlinedLocaleContent(
+        plan: _planForLocale(entry.key),
+        source: source,
+        candidate: candidate,
+      );
+
+      expect(result.errors, isEmpty, reason: entry.key);
+    }
+  });
+
+  test('review must repair unsafe candidate content before acceptance', () {
+    StreamlinedAcceptanceResult review({required bool repair}) {
+      final prepared = prepareStreamlinedLocale(
+        plan: _plan(),
+        source: _source(),
+        translationBundle: _bundle(),
+      );
+      prepared.candidate['privacy'] = 'sales@cccue.com';
+      final rows = prepared.reviewRows;
+      for (final row in rows) {
+        row['decision'] = 'ACCEPT';
+      }
+      final privacy = rows.singleWhere((row) => row['key'] == 'privacy');
+      privacy['candidate'] = 'sales@cccue.com';
+      if (repair) {
+        privacy['decision'] = 'REVISE';
+        privacy['replacement'] = 'Vos réflexions restent privées.';
+      }
+      return acceptStreamlinedLocaleReview(
+        plan: _plan(),
+        source: _source(),
+        candidate: prepared.candidate,
+        approvedSourceEqual: prepared.approvedSourceEqual,
+        reviewRows: rows,
+      );
+    }
+
+    final unsafe = review(repair: false);
+    expect(unsafe.passed, isFalse);
+    expect(unsafe.errors, contains('candidate_introduced_identifier:privacy'));
+
+    final repaired = review(repair: true);
+    expect(repaired.passed, isTrue);
+    expect(repaired.contentSafety.passed, isTrue);
+  });
+
+  test('reviewed replacements preserve structural boundary whitespace', () {
+    final prepared = prepareStreamlinedLocale(
+      plan: _plan(),
+      source: _source(),
+      translationBundle: _bundle(),
+    );
+    final rows = prepared.reviewRows;
+    for (final row in rows) {
+      row['decision'] = 'ACCEPT';
+    }
+    final privacy = rows.singleWhere((row) => row['key'] == 'privacy');
+    privacy['decision'] = 'REVISE';
+    privacy['replacement'] = ' Vos réflexions restent privées.';
+
+    final result = acceptStreamlinedLocaleReview(
+      plan: _plan(),
+      source: _source(),
+      candidate: prepared.candidate,
+      approvedSourceEqual: prepared.approvedSourceEqual,
+      reviewRows: rows,
+    );
+
+    expect(result.passed, isFalse);
+    expect(
+      result.errors,
+      contains('replacement_boundary_whitespace_mismatch:privacy'),
+    );
+  });
+
   test('region-specific locale plans use BCP-47 storage and ARB paths', () {
     final json = _plan().toJson()
       ..['locale'] = 'pt-BR'
@@ -212,6 +359,23 @@ StreamlinedLocalePlan _plan() => StreamlinedLocalePlan.fromJson({
     'storePromotion': false,
   },
 });
+
+StreamlinedLocalePlan _planForLocale(String locale) {
+  final arbLocale = locale.replaceAll('-', '_');
+  final json = _plan().toJson()
+    ..['locale'] = locale
+    ..['englishName'] = locale
+    ..['nativeName'] = locale
+    ..['reviewScope'] = '${locale}_review'
+    ..['candidateCatalog'] = 'localization/candidates/app_$arbLocale.arb'
+    ..['structuralAudit'] = 'localization/reviews/$locale/structural-audit.json'
+    ..['approvedCatalog'] =
+        'localization/reviews/$locale/app_$arbLocale.approved.arb'
+    ..['validationRecord'] =
+        'localization/reviews/$locale/private-human-validation.json'
+    ..['runtimeCatalog'] = 'lib/l10n/app_$arbLocale.arb';
+  return StreamlinedLocalePlan.fromJson(json);
+}
 
 Map<String, dynamic> _source() => {
   '@@locale': 'en',
