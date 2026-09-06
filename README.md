@@ -752,6 +752,14 @@ the wave and never allows one locale's success to approve another locale. The
 first bounded batch uses that path for German and Brazilian Portuguese, with
 separate 980-message fluent reviews, anonymous validation records, and exact
 reviewed-to-runtime catalog locks.
+An optional development-only Google Cloud Translation Advanced adapter can now
+create those private machine-assisted input bundles from the locked public
+English catalog. It requires one locale-specific glossary, refuses API keys
+and repository-local output, keeps provider failures isolated, and applies the
+same structural and content-safety gate before writing any bundle. Google
+output remains an unapproved draft: every message still requires private
+fluent review, and the adapter cannot create a runtime catalog or activate a
+language.
 Flutter also generates from a mechanically derived `pt` fallback ARB because
 its localization tool requires a base locale for `pt-BR`. That fallback differs
 from the exact reviewed Brazilian Portuguese runtime catalog only in

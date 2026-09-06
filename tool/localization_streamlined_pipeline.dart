@@ -1226,6 +1226,18 @@ bool _containsTranslatedTimeUnit(
     ('pl', false) => r'\bminut',
     ('nl', true) => r'\bsecon',
     ('nl', false) => r'\bminu',
+    ('id', true) => r'\bdetik',
+    ('id', false) => r'\bmenit',
+    ('tr', true) => r'\bsaniye',
+    ('tr', false) => r'\bdakika',
+    ('sv', true) => r'\bsekund',
+    ('sv', false) => r'\bminut',
+    ('nb', true) => r'\bsekund',
+    ('nb', false) => r'\bminutt',
+    ('da', true) => r'\bsekund',
+    ('da', false) => r'\bminut',
+    ('fi', true) => r'\bsekunt',
+    ('fi', false) => r'\bminuut',
     ('en', true) => r'\bsecond',
     ('en', false) => r'\bminute',
     _ => null,
@@ -1239,12 +1251,29 @@ bool _hasUnexpectedScript(String source, String candidate, String locale) {
   final han = RegExp(r'[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF]');
   final kana = RegExp(r'[\u3040-\u30FF\u31F0-\u31FF]');
   final hangul = RegExp(r'[\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]');
+  final cyrillic = RegExp(r'[\u0400-\u052F]');
+  final arabic = RegExp(r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]');
+  final devanagari = RegExp(r'[\u0900-\u097F]');
+  final thai = RegExp(r'[\u0E00-\u0E7F]');
 
   bool introduced(RegExp script) =>
       script.hasMatch(candidate) && !script.hasMatch(source);
 
-  if (language == 'ja') return introduced(hangul);
-  if (language == 'ko') return introduced(han) || introduced(kana);
+  if (language == 'ja') {
+    return introduced(hangul) ||
+        introduced(cyrillic) ||
+        introduced(arabic) ||
+        introduced(devanagari) ||
+        introduced(thai);
+  }
+  if (language == 'ko') {
+    return introduced(han) ||
+        introduced(kana) ||
+        introduced(cyrillic) ||
+        introduced(arabic) ||
+        introduced(devanagari) ||
+        introduced(thai);
+  }
   if (const {
     'en',
     'es',
@@ -1254,8 +1283,20 @@ bool _hasUnexpectedScript(String source, String candidate, String locale) {
     'it',
     'pl',
     'nl',
+    'id',
+    'tr',
+    'sv',
+    'nb',
+    'da',
+    'fi',
   }.contains(language)) {
-    return introduced(han) || introduced(kana) || introduced(hangul);
+    return introduced(han) ||
+        introduced(kana) ||
+        introduced(hangul) ||
+        introduced(cyrillic) ||
+        introduced(arabic) ||
+        introduced(devanagari) ||
+        introduced(thai);
   }
   return false;
 }

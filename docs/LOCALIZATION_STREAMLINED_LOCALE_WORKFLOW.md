@@ -165,6 +165,86 @@ It never activates a locale, edits the production registry, copies a catalog
 into `lib/l10n`, contacts a translation provider, reads private FocusHaven
 content, records a reviewer identity, deploys, publishes, or changes a store.
 
+## Optional Google Cloud draft adapter
+
+`tool/localization_google_translate_drafts.dart` can create the private
+machine-assisted bundles consumed by the existing `prepare` command. It is an
+offline development tool, not an app dependency or runtime translation
+feature. It sends only the locked public English ARB messages to Google Cloud
+Translation Advanced v3 and never sends tasks, reflections, transcripts,
+account data, or other FocusHaven runtime content.
+
+The adapter deliberately keeps provider access outside the repository:
+
+- it uses a private configuration file and private output directory;
+- it accepts OAuth access from the authenticated `gcloud` CLI and never accepts
+  or stores an API key or credential file;
+- it requires one distinct bilingual glossary resource per target locale;
+- it uses `us-central1`, the required glossary location, and the general NMT
+  model;
+- it chunks the 980 messages into requests of no more than 5,000 code points;
+- it never prints source copy, translations, access tokens, provider response
+  bodies, or provider request identifiers;
+- it refuses existing outputs and writes a bundle only after the complete
+  locale passes the ordinary structural and content-safety preparation gate;
+- one provider or safety failure remains isolated to that locale; and
+- every generated draft still requires the complete private fluent review,
+  acceptance, integration, test, build, and activation gates below.
+
+The private provider configuration has this exact shape:
+
+```json
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_google_translation_drafts_v1",
+  "projectId": "your-google-cloud-project-id",
+  "location": "us-central1",
+  "model": "general/nmt",
+  "maxCodePointsPerRequest": 4500,
+  "locales": {
+    "id": {
+      "targetLanguageCode": "id",
+      "glossary": "projects/your-google-cloud-project-id/locations/us-central1/glossaries/focushaven-en-id",
+      "approvedSourceEqual": {
+        "appTitle": "The registered product name remains invariant."
+      }
+    }
+  }
+}
+```
+
+The config's locale set must exactly equal the batch manifest. A glossary may
+not be reused for another locale. `approvedSourceEqual` is not inferred from
+provider output: every exact English value needs an explicit non-empty
+rationale, and a stale rationale fails closed if the provider returns a
+translated value instead.
+
+Run a no-network preflight first:
+
+```bash
+dart run tool/localization_google_translate_drafts.dart preflight \
+  /private/path/locale-batch.json \
+  /private/path/google-translation-config.json \
+  /private/path/translation-bundles
+```
+
+After the Cloud Translation API and all per-language glossaries exist and the
+active `gcloud` identity has only the required translation permissions, create
+the private drafts:
+
+```bash
+dart run tool/localization_google_translate_drafts.dart translate \
+  /private/path/locale-batch.json \
+  /private/path/google-translation-config.json \
+  /private/path/translation-bundles
+```
+
+The output names remain
+`focushaven-<locale>-translations.json`, so the ordinary batch `prepare`
+command consumes them without a provider-specific exception. Google remains a
+draft source only: it cannot approve a message, produce a validation record,
+copy a runtime ARB, edit the picker, or activate a locale.
+
 ## 1. Initialize the locale
 
 Run from the repository root. French is shown only as an example:
