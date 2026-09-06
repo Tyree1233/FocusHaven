@@ -235,6 +235,12 @@ messages. These checks catch high-confidence corruption and cross-contamination;
 they do not replace fluent review or claim that machine-generated copy is
 linguistically correct.
 
+The repetition check preserves ordinary Latin-language word boundaries. It
+does not treat four identical letters created only by removing spaces—such as
+the boundary in Dutch `twee eerlijke`—as runaway repetition. Four repeated
+tokens, repeated multi-character units, and single-character CJK runs remain
+fail-closed.
+
 If an older prepared candidate predates these checks, its private worksheet can
 still be reviewed and repaired. `accept` applies all reviewed revisions first
 and then runs the same content-safety screen on the proposed approved catalog.

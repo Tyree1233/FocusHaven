@@ -202,6 +202,30 @@ void main() {
     expect(result.errors, contains('candidate_runaway_repetition:weekday'));
   });
 
+  test('does not flag valid Latin word-boundary letter runs', () {
+    final valid = auditStreamlinedLocaleContent(
+      plan: _planForLocale('nl'),
+      source: {
+        '@@locale': 'en',
+        'reflection':
+            'It sounds like two honest needs are pulling in different directions.',
+      },
+      candidate: {
+        '@@locale': 'nl',
+        'reflection':
+            'Het klinkt alsof twee eerlijke behoeften verschillende kanten op trekken.',
+      },
+    );
+    final repeated = auditStreamlinedLocaleContent(
+      plan: _planForLocale('nl'),
+      source: {'@@locale': 'en', 'step': 'One step'},
+      candidate: {'@@locale': 'nl', 'step': 'stap stap stap stap'},
+    );
+
+    expect(valid.errors, isEmpty);
+    expect(repeated.errors, contains('candidate_runaway_repetition:step'));
+  });
+
   test('content screen accepts every existing reviewed production catalog', () {
     final source =
         jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())

@@ -1281,8 +1281,16 @@ bool _hasRunawayRepetition(String value) {
     '',
   );
   final runes = compact.runes.toList();
+  final compactHasCjk = RegExp(
+    r'[\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u1100-\u11FF\u3130-\u318F\uAC00-\uD7AF]',
+  ).hasMatch(compact);
   final maximumUnit = runes.length ~/ 4 < 12 ? runes.length ~/ 4 : 12;
-  for (var unit = 1; unit <= maximumUnit; unit += 1) {
+  // A valid Latin word boundary can form four identical letters after spaces
+  // are removed (for example, Dutch "twee eerlijke"). Single-rune compact
+  // repetition remains meaningful for CJK, while repeated Latin words are
+  // already caught by the token scan above.
+  final minimumUnit = compactHasCjk ? 1 : 2;
+  for (var unit = minimumUnit; unit <= maximumUnit; unit += 1) {
     for (var start = 0; start + unit * 4 <= runes.length; start += 1) {
       var repeats = 1;
       while (start + unit * (repeats + 1) <= runes.length &&
