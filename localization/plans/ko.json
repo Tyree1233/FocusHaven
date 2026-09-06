@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "ko",
+  "englishName": "Korean",
+  "nativeName": "한국어",
+  "reviewScope": "korean_cjk",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalog": "localization/candidates/app_ko.arb",
+  "structuralAudit": "localization/reviews/ko/structural-audit.json",
+  "approvedCatalog": "localization/reviews/ko/app_ko.approved.arb",
+  "validationRecord": "localization/reviews/ko/private-human-validation.json",
+  "runtimeCatalog": "lib/l10n/app_ko.arb",
+  "exceptionalGates": {
+    "rightToLeft": false,
+    "fontCoverage": true,
+    "physicalScreenReader": false,
+    "physicalSpeechRecognition": false,
+    "storePromotion": false
+  }
+}

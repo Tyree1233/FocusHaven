@@ -726,11 +726,12 @@ not cover these capabilities.
 ## Languages and global releases
 
 FocusHaven now has a generated Flutter localization foundation, with English as
-the source and fallback catalog. Spanish, French, German, and Brazilian
-Portuguese are exact reviewed production runtime catalogs. FocusHaven follows a
-supported device language by default and provides local, reversible Device,
-English, Español, Français, Deutsch, and Português (Brasil) choices in
-Appearance. Store-language promotion remains a separate release decision.
+the source and fallback catalog. Spanish, French, German, Brazilian Portuguese,
+Japanese, and Korean are exact reviewed production runtime catalogs. FocusHaven
+follows a supported device language by default and provides local, reversible
+Device, English, Español, Français, Deutsch, Português (Brasil), 日本語, and
+한국어 choices in Appearance. Store-language promotion remains a separate
+release decision.
 
 Adding a locale still requires a complete catalog, placeholder validation,
 fluent review, focused layout checks, and green application tests and builds.
@@ -759,6 +760,15 @@ The authoritative contract is the
 [localization and global-release policy](docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md).
 The exact reusable commands and private-review format are documented in the
 [streamlined locale workflow](docs/LOCALIZATION_STREAMLINED_LOCALE_WORKFLOW.md).
+
+Japanese and Korean are the first streamlined locales with an explicit CJK
+font-coverage gate. Their corrected fluent reviews contain no remaining
+content-safety issue, and exact debug Android plus standalone profile iOS
+artifacts passed bounded physical glyph, fallback, wrapping, large-text,
+branding, repetition, contamination, and control-clearance checks. The normal
+five-language artifacts were restored after each platform check before the
+registry expanded to seven. Japanese and Korean speech recognition remains
+fail-closed, and store and country promotion remain separate.
 
 French is the first locale delivered through that streamlined path. Its exact
 980-message candidate received a complete anonymous fluent review: 654 entries

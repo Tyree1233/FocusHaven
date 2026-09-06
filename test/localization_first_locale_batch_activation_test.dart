@@ -118,7 +118,7 @@ void main() {
       'docs/LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md',
     ).readAsStringSync();
     expect(voice, contains("supportedLocaleIds = <String>{'en', 'es'}"));
-    expect(policy, contains('store promotion remains separate'));
+    expect(policy, contains('store and country promotion remain separate'));
   });
 }
 

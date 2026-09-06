@@ -96,7 +96,7 @@ void main() {
     );
     expect(
       roadmap,
-      contains('German and Brazilian Portuguese are the first bounded'),
+      contains('German and Brazilian Portuguese retain independent batch'),
     );
     expect(policy, contains('In-app locale support and localized'));
     expect(policy, contains('store promotion are separate decisions'));

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_cjk_physical_v1",
+  "locale": "ko",
+  "status": "physical_font_coverage_complete",
+  "reviewedCatalogSha256": "d1d7651493465c83f0d51c0a394c0e4629e91b5c11ae595ad1b7ffd9a7f19302",
+  "android": {
+    "result": "PASS",
+    "buildMode": "debug",
+    "sourceContentLockSha256": "8880f507b711008e436c39f2830facf56ea4e563975aa1b82ec307ca0eee3de9",
+    "artifactSha256": "4995707f3edf2515b0ef5d41da3348ee4ddc4081f6d53b53390e1ec1c3310f9a",
+    "auditReportSha256": "ad54d6d73f328f8015d8307ef2da60152d8d2d731484902e39baa55519c8a2f7",
+    "normalRestorationResult": "PASS",
+    "normalRestorationReportSha256": "4e4617e5a07bf386ea543a36aecde65b87b5e4aeb587442c4f536c0b0787a391"
+  },
+  "ios": {
+    "result": "PASS",
+    "buildMode": "profile",
+    "sourceContentLockSha256": "87dbb65c297d6c9876302e4a095b538b1481172430d081aee2e34c5d8ab0d75c",
+    "artifactManifestSha256": "60e4302cf1668043752d09d70d91f3639915fddba3d230b9381c0a3c28ec0a60",
+    "auditReportSha256": "cc2adc8430c2669b7816a8afd79ccda7abe30e19d703a9e8be623bf7b312b3ff",
+    "normalRestorationResult": "PASS",
+    "normalRestorationReportSha256": "e6cc2107052dbfccb4b631303bbfd5e81fc690003e7d3f1be910dbe75d57ec38"
+  },
+  "profileEntrypointCorrection": {
+    "changedFiles": [
+      "lib/main_cjk_integration.dart",
+      "test/localization_second_locale_batch_cjk_coverage_test.dart"
+    ],
+    "translationChanged": false,
+    "androidDebugBehaviorChanged": false,
+    "productionRegistryChangedBeforeAcceptance": false,
+    "releaseBuildRemainsFailClosed": true
+  },
+  "checks": [
+    "glyph_coverage",
+    "font_fallback",
+    "line_wrapping",
+    "large_text",
+    "brand_integrity",
+    "repetition_absence",
+    "foreign_script_absence",
+    "data_contamination_absence",
+    "control_clearance"
+  ],
+  "physicalFontCoverageQualified": true,
+  "runtimeActivatedByThisChange": true,
+  "physicalScreenReaderQualified": false,
+  "physicalSpeechRecognitionQualified": false,
+  "storePromotionQualified": false,
+  "personalDataIncluded": false
+}

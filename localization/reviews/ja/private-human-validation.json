@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "ja",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "japanese_cjk",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "f3c8d3ed0749764d7256bbf738b6c1651cea23d3d8f6071bfda68d464aa1256b",
+  "approvedCatalogSha256": "27eab8db2974e3be9f3603cc9d7f874914fe4a7aad3dec72d00ebc6cf842a3e8",
+  "privateReviewPayloadSha256": "7e0613cb875d135350f3778d679edac8d9d9d0d21495d745882d2863554d9140",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 647,
+    "revised": 333,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "appTitle",
+    "havenActionServiceSurfaceHavenPlan"
+  ],
+  "contentSafetyIssueCount": 0,
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

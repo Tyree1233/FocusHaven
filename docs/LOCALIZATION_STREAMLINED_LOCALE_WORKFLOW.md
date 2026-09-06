@@ -101,6 +101,17 @@ example, Japanese and Korean remain left-to-right in the app but set
 line breaking require explicit evidence before activation. A locale that needs
 right-to-left layout instead sets `rightToLeft` to `true`.
 
+Japanese and Korean completed that exceptional gate with anonymous physical
+checks on exact Android debug artifacts and standalone signed iOS profile
+artifacts. The iOS profile path avoids the iOS debug-launch dependency on a
+resident Flutter debugger. Its isolated CJK entry point accepts only explicitly
+authorized non-release builds and remains fail-closed in release mode. Each
+locale keeps an anonymous `physical-cjk-coverage.json` record that binds the
+reviewed catalog and platform artifacts while recording no operator or device
+identity. Passing this gate permits in-app registry activation only; speech
+recognition, screen-reader qualification, store promotion, and country release
+remain independent.
+
 The batch is deliberately bounded to ten locales and five simultaneous child
 operations. Three locales with `maxParallelism: 3` is the recommended first
 wave. Every operation performs a complete batch preflight before starting a

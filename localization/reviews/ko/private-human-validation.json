@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "ko",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "korean_cjk",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "fc3ac010e3cabe9355af09cece70fb455da66b3482e7661d11f3f26dad956a54",
+  "approvedCatalogSha256": "d1d7651493465c83f0d51c0a394c0e4629e91b5c11ae595ad1b7ffd9a7f19302",
+  "privateReviewPayloadSha256": "dbf1b34fe1cb4b03df3efb234170822b2abc7894188a0c0431d2360ec3bb46ee",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 603,
+    "revised": 377,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "appTitle",
+    "focusForecastSemantics",
+    "havenActionServiceSurfaceFocusQueue",
+    "havenActionServiceSurfaceHavenPlan",
+    "havenJourneyEyebrow",
+    "havenRhythmEyebrow",
+    "havenWindowEyebrow",
+    "havenWindowSemantics"
+  ],
+  "contentSafetyIssueCount": 0,
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

@@ -61,6 +61,18 @@ abstract final class FocusHavenLocales {
       nativeName: 'Português (Brasil)',
       status: FocusHavenLocaleStatus.production,
     ),
+    FocusHavenLocaleDefinition(
+      languageCode: 'ja',
+      englishName: 'Japanese',
+      nativeName: '日本語',
+      status: FocusHavenLocaleStatus.production,
+    ),
+    FocusHavenLocaleDefinition(
+      languageCode: 'ko',
+      englishName: 'Korean',
+      nativeName: '한국어',
+      status: FocusHavenLocaleStatus.production,
+    ),
   ];
 
   static const firstTranslationWave = <FocusHavenLocaleDefinition>[
@@ -97,10 +109,21 @@ abstract final class FocusHavenLocales {
     Locale('fr'),
     Locale('de'),
     Locale('pt', 'BR'),
+    Locale('ja'),
+    Locale('ko'),
   ];
 
   // Generated catalogs still awaiting production activation belong here.
+  // The current reviewed Japanese and Korean catalogs have completed their
+  // physical CJK coverage gate, so no catalog remains integration-only.
   static const integrationLocales = <Locale>[];
+
+  // Exact locale surface for the fail-closed CJK coverage entry point.
+  static const cjkCoverageTestLocales = <Locale>[
+    Locale('en'),
+    Locale('ja'),
+    Locale('ko'),
+  ];
 
   // Exact locale surface retained for the reproducible debug-only Spanish
   // device-test entry point.

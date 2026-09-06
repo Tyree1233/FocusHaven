@@ -66,9 +66,9 @@ void main() {
     final service = LocaleService();
     await service.initialized;
     const unsupported = FocusHavenLocaleDefinition(
-      languageCode: 'ja',
-      englishName: 'Japanese',
-      nativeName: '日本語',
+      languageCode: 'zz',
+      englishName: 'Unsupported test language',
+      nativeName: 'Unsupported test language',
       status: FocusHavenLocaleStatus.planned,
     );
 
@@ -104,7 +104,7 @@ void main() {
   });
 
   test('repairs an unsupported saved language to device default', () async {
-    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'ja'});
+    SharedPreferences.setMockInitialValues({LocaleService.storageKey: 'zz'});
     final service = LocaleService();
     await service.initialized;
 

@@ -1,7 +1,8 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Spanish, French, German, and Brazilian Portuguese in-app production
-activation; English remains the fallback and store promotion remains separate
+Status: Spanish, French, German, Brazilian Portuguese, Japanese, and Korean
+in-app production activation; English remains the fallback and store promotion
+remains separate
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -11,8 +12,9 @@ country release readiness.
 ## Current truth
 
 - English (`en`) is the source catalog and fallback production locale.
-- Spanish (`es`), French (`fr`), German (`de`), and Brazilian Portuguese
-  (`pt-BR`) are reviewed production runtime locales.
+- Spanish (`es`), French (`fr`), German (`de`), Brazilian Portuguese
+  (`pt-BR`), Japanese (`ja`), and Korean (`ko`) are reviewed production
+  runtime locales.
 - Planned locales are not exposed by the production
   `MaterialApp.supportedLocales` allowlist. In-app locale support and localized
   Apple or Google store promotion are separate decisions.
@@ -216,6 +218,20 @@ Flutter's required base `pt` fallback catalog is mechanically derived from the
 exact reviewed `pt-BR` catalog and differs only in its `@@locale` identity. It
 does not create another user-facing language choice or weaken the reviewed
 Brazilian Portuguese runtime lock.
+
+Japanese and Korean are the first reviewed production batch whose locale plans
+require the exceptional CJK font-coverage gate. Their 980-message approvals
+remain byte-identical to the runtime catalogs after corrected fluent reviews
+removed the detected meaning, repetition, foreign-script, brand, number, and
+data-contamination defects. Exact Japanese and Korean debug APKs passed bounded
+physical Android glyph, fallback, wrapping, large-text, branding, repetition,
+and control-clearance checks. Exact standalone signed profile apps passed the
+same bounded iOS checks after a two-file integration-entry correction permitted
+explicitly authorized profile testing while every release build remained
+fail-closed. The correction changed no translation or Android debug behavior.
+Normal production artifacts were restored and audited on both platforms.
+Japanese and Korean are therefore active in the registry-driven in-app picker;
+speech recognition remains fail-closed, and store and country promotion remain separate.
 
 The following content must be catalog-owned before another locale can be
 considered complete:

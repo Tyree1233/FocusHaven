@@ -112,25 +112,23 @@ void main() {
     await tester.pumpWidget(_app(themeService, localeService: localeService));
     await tester.pump();
 
-    expect(
-      find.text('English / Español / Français / Deutsch / Português (Brasil)'),
-      findsOneWidget,
-    );
+    const languageSummary =
+        'English / Español / Français / Deutsch / Português (Brasil) / 日本語 / 한국어';
+    expect(find.text(languageSummary), findsOneWidget);
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     expect(find.text('English'), findsOneWidget);
     expect(find.text('Español'), findsOneWidget);
     expect(find.text('Français'), findsOneWidget);
     expect(find.text('Deutsch'), findsOneWidget);
     expect(find.text('Português (Brasil)'), findsOneWidget);
+    expect(find.text('日本語'), findsOneWidget);
+    expect(find.text('한국어'), findsOneWidget);
 
     await tester.tap(find.text('Español'));
     await tester.pumpAndSettle();
 
     expect(localeService.selectedChoice, FocusHavenLanguageChoice.spanish);
-    expect(
-      find.text('English / Español / Français / Deutsch / Português (Brasil)'),
-      findsOneWidget,
-    );
+    expect(find.text(languageSummary), findsOneWidget);
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     final preferences = await SharedPreferences.getInstance();
     expect(preferences.getString(LocaleService.storageKey), 'es');
@@ -148,10 +146,7 @@ void main() {
       localeService.selectedChoice,
       FocusHavenLanguageChoice.forDefinition(french),
     );
-    expect(
-      find.text('English / Español / Français / Deutsch / Português (Brasil)'),
-      findsOneWidget,
-    );
+    expect(find.text(languageSummary), findsOneWidget);
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     expect(preferences.getString(LocaleService.storageKey), 'fr');
     expect(tester.takeException(), isNull);

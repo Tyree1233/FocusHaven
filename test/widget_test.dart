@@ -52,6 +52,8 @@ void main() {
       Locale('fr'),
       Locale('de'),
       Locale('pt', 'BR'),
+      Locale('ja'),
+      Locale('ko'),
     ]);
     expect(
       AppLocalizations.supportedLocales,
@@ -62,6 +64,8 @@ void main() {
         Locale('de'),
         Locale('pt'),
         Locale('pt', 'BR'),
+        Locale('ja'),
+        Locale('ko'),
       ]),
     );
     expect(
@@ -115,7 +119,7 @@ void main() {
     expect(find.text('Bienvenue à FocusHaven'), findsOneWidget);
 
     await localeService.setLanguage(FocusHavenLanguageChoice.system);
-    tester.platformDispatcher.localeTestValue = const Locale('ja');
+    tester.platformDispatcher.localeTestValue = const Locale('zz');
     addTearDown(tester.platformDispatcher.clearLocaleTestValue);
     await tester.pumpAndSettle();
 

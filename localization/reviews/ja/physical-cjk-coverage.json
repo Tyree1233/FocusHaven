@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_cjk_physical_v1",
+  "locale": "ja",
+  "status": "physical_font_coverage_complete",
+  "reviewedCatalogSha256": "27eab8db2974e3be9f3603cc9d7f874914fe4a7aad3dec72d00ebc6cf842a3e8",
+  "android": {
+    "result": "PASS",
+    "buildMode": "debug",
+    "sourceContentLockSha256": "8880f507b711008e436c39f2830facf56ea4e563975aa1b82ec307ca0eee3de9",
+    "artifactSha256": "e1c11c66bf18a7df63cccec17bb1885fdf231eedd9fcfc20fb94bba331e97eb0",
+    "auditReportSha256": "171f80c48e3e7b782477b8c3e7f557acf7697376c1cb6b89709b0e4231e78a04",
+    "normalRestorationResult": "PASS",
+    "normalRestorationReportSha256": "4e4617e5a07bf386ea543a36aecde65b87b5e4aeb587442c4f536c0b0787a391"
+  },
+  "ios": {
+    "result": "PASS",
+    "buildMode": "profile",
+    "sourceContentLockSha256": "87dbb65c297d6c9876302e4a095b538b1481172430d081aee2e34c5d8ab0d75c",
+    "artifactManifestSha256": "174b204302e6dfcc637f3637b0d74f49ddd74b8ebb14ae396c3987aafa987263",
+    "auditReportSha256": "1213ad68c1b0a5213143f6851974e7cfd0b21d4e81fccfecdf30acd93340521b",
+    "normalRestorationResult": "PASS",
+    "normalRestorationReportSha256": "e6cc2107052dbfccb4b631303bbfd5e81fc690003e7d3f1be910dbe75d57ec38"
+  },
+  "profileEntrypointCorrection": {
+    "changedFiles": [
+      "lib/main_cjk_integration.dart",
+      "test/localization_second_locale_batch_cjk_coverage_test.dart"
+    ],
+    "translationChanged": false,
+    "androidDebugBehaviorChanged": false,
+    "productionRegistryChangedBeforeAcceptance": false,
+    "releaseBuildRemainsFailClosed": true
+  },
+  "checks": [
+    "glyph_coverage",
+    "font_fallback",
+    "line_wrapping",
+    "large_text",
+    "brand_integrity",
+    "repetition_absence",
+    "control_clearance"
+  ],
+  "physicalFontCoverageQualified": true,
+  "runtimeActivatedByThisChange": true,
+  "physicalScreenReaderQualified": false,
+  "physicalSpeechRecognitionQualified": false,
+  "storePromotionQualified": false,
+  "personalDataIncluded": false
+}
