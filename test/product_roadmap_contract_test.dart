@@ -100,6 +100,8 @@ void main() {
     expect(readme, contains('No production control consumes it yet'));
     expect(readme, contains('Adaptive Focus review foundation'));
     expect(readme, contains('one-time local review ticket'));
+    expect(readme, contains('Adaptive Focus owner-delegation foundation'));
+    expect(readme, contains('update both defaults atomically'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -226,6 +228,13 @@ void main() {
       '`AdaptiveFocusReviewCard`',
       'performs no localization, interpolation, or sentence assembly',
       'No production file consumes the card in Phase 216B',
+      'Phase 216C owner-revalidated adaptive delegation',
+      '`AdaptiveFocusDelegationService.beginReview()`',
+      'opaque `AdaptiveFocusOwnerReviewTicket`',
+      '`TimerService.applyReviewedAdaptiveDurations()`',
+      'updates both saved defaults and the ready Focus countdown atomically',
+      'never selects a session or starts, pauses, resets, resumes, or completes one',
+      'No production screen consumes it in Phase 216C',
     ]) {
       expect(architecture, contains(required));
     }

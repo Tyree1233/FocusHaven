@@ -66,7 +66,7 @@ Every future phase must preserve these rules:
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
 | Unified Haven Loop | Shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, Journey, and Local Coach context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. The Local Coach bridge copies only text-free enums, booleans, and the exact current completion identity; it is never serialized remotely. Queue and timer services retain ownership. | Preserve these service-owned boundaries as later adaptive features consume the Loop. |
-| Adaptive Focus Engine | Foundation shipped | A deterministic local service can create one ephemeral, text-free focus/break/timing preview only from explicit current choices and bounded Focus Event, Rhythm, and Forecast signals. An isolated accessible review foundation binds one keep or accept choice to the exact current preview and fails closed for stale or replayed decisions. Nothing consumes it in production yet. | Review complete presentation copy in every active locale, integrate the card, and delegate only a freshly revalidated accepted duration to the timer owner. |
+| Adaptive Focus Engine | Foundation shipped | A deterministic local service can create one ephemeral, text-free focus/break/timing preview only from explicit current choices and bounded Focus Event, Rhythm, and Forecast signals. Isolated review and owner-delegation foundations bind one keep or accept choice to the exact current preview, revalidate the live timer, and allow only the timer owner to atomically persist a reviewed duration pair without starting. Nothing consumes it in production yet. | Review complete presentation copy in every active locale and integrate the card into one deliberate production location. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Ten reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, and Dutch; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, right-to-left, store promotion, and country distribution behind their separate gates. |
@@ -596,8 +596,9 @@ Offer explainable local adjustments to session length, break shape, and timing
 using bounded text-free signals. Recovery needs and explicit user choices
 override learned patterns.
 
-Status: Phase 216A local advisory foundation and Phase 216B isolated review
-foundation implemented in the current source. `AdaptiveFocusService` accepts
+Status: Phase 216A local advisory, Phase 216B isolated review, and Phase 216C
+owner-revalidated delegation foundations implemented in the current source.
+`AdaptiveFocusService` accepts
 only an explicit current focus duration, current break duration, keep-current
 choice, bounded text-free Focus Events, the enum/count/suggested-duration output
 of Haven Rhythm, and a qualified Focus Forecast window. It returns one
@@ -621,12 +622,22 @@ The isolated accessible card accepts complete reviewed copy from its caller,
 keeps the two choices separate, and serializes taps. It does not assemble or
 localize text and is not consumed by a production screen.
 
-The preview, review ticket, and decision are not persisted and cannot start or
-alter a timer, choose a break, schedule work, write a calendar, create an action
-proposal, or contact local or remote AI. Phases 216A and 216B add no new catalog
-copy, translation, dependency, permission, account requirement, backend, or
-deployment. Production presentation-copy review and the final owner-
-revalidation/delegation path remain separate work.
+The Phase 216C coordinator adds an opaque one-use owner ticket only for an
+untouched, ready Focus timer whose whole-minute Focus and short-break defaults
+exactly match the preview. Settlement consumes that capability before
+rechecking the latest suggestion and live owner state. Keep-current changes
+nothing. A valid acceptance delegates both values to one timer-owned atomic
+method, which rechecks expected defaults, persists through existing storage,
+and leaves the session stopped. Stale, replayed, superseded, active, paused,
+completed, non-Focus, invalid, mismatched, or unchanged requests fail closed.
+
+The preview, tickets, decision, and delegation result are not persisted. Only
+the authoritative timer persists a successfully reviewed pair; it cannot start
+a session, schedule work, write a calendar, create an action proposal, or
+contact local or remote AI. Phases 216A, 216B, and 216C add no new catalog copy,
+translation, dependency, permission, account requirement, backend, or
+deployment. Production presentation-copy review and deliberate card placement
+remain separate work.
 
 ### Phase 217 — System assistant intents
 

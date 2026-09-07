@@ -237,6 +237,14 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
       !_isComplete &&
       !_hasPendingResume &&
       _activeFocusStartedAt == null;
+  int get focusDurationSeconds => _focusSeconds;
+  int get shortBreakDurationSeconds => _shortBreakSeconds;
+  bool get canApplyReviewedAdaptiveDurations =>
+      _hasLoaded &&
+      canStartHavenPlan &&
+      _endsAt == null &&
+      _secondsRemaining == _focusSeconds &&
+      _totalSessionSeconds == _focusSeconds;
   FocusSessionFit? get completedFocusSessionFit {
     if (_sessionType != SessionType.focus ||
         !_isComplete ||
@@ -513,6 +521,44 @@ class TimerService extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   void setCustomMinutes(int minutes) => setCustomDuration(minutes, 0);
+
+  /// Atomically applies one freshly reviewed Focus and short-break pair.
+  ///
+  /// The timer remains the sole duration and persistence owner. A caller must
+  /// present the exact defaults it reviewed, and the current Focus timer must
+  /// still be completely ready. Invalid, stale, unchanged, or active-session
+  /// requests fail closed without mutating either duration or starting time.
+  bool applyReviewedAdaptiveDurations({
+    required int expectedFocusSeconds,
+    required int expectedBreakSeconds,
+    required int focusSeconds,
+    required int breakSeconds,
+  }) {
+    const maximumAdaptiveFocusSeconds = 180 * 60;
+    const maximumAdaptiveBreakSeconds = 60 * 60;
+    if (!canApplyReviewedAdaptiveDurations ||
+        expectedFocusSeconds != _focusSeconds ||
+        expectedBreakSeconds != _shortBreakSeconds ||
+        expectedFocusSeconds % 60 != 0 ||
+        expectedBreakSeconds % 60 != 0 ||
+        focusSeconds < 60 ||
+        focusSeconds > maximumAdaptiveFocusSeconds ||
+        focusSeconds % 60 != 0 ||
+        breakSeconds < 60 ||
+        breakSeconds > maximumAdaptiveBreakSeconds ||
+        breakSeconds % 60 != 0 ||
+        (focusSeconds == _focusSeconds && breakSeconds == _shortBreakSeconds)) {
+      return false;
+    }
+
+    _focusSeconds = focusSeconds;
+    _shortBreakSeconds = breakSeconds;
+    _secondsRemaining = focusSeconds;
+    _totalSessionSeconds = focusSeconds;
+    notifyListeners();
+    _saveToPrefs();
+    return true;
+  }
 
   void setFocusTask(String task) {
     final cleaned = _cleanFocusTask(task);

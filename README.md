@@ -756,6 +756,19 @@ the timer, localization catalogs, persistence, AI, or network services. No
 production screen consumes the card, no new user-visible catalog message was
 added, and an accepted result is not yet a timer command.
 
+Phase 216C adds the closed **Adaptive Focus owner-delegation foundation**
+without placing the review in production. A coordinator can open one opaque,
+single-use owner review only while the authoritative timer is an untouched,
+ready Focus session and the suggestion matches its exact whole-minute Focus
+and short-break defaults. Keep-current consumes the review without mutation.
+Acceptance rechecks the latest suggestion and live defaults, then asks the
+timer owner to update both defaults atomically through one guarded method.
+Stale, replayed, superseded, mismatched, active, paused, completed, non-Focus,
+invalid, or unchanged attempts fail closed. A successful update persists
+through the timer's existing storage but never starts a session. No production
+screen consumes this coordinator, no catalog message changed, and no AI,
+network, calendar, queue, task, or action authority was added.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

@@ -567,8 +567,8 @@ values and no delegation authority. An explicit **accept suggestion**
 settlement can return the exact reviewed suggested values, but the result is
 still not an execution command. It is never persisted, and Phase 216B has no
 coordinator that can pass it to `TimerService`. A later integration must
-revalidate current owner state at the delegation boundary and must use the
-timer's existing public API instead of duplicating timer storage or mutation.
+revalidate current owner state at the delegation boundary and must use a
+timer-owned API instead of duplicating timer storage or mutation.
 
 `AdaptiveFocusReviewCard` is an isolated accessible view with two vertically
 stacked, one-shot actions. It accepts one complete `AdaptiveFocusReviewCopy`
@@ -584,3 +584,35 @@ The widget and settlement service import no `TimerService`, localization,
 persistence, network, or AI owner. Therefore this phase cannot start, resize,
 pause, reset, or complete a timer; schedule work; write a calendar; execute a
 Haven action; call local or remote AI; or change any account or external state.
+
+## Phase 216C owner-revalidated adaptive delegation
+
+Phase 216C adds the missing local coordinator while leaving production
+presentation closed. `AdaptiveFocusDelegationService.beginReview()` returns an
+opaque `AdaptiveFocusOwnerReviewTicket` only when the authoritative
+`TimerService` is on an untouched, stopped, incomplete Focus session with no
+pending resume or active attempt. Its current Focus and short-break defaults
+must be whole minutes and must exactly match the suggestion under review.
+
+The owner ticket embeds the existing one-use review ticket and adds its own
+generation. A new valid review supersedes an older one. Settlement consumes the
+owner generation before rechecking the latest complete suggestion, live timer
+readiness, and both live defaults. Keep-current produces a text-free
+`keptCurrent` result and performs no mutation. Acceptance can proceed only for
+one changed, in-range pair settled by the exact embedded review.
+
+`TimerService.applyReviewedAdaptiveDurations()` is the sole new mutation
+boundary. It independently verifies the expected Focus and short-break
+defaults, the completely ready Focus state, the supported duration bounds, and
+that at least one value changes. It then updates both saved defaults and the
+ready Focus countdown atomically, emits one state notification, and persists
+through the timer's existing private storage. It never selects a session or
+starts, pauses, resets, resumes, or completes one. A stale or invalid request
+changes neither duration.
+
+The owner ticket, review decision, and delegation result remain ephemeral and
+text-free. The coordinator imports no localization, persistence, network, AI,
+calendar, queue, task, or Haven-action owner. No production screen consumes it
+in Phase 216C, and no ARB catalog changes are included. Reviewed presentation
+copy and a deliberate production placement remain required before a person can
+use the adaptive review.
