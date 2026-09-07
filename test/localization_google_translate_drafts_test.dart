@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
 import '../tool/localization_google_translate_drafts.dart';
@@ -77,6 +80,114 @@ void main() {
     },
   );
 
+  test('shields and restores simple and plural ICU syntax through HTML', () {
+    const source =
+        '{count, plural, =1 {1 minute for {name}} other {{count} minutes for {name}}} <ready>';
+    final protected = protectGoogleTranslationIcu(source);
+
+    expect(protected.html, contains('<span translate="no">FHICU'));
+    expect(protected.html, contains('&lt;ready&gt;'));
+    expect(protected.html, isNot(contains('{count')));
+    expect(protected.html, isNot(contains('plural')));
+    expect(protected.html, isNot(contains('other')));
+    expect(protected.html, isNot(contains('{name')));
+
+    final providerHtml = protected.html
+        .replaceAll('minutes', 'menit')
+        .replaceAll('minute', 'menit')
+        .replaceAll('for', 'untuk')
+        .replaceAll('&lt;ready&gt;', '&lt;siap&gt;');
+    expect(
+      restoreGoogleTranslationIcu(
+        protected: protected,
+        providerHtml: providerHtml,
+      ),
+      '{count, plural, =1 {1 menit untuk {name}} other {{count} menit untuk {name}}} <siap>',
+    );
+  });
+
+  test(
+    'chunks protected provider HTML against the configured request limit',
+    () {
+      final chunks = buildGoogleTranslationDraftChunks(
+        source: {
+          '@@locale': 'en',
+          'a': 'Hello, {name}',
+          'b': '{count, plural, =1 {1 minute} other {{count} minutes}}',
+        },
+        maxCodePointsPerRequest: 500,
+        protectIcuForProvider: true,
+      );
+
+      expect(chunks, isNotEmpty);
+      expect(chunks.expand((chunk) => chunk.keys), ['a', 'b']);
+      expect(
+        chunks.expand((chunk) => chunk.contents),
+        everyElement(contains('<span translate="no">FHICU')),
+      );
+      expect(
+        chunks.map((chunk) => chunk.codePointCount),
+        everyElement(lessThanOrEqualTo(500)),
+      );
+    },
+  );
+
+  test('fails closed when a protected ICU marker is missing or duplicated', () {
+    final protected = protectGoogleTranslationIcu('Hello, {name}');
+    expect(
+      () => restoreGoogleTranslationIcu(
+        protected: protected,
+        providerHtml: 'Halo',
+      ),
+      throwsA(
+        isA<GoogleTranslationDraftFailure>().having(
+          (error) => error.code,
+          'code',
+          'provider_icu_marker_mismatch',
+        ),
+      ),
+    );
+    expect(
+      () => restoreGoogleTranslationIcu(
+        protected: protected,
+        providerHtml: '${protected.html} ${protected.html}',
+      ),
+      throwsA(
+        isA<GoogleTranslationDraftFailure>().having(
+          (error) => error.code,
+          'code',
+          'provider_icu_marker_mismatch',
+        ),
+      ),
+    );
+  });
+
+  test('all locked English ARB messages round-trip through ICU shielding', () {
+    final source =
+        jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())
+            as Map<String, dynamic>;
+    final messageKeys =
+        source.keys.where((key) => !key.startsWith('@')).toList()..sort();
+
+    for (final key in messageKeys) {
+      final value = source[key] as String;
+      final protected = protectGoogleTranslationIcu(value);
+      expect(
+        restoreGoogleTranslationIcu(
+          protected: protected,
+          providerHtml: protected.html,
+        ),
+        value,
+        reason: key,
+      );
+      final metadata = source['@$key'] as Map<String, dynamic>;
+      final placeholders = metadata['placeholders'];
+      if (placeholders is Map && placeholders.isNotEmpty) {
+        expect(protected.syntaxTokens, isNotEmpty, reason: key);
+      }
+    }
+  });
+
   test(
     'creates only the existing locked bundle schema after safety passes',
     () async {
@@ -90,12 +201,6 @@ void main() {
           'appTitle': 'The registered product name remains invariant.',
         },
       );
-      final translatedBySource = {
-        'FocusHaven': 'FocusHaven',
-        'Hello, {name}': 'Halo, {name}',
-        'Pause for 60 minutes': 'Jeda selama 60 menit',
-      };
-
       final bundle = await buildGoogleTranslationDraftBundle(
         plan: plan,
         localeConfig: config,
@@ -103,7 +208,16 @@ void main() {
         maxCodePointsPerRequest: 5000,
         sender:
             ({required locale, required glossary, required contents}) async =>
-                contents.map((value) => translatedBySource[value]!).toList(),
+                contents
+                    .map(
+                      (value) => value
+                          .replaceAll('Hello,', 'Halo,')
+                          .replaceAll(
+                            'Pause for 60 minutes',
+                            'Jeda selama 60 menit',
+                          ),
+                    )
+                    .toList(),
       );
 
       expect(bundle.keys, {
@@ -137,11 +251,9 @@ void main() {
         sender:
             ({required locale, required glossary, required contents}) async => [
               for (final value in contents)
-                switch (value) {
-                  'Hello, {name}' => 'Halo, {name}',
-                  'Pause for 60 minutes' => 'Jeda selama 60 menit',
-                  _ => value,
-                },
+                value
+                    .replaceAll('Hello,', 'Halo,')
+                    .replaceAll('Pause for 60 minutes', 'Jeda selama 60 menit'),
             ],
       );
     }

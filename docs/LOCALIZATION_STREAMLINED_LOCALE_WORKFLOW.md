@@ -182,7 +182,15 @@ The adapter deliberately keeps provider access outside the repository:
 - it requires one distinct bilingual glossary resource per target locale;
 - it uses `us-central1`, the required glossary location, and the general NMT
   model;
-- it chunks the 980 messages into requests of no more than 5,000 code points;
+- it converts source messages to HTML only for the provider boundary, wrapping
+  every ICU placeholder and plural/select syntax segment in Google's supported
+  `translate="no"` span before any request;
+- it chunks that protected provider payload into requests of no more than 5,000
+  code points and reports both the locked source size and protected payload
+  size during preflight;
+- it restores the exact original ICU syntax after translation and fails closed
+  if any opaque marker is missing, duplicated, changed, or returned inside an
+  unexpected HTML element;
 - it never prints source copy, translations, access tokens, provider response
   bodies, or provider request identifiers;
 - it refuses existing state before a new provider run, privately checkpoints
@@ -196,6 +204,11 @@ The adapter deliberately keeps provider access outside the repository:
 - one provider or safety failure remains isolated to that locale; and
 - every generated draft still requires the complete private fluent review,
   acceptance, integration, test, build, and activation gates below.
+
+The HTML boundary follows Google Cloud Translation Advanced's documented
+`text/html` behavior and `span translate="no"` exclusion. HTML is used only as
+an in-flight syntax shield: accepted bundles contain ordinary ARB text and the
+exact original ICU identifiers, braces, plural types, selectors, and nesting.
 
 The private provider configuration has this exact shape:
 

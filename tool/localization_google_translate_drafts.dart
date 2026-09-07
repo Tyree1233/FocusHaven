@@ -12,6 +12,267 @@ const googleTranslationDraftQuarantineWorkflow =
 const googleTranslationDraftLocation = 'us-central1';
 const googleTranslationDraftModel = 'general/nmt';
 const googleTranslationRecommendedCodePointLimit = 5000;
+const googleTranslationDraftMimeType = 'text/html';
+const _googleTranslationIcuTokenPrefix = 'FHICU';
+
+final class GoogleTranslationProtectedMessage {
+  const GoogleTranslationProtectedMessage({
+    required this.html,
+    required this.syntaxTokens,
+  });
+
+  final String html;
+  final List<String> syntaxTokens;
+}
+
+GoogleTranslationProtectedMessage protectGoogleTranslationIcu(String source) {
+  if (source.contains(_googleTranslationIcuTokenPrefix)) {
+    throw const GoogleTranslationDraftFailure('source_uses_reserved_icu_token');
+  }
+  return _GoogleTranslationIcuShield(source).build();
+}
+
+String restoreGoogleTranslationIcu({
+  required GoogleTranslationProtectedMessage protected,
+  required String providerHtml,
+}) {
+  var restored = providerHtml;
+  for (var index = 0; index < protected.syntaxTokens.length; index += 1) {
+    final marker = _googleTranslationIcuMarker(index);
+    final span = RegExp(
+      '<span\\b[^>]*>\\s*${RegExp.escape(marker)}\\s*</span>',
+      caseSensitive: false,
+    );
+    if (span.allMatches(restored).length != 1) {
+      throw const GoogleTranslationDraftFailure('provider_icu_marker_mismatch');
+    }
+    restored = restored.replaceFirst(span, protected.syntaxTokens[index]);
+  }
+  if (restored.contains(_googleTranslationIcuTokenPrefix) ||
+      RegExp(r'</?[A-Za-z][^>]*>').hasMatch(restored)) {
+    throw const GoogleTranslationDraftFailure('provider_html_mismatch');
+  }
+  return _decodeGoogleTranslationHtml(restored);
+}
+
+String _googleTranslationIcuMarker(int index) =>
+    '$_googleTranslationIcuTokenPrefix${index.toString().padLeft(4, '0')}X';
+
+final class _GoogleTranslationIcuShield {
+  _GoogleTranslationIcuShield(this.source);
+
+  final String source;
+  final List<String> _syntaxTokens = [];
+
+  GoogleTranslationProtectedMessage build() =>
+      GoogleTranslationProtectedMessage(
+        html: _shieldRange(0, source.length),
+        syntaxTokens: List<String>.unmodifiable(_syntaxTokens),
+      );
+
+  String _shieldRange(int start, int end) {
+    final result = StringBuffer();
+    var cursor = start;
+    while (cursor < end) {
+      if (source.codeUnitAt(cursor) == 0x7b) {
+        final argument = _shieldArgument(cursor, end);
+        if (argument != null) {
+          result.write(argument.html);
+          cursor = argument.end;
+          continue;
+        }
+      }
+      final textStart = cursor;
+      cursor += 1;
+      while (cursor < end && source.codeUnitAt(cursor) != 0x7b) {
+        cursor += 1;
+      }
+      result.write(
+        _escapeGoogleTranslationHtml(source.substring(textStart, cursor)),
+      );
+    }
+    return result.toString();
+  }
+
+  _ShieldedIcuArgument? _shieldArgument(int openingBrace, int end) {
+    final closingBrace = _matchingBrace(openingBrace, end);
+    if (closingBrace < 0) return null;
+    final tokenCheckpoint = _syntaxTokens.length;
+
+    var cursor = _skipWhitespace(openingBrace + 1, closingBrace);
+    final nameStart = cursor;
+    cursor = _scanIdentifier(cursor, closingBrace);
+    if (cursor == nameStart) return null;
+    cursor = _skipWhitespace(cursor, closingBrace);
+    if (cursor == closingBrace) {
+      return _protectWholeArgument(openingBrace, closingBrace, tokenCheckpoint);
+    }
+    if (source.codeUnitAt(cursor) != 0x2c) {
+      return _protectWholeArgument(openingBrace, closingBrace, tokenCheckpoint);
+    }
+
+    cursor = _skipWhitespace(cursor + 1, closingBrace);
+    final typeStart = cursor;
+    cursor = _scanIdentifier(cursor, closingBrace);
+    final type = source.substring(typeStart, cursor).toLowerCase();
+    cursor = _skipWhitespace(cursor, closingBrace);
+    if (cursor == closingBrace ||
+        source.codeUnitAt(cursor) != 0x2c ||
+        !const {'plural', 'selectordinal', 'select'}.contains(type)) {
+      return _protectWholeArgument(openingBrace, closingBrace, tokenCheckpoint);
+    }
+
+    final result = StringBuffer()
+      ..write(_protectSyntax(source.substring(openingBrace, cursor + 1)));
+    cursor += 1;
+    while (cursor < closingBrace) {
+      final whitespaceStart = cursor;
+      cursor = _skipWhitespace(cursor, closingBrace);
+      result.write(
+        _escapeGoogleTranslationHtml(source.substring(whitespaceStart, cursor)),
+      );
+      if (cursor >= closingBrace) break;
+
+      if (source.startsWith('offset:', cursor)) {
+        final offsetStart = cursor;
+        cursor += 'offset:'.length;
+        while (cursor < closingBrace &&
+            !_isWhitespace(source.codeUnitAt(cursor))) {
+          cursor += 1;
+        }
+        result.write(_protectSyntax(source.substring(offsetStart, cursor)));
+        continue;
+      }
+
+      final selectorStart = cursor;
+      while (cursor < closingBrace &&
+          !_isWhitespace(source.codeUnitAt(cursor)) &&
+          source.codeUnitAt(cursor) != 0x7b) {
+        cursor += 1;
+      }
+      cursor = _skipWhitespace(cursor, closingBrace);
+      if (selectorStart == cursor ||
+          cursor >= closingBrace ||
+          source.codeUnitAt(cursor) != 0x7b) {
+        return _protectWholeArgument(
+          openingBrace,
+          closingBrace,
+          tokenCheckpoint,
+        );
+      }
+      final branchOpening = cursor;
+      final branchClosing = _matchingBrace(branchOpening, closingBrace);
+      if (branchClosing < 0) {
+        return _protectWholeArgument(
+          openingBrace,
+          closingBrace,
+          tokenCheckpoint,
+        );
+      }
+      result.write(
+        _protectSyntax(source.substring(selectorStart, branchOpening + 1)),
+      );
+      result.write(_shieldRange(branchOpening + 1, branchClosing));
+      result.write(_protectSyntax('}'));
+      cursor = branchClosing + 1;
+    }
+    result.write(_protectSyntax('}'));
+    return _ShieldedIcuArgument(html: result.toString(), end: closingBrace + 1);
+  }
+
+  _ShieldedIcuArgument _protectWholeArgument(
+    int openingBrace,
+    int closingBrace,
+    int tokenCheckpoint,
+  ) {
+    if (_syntaxTokens.length > tokenCheckpoint) {
+      _syntaxTokens.removeRange(tokenCheckpoint, _syntaxTokens.length);
+    }
+    return _ShieldedIcuArgument(
+      html: _protectSyntax(source.substring(openingBrace, closingBrace + 1)),
+      end: closingBrace + 1,
+    );
+  }
+
+  int _matchingBrace(int openingBrace, int end) {
+    var depth = 0;
+    for (var cursor = openingBrace; cursor < end; cursor += 1) {
+      final codeUnit = source.codeUnitAt(cursor);
+      if (codeUnit == 0x7b) {
+        depth += 1;
+      } else if (codeUnit == 0x7d) {
+        depth -= 1;
+        if (depth == 0) return cursor;
+      }
+    }
+    return -1;
+  }
+
+  int _skipWhitespace(int cursor, int end) {
+    while (cursor < end && _isWhitespace(source.codeUnitAt(cursor))) {
+      cursor += 1;
+    }
+    return cursor;
+  }
+
+  int _scanIdentifier(int cursor, int end) {
+    while (cursor < end) {
+      final codeUnit = source.codeUnitAt(cursor);
+      final valid =
+          (codeUnit >= 0x41 && codeUnit <= 0x5a) ||
+          (codeUnit >= 0x61 && codeUnit <= 0x7a) ||
+          (codeUnit >= 0x30 && codeUnit <= 0x39) ||
+          codeUnit == 0x5f;
+      if (!valid) break;
+      cursor += 1;
+    }
+    return cursor;
+  }
+
+  bool _isWhitespace(int codeUnit) =>
+      codeUnit == 0x20 ||
+      codeUnit == 0x09 ||
+      codeUnit == 0x0a ||
+      codeUnit == 0x0d;
+
+  String _protectSyntax(String syntax) {
+    final marker = _googleTranslationIcuMarker(_syntaxTokens.length);
+    _syntaxTokens.add(syntax);
+    return '<span translate="no">$marker</span>';
+  }
+}
+
+final class _ShieldedIcuArgument {
+  const _ShieldedIcuArgument({required this.html, required this.end});
+
+  final String html;
+  final int end;
+}
+
+String _escapeGoogleTranslationHtml(String value) => value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+
+String _decodeGoogleTranslationHtml(String value) {
+  var result = value.replaceAllMapped(RegExp(r'&#(x[0-9A-Fa-f]+|[0-9]+);'), (
+    match,
+  ) {
+    final raw = match.group(1)!;
+    final codePoint = raw.startsWith('x')
+        ? int.tryParse(raw.substring(1), radix: 16)
+        : int.tryParse(raw);
+    return codePoint == null ? match.group(0)! : String.fromCharCode(codePoint);
+  });
+  result = result
+      .replaceAll('&quot;', '"')
+      .replaceAll('&apos;', "'")
+      .replaceAll('&#39;', "'")
+      .replaceAll('&lt;', '<')
+      .replaceAll('&gt;', '>')
+      .replaceAll('&amp;', '&');
+  return result;
+}
 
 final class GoogleTranslationDraftFailure implements Exception {
   const GoogleTranslationDraftFailure(this.code) : diagnosticCodes = const [];
@@ -238,6 +499,7 @@ typedef GoogleTranslationDraftSender =
 List<GoogleTranslationDraftChunk> buildGoogleTranslationDraftChunks({
   required Map<String, dynamic> source,
   required int maxCodePointsPerRequest,
+  bool protectIcuForProvider = false,
 }) {
   if (source['@@locale'] != 'en') {
     throw const GoogleTranslationDraftFailure('invalid_source_locale');
@@ -271,7 +533,10 @@ List<GoogleTranslationDraftChunk> buildGoogleTranslationDraftChunks({
         'invalid_source_message:${entry.key}',
       );
     }
-    final length = value.runes.length;
+    final content = protectIcuForProvider
+        ? protectGoogleTranslationIcu(value).html
+        : value;
+    final length = content.runes.length;
     if (length > maxCodePointsPerRequest) {
       throw GoogleTranslationDraftFailure(
         'source_message_exceeds_request_limit:${entry.key}',
@@ -283,7 +548,7 @@ List<GoogleTranslationDraftChunk> buildGoogleTranslationDraftChunks({
       finishChunk();
     }
     keys.add(entry.key);
-    contents.add(value);
+    contents.add(content);
     codePointCount += length;
   }
   finishChunk();
@@ -313,6 +578,7 @@ Future<Map<String, String>> fetchGoogleTranslationDraftTranslations({
   final chunks = buildGoogleTranslationDraftChunks(
     source: source,
     maxCodePointsPerRequest: maxCodePointsPerRequest,
+    protectIcuForProvider: true,
   );
   for (final chunk in chunks) {
     final translated = await sender(
@@ -327,7 +593,11 @@ Future<Map<String, String>> fetchGoogleTranslationDraftTranslations({
     }
     for (var index = 0; index < chunk.keys.length; index += 1) {
       final key = chunk.keys[index];
-      final value = translated[index];
+      final providerValue = translated[index];
+      final value = restoreGoogleTranslationIcu(
+        protected: protectGoogleTranslationIcu(source[key] as String),
+        providerHtml: providerValue,
+      );
       if (value.trim().isEmpty || value.contains('\u0000')) {
         throw GoogleTranslationDraftFailure('invalid_provider_value:$key');
       }
@@ -533,11 +803,20 @@ Future<void> main(List<String> arguments) async {
       _refuseExistingDraftState(manifest, outputDirectory);
     }
     final source = _jsonObject(manifest.sourceCatalog);
-    final chunks = buildGoogleTranslationDraftChunks(
+    final sourceChunks = buildGoogleTranslationDraftChunks(
       source: source,
       maxCodePointsPerRequest: config.maxCodePointsPerRequest,
     );
-    final codePointCount = chunks.fold<int>(
+    final providerChunks = buildGoogleTranslationDraftChunks(
+      source: source,
+      maxCodePointsPerRequest: config.maxCodePointsPerRequest,
+      protectIcuForProvider: true,
+    );
+    final codePointCount = sourceChunks.fold<int>(
+      0,
+      (sum, chunk) => sum + chunk.codePointCount,
+    );
+    final providerCodePointCount = providerChunks.fold<int>(
       0,
       (sum, chunk) => sum + chunk.codePointCount,
     );
@@ -556,8 +835,11 @@ Future<void> main(List<String> arguments) async {
           'messageCountPerLocale': source.keys
               .where((key) => !key.startsWith('@'))
               .length,
-          'requestCountPerLocale': chunks.length,
+          'requestCountPerLocale': providerChunks.length,
           'codePointCountPerLocale': codePointCount,
+          'providerCodePointCountPerLocale': providerCodePointCount,
+          'providerMimeType': googleTranslationDraftMimeType,
+          'icuPlaceholderShielding': true,
           'glossaryRequiredPerLocale': true,
           'humanReviewRequired': true,
           'runtimeActivated': false,
@@ -652,7 +934,7 @@ Future<void> main(List<String> arguments) async {
           return GoogleTranslationDraftLocaleResult(
             locale: entry.locale,
             passed: true,
-            requestCount: operation == 'translate' ? chunks.length : 0,
+            requestCount: operation == 'translate' ? providerChunks.length : 0,
             messageCount: source.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
@@ -664,7 +946,7 @@ Future<void> main(List<String> arguments) async {
           return GoogleTranslationDraftLocaleResult(
             locale: entry.locale,
             passed: false,
-            requestCount: operation == 'translate' ? chunks.length : 0,
+            requestCount: operation == 'translate' ? providerChunks.length : 0,
             messageCount: source.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
@@ -679,7 +961,7 @@ Future<void> main(List<String> arguments) async {
           return GoogleTranslationDraftLocaleResult(
             locale: entry.locale,
             passed: false,
-            requestCount: operation == 'translate' ? chunks.length : 0,
+            requestCount: operation == 'translate' ? providerChunks.length : 0,
             messageCount: source.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
@@ -710,6 +992,8 @@ Future<void> main(List<String> arguments) async {
         'runtimeActivated': false,
         'externalRequestMade': operation == 'translate',
         'recoverablePrivateQuarantineEnabled': true,
+        'providerMimeType': googleTranslationDraftMimeType,
+        'icuPlaceholderShielding': true,
       }),
     );
     if (!passed) exitCode = 65;
@@ -759,7 +1043,7 @@ final class _GoogleTranslationRestClient {
         jsonEncode({
           'sourceLanguageCode': 'en',
           'targetLanguageCode': locale,
-          'mimeType': 'text/plain',
+          'mimeType': googleTranslationDraftMimeType,
           'contents': contents,
           'model': modelResource,
           'glossaryConfig': {'glossary': glossary, 'ignoreCase': false},
