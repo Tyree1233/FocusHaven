@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/models/coaching_message.dart';
+import 'package:focushaven/models/haven_loop_coach_context.dart';
 import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/providers/app_providers.dart';
 import 'package:focushaven/services/coaching_service.dart';
@@ -99,6 +100,39 @@ void main() {
           .onPressed,
       isNull,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reviews one local text-free Loop moment before coaching', (
+    tester,
+  ) async {
+    final coach = await _createCoach();
+    const coachingContext = CoachingContext(
+      havenLoopContext: HavenLoopCoachContext(
+        moment: HavenLoopCoachMoment.taskDecision,
+        hasLinkedTask: true,
+      ),
+    );
+
+    await tester.pumpWidget(_app(coach, coachingContext: coachingContext));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey<String>('haven-loop-coach-context')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('queue task is finished'), findsOneWidget);
+    expect(find.textContaining('text-free focus signals'), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('coach-message-input')),
+      'What should I do next?',
+    );
+    await tester.tap(find.byKey(const ValueKey<String>('coach-send-message')));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('You decide whether'), findsOneWidget);
+    expect(find.textContaining('never completes it'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

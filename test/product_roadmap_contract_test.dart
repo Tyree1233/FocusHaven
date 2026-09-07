@@ -31,7 +31,7 @@ void main() {
       '| Focus Shield | Foundation shipped |',
       '| Enhanced remote coach | Foundation shipped, disabled |',
       '| Haven AI planner | Foundation shipped |',
-      '| Unified Haven Loop | Foundation shipped |',
+      '| Unified Haven Loop | Shipped |',
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
     ]) {
@@ -92,6 +92,9 @@ void main() {
     expect(readme, contains('completion-to-Journey'));
     expect(readme, contains('stores no task title, queue ID, reflection'));
     expect(readme, contains('free of scores or streak pressure'));
+    expect(readme, contains('Unified Loop-to-Local-Coach'));
+    expect(readme, contains('text-free enums, booleans'));
+    expect(readme, contains('never persisted or serialized'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -110,7 +113,7 @@ void main() {
       'confirmation binds to the exact proposal ID',
       'typed input exercises the engine without a microphone or remote model',
       'all mutations route through existing services',
-      'Phase 210 typed runtime and Phase 213 safe voice runtime implemented',
+      'Phase 210 typed runtime, Phase 213 safe voice runtime, and Phase 215H',
       'lib/services/haven_action_interpreter.dart',
       'lib/services/haven_action_policy.dart',
       'lib/services/haven_action_engine.dart',
@@ -191,7 +194,15 @@ void main() {
       'contains no task title, queue ID, reflection, transcript, authored content',
       'This advisory changed nothing automatically',
       'free of scores or streak pressure',
-      'Local-coach context remains separate',
+      'Phase 215H text-free Local-Coach context',
+      '`HavenLoopCoachContextService`',
+      'one valid Focus moment',
+      'stale, duplicate, mismatched, unresolved, non-Focus, or between-session input',
+      '`HavenLoopCoachContext` contains only',
+      '`CoachingContext.toPromptData()` deliberately omits it',
+      'deterministic local responder',
+      'cannot complete a task, save a reflection',
+      'Every state change remains with the person',
     ]) {
       expect(architecture, contains(required));
     }

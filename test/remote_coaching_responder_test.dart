@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:focushaven/models/coaching_message.dart';
+import 'package:focushaven/models/haven_loop_coach_context.dart';
 import 'package:focushaven/services/coaching_service.dart';
 import 'package:focushaven/services/remote_coaching_responder.dart';
 
@@ -34,6 +35,10 @@ void main() {
           recentMood: '  hopeful ',
           parkedThoughtCount: 3,
           isTimerRunning: true,
+          havenLoopContext: HavenLoopCoachContext(
+            moment: HavenLoopCoachMoment.gentlerNextSession,
+            hasLinkedTask: false,
+          ),
         ),
         conversation: conversation,
       );
@@ -53,6 +58,10 @@ void main() {
         'parkedThoughtCount': 3,
         'isTimerRunning': true,
       });
+      expect(
+        backend.lastPayload['context'],
+        isNot(contains('havenLoopContext')),
+      );
       final sharedConversation =
           backend.lastPayload['conversation']! as List<dynamic>;
       expect(sharedConversation, hasLength(12));

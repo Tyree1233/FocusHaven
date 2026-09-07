@@ -717,6 +717,20 @@ completed Focus boundary. Stale, duplicate, unresolved, or inconsistent
 evidence fails closed. This advisory changes nothing automatically, and Haven
 Journey remains private, cumulative, and free of scores or streak pressure.
 
+Phase 215H completes the first **Unified Loop-to-Local-Coach** connection. At
+one valid linked Smart Reset or exact current completed-Focus boundary,
+FocusHaven derives an ephemeral snapshot containing only text-free enums,
+booleans, and the existing completion identity. It copies no task title, queue
+ID, journal or reflection text, mood, transcript, account value, or localized
+prose. Stale, duplicate, unresolved, non-Focus, and mismatched evidence returns
+no context. After the person explicitly opens Focus Coach, a read-only card
+shows the bounded Loop moment and matching Rhythm, Forecast, and Journey signal
+kinds using the existing reviewed catalog. **What should I do next?** may use
+that snapshot through the deterministic Local Coach, but the coach receives no
+timer, queue, reflection, scheduling, or action authority. The snapshot is
+never persisted or serialized in the remote prompt, forces local response
+routing when present, and is not attached while enhanced coaching is selected.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

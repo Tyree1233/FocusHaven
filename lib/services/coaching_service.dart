@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../l10n/service_localizations.dart';
 import '../models/coaching_message.dart';
+import '../models/haven_loop_coach_context.dart';
 import 'privacy_safe_diagnostics.dart';
 
 class CoachingContext {
@@ -19,6 +20,7 @@ class CoachingContext {
     this.recentMood,
     this.parkedThoughtCount = 0,
     this.isTimerRunning = false,
+    this.havenLoopContext,
     this.localizations,
   });
 
@@ -31,6 +33,7 @@ class CoachingContext {
   final String? recentMood;
   final int parkedThoughtCount;
   final bool isTimerRunning;
+  final HavenLoopCoachContext? havenLoopContext;
   final AppLocalizations? localizations;
 
   CoachingContext withLocalizations(AppLocalizations value) => CoachingContext(
@@ -43,6 +46,7 @@ class CoachingContext {
     recentMood: recentMood,
     parkedThoughtCount: parkedThoughtCount,
     isTimerRunning: isTimerRunning,
+    havenLoopContext: havenLoopContext,
     localizations: value,
   );
 
@@ -427,13 +431,14 @@ class LocalCoachingResponder implements CoachingResponder {
     ])) {
       return _progressReply(context, conversation, l10n);
     }
-    if (_containsAny(normalized, const [
-      'what should i do',
-      'what next',
-      'help me plan',
-      'prioritize',
-      'where do i start',
-    ])) {
+    if (normalized == l10n.coachPromptWhatNext.trim().toLowerCase() ||
+        _containsAny(normalized, const [
+          'what should i do',
+          'what next',
+          'help me plan',
+          'prioritize',
+          'where do i start',
+        ])) {
       return _planningReply(context, l10n);
     }
     if (_containsAny(normalized, const [
@@ -884,11 +889,40 @@ class LocalCoachingResponder implements CoachingResponder {
   }
 
   static String _planningReply(CoachingContext context, AppLocalizations l10n) {
+    final havenLoopReply = _havenLoopPlanningReply(
+      context.havenLoopContext,
+      l10n,
+    );
+    if (havenLoopReply != null) return havenLoopReply;
     final task = _currentTask(context, l10n);
     final queueNote = context.queueRemaining > 1
         ? l10n.coachServicePlanningQueueMultiple(context.queueRemaining - 1)
         : l10n.coachServicePlanningQueueSingle;
     return l10n.coachServicePlanningResponse(task, queueNote);
+  }
+
+  static String? _havenLoopPlanningReply(
+    HavenLoopCoachContext? context,
+    AppLocalizations l10n,
+  ) {
+    if (context == null) return null;
+    return switch (context.moment) {
+      HavenLoopCoachMoment.smartResetChoice =>
+        '${l10n.smartResetPauseStillCounts} '
+            '${l10n.smartResetLinkedTaskBoundary}',
+      HavenLoopCoachMoment.taskDecision => l10n.havenLoopDecisionDescription,
+      HavenLoopCoachMoment.reflectionChoice =>
+        '${l10n.focusReflectionTitle} ${l10n.focusReflectionDescription}',
+      HavenLoopCoachMoment.gentlerNextSession =>
+        '${l10n.havenPlanServiceReflectionTooMuch} '
+            '${l10n.havenRhythmNoAutomaticChange}',
+      HavenLoopCoachMoment.steadyNextSession =>
+        '${l10n.havenPlanServiceReflectionAboutRight} '
+            '${l10n.havenRhythmNoAutomaticChange}',
+      HavenLoopCoachMoment.flexibleNextSession =>
+        '${l10n.havenPlanServiceReflectionCouldDoMore} '
+            '${l10n.havenRhythmNoAutomaticChange}',
+    };
   }
 
   static String _celebrationReply(
@@ -1105,7 +1139,8 @@ class CoachingService extends ChangeNotifier {
         LocalCoachingResponder.isSafetyConcern(message) ||
         LocalCoachingResponder.isBoundaryRequest(message) ||
         LocalCoachingResponder.isRepairRequest(message) ||
-        LocalCoachingResponder.isReflectiveConversation(_messages);
+        LocalCoachingResponder.isReflectiveConversation(_messages) ||
+        context.havenLoopContext != null;
     final responder = requiresLocalResponse
         ? _localResponder
         : _enhancedCoachingEnabled && _enhancedResponder != null

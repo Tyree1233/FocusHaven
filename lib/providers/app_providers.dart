@@ -12,6 +12,7 @@ import '../models/focus_forecast.dart';
 import '../models/focus_shield_state.dart';
 import '../models/focus_session.dart';
 import '../models/haven_journey_state.dart';
+import '../models/haven_loop_coach_context.dart';
 import '../models/haven_loop_state.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_rhythm_insight.dart';
@@ -32,6 +33,7 @@ import '../services/focus_queue_service.dart';
 import '../services/focus_shield_service.dart';
 import '../services/focus_shield_platform_bridge.dart';
 import '../services/haven_journey_service.dart';
+import '../services/haven_loop_coach_context_service.dart';
 import '../services/haven_loop_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_planner_service.dart';
@@ -236,6 +238,12 @@ final havenLoopStateProvider = Provider<HavenLoopState>(
   (ref) => ref.watch(havenLoopServiceProvider).state,
   name: 'havenLoopStateProvider',
 );
+
+final havenLoopCoachContextServiceProvider =
+    Provider<HavenLoopCoachContextService>(
+      (ref) => const HavenLoopCoachContextService(),
+      name: 'havenLoopCoachContextServiceProvider',
+    );
 
 final focusShieldServiceProvider = Provider<FocusShieldService>(
   (ref) => const FocusShieldService(),
@@ -652,6 +660,38 @@ final havenRhythmReflectionConnectionProvider =
             recentEvents: ref.watch(timerFocusEventsProvider),
           );
     }, name: 'havenRhythmReflectionConnectionProvider');
+
+/// Rebuilds one exact, text-free Haven Loop moment for the private Local
+/// Coach. The snapshot has no task text, queue identity, mutation authority,
+/// persistence, or remote serialization path.
+final havenLoopCoachContextProvider = Provider<HavenLoopCoachContext?>((ref) {
+  final session = ref.watch(timerSessionStateProvider);
+  final timer = ref.watch(
+    timerServiceProvider.select(
+      (timer) => (
+        canOfferSmartReset: timer.canOfferSmartReset,
+        completion: timer.completedFocusIdentity,
+        sessionFit: timer.completedFocusSessionFit,
+      ),
+    ),
+  );
+  return ref
+      .watch(havenLoopCoachContextServiceProvider)
+      .createContext(
+        loop: ref.watch(havenLoopStateProvider),
+        sessionType: session.sessionType,
+        isComplete: session.isComplete,
+        canOfferSmartReset: timer.canOfferSmartReset,
+        completion: timer.completion,
+        sessionFit: timer.sessionFit,
+        recentEvents: ref.watch(timerFocusEventsProvider),
+        rhythmConnection: ref.watch(havenRhythmReflectionConnectionProvider),
+        forecastConnection: ref.watch(
+          focusForecastReflectionConnectionProvider,
+        ),
+        journeyConnection: ref.watch(havenJourneyCompletionConnectionProvider),
+      );
+}, name: 'havenLoopCoachContextProvider');
 
 /// Rebuilds the lantern from current timer controls and private text-free
 /// events. The result is local, ephemeral, informational, and non-punitive.

@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/l10n/app_localizations.dart';
 import 'package:focushaven/models/coaching_message.dart';
+import 'package:focushaven/models/haven_loop_coach_context.dart';
 import 'package:focushaven/services/coaching_service.dart';
 
 void main() {
@@ -62,6 +63,53 @@ void main() {
       const CoachingContext().toPromptData(),
       isNot(contains('focusTask')),
     );
+  });
+
+  test('keeps an exact Haven Loop moment on the local responder', () async {
+    final enhancedResponder = _RecordingResponder(
+      'This remote responder must not be used.',
+    );
+    final coach = await createCoach(enhancedResponder: enhancedResponder);
+    addTearDown(coach.dispose);
+    expect(await coach.setEnhancedCoachingEnabled(true), isTrue);
+
+    expect(
+      await coach.send(
+        'What should I do next?',
+        const CoachingContext(
+          havenLoopContext: HavenLoopCoachContext(
+            moment: HavenLoopCoachMoment.taskDecision,
+            hasLinkedTask: true,
+          ),
+        ),
+      ),
+      isTrue,
+    );
+
+    expect(enhancedResponder.calls, 0);
+    expect(coach.messages.last.role, CoachingMessageRole.coach);
+    expect(coach.messages.last.text, contains('You decide whether'));
+    expect(coach.messages.last.text, contains('never completes it'));
+  });
+
+  test('uses the reviewed localized prompt to reach Loop guidance', () async {
+    const responder = LocalCoachingResponder();
+    final l10n = lookupAppLocalizations(const Locale('ja'));
+
+    final response = await responder.respond(
+      message: l10n.coachPromptWhatNext,
+      context: CoachingContext(
+        localizations: l10n,
+        havenLoopContext: const HavenLoopCoachContext(
+          moment: HavenLoopCoachMoment.reflectionChoice,
+          hasLinkedTask: false,
+        ),
+      ),
+      conversation: const [],
+    );
+
+    expect(response, contains(l10n.focusReflectionTitle));
+    expect(response, contains(l10n.focusReflectionDescription));
   });
 
   test('responds to overwhelm with empathy and a concrete next step', () async {

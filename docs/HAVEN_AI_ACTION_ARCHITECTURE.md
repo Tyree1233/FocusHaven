@@ -1,6 +1,7 @@
 # Haven AI and Action Architecture
 
-Status: Phase 210 typed runtime and Phase 213 safe voice runtime implemented
+Status: Phase 210 typed runtime, Phase 213 safe voice runtime, and Phase 215H
+text-free Local-Coach bridge implemented
 
 The Haven Action Engine is the single policy boundary between a human
 request and an existing FocusHaven service. It exists so typed input, reviewed
@@ -468,5 +469,46 @@ content, account data, score, or new persisted state. The card has no button,
 network, coaching, timer, or queue surface and appears only after a pending
 linked-task outcome is settled. It says **This advisory changed nothing
 automatically** and that Journey remains private, cumulative, and free of
-scores or streak pressure. Local-coach context remains separate later Phase
-215 work.
+scores or streak pressure.
+
+## Phase 215H text-free Local-Coach context
+
+Phase 215H connects the current Haven Loop boundary to the deterministic Local
+Coach without giving coaching a new data store or action path. The
+`HavenLoopCoachContextService` accepts the already-derived Loop, timer,
+reflection, Rhythm, Forecast, and Journey boundaries. It emits nothing until
+the owners are initialized and agree on one valid Focus moment.
+
+For a completed session, the exact newest `FocusCompletionIdentity` must appear
+once in bounded text-free event history. The event's saved fit must match the
+current timer fit, and any supplied Rhythm, Forecast, or Journey connection
+must bind to the same completion. For a Smart Reset moment, the current linked
+selection must still exist and the timer must currently offer recovery. A
+stale, duplicate, mismatched, unresolved, non-Focus, or between-session input
+fails closed.
+
+The resulting `HavenLoopCoachContext` contains only:
+
+- one allowlisted Loop-moment enum;
+- whether an unchanged task link exists;
+- the existing text-free completion identity when applicable;
+- the bounded session-fit enum when applicable; and
+- matching Rhythm, Forecast, and Journey connection-kind enums.
+
+It contains no task title, queue identifier, journal text, mood label,
+transcript, conversation, account value, explanatory strings, persistence
+format, network method, or mutation method. It is rebuilt ephemerally and is
+never saved. `CoachingContext.toPromptData()` deliberately omits it, its
+presence forces `CoachingService` to select the deterministic local responder,
+and the production timer does not attach it while enhanced coaching is
+selected.
+
+The existing explicit **Focus Coach** tap remains the entry permission. Inside
+that sheet, one read-only card discloses the exact current Loop moment and the
+matching bounded connections using only already-reviewed catalog messages.
+The reviewed localized **What should I do next?** prompt can produce a
+deterministic response for that moment in every active UI locale. The card and
+response have no controls and cannot complete a task, save a reflection,
+select Smart Reset, start or adapt a timer, schedule work, or create a Haven
+action proposal. Every state change remains with the person and the existing
+owning service.

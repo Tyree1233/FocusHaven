@@ -11,6 +11,7 @@ import '../providers/app_providers.dart';
 import '../services/coaching_service.dart';
 import '../services/voice_transcription_service.dart';
 import 'confirmation_dialog.dart';
+import 'haven_loop_coach_context_card.dart';
 
 typedef CoachingContextBuilder = CoachingContext Function();
 
@@ -362,6 +363,7 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
     final l10n = context.l10n;
     final coachingState = ref.watch(coachingStateProvider);
     final voiceState = ref.watch(voiceTranscriptionServiceProvider);
+    final coachingContext = widget.contextBuilder();
     if (coachingState.conversationRevision != _lastConversationRevision) {
       _lastConversationRevision = coachingState.conversationRevision;
       if (coachingState.messages.isNotEmpty || coachingState.isResponding) {
@@ -538,6 +540,15 @@ class _CoachingSheetState extends ConsumerState<CoachingSheet> {
                           ),
                   ),
                   const Divider(height: 1),
+                  if (coachingContext.havenLoopContext != null) ...[
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+                      child: HavenLoopCoachContextCard(
+                        loopContext: coachingContext.havenLoopContext!,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                  ],
                   if (coachingState.enhancedCoachingAvailable) ...[
                     SwitchListTile.adaptive(
                       key: const ValueKey<String>('coach-enhanced-ai-toggle'),

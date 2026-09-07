@@ -890,6 +890,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final queueState = ref.read(focusQueueStateProvider);
     final journalState = ref.read(journalStateProvider);
     final parkedThoughtState = ref.read(parkedThoughtStateProvider);
+    final coach = ref.read(coachingServiceProvider);
     return CoachingContext(
       focusTask: timer.focusTask,
       focusProfile: ref.read(focusProfileTypeProvider),
@@ -902,6 +903,9 @@ class TimerScreen extends riverpod.ConsumerWidget {
       recentMood: journalState.mostCommonRecentMood,
       parkedThoughtCount: parkedThoughtState.activeThoughts.length,
       isTimerRunning: timer.isRunning,
+      havenLoopContext: coach.enhancedCoachingEnabled
+          ? null
+          : ref.read(havenLoopCoachContextProvider),
     );
   }
 
@@ -917,8 +921,19 @@ class TimerScreen extends riverpod.ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (_) =>
-          CoachingSheet(contextBuilder: () => _buildCoachingContext(ref)),
+      builder: (_) => riverpod.Consumer(
+        builder: (context, ref, child) {
+          ref.watch(havenLoopCoachContextProvider);
+          ref.watch(
+            coachingServiceProvider.select(
+              (coach) => coach.enhancedCoachingEnabled,
+            ),
+          );
+          return CoachingSheet(
+            contextBuilder: () => _buildCoachingContext(ref),
+          );
+        },
+      ),
     );
   }
 

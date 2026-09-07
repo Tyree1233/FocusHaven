@@ -65,7 +65,7 @@ Every future phase must preserve these rules:
 | Local Focus Coach | Shipped | Private local coaching remains the default and offline fallback. | Receive structured context and optional typed or voice transcripts through a common input boundary. |
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
-| Unified Haven Loop | Foundation shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, and Journey context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. Queue and timer services retain ownership. | Add local-coach context as one bounded, reviewable connection. |
+| Unified Haven Loop | Shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, Journey, and Local Coach context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. The Local Coach bridge copies only text-free enums, booleans, and the exact current completion identity; it is never serialized remotely. Queue and timer services retain ownership. | Preserve these service-owned boundaries as later adaptive features consume the Loop. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Ten reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, and Dutch; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, right-to-left, store promotion, and country distribution behind their separate gates. |
@@ -208,11 +208,12 @@ Connect Plan, focus, reflection, Rhythm, Forecast, Smart Reset, Journey, and
 local coaching into one calm lifecycle without turning the dashboard into a
 checklist or streak pressure system.
 
-Status: Phase 215F completion-to-Journey continuity implemented in the current
+Status: Phase 215H text-free Local-Coach context implemented in the current
 source, building on the Phase 215A local Plan-to-Focus loop, Phase 215B
 task-decision-to-reflection connection, Phase 215C reflection-to-Rhythm
 connection, Phase 215D reflection-to-Forecast connection, and Phase 215E
-linked Smart Reset continuity.
+linked Smart Reset continuity, plus Phase 215F completion-to-Journey
+continuity.
 An explicit queue selection stores only the active queue-item ID and delegates
 the visible intention to the existing timer owner. The queue remains the sole
 owner of task text, ordering, and completion. The timer remains the sole owner
@@ -288,11 +289,32 @@ Focus boundary. The visible statement says **This advisory changed nothing
 automatically** and that Journey remains private, cumulative, and free of
 scores or streak pressure.
 
-Phases 215A through 215F do not infer success from elapsed time, auto-complete
-work, select a break, copy task text or reflection content into a connection,
-contact local or remote coaching, read or write a calendar, or add an account,
-permission, dependency, backend, or deployment. Local-coach context remains
-later Phase 215 work and must keep the same explicit, service-owned boundary.
+Phase 215H creates one ephemeral `HavenLoopCoachContext` only at a valid linked
+Smart Reset choice or exact current completed-Focus boundary. The builder
+requires initialized Focus owners, one newest completion identity appearing
+exactly once, the same saved fit, and matching Rhythm, Forecast, and Journey
+connections. Stale, duplicate, mismatched, unresolved, non-Focus, and
+between-session evidence produces no context.
+
+The snapshot contains only enums, booleans, and the existing text-free
+completion identity. It contains no task title, queue ID, journal or reflection
+text, mood label, transcript, account value, localized prose, persistence
+format, or mutation method. After the person explicitly opens Focus Coach, a
+read-only card discloses the reviewed Loop moment and any matching Rhythm,
+Forecast, or Journey signals using the existing reviewed locale catalog. The
+deterministic Local Coach can use the snapshot for **What should I do next?**;
+it cannot choose the outcome, change a service, or create an action proposal.
+The snapshot is omitted from `CoachingContext.toPromptData()`, and its presence
+forces local response routing as defense in depth. The production timer does
+not attach it while enhanced coaching is selected.
+
+Phases 215A through 215F do not contact local or remote coaching. None of
+Phases 215A through 215F or Phase 215H infer success from elapsed time,
+auto-complete work, select a break, copy task text or reflection content into
+a connection, read or write a calendar, or add an account, permission,
+dependency, backend, or deployment. Phase 215H connects only the private
+deterministic Local Coach after an explicit Coach tap; it grants no action
+authority and sends no Loop snapshot to enhanced remote coaching.
 
 ### Phase 215G — Global localization
 
