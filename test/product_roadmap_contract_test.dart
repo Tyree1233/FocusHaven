@@ -32,6 +32,7 @@ void main() {
       '| Enhanced remote coach | Foundation shipped, disabled |',
       '| Haven AI planner | Foundation shipped |',
       '| Unified Haven Loop | Shipped |',
+      '| Adaptive Focus Engine | Foundation shipped |',
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
     ]) {
@@ -95,6 +96,8 @@ void main() {
     expect(readme, contains('Unified Loop-to-Local-Coach'));
     expect(readme, contains('text-free enums, booleans'));
     expect(readme, contains('never persisted or serialized'));
+    expect(readme, contains('Adaptive Focus Engine foundation'));
+    expect(readme, contains('No production control consumes it yet'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -203,6 +206,15 @@ void main() {
       'deterministic local responder',
       'cannot complete a task, save a reflection',
       'Every state change remains with the person',
+      'Phase 216A text-free adaptive preview',
+      '`AdaptiveFocusService`',
+      '`AdaptiveFocusSuggestion` contains only',
+      'An explicit **keep current** choice',
+      'Two recovery outcomes among the newest three meaningful events',
+      'One **Could do more** reflection is insufficient',
+      'A Forecast window requires the existing minimum of six completed signals',
+      'no timer or scheduling authority',
+      'no production UI consumes the preview in Phase 216A',
     ]) {
       expect(architecture, contains(required));
     }

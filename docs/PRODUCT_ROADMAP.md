@@ -66,6 +66,7 @@ Every future phase must preserve these rules:
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
 | Unified Haven Loop | Shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, Journey, and Local Coach context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. The Local Coach bridge copies only text-free enums, booleans, and the exact current completion identity; it is never serialized remotely. Queue and timer services retain ownership. | Preserve these service-owned boundaries as later adaptive features consume the Loop. |
+| Adaptive Focus Engine | Foundation shipped | A deterministic local service can create one ephemeral, text-free focus/break/timing preview only from explicit current choices and bounded Focus Event, Rhythm, and Forecast signals. Explicit keep-current and recovery needs lead; growth requires repeated evidence. Nothing consumes the preview in production yet. | Add a separately reviewed presentation that explains every contributing signal and delegates only an explicitly accepted duration to the timer owner. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Ten reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, and Dutch; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, right-to-left, store promotion, and country distribution behind their separate gates. |
@@ -594,6 +595,28 @@ build, or edits a store listing. The detailed release gates are defined in
 Offer explainable local adjustments to session length, break shape, and timing
 using bounded text-free signals. Recovery needs and explicit user choices
 override learned patterns.
+
+Status: Phase 216A local advisory foundation implemented in the current
+source. `AdaptiveFocusService` accepts only an explicit current focus duration,
+current break duration, keep-current choice, bounded text-free Focus Events,
+the enum/count/suggested-duration output of Haven Rhythm, and a qualified Focus
+Forecast window. It returns one ephemeral `AdaptiveFocusSuggestion` made only
+of bounded numbers, booleans, enums, and an optional timing window.
+
+The precedence is fail-closed. An explicit keep-current choice bypasses learned
+pace changes. Repeated recent recovery leads before reflection, Rhythm, or
+Forecast evidence and cannot lengthen focus. A newest **Too much** reflection
+can move only gentler. One **Could do more** reflection cannot increase focus
+unless at least three matching Rhythm signals support it, and even then the
+preview moves only one bounded step. A Forecast window needs its existing six
+completed signals and can add timing context without changing duration.
+
+The preview is not persisted, does not expose a production control, and cannot
+start or alter a timer, choose a break, schedule work, write a calendar, create
+an action proposal, or contact local or remote AI. Phase 216A adds no new user
+copy, translation, dependency, permission, account requirement, backend, or
+deployment. The later presentation and explicit acceptance path remain
+separate work and must delegate any chosen duration to `TimerService`.
 
 ### Phase 217 — System assistant intents
 

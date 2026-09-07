@@ -731,6 +731,19 @@ timer, queue, reflection, scheduling, or action authority. The snapshot is
 never persisted or serialized in the remote prompt, forces local response
 routing when present, and is not attached while enhanced coaching is selected.
 
+Phase 216A adds the private **Adaptive Focus Engine foundation** without
+changing the timer UI. One ephemeral, text-free preview can compare an
+explicit current focus and break choice with bounded focus-event, Haven
+Rhythm, and Focus Forecast signals. A keep-current choice wins immediately;
+repeated recovery wins over learned pace or timing; one **Too much** reflection
+can only move gentler; and one **Could do more** reflection cannot lengthen a
+session without repeated matching Rhythm evidence. A qualified Forecast may
+add an optional time window but cannot change duration. The preview contains
+no task, journal, mood, coach, account, or localized text; is not persisted;
+and has no timer, calendar, action, network, or remote-model authority.
+No production control consumes it yet, so every visible timer choice remains
+unchanged while the later reviewed presentation gate is prepared.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

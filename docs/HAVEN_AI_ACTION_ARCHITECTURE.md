@@ -1,7 +1,8 @@
 # Haven AI and Action Architecture
 
 Status: Phase 210 typed runtime, Phase 213 safe voice runtime, and Phase 215H
-text-free Local-Coach bridge implemented
+text-free Local-Coach bridge implemented; Phase 216A adds a local adaptive
+preview.
 
 The Haven Action Engine is the single policy boundary between a human
 request and an existing FocusHaven service. It exists so typed input, reviewed
@@ -512,3 +513,40 @@ response have no controls and cannot complete a task, save a reflection,
 select Smart Reset, start or adapt a timer, schedule work, or create a Haven
 action proposal. Every state change remains with the person and the existing
 owning service.
+
+## Phase 216A text-free adaptive preview
+
+Phase 216A adds one deterministic `AdaptiveFocusService` behind an explicit
+request boundary. It combines only the current focus and break choices supplied
+by a future review surface, bounded `FocusEvent` values, the enum/count output
+of Haven Rhythm, and an already-qualified Focus Forecast window. It never reads
+the headline, detail, or evidence prose carried by those presentation models.
+
+The resulting `AdaptiveFocusSuggestion` contains only bounded numbers,
+booleans, enums, and an optional `FocusForecastWindow`. It contains no task or
+queue value, journal or reflection text, mood, coach message, transcript,
+account value, localized prose, persistence format, network method, or action
+method. It is rebuilt on demand and has no timer or scheduling authority.
+
+Precedence is deliberately conservative:
+
+1. An explicit **keep current** choice returns the supplied focus and break
+   values unchanged and does not claim to use learned pace evidence.
+2. Two recovery outcomes among the newest three meaningful events lead before
+   a growth signal and can only shorten or retain focus while preserving or
+   increasing recovery time.
+3. The newest completed **Too much** reflection can only move one bounded step
+   gentler. **About right** retains the current choice.
+4. One **Could do more** reflection is insufficient to lengthen a session. It
+   requires at least three matching Rhythm signals and still permits only one
+   bounded step.
+5. A Forecast window requires the existing minimum of six completed signals.
+   It adds optional timing context but cannot alter focus or break duration.
+
+The Riverpod family requires the caller to supply the current values and the
+explicit keep-current flag. There is no default adaptive command and no
+production UI consumes the preview in Phase 216A. A later presentation phase
+must use reviewed localized copy, disclose the contributing bounded signals,
+and delegate any accepted duration to the existing `TimerService`. The engine
+cannot start, pause, reset, resize, or complete a timer; schedule work; write a
+calendar; create a Haven action proposal; or invoke local or remote coaching.

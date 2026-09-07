@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/legacy.dart';
 
 import '../config/feature_flags.dart';
 import '../l10n/app_localizations.dart';
+import '../models/adaptive_focus_suggestion.dart';
 import '../models/coaching_message.dart';
 import '../models/focus_event.dart';
 import '../models/focus_forecast.dart';
@@ -24,6 +25,7 @@ import '../models/parked_thought.dart';
 import '../models/pro_entitlement.dart';
 import '../models/system_focus_snapshot.dart';
 import '../services/account_deletion_service.dart';
+import '../services/adaptive_focus_service.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
 import '../services/coaching_service.dart';
@@ -104,6 +106,16 @@ typedef LocalizedHavenPlanRequest = ({
   HavenEnergy energy,
   int availableMinutes,
   AppLocalizations localizations,
+});
+
+/// Explicit inputs for one ephemeral adaptive preview.
+///
+/// No default provider silently chooses for the person; a caller must supply
+/// the current focus/break choices and whether they must remain unchanged.
+typedef AdaptiveFocusRequest = ({
+  int currentFocusMinutes,
+  int currentBreakMinutes,
+  bool preserveCurrentChoice,
 });
 
 /// Immutable journal data used by the Reflection Journal sheet.
@@ -212,6 +224,11 @@ final accountDeletionServiceProvider = Provider<AccountDeletionService>(
 final focusForecastServiceProvider = Provider<FocusForecastService>(
   (ref) => const FocusForecastService(),
   name: 'focusForecastServiceProvider',
+);
+
+final adaptiveFocusServiceProvider = Provider<AdaptiveFocusService>(
+  (ref) => const AdaptiveFocusService(),
+  name: 'adaptiveFocusServiceProvider',
 );
 
 final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(
@@ -638,6 +655,26 @@ final havenRhythmInsightProvider = Provider<HavenRhythmInsight>((ref) {
       .watch(havenRhythmServiceProvider)
       .createInsight(recentEvents: events);
 }, name: 'havenRhythmInsightProvider');
+
+/// Builds one text-free, local-only Phase 216A preview from existing owner
+/// snapshots and explicit current choices. The result is advisory and has no
+/// timer, scheduling, persistence, or remote-model authority.
+final adaptiveFocusSuggestionProvider =
+    Provider.family<AdaptiveFocusSuggestion?, AdaptiveFocusRequest>((
+      ref,
+      request,
+    ) {
+      return ref
+          .watch(adaptiveFocusServiceProvider)
+          .createSuggestion(
+            currentFocusMinutes: request.currentFocusMinutes,
+            currentBreakMinutes: request.currentBreakMinutes,
+            preserveCurrentChoice: request.preserveCurrentChoice,
+            recentEvents: ref.watch(timerFocusEventsProvider),
+            rhythm: ref.watch(havenRhythmInsightProvider),
+            forecast: ref.watch(focusForecastProvider),
+          );
+    }, name: 'adaptiveFocusSuggestionProvider');
 
 /// Explains how the reflection on the exact current completed Focus session
 /// relates to Haven Rhythm. The connection is ephemeral and advisory only.
