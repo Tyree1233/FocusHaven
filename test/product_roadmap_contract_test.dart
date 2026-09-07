@@ -98,6 +98,8 @@ void main() {
     expect(readme, contains('never persisted or serialized'));
     expect(readme, contains('Adaptive Focus Engine foundation'));
     expect(readme, contains('No production control consumes it yet'));
+    expect(readme, contains('Adaptive Focus review foundation'));
+    expect(readme, contains('one-time local review ticket'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -215,6 +217,15 @@ void main() {
       'A Forecast window requires the existing minimum of six completed signals',
       'no timer or scheduling authority',
       'no production UI consumes the preview in Phase 216A',
+      'Phase 216B isolated adaptive review',
+      '`AdaptiveFocusReviewService.beginReview()`',
+      'A stale, replayed, superseded, mismatched, or owner-changed review',
+      'An unchanged preview cannot authorize acceptance',
+      'explicit **keep current** settlement',
+      'still not an execution command',
+      '`AdaptiveFocusReviewCard`',
+      'performs no localization, interpolation, or sentence assembly',
+      'No production file consumes the card in Phase 216B',
     ]) {
       expect(architecture, contains(required));
     }

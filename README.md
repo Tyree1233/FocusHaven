@@ -744,6 +744,18 @@ and has no timer, calendar, action, network, or remote-model authority.
 No production control consumes it yet, so every visible timer choice remains
 unchanged while the later reviewed presentation gate is prepared.
 
+Phase 216B adds the isolated **Adaptive Focus review foundation** while keeping
+that production boundary closed. A one-time local review ticket binds an
+explicit keep-current or accept choice to the exact text-free suggestion and
+the exact current focus and break values. Superseded, stale, replayed,
+mismatched, unchanged-accept, or owner-changed attempts fail closed. A reusable
+accessible card accepts only complete copy injected by a future reviewed
+locale-specific caller and emits the exact immutable suggestion through one of
+two one-shot callbacks. The card and settlement service do not import or call
+the timer, localization catalogs, persistence, AI, or network services. No
+production screen consumes the card, no new user-visible catalog message was
+added, and an accepted result is not yet a timer command.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

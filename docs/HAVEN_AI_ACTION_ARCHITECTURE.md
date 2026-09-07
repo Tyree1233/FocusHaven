@@ -1,8 +1,8 @@
 # Haven AI and Action Architecture
 
 Status: Phase 210 typed runtime, Phase 213 safe voice runtime, and Phase 215H
-text-free Local-Coach bridge implemented; Phase 216A adds a local adaptive
-preview.
+text-free Local-Coach bridge implemented; Phases 216A and 216B add the local
+adaptive preview and isolated review foundations.
 
 The Haven Action Engine is the single policy boundary between a human
 request and an existing FocusHaven service. It exists so typed input, reviewed
@@ -550,3 +550,37 @@ must use reviewed localized copy, disclose the contributing bounded signals,
 and delegate any accepted duration to the existing `TimerService`. The engine
 cannot start, pause, reset, resize, or complete a timer; schedule work; write a
 calendar; create a Haven action proposal; or invoke local or remote coaching.
+
+## Phase 216B isolated adaptive review
+
+Phase 216B adds a presentation and settlement foundation without opening the
+production timer boundary. `AdaptiveFocusReviewService.beginReview()` issues
+one opaque, in-memory ticket for one exact `AdaptiveFocusSuggestion`. Beginning
+a newer review supersedes the older ticket. Settlement consumes the ticket
+before rechecking the complete suggestion and the current focus and break
+values that the future caller reads from the timer owner. A stale, replayed,
+superseded, mismatched, or owner-changed review returns no decision. An
+unchanged preview cannot authorize acceptance.
+
+An explicit **keep current** settlement returns only the reviewed current
+values and no delegation authority. An explicit **accept suggestion**
+settlement can return the exact reviewed suggested values, but the result is
+still not an execution command. It is never persisted, and Phase 216B has no
+coordinator that can pass it to `TimerService`. A later integration must
+revalidate current owner state at the delegation boundary and must use the
+timer's existing public API instead of duplicating timer storage or mutation.
+
+`AdaptiveFocusReviewCard` is an isolated accessible view with two vertically
+stacked, one-shot actions. It accepts one complete `AdaptiveFocusReviewCopy`
+from its caller and performs no localization, interpolation, or sentence
+assembly itself. That contract prevents test fixture copy or a partially
+translated phrase from silently becoming production UI. The summary is exposed
+as one semantic container while both choices remain separate semantic buttons;
+the layout is covered at narrow width and large text.
+
+No production file consumes the card in Phase 216B, and no ARB catalog changes
+are included.
+The widget and settlement service import no `TimerService`, localization,
+persistence, network, or AI owner. Therefore this phase cannot start, resize,
+pause, reset, or complete a timer; schedule work; write a calendar; execute a
+Haven action; call local or remote AI; or change any account or external state.
