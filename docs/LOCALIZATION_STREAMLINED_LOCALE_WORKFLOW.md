@@ -246,10 +246,14 @@ dart run tool/localization_google_incremental_drafts.dart translate \
   /private/path/incremental-translation-bundles
 ```
 
-Each complete response is first written to a private, provider-bound
-quarantine. A local safety refusal preserves that quarantine. After correcting
-only the private policy input, `resume` revalidates the preserved response
-offline and never authenticates or sends another request:
+Each complete response is first written as a raw provider-response envelope,
+bound to the delta, source digest, locale, project, model, glossary, target
+language, MIME type, and ICU-shield contract. This happens before HTML/ICU
+decoding, so even a provider HTML-shape refusal remains recoverable. A local
+safety refusal preserves either that envelope or the older validated-response
+quarantine. After correcting only local handling or private policy, `resume`
+revalidates the preserved response offline and never authenticates or sends
+another request:
 
 ```bash
 dart run tool/localization_google_incremental_drafts.dart resume \
@@ -258,8 +262,27 @@ dart run tool/localization_google_incremental_drafts.dart resume \
   /private/path/incremental-translation-bundles
 ```
 
-All three commands refuse repository-owned private paths and existing state
-outside their exact new-run or resume contract. They print only aggregate
+When an earlier batch has exact saved bundles for every locale except one and
+no recoverable response exists for that missing locale, run the no-request
+`repair-preflight` target lock first:
+
+```bash
+dart run tool/localization_google_incremental_drafts.dart repair-preflight \
+  /private/path/incremental-review-manifest.json \
+  /private/path/google-incremental-config.json \
+  /private/path/incremental-translation-bundles \
+  ja
+```
+
+Only a separately authorized `repair-translate` may then contact the provider.
+It processes exactly the named missing locale and refuses unless every peer
+bundle rebuilds byte-for-byte from its saved translations, with no peer
+quarantine or provider-response envelope present. The repair command preserves
+its own raw provider-response envelope before decoding and never overwrites any
+existing file.
+
+All commands refuse repository-owned private paths and existing state outside
+their exact new-run, resume, or targeted-repair contract. They print only aggregate
 diagnostics, never message text, translated text, tokens, response bodies, or
 request identifiers. A successful draft still has no fluent-review,
 acceptance, runtime, fallback, UI, timer, deployment, or publication authority.

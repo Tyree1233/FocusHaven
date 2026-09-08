@@ -9,6 +9,8 @@ const googleIncrementalTranslationDraftWorkflow =
     'focus_haven_google_incremental_translation_drafts_v1';
 const googleIncrementalTranslationQuarantineWorkflow =
     'focus_haven_google_incremental_translation_quarantine_v1';
+const googleIncrementalProviderResponseWorkflow =
+    'focus_haven_google_incremental_provider_response_v1';
 const googleIncrementalTranslationMaxParallelism = 3;
 
 final class GoogleIncrementalTranslationDraftResult {
@@ -119,6 +121,87 @@ Map<String, dynamic> buildGoogleIncrementalTranslationQuarantine({
   'glossary': localeConfig.glossary,
   'translations': translations,
 };
+
+Map<String, dynamic> buildGoogleIncrementalProviderResponse({
+  required IncrementalLocaleReviewManifest manifest,
+  required IncrementalLocaleReviewEntry entry,
+  required GoogleTranslationDraftConfig config,
+  required GoogleTranslationDraftLocaleConfig localeConfig,
+  required Map<String, String> providerHtml,
+}) => {
+  'schemaVersion': 1,
+  'workflow': googleIncrementalProviderResponseWorkflow,
+  'deltaId': manifest.deltaId,
+  'locale': entry.locale,
+  'sourceProposalSha256': manifest.sourceProposalSha256,
+  'provider': 'google_cloud_translation_advanced_v3',
+  'projectId': config.projectId,
+  'location': config.location,
+  'model': config.model,
+  'glossary': localeConfig.glossary,
+  'targetLanguageCode': localeConfig.targetLanguageCode,
+  'providerMimeType': googleTranslationDraftMimeType,
+  'icuPlaceholderShielding': true,
+  'providerHtml': providerHtml,
+};
+
+Map<String, String> verifyGoogleIncrementalProviderResponse({
+  required Map<String, dynamic> response,
+  required IncrementalLocaleReviewManifest manifest,
+  required IncrementalLocaleReviewEntry entry,
+  required GoogleTranslationDraftConfig config,
+  required GoogleTranslationDraftLocaleConfig localeConfig,
+  required Map<String, dynamic> sourceProposal,
+}) {
+  _requireExactKeys(response, const {
+    'schemaVersion',
+    'workflow',
+    'deltaId',
+    'locale',
+    'sourceProposalSha256',
+    'provider',
+    'projectId',
+    'location',
+    'model',
+    'glossary',
+    'targetLanguageCode',
+    'providerMimeType',
+    'icuPlaceholderShielding',
+    'providerHtml',
+  }, 'Google incremental provider response');
+  if (response['schemaVersion'] != 1 ||
+      response['workflow'] != googleIncrementalProviderResponseWorkflow ||
+      response['deltaId'] != manifest.deltaId ||
+      response['locale'] != entry.locale ||
+      response['sourceProposalSha256'] != manifest.sourceProposalSha256 ||
+      response['provider'] != 'google_cloud_translation_advanced_v3' ||
+      response['projectId'] != config.projectId ||
+      response['location'] != config.location ||
+      response['model'] != config.model ||
+      response['glossary'] != localeConfig.glossary ||
+      response['targetLanguageCode'] != localeConfig.targetLanguageCode ||
+      response['providerMimeType'] != googleTranslationDraftMimeType ||
+      response['icuPlaceholderShielding'] != true) {
+    throw const GoogleTranslationDraftFailure(
+      'incremental_provider_response_binding_mismatch',
+    );
+  }
+  final providerHtml = _strictStringMap(
+    response['providerHtml'],
+    'incremental provider response HTML',
+  );
+  final sourceKeys = sourceProposal.keys
+      .where((key) => !key.startsWith('@'))
+      .toSet();
+  final responseKeys = providerHtml.keys.toSet();
+  if (sourceKeys.length != responseKeys.length ||
+      !sourceKeys.containsAll(responseKeys)) {
+    throw const GoogleTranslationDraftFailure(
+      'incremental_provider_response_key_mismatch',
+    );
+  }
+  return providerHtml;
+}
 
 Map<String, String> verifyGoogleIncrementalTranslationQuarantine({
   required Map<String, dynamic> quarantine,
@@ -234,8 +317,11 @@ Map<String, dynamic> googleIncrementalTranslationPreflightSummary({
 }
 
 Future<void> main(List<String> arguments) async {
-  if (arguments.length != 4 ||
-      !const {'preflight', 'translate', 'resume'}.contains(arguments.first)) {
+  const ordinaryOperations = {'preflight', 'translate', 'resume'};
+  const repairOperations = {'repair-preflight', 'repair-translate'};
+  if ((arguments.length != 4 ||
+          !ordinaryOperations.contains(arguments.first)) &&
+      (arguments.length != 5 || !repairOperations.contains(arguments.first))) {
     _usage();
     exitCode = 64;
     return;
@@ -249,6 +335,11 @@ Future<void> main(List<String> arguments) async {
       _jsonObject(arguments[2]),
     );
     final outputDirectory = arguments[3];
+    final targetLocale = repairOperations.contains(operation)
+        ? arguments[4]
+        : null;
+    final makesProviderRequest =
+        operation == 'translate' || operation == 'repair-translate';
     _requirePrivateFile(arguments[2]);
     _requirePrivateDirectory(outputDirectory);
     verifyGoogleIncrementalTranslationDraftConfiguration(
@@ -267,7 +358,15 @@ Future<void> main(List<String> arguments) async {
       config: config,
       sourceProposal: sourceProposal,
     );
-    if (operation == 'resume') {
+    if (targetLocale != null) {
+      verifyGoogleIncrementalTargetedRepairState(
+        manifest: manifest,
+        config: config,
+        sourceProposal: sourceProposal,
+        outputDirectory: outputDirectory,
+        targetLocale: targetLocale,
+      );
+    } else if (operation == 'resume') {
       _requireResumableState(manifest, outputDirectory);
     } else {
       _refuseExistingState(manifest, outputDirectory);
@@ -278,8 +377,20 @@ Future<void> main(List<String> arguments) async {
       config: config,
       sourceProposal: sourceProposal,
     );
-    if (operation == 'preflight') {
-      stdout.writeln(_prettyJson(preflight));
+    if (operation == 'preflight' || operation == 'repair-preflight') {
+      stdout.writeln(
+        _prettyJson(
+          targetLocale == null
+              ? preflight
+              : {
+                  ...preflight,
+                  'operation': operation,
+                  'localeCount': 1,
+                  'targetLocale': targetLocale,
+                  'existingBundleCount': manifest.locales.length - 1,
+                },
+        ),
+      );
       return;
     }
 
@@ -290,7 +401,7 @@ Future<void> main(List<String> arguments) async {
     );
     final requestCount = providerChunks.length;
     final codePointCount = preflight['codePointCountPerLocale'] as int;
-    final client = operation == 'translate'
+    final client = makesProviderRequest
         ? GoogleTranslationRestClient(
             projectId: config.projectId,
             location: config.location,
@@ -298,12 +409,23 @@ Future<void> main(List<String> arguments) async {
             accessToken: await googleTranslationAccessToken(),
           )
         : null;
+    final entries = targetLocale == null
+        ? manifest.locales
+        : [
+            manifest.locales.singleWhere(
+              (entry) => entry.locale == targetLocale,
+            ),
+          ];
     final results = await _concurrentMap(
-      manifest.locales,
+      entries,
       googleIncrementalTranslationMaxParallelism,
       (entry) async {
         final outputPath = entry.bundlePath(outputDirectory);
         final quarantinePath = _quarantinePath(outputDirectory, entry.locale);
+        final providerResponsePath = _providerResponsePath(
+          outputDirectory,
+          entry.locale,
+        );
         final localeConfig = config.locales[entry.locale]!;
         final plan = incrementalLocalePlanFor(manifest, entry);
         try {
@@ -338,22 +460,37 @@ Future<void> main(List<String> arguments) async {
           }
 
           late final Map<String, String> translations;
-          if (operation == 'translate') {
+          if (makesProviderRequest) {
             translations = await fetchGoogleTranslationDraftTranslations(
               plan: plan,
               localeConfig: localeConfig,
               source: sourceProposal,
               maxCodePointsPerRequest: config.maxCodePointsPerRequest,
               sender: client!.translate,
+              onProviderHtml: (providerHtml) {
+                final response = buildGoogleIncrementalProviderResponse(
+                  manifest: manifest,
+                  entry: entry,
+                  config: config,
+                  localeConfig: localeConfig,
+                  providerHtml: providerHtml,
+                );
+                _writePrivateNew(providerResponsePath, _prettyJson(response));
+              },
             );
-            final quarantine = buildGoogleIncrementalTranslationQuarantine(
+          } else if (File(providerResponsePath).existsSync()) {
+            final providerHtml = verifyGoogleIncrementalProviderResponse(
+              response: _jsonObject(providerResponsePath),
               manifest: manifest,
               entry: entry,
               config: config,
               localeConfig: localeConfig,
-              translations: translations,
+              sourceProposal: sourceProposal,
             );
-            _writePrivateNew(quarantinePath, _prettyJson(quarantine));
+            translations = restoreGoogleTranslationDraftProviderHtml(
+              source: sourceProposal,
+              providerHtml: providerHtml,
+            );
           } else {
             translations = verifyGoogleIncrementalTranslationQuarantine(
               quarantine: _jsonObject(quarantinePath),
@@ -372,11 +509,21 @@ Future<void> main(List<String> arguments) async {
             translations: translations,
           );
           _writePrivateNew(outputPath, _prettyJson(bundle));
-          File(quarantinePath).deleteSync();
+          try {
+            if (File(providerResponsePath).existsSync()) {
+              File(providerResponsePath).deleteSync();
+            }
+            if (File(quarantinePath).existsSync()) {
+              File(quarantinePath).deleteSync();
+            }
+          } on Object {
+            if (File(outputPath).existsSync()) File(outputPath).deleteSync();
+            rethrow;
+          }
           return GoogleIncrementalTranslationDraftResult(
             locale: entry.locale,
             passed: true,
-            requestCount: operation == 'translate' ? requestCount : 0,
+            requestCount: makesProviderRequest ? requestCount : 0,
             messageCount: translations.length,
             codePointCount: codePointCount,
             errorCode: null,
@@ -386,60 +533,65 @@ Future<void> main(List<String> arguments) async {
           return GoogleIncrementalTranslationDraftResult(
             locale: entry.locale,
             passed: false,
-            requestCount: operation == 'translate' ? requestCount : 0,
+            requestCount: makesProviderRequest ? requestCount : 0,
             messageCount: sourceProposal.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
             codePointCount: codePointCount,
             errorCode: error.code,
             diagnosticCodes: error.allCodes,
-            quarantineState: File(quarantinePath).existsSync()
-                ? 'preserved'
-                : 'not_created',
+            quarantineState: _quarantineState(
+              providerResponsePath,
+              quarantinePath,
+            ),
           );
         } on Object {
           return GoogleIncrementalTranslationDraftResult(
             locale: entry.locale,
             passed: false,
-            requestCount: operation == 'translate' ? requestCount : 0,
+            requestCount: makesProviderRequest ? requestCount : 0,
             messageCount: sourceProposal.keys
                 .where((key) => !key.startsWith('@'))
                 .length,
             codePointCount: codePointCount,
             errorCode: 'unexpected_local_failure',
             diagnosticCodes: const ['unexpected_local_failure'],
-            quarantineState: File(quarantinePath).existsSync()
-                ? 'preserved'
-                : 'not_created',
+            quarantineState: _quarantineState(
+              providerResponsePath,
+              quarantinePath,
+            ),
           );
         }
       },
     );
     client?.close();
     final passed = results.every((result) => result.passed);
-    stdout.writeln(
-      _prettyJson({
-        'schemaVersion': 1,
-        'workflow': googleIncrementalTranslationDraftWorkflow,
-        'operation': operation,
-        'passed': passed,
-        'deltaId': manifest.deltaId,
-        'provider': 'google_cloud_translation_advanced_v3',
-        'localeCount': results.length,
-        'passedCount': results.where((result) => result.passed).length,
-        'failedCount': results.where((result) => !result.passed).length,
-        'messageCountPerLocale': preflight['messageCountPerLocale'],
-        'requestCountPerLocale': operation == 'translate' ? requestCount : 0,
-        'maxParallelism': googleIncrementalTranslationMaxParallelism,
-        'locales': results.map((result) => result.toJson()).toList(),
-        'humanReviewRequired': true,
-        'runtimeActivated': false,
-        'externalRequestMade': operation == 'translate',
-        'recoverablePrivateQuarantineEnabled': true,
-        'providerMimeType': googleTranslationDraftMimeType,
-        'icuPlaceholderShielding': true,
-      }),
-    );
+    final summary = <String, dynamic>{
+      'schemaVersion': 1,
+      'workflow': googleIncrementalTranslationDraftWorkflow,
+      'operation': operation,
+      'passed': passed,
+      'deltaId': manifest.deltaId,
+      'provider': 'google_cloud_translation_advanced_v3',
+      'localeCount': results.length,
+      'passedCount': results.where((result) => result.passed).length,
+      'failedCount': results.where((result) => !result.passed).length,
+      'messageCountPerLocale': preflight['messageCountPerLocale'],
+      'requestCountPerLocale': makesProviderRequest ? requestCount : 0,
+      'maxParallelism': googleIncrementalTranslationMaxParallelism,
+      'locales': results.map((result) => result.toJson()).toList(),
+      'humanReviewRequired': true,
+      'runtimeActivated': false,
+      'externalRequestMade': makesProviderRequest,
+      'recoverablePrivateQuarantineEnabled': true,
+      'providerMimeType': googleTranslationDraftMimeType,
+      'icuPlaceholderShielding': true,
+    };
+    if (targetLocale != null) {
+      summary['targetLocale'] = targetLocale;
+      summary['existingBundleCount'] = manifest.locales.length - 1;
+    }
+    stdout.writeln(_prettyJson(summary));
     if (!passed) exitCode = 65;
   } on GoogleTranslationDraftFailure catch (error) {
     stderr.writeln(
@@ -533,6 +685,122 @@ String _quarantinePath(String outputDirectory, String locale) =>
     '${Directory(outputDirectory).absolute.path}'
     '${Platform.pathSeparator}focushaven-$locale-incremental-quarantine.json';
 
+String _providerResponsePath(String outputDirectory, String locale) =>
+    '${Directory(outputDirectory).absolute.path}'
+    '${Platform.pathSeparator}focushaven-$locale-incremental-provider-response.json';
+
+String _quarantineState(String providerResponsePath, String quarantinePath) {
+  if (File(providerResponsePath).existsSync()) {
+    return 'provider_response_preserved';
+  }
+  if (File(quarantinePath).existsSync()) {
+    return 'validated_response_preserved';
+  }
+  return 'not_created';
+}
+
+void verifyGoogleIncrementalTargetedRepairState({
+  required IncrementalLocaleReviewManifest manifest,
+  required GoogleTranslationDraftConfig config,
+  required Map<String, dynamic> sourceProposal,
+  required String outputDirectory,
+  required String targetLocale,
+}) {
+  final targets = manifest.locales
+      .where((entry) => entry.locale == targetLocale)
+      .toList();
+  if (targets.length != 1) {
+    throw GoogleTranslationDraftFailure(
+      'incremental_repair_unknown_target:$targetLocale',
+    );
+  }
+  final target = targets.single;
+  final targetOutputPath = target.bundlePath(outputDirectory);
+  final targetQuarantinePath = _quarantinePath(outputDirectory, targetLocale);
+  final targetProviderResponsePath = _providerResponsePath(
+    outputDirectory,
+    targetLocale,
+  );
+  if (FileSystemEntity.typeSync(targetOutputPath, followLinks: false) !=
+          FileSystemEntityType.notFound ||
+      FileSystemEntity.typeSync(targetQuarantinePath, followLinks: false) !=
+          FileSystemEntityType.notFound ||
+      FileSystemEntity.typeSync(
+            targetProviderResponsePath,
+            followLinks: false,
+          ) !=
+          FileSystemEntityType.notFound) {
+    throw GoogleTranslationDraftFailure(
+      'incremental_repair_target_not_empty:$targetLocale',
+    );
+  }
+  final outputRoot = Directory(outputDirectory);
+  final expectedPeerPaths = manifest.locales
+      .where((entry) => entry.locale != targetLocale)
+      .map((entry) => File(entry.bundlePath(outputDirectory)).absolute.path)
+      .toSet();
+  if (!outputRoot.existsSync()) {
+    throw const GoogleTranslationDraftFailure(
+      'incremental_repair_output_directory_missing',
+    );
+  }
+  final actualEntries = outputRoot.listSync(followLinks: false);
+  final actualPeerPaths = actualEntries
+      .whereType<File>()
+      .map((file) => file.absolute.path)
+      .toSet();
+  if (actualEntries.length != expectedPeerPaths.length ||
+      actualPeerPaths.length != expectedPeerPaths.length ||
+      !actualPeerPaths.containsAll(expectedPeerPaths)) {
+    throw const GoogleTranslationDraftFailure(
+      'incremental_repair_output_scope_mismatch',
+    );
+  }
+  for (final entry in manifest.locales) {
+    final outputPath = entry.bundlePath(outputDirectory);
+    final quarantinePath = _quarantinePath(outputDirectory, entry.locale);
+    final providerResponsePath = _providerResponsePath(
+      outputDirectory,
+      entry.locale,
+    );
+    if (Directory(outputPath).existsSync() ||
+        Directory(quarantinePath).existsSync() ||
+        Directory(providerResponsePath).existsSync()) {
+      throw GoogleTranslationDraftFailure(
+        'invalid_incremental_repair_state:${entry.locale}',
+      );
+    }
+    final hasOutput = File(outputPath).existsSync();
+    final hasQuarantine = File(quarantinePath).existsSync();
+    final hasProviderResponse = File(providerResponsePath).existsSync();
+    if (entry.locale == targetLocale) {
+      continue;
+    }
+    if (!hasOutput || hasQuarantine || hasProviderResponse) {
+      throw GoogleTranslationDraftFailure(
+        'incremental_repair_existing_state_mismatch:${entry.locale}',
+      );
+    }
+    final existing = _jsonObject(outputPath);
+    final translations = _strictStringMap(
+      existing['translations'],
+      '${entry.locale} existing incremental bundle translations',
+    );
+    final expected = buildGoogleIncrementalTranslationDraftBundle(
+      manifest: manifest,
+      entry: entry,
+      localeConfig: config.locales[entry.locale]!,
+      sourceProposal: sourceProposal,
+      translations: translations,
+    );
+    if (_prettyJson(existing) != _prettyJson(expected)) {
+      throw GoogleTranslationDraftFailure(
+        'incremental_repair_existing_bundle_lock_mismatch:${entry.locale}',
+      );
+    }
+  }
+}
+
 void _refuseExistingState(
   IncrementalLocaleReviewManifest manifest,
   String outputDirectory,
@@ -540,6 +808,10 @@ void _refuseExistingState(
   for (final entry in manifest.locales) {
     final outputPath = entry.bundlePath(outputDirectory);
     final quarantinePath = _quarantinePath(outputDirectory, entry.locale);
+    final providerResponsePath = _providerResponsePath(
+      outputDirectory,
+      entry.locale,
+    );
     if (File(outputPath).existsSync() || Directory(outputPath).existsSync()) {
       throw GoogleTranslationDraftFailure(
         'refusing_existing_incremental_output:${entry.locale}',
@@ -549,6 +821,12 @@ void _refuseExistingState(
         Directory(quarantinePath).existsSync()) {
       throw GoogleTranslationDraftFailure(
         'refusing_existing_incremental_quarantine:${entry.locale}',
+      );
+    }
+    if (File(providerResponsePath).existsSync() ||
+        Directory(providerResponsePath).existsSync()) {
+      throw GoogleTranslationDraftFailure(
+        'refusing_existing_incremental_provider_response:${entry.locale}',
       );
     }
   }
@@ -561,11 +839,22 @@ void _requireResumableState(
   for (final entry in manifest.locales) {
     final outputPath = entry.bundlePath(outputDirectory);
     final quarantinePath = _quarantinePath(outputDirectory, entry.locale);
+    final providerResponsePath = _providerResponsePath(
+      outputDirectory,
+      entry.locale,
+    );
     final hasOutput = File(outputPath).existsSync();
     final hasQuarantine = File(quarantinePath).existsSync();
+    final hasProviderResponse = File(providerResponsePath).existsSync();
     if (Directory(outputPath).existsSync() ||
         Directory(quarantinePath).existsSync() ||
-        hasOutput == hasQuarantine) {
+        Directory(providerResponsePath).existsSync() ||
+        [
+              hasOutput,
+              hasQuarantine,
+              hasProviderResponse,
+            ].where((value) => value).length !=
+            1) {
       throw GoogleTranslationDraftFailure(
         'invalid_incremental_resume_state:${entry.locale}',
       );
@@ -660,5 +949,7 @@ Usage:
   dart run tool/localization_google_incremental_drafts.dart preflight <incremental-manifest.json> <private-provider-config.json> <private-output-directory>
   dart run tool/localization_google_incremental_drafts.dart translate <incremental-manifest.json> <private-provider-config.json> <private-output-directory>
   dart run tool/localization_google_incremental_drafts.dart resume <incremental-manifest.json> <private-provider-config.json> <private-output-directory>
+  dart run tool/localization_google_incremental_drafts.dart repair-preflight <incremental-manifest.json> <private-provider-config.json> <private-output-directory> <missing-locale>
+  dart run tool/localization_google_incremental_drafts.dart repair-translate <incremental-manifest.json> <private-provider-config.json> <private-output-directory> <missing-locale>
 ''');
 }

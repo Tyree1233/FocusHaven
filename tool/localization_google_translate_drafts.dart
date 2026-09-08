@@ -499,6 +499,9 @@ typedef GoogleTranslationDraftSender =
       required List<String> contents,
     });
 
+typedef GoogleTranslationDraftProviderHtmlObserver =
+    void Function(Map<String, String> providerHtml);
+
 List<GoogleTranslationDraftChunk> buildGoogleTranslationDraftChunks({
   required Map<String, dynamic> source,
   required int maxCodePointsPerRequest,
@@ -564,6 +567,7 @@ Future<Map<String, String>> fetchGoogleTranslationDraftTranslations({
   required Map<String, dynamic> source,
   required int maxCodePointsPerRequest,
   required GoogleTranslationDraftSender sender,
+  GoogleTranslationDraftProviderHtmlObserver? onProviderHtml,
 }) async {
   final sourceKeys = source.keys.where((key) => !key.startsWith('@')).toSet();
   final unknownSourceEqualKeys =
@@ -577,7 +581,7 @@ Future<Map<String, String>> fetchGoogleTranslationDraftTranslations({
       for (final key in unknownSourceEqualKeys) 'unknown_source_equal_key:$key',
     ]);
   }
-  final translations = <String, String>{};
+  final providerHtml = <String, String>{};
   final chunks = buildGoogleTranslationDraftChunks(
     source: source,
     maxCodePointsPerRequest: maxCodePointsPerRequest,
@@ -596,16 +600,36 @@ Future<Map<String, String>> fetchGoogleTranslationDraftTranslations({
     }
     for (var index = 0; index < chunk.keys.length; index += 1) {
       final key = chunk.keys[index];
-      final providerValue = translated[index];
-      final value = restoreGoogleTranslationIcu(
-        protected: protectGoogleTranslationIcu(source[key] as String),
-        providerHtml: providerValue,
-      );
-      if (value.trim().isEmpty || value.contains('\u0000')) {
-        throw GoogleTranslationDraftFailure('invalid_provider_value:$key');
-      }
-      translations[key] = value;
+      providerHtml[key] = translated[index];
     }
+  }
+  onProviderHtml?.call(Map<String, String>.unmodifiable(providerHtml));
+  return restoreGoogleTranslationDraftProviderHtml(
+    source: source,
+    providerHtml: providerHtml,
+  );
+}
+
+Map<String, String> restoreGoogleTranslationDraftProviderHtml({
+  required Map<String, dynamic> source,
+  required Map<String, String> providerHtml,
+}) {
+  final sourceKeys = source.keys.where((key) => !key.startsWith('@')).toSet();
+  final providerKeys = providerHtml.keys.toSet();
+  if (sourceKeys.length != providerKeys.length ||
+      !sourceKeys.containsAll(providerKeys)) {
+    throw const GoogleTranslationDraftFailure('provider_response_key_mismatch');
+  }
+  final translations = <String, String>{};
+  for (final key in sourceKeys.toList()..sort()) {
+    final value = restoreGoogleTranslationIcu(
+      protected: protectGoogleTranslationIcu(source[key] as String),
+      providerHtml: providerHtml[key]!,
+    );
+    if (value.trim().isEmpty || value.contains('\u0000')) {
+      throw GoogleTranslationDraftFailure('invalid_provider_value:$key');
+    }
+    translations[key] = value;
   }
   return translations;
 }

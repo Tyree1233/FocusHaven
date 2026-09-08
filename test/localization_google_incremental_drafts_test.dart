@@ -305,6 +305,171 @@ void main() {
     );
   });
 
+  test(
+    'raw provider HTML is observed before local decoding can fail',
+    () async {
+      final manifest = IncrementalLocaleReviewManifest.fromJson(
+        _manifestJson(),
+      );
+      final config = GoogleTranslationDraftConfig.fromJson(_configJson());
+      final entry = manifest.locales.first;
+      Map<String, String>? observed;
+
+      await expectLater(
+        fetchGoogleTranslationDraftTranslations(
+          plan: incrementalLocalePlanFor(manifest, entry),
+          localeConfig: config.locales[entry.locale]!,
+          source: _sourceProposal(),
+          maxCodePointsPerRequest: 5000,
+          sender:
+              ({
+                required locale,
+                required glossary,
+                required contents,
+              }) async => [
+                for (var index = 0; index < contents.length; index += 1)
+                  index == 0 ? '<b>${contents[index]}</b>' : contents[index],
+              ],
+          onProviderHtml: (providerHtml) => observed = providerHtml,
+        ),
+        throwsA(
+          isA<GoogleTranslationDraftFailure>().having(
+            (error) => error.code,
+            'code',
+            'provider_html_mismatch',
+          ),
+        ),
+      );
+
+      expect(observed, isNotNull);
+      expect(observed, hasLength(3));
+      expect(observed!.values, contains(startsWith('<b>')));
+    },
+  );
+
+  test('raw provider response is exact and bound before offline decode', () {
+    final manifest = IncrementalLocaleReviewManifest.fromJson(_manifestJson());
+    final config = GoogleTranslationDraftConfig.fromJson(_configJson());
+    final entry = manifest.locales.first;
+    final localeConfig = config.locales[entry.locale]!;
+    final providerHtml = <String, String>{
+      for (final sourceEntry in _sourceProposal().entries)
+        if (!sourceEntry.key.startsWith('@'))
+          sourceEntry.key: sourceEntry.key == 'adaptiveFocusEyebrow'
+              ? '<b>${sourceEntry.value}</b>'
+              : protectGoogleTranslationIcu(sourceEntry.value as String).html,
+    };
+    final response = buildGoogleIncrementalProviderResponse(
+      manifest: manifest,
+      entry: entry,
+      config: config,
+      localeConfig: localeConfig,
+      providerHtml: providerHtml,
+    );
+
+    expect(
+      verifyGoogleIncrementalProviderResponse(
+        response: response,
+        manifest: manifest,
+        entry: entry,
+        config: config,
+        localeConfig: localeConfig,
+        sourceProposal: _sourceProposal(),
+      ),
+      providerHtml,
+    );
+    expect(
+      () => restoreGoogleTranslationDraftProviderHtml(
+        source: _sourceProposal(),
+        providerHtml: providerHtml,
+      ),
+      throwsA(
+        isA<GoogleTranslationDraftFailure>().having(
+          (error) => error.code,
+          'code',
+          'provider_html_mismatch',
+        ),
+      ),
+    );
+
+    final changed = Map<String, dynamic>.from(response)
+      ..['projectId'] = 'different-project';
+    expect(
+      () => verifyGoogleIncrementalProviderResponse(
+        response: changed,
+        manifest: manifest,
+        entry: entry,
+        config: config,
+        localeConfig: localeConfig,
+        sourceProposal: _sourceProposal(),
+      ),
+      throwsA(
+        isA<GoogleTranslationDraftFailure>().having(
+          (error) => error.code,
+          'code',
+          'incremental_provider_response_binding_mismatch',
+        ),
+      ),
+    );
+  });
+
+  test('targeted repair requires one empty target and exact saved peers', () {
+    final manifest = IncrementalLocaleReviewManifest.fromJson(_manifestJson());
+    final config = GoogleTranslationDraftConfig.fromJson(_configJson());
+    final sourceProposal = _sourceProposal();
+    final directory = Directory.systemTemp.createTempSync(
+      'focushaven-incremental-repair-',
+    );
+    addTearDown(() => directory.deleteSync(recursive: true));
+    final peer = manifest.locales.singleWhere((entry) => entry.locale == 'fr');
+    final bundle = buildGoogleIncrementalTranslationDraftBundle(
+      manifest: manifest,
+      entry: peer,
+      localeConfig: config.locales[peer.locale]!,
+      sourceProposal: sourceProposal,
+      translations: _spanishTranslations(),
+    );
+    File(peer.bundlePath(directory.path))
+      ..parent.createSync(recursive: true)
+      ..writeAsStringSync(
+        '${const JsonEncoder.withIndent('  ').convert(bundle)}\n',
+      );
+
+    expect(
+      () => verifyGoogleIncrementalTargetedRepairState(
+        manifest: manifest,
+        config: config,
+        sourceProposal: sourceProposal,
+        outputDirectory: directory.path,
+        targetLocale: 'es',
+      ),
+      returnsNormally,
+    );
+
+    final target = manifest.locales.singleWhere(
+      (entry) => entry.locale == 'es',
+    );
+    File(target.bundlePath(directory.path))
+      ..parent.createSync(recursive: true)
+      ..writeAsStringSync('{}\n');
+    expect(
+      () => verifyGoogleIncrementalTargetedRepairState(
+        manifest: manifest,
+        config: config,
+        sourceProposal: sourceProposal,
+        outputDirectory: directory.path,
+        targetLocale: 'es',
+      ),
+      throwsA(
+        isA<GoogleTranslationDraftFailure>().having(
+          (error) => error.code,
+          'code',
+          'incremental_repair_target_not_empty:es',
+        ),
+      ),
+    );
+  });
+
   test('all seventeen proposed messages round-trip through ICU shielding', () {
     final proposal =
         jsonDecode(
@@ -346,7 +511,10 @@ void main() {
     expect(productionReview, contains('provider-draft foundation'));
     expect(localeWorkflow, contains('Google-assisted incremental drafts'));
     expect(localeWorkflow, contains('explicitly authorized `translate`'));
-    expect(roadmap, contains('No provider request has been made'));
+    expect(roadmap, contains('Fourteen provider drafts were preserved'));
+    expect(localeWorkflow, contains('raw provider-response envelope'));
+    expect(localeWorkflow, contains('`repair-preflight`'));
+    expect(productionReview, contains('Japanese-only targeted repair'));
   });
 }
 

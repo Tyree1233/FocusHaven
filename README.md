@@ -794,6 +794,10 @@ offline-resume contracts for only those seventeen public messages. Its
 preflight never authenticates or sends text, and its translation command
 requires a separate explicit authorization. Provider output remains a private
 draft with no review, runtime, timer, deployment, or publication authority.
+Every complete provider response is now preserved in a bound private envelope
+before HTML or ICU decoding. If one locale fails locally after the provider
+returns, a targeted repair preflight can prove every successful peer bundle is
+exact and keep any later provider authority limited to only the missing locale.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

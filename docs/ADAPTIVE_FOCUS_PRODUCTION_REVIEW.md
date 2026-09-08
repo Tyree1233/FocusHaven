@@ -110,6 +110,14 @@ only a completely bound private quarantine and never contacts Google. A
 machine draft cannot approve a row, create a validation record, edit a runtime
 catalog, derive `pt`, or expose the production card.
 
+The first authorized batch returned fourteen complete private drafts and one
+Japanese HTML-shape refusal. The fourteen drafts remain immutable inputs. The
+recovery contract now checkpoints a complete raw provider-response envelope
+before local decoding, supports an offline retry of that exact envelope, and
+adds a Japanese-only targeted repair whose preflight must prove the other
+fourteen bundles are byte-exact. It never retries automatically, broadens the
+locale set, or treats a recovered machine draft as fluent approval.
+
 ## Authority and privacy boundary
 
 The proposal contains only public interface copy. It contains no task,

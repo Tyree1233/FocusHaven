@@ -664,9 +664,13 @@ implicit, and even completed delta approvals cannot expose the card until a
 later atomic integration and production-placement phase passes all gates.
 The bounded Google-assisted incremental adapter now reuses the existing
 glossary, HTML ICU-shield, quarantine, offline-resume, and aggregate-diagnostic
-contracts for only this locked proposal. No provider request has been made;
-generation still requires separate authorization, and every resulting private
-draft must pass its own complete fluent review before integration.
+contracts for only this locked proposal. Fourteen provider drafts were preserved
+after the first authorized generation; Japanese alone failed the local HTML
+shape gate and no Japanese output survived that original adapter path. The
+recovery correction checkpoints raw responses before decoding and adds a
+state-locked, Japanese-only repair path without automatic retry. Any later
+provider call still requires separate authorization, and every resulting
+private draft must pass its own complete fluent review before integration.
 
 ### Phase 217 — System assistant intents
 
