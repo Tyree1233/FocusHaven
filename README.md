@@ -781,6 +781,13 @@ private delta review and the resulting copy can be merged atomically across
 the sixteen language choices plus Flutter's mechanical base `pt` fallback.
 The planned card location is immediately after Focus Forecast and remains
 limited to a fresh, stopped Focus timer with one exact owner-issued ticket.
+The next review foundation treats those seventeen messages as a separately
+locked delta for the fifteen non-English production languages. It hashes every
+existing runtime catalog before preparing one private bundle and one private
+review per language, reuses the established placeholder and content-safety
+gates, and produces only private approved delta catalogs. It cannot rewrite the
+existing 980-message catalogs, derive the base `pt` fallback before reviewed
+`pt-BR` approval, contact a provider, or activate the production card.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

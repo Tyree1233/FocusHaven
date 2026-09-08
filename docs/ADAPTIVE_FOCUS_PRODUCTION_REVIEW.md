@@ -1,6 +1,7 @@
 # Adaptive Focus production review gate
 
-Status: Phase 216D copy lock prepared; production presentation remains closed.
+Status: Phase 216D copy lock prepared; private incremental-review foundation in
+progress; production presentation remains closed.
 
 ## Purpose
 
@@ -63,6 +64,40 @@ production sentence from translated fragments.
    persistence, semantics, large text, narrow layouts, and all active locales.
 8. Run the complete Flutter suite, analysis, and fresh web, Android, and
    unsigned iOS builds before committing or pushing the activation.
+
+## Incremental delta-review foundation
+
+`tool/localization_incremental_review.dart` makes the translation step smaller
+without weakening the established review standard. A private manifest locks
+the isolated English proposal, its digest, all fifteen non-English runtime
+catalogs and their current digests, the locale-specific review scopes, and the
+mechanical base `pt` fallback relationship. The tool has three closed commands:
+
+```text
+preflight  Prove the exact seventeen-message delta is complete and absent from
+           every locked runtime catalog.
+prepare    Apply one private translation bundle per locale to the existing
+           structural, placeholder, and content-safety pipeline and emit one
+           private review CSV per locale.
+accept     Require every row to receive an independent fluent decision and
+           emit only a private approved delta catalog and anonymous validation
+           record.
+```
+
+All bundle, review, and approval directories must be outside the repository.
+The tool refuses existing output files instead of overwriting them. Provider
+draft generation is a separate, explicitly authorized step; none of these
+commands contacts Google or another AI service. The fifteen reviews remain
+independent, and approval of one language cannot approve another.
+
+The workflow deliberately excludes the 980 already-reviewed messages in each
+language. Existing runtime catalogs are read only to verify their exact hashes,
+locale identities, and absence of the new keys. Acceptance still does not edit
+`lib/l10n`, generated localization, the language registry, or the timer screen.
+After all fifteen approved deltas exist, a separate integration phase must
+derive `pt` from reviewed `pt-BR`, atomically merge complete deltas into all
+seventeen runtime catalogs, and rerun every localization, UI, accessibility,
+test, analysis, and build gate before production placement can open.
 
 ## Authority and privacy boundary
 

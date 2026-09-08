@@ -169,6 +169,51 @@ It never activates a locale, edits the production registry, copies a catalog
 into `lib/l10n`, contacts a translation provider, reads private FocusHaven
 content, records a reviewer identity, deploys, publishes, or changes a store.
 
+## Review a bounded message delta across existing locales
+
+When a reviewed feature adds a small set of messages to every already-active
+language, `tool/localization_incremental_review.dart` avoids reopening the
+complete locale catalogs. Its locked manifest identifies one English proposal
+under `localization/proposals`, the proposal digest, one through twenty target
+runtime catalogs and their exact current digests, and any mechanical fallback
+relationship. For Adaptive Focus, the scope is exactly seventeen messages in
+fifteen independently reviewed target languages; Flutter's base `pt` catalog is
+derived only from the approved `pt-BR` delta during later integration.
+
+Run its commands from the repository root:
+
+```bash
+dart run tool/localization_incremental_review.dart preflight \
+  /path/to/incremental-review-manifest.json
+
+dart run tool/localization_incremental_review.dart prepare \
+  /path/to/incremental-review-manifest.json \
+  /private/path/incremental-translation-bundles \
+  /private/path/incremental-review-csvs
+
+dart run tool/localization_incremental_review.dart accept \
+  /path/to/incremental-review-manifest.json \
+  /private/path/incremental-translation-bundles \
+  /private/path/completed-incremental-review-csvs \
+  /private/path/incremental-approvals
+```
+
+`prepare` normalizes each bounded delta into the established streamlined
+pipeline, so exact keys, ICU placeholders, approved source-equal exceptions,
+script contamination, repeated garbage, leaked email addresses, brand
+integrity, structural readiness, and content safety remain fail-closed. It
+emits one private CSV per language; the existing private Excel helper may turn
+each CSV into a two-sheet fluent-review workbook. `accept` requires a complete
+immutable decision for every row and writes only private approved deltas and
+anonymous aggregate validation records.
+
+The three commands never call a translation provider, modify a runtime ARB,
+generate localization, expose UI, or activate a feature. Provider-assisted
+drafts require a separate explicit authorization. Runtime merge and fallback
+derivation occur only after all required fluent reviews are complete and must
+be followed by the normal localization, layout, accessibility, test, analysis,
+platform-build, commit, push, and CI gates.
+
 ## Optional Google Cloud draft adapter
 
 `tool/localization_google_translate_drafts.dart` can create the private
