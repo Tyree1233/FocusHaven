@@ -32,7 +32,7 @@ void main() {
       '| Enhanced remote coach | Foundation shipped, disabled |',
       '| Haven AI planner | Foundation shipped |',
       '| Unified Haven Loop | Shipped |',
-      '| Adaptive Focus Engine | Foundation shipped |',
+      '| Adaptive Focus Engine | Production review gate in progress |',
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
     ]) {
@@ -102,6 +102,8 @@ void main() {
     expect(readme, contains('one-time local review ticket'));
     expect(readme, contains('Adaptive Focus owner-delegation foundation'));
     expect(readme, contains('update both defaults atomically'));
+    expect(readme, contains('Adaptive Focus production review gate'));
+    expect(readme, contains('Seventeen complete English messages'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -235,6 +237,10 @@ void main() {
       'updates both saved defaults and the ready Focus countdown atomically',
       'never selects a session or starts, pauses, resets, resumes, or completes one',
       'No production screen consumes it in Phase 216C',
+      'Phase 216D production review copy lock',
+      'seventeen proposed messages',
+      'immediately after Focus Forecast',
+      'leaving the timer stopped',
     ]) {
       expect(architecture, contains(required));
     }

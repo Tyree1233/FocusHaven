@@ -81,7 +81,12 @@ void main() {
     final architecture = read('docs/HAVEN_AI_ACTION_ARCHITECTURE.md');
     final readme = read('README.md');
 
-    expect(roadmap, contains('| Adaptive Focus Engine | Foundation shipped |'));
+    expect(
+      roadmap,
+      contains(
+        '| Adaptive Focus Engine | Production review gate in progress |',
+      ),
+    );
     expect(
       roadmap,
       contains(
@@ -100,6 +105,7 @@ void main() {
     expect(readme, contains('No production control consumes it yet'));
     expect(readme, contains('Adaptive Focus review foundation'));
     expect(readme, contains('Adaptive Focus owner-delegation foundation'));
+    expect(readme, contains('Adaptive Focus production review gate'));
   });
 
   test('Phase 216B review settlement is text-free and fail-closed', () {
@@ -349,5 +355,21 @@ void main() {
         reason: catalog.path,
       );
     }
+  });
+
+  test('Phase 216D locks proposed copy without opening production', () {
+    final roadmap = read('docs/PRODUCT_ROADMAP.md');
+    final architecture = read('docs/HAVEN_AI_ACTION_ARCHITECTURE.md');
+    final policy = read('docs/ADAPTIVE_FOCUS_PRODUCTION_REVIEW.md');
+
+    expect(roadmap, contains('seventeen-message proposal'));
+    expect(architecture, contains('## Phase 216D production review copy lock'));
+    expect(
+      architecture,
+      contains('Runtime catalog merge, generated localization, production'),
+    );
+    expect(policy, contains('production presentation remains closed'));
+    expect(policy, contains('other fifteen active languages'));
+    expect(policy, contains('immediately after Focus Forecast'));
   });
 }

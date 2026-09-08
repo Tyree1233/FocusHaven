@@ -769,6 +769,19 @@ through the timer's existing storage but never starts a session. No production
 screen consumes this coordinator, no catalog message changed, and no AI,
 network, calendar, queue, task, or action authority was added.
 
+Phase 216D begins the **Adaptive Focus production review gate** without yet
+changing the timer UI or any runtime locale catalog. Seventeen complete English
+messages and their placeholder metadata are locked in an isolated proposal for
+the gentler and room-to-grow headings, current and suggested plans, bounded
+reasons, optional Forecast context, privacy and no-start disclosures, one
+screen-reader summary, two explicit choices, and all settlement outcomes. The
+proposal is not a Flutter ARB input and no production file reads it. Production
+placement remains closed until all fifteen other active languages complete a
+private delta review and the resulting copy can be merged atomically across
+the sixteen language choices plus Flutter's mechanical base `pt` fallback.
+The planned card location is immediately after Focus Forecast and remains
+limited to a fresh, stopped Focus timer with one exact owner-issued ticket.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate
