@@ -1,8 +1,7 @@
 # FocusHaven Localization and Global-Release Policy
 
-Status: Spanish, French, German, Brazilian Portuguese, Japanese, Korean,
-Italian, Polish, and Dutch in-app production activation; English remains the
-fallback and store promotion remains separate
+Status: sixteen reviewed in-app languages are in production; English remains
+the fallback and store promotion remains separate
 
 FocusHaven is intended to become useful in multiple languages without making
 premature availability claims or weakening its local-first privacy boundary.
@@ -14,7 +13,9 @@ country release readiness.
 - English (`en`) is the source catalog and fallback production locale.
 - Spanish (`es`), French (`fr`), German (`de`), Brazilian Portuguese
   (`pt-BR`), Japanese (`ja`), Korean (`ko`), Italian (`it`), Polish (`pl`),
-  and Dutch (`nl`) are reviewed production runtime locales.
+  Dutch (`nl`), Indonesian (`id`), Turkish (`tr`), Swedish (`sv`), Norwegian
+  Bokmål (`nb`), Danish (`da`), and Finnish (`fi`) are reviewed production
+  runtime locales.
 - Planned locales are not exposed by the production
   `MaterialApp.supportedLocales` allowlist. In-app locale support and localized
   Apple or Google store promotion are separate decisions.
@@ -249,6 +250,25 @@ left-to-right Latin-script locales require no exceptional font or
 right-to-left gate, and their runtime catalogs are byte-identical to the exact
 reviewed approvals. Speech recognition, screen-reader qualification, store
 promotion, and country distribution remain separate.
+
+Indonesian, Turkish, Swedish, Norwegian Bokmål, Danish, and Finnish form the
+first six-locale production batch prepared through the guarded Google-assisted
+draft path. Google received only the locked public English catalog; provider
+responses, quarantines, repair inputs, workbooks, and reviewer information
+remained private and outside Git. Each locale then received its own complete
+980-message fluent review and anonymous validation record. Indonesian records
+881 acceptances, 99 revisions, zero blocks, and four explicitly approved
+source-equal values. Turkish records 832 acceptances, 148 revisions, zero
+blocks, and four source-equal values. Swedish records 901 acceptances, 79
+revisions, zero blocks, and two source-equal values. Norwegian Bokmål records
+865 acceptances, 115 revisions, zero blocks, and six source-equal values.
+Danish records 870 acceptances, 110 revisions, zero blocks, and six
+source-equal values. Finnish records 835 acceptances, 145 revisions, zero
+blocks, and four source-equal values. All 5,880 messages passed placeholder and
+deterministic content-safety verification, and each runtime catalog is
+byte-identical to its reviewed approval. These left-to-right locales require no
+exceptional font or right-to-left gate. Speech recognition, screen-reader
+qualification, store promotion, and country distribution remain separate.
 
 The following content must be catalog-owned before another locale can be
 considered complete:

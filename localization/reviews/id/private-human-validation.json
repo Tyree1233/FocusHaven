@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "id",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "general_indonesian",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "b6cfabfa2bd1770bef4ea2896d8fb80b4c0ec2d4c24bf7653012053d49c30f0e",
+  "approvedCatalogSha256": "df81de979339eac0ef515b946afdf2eb69e23e22c02309f6b7d2865b7b6367f2",
+  "privateReviewPayloadSha256": "25c2c19c63e3c04cecf98f5b5197972acdab2eb11d5cd4a5d2ffd87b291cdd49",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 881,
+    "revised": 99,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "coachTitle",
+    "havenActionServiceSurfaceHavenPlan",
+    "havenWindowEyebrow",
+    "havenWindowHeldSameDay"
+  ],
+  "contentSafetyIssueCount": 0,
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

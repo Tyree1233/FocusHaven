@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "nb",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "norwegian_bokmal",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "1cae6f6b4512a63edc88e7d50bb731ef5483375dc73567e0eccfae2b01fe499d",
+  "approvedCatalogSha256": "9ffc4be4da5057fbeebbc8b16c891e9589af066ee490686638ffe389817df789",
+  "privateReviewPayloadSha256": "cb7a8c939ddef053def612cb75bc56e6fb8a7e6da6f523e2481ea249521b86a3",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 865,
+    "revised": 115,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "coachTitle",
+    "havenActionServiceSurfaceHavenPlan",
+    "havenJourneyEyebrow",
+    "havenWindowEyebrow",
+    "havenWindowHeldSameDay",
+    "havenWindowSemantics"
+  ],
+  "contentSafetyIssueCount": 0,
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "sv",
+  "englishName": "Swedish",
+  "nativeName": "Svenska",
+  "reviewScope": "general_swedish",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalog": "localization/candidates/app_sv.arb",
+  "structuralAudit": "localization/reviews/sv/structural-audit.json",
+  "approvedCatalog": "localization/reviews/sv/app_sv.approved.arb",
+  "validationRecord": "localization/reviews/sv/private-human-validation.json",
+  "runtimeCatalog": "lib/l10n/app_sv.arb",
+  "exceptionalGates": {
+    "rightToLeft": false,
+    "fontCoverage": false,
+    "physicalScreenReader": false,
+    "physicalSpeechRecognition": false,
+    "storePromotion": false
+  }
+}

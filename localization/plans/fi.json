@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "fi",
+  "englishName": "Finnish",
+  "nativeName": "Suomi",
+  "reviewScope": "general_finnish",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalog": "localization/candidates/app_fi.arb",
+  "structuralAudit": "localization/reviews/fi/structural-audit.json",
+  "approvedCatalog": "localization/reviews/fi/app_fi.approved.arb",
+  "validationRecord": "localization/reviews/fi/private-human-validation.json",
+  "runtimeCatalog": "lib/l10n/app_fi.arb",
+  "exceptionalGates": {
+    "rightToLeft": false,
+    "fontCoverage": false,
+    "physicalScreenReader": false,
+    "physicalSpeechRecognition": false,
+    "storePromotion": false
+  }
+}

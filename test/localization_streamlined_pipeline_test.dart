@@ -235,6 +235,17 @@ void main() {
       'fr': 'lib/l10n/app_fr.arb',
       'de': 'lib/l10n/app_de.arb',
       'pt-BR': 'lib/l10n/app_pt_BR.arb',
+      'ja': 'lib/l10n/app_ja.arb',
+      'ko': 'lib/l10n/app_ko.arb',
+      'it': 'lib/l10n/app_it.arb',
+      'pl': 'lib/l10n/app_pl.arb',
+      'nl': 'lib/l10n/app_nl.arb',
+      'id': 'lib/l10n/app_id.arb',
+      'tr': 'lib/l10n/app_tr.arb',
+      'sv': 'lib/l10n/app_sv.arb',
+      'nb': 'lib/l10n/app_nb.arb',
+      'da': 'lib/l10n/app_da.arb',
+      'fi': 'lib/l10n/app_fi.arb',
     }.entries) {
       final candidate =
           jsonDecode(File(entry.value).readAsStringSync())

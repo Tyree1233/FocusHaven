@@ -195,7 +195,7 @@ void main() {
         .whereType<File>()
         .where((file) => file.path.endsWith('.arb'))
         .toList(growable: false);
-    expect(catalogs, hasLength(11));
+    expect(catalogs, hasLength(17));
     for (final catalog in catalogs) {
       expect(
         catalog.readAsStringSync(),
@@ -341,7 +341,7 @@ void main() {
         .whereType<File>()
         .where((file) => file.path.endsWith('.arb'))
         .toList(growable: false);
-    expect(catalogs, hasLength(11));
+    expect(catalogs, hasLength(17));
     for (final catalog in catalogs) {
       expect(
         catalog.readAsStringSync(),

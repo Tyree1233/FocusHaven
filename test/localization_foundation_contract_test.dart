@@ -53,8 +53,14 @@ void main() {
       Locale('it'),
       Locale('pl'),
       Locale('nl'),
+      Locale('id'),
+      Locale('tr'),
+      Locale('sv'),
+      Locale('nb'),
+      Locale('da'),
+      Locale('fi'),
     ]);
-    expect(FocusHavenLocales.production, hasLength(10));
+    expect(FocusHavenLocales.production, hasLength(16));
     expect(
       FocusHavenLocales.production,
       everyElement(
@@ -145,7 +151,7 @@ void main() {
 
     for (final required in <String>[
       'English (`en`) is the source catalog and fallback production locale',
-      'Spanish (`es`), French (`fr`), German (`de`), Brazilian Portuguese (`pt-BR`), Japanese (`ja`), Korean (`ko`), Italian (`it`), Polish (`pl`), and Dutch (`nl`) are reviewed production runtime locales',
+      'Spanish (`es`), French (`fr`), German (`de`), Brazilian Portuguese (`pt-BR`), Japanese (`ja`), Korean (`ko`), Italian (`it`), Polish (`pl`), Dutch (`nl`), Indonesian (`id`), Turkish (`tr`), Swedish (`sv`), Norwegian Bokmål (`nb`), Danish (`da`), and Finnish (`fi`) are reviewed production runtime locales',
       'Planned locales are not exposed by the production `MaterialApp.supportedLocales` allowlist',
       'no private user content is sent anywhere for translation',
       'qualified human reviewer',
@@ -159,7 +165,7 @@ void main() {
     expect(
       roadmap,
       contains(
-        '| Global localization | Ten reviewed in-app languages active |',
+        '| Global localization | Sixteen reviewed in-app languages active |',
       ),
     );
     expect(

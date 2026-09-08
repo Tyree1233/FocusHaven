@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "id",
+  "status": "structurally_ready_for_private_review",
+  "sourceCatalog": "lib/l10n/app_en.arb",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalog": "localization/candidates/app_id.arb",
+  "candidateCatalogSha256": "b6cfabfa2bd1770bef4ea2896d8fb80b4c0ec2d4c24bf7653012053d49c30f0e",
+  "messageCount": 980,
+  "placeholderMessageCount": 148,
+  "approvedSourceEqual": {
+    "appTitle": "The registered product name remains invariant.",
+    "accountPro": "The registered product and subscription-tier name remains invariant.",
+    "proTitle": "The registered product and subscription-tier name remains invariant.",
+    "havenWindowHeldMultiDay": "This message contains only ICU placeholders and locale-neutral punctuation.",
+    "focusShieldEyebrow": "Draft-only exception: provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "havenPlannerEdit": "Draft-only exception: provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "milestoneMomentumTitle": "Draft-only exception: provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "statMinutesCompact": "Draft-only exception: provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "customDurationSet": "Draft-only exception: shielded provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "durationMinutesShort": "Draft-only exception: shielded provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "havenPlanServiceExplanationWithDetails": "Draft-only exception: shielded provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "journalMoodCount": "Draft-only exception: shielded provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "reminderTimeAndDays": "Draft-only exception: shielded provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "timerDurationSecondsShortUpper": "Draft-only exception: shielded provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval.",
+    "timerServiceExportSessionRow": "Draft-only exception: shielded provider source-equal text is preserved for mandatory fluent accept-or-revise review; it is not production approval."
+  },
+  "contentSafety": {
+    "passed": true,
+    "issueCount": 0,
+    "issueCounts": {
+      "introducedIdentifier": 0,
+      "protectedTerm": 0,
+      "suspiciousReuse": 0,
+      "runawayRepetition": 0,
+      "unexpectedScript": 0,
+      "numberDrift": 0,
+      "timeUnitDrift": 0
+    }
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "humanReviewRequired": true,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

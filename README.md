@@ -779,11 +779,13 @@ not cover these capabilities.
 
 FocusHaven now has a generated Flutter localization foundation, with English as
 the source and fallback catalog. Spanish, French, German, Brazilian Portuguese,
-Japanese, Korean, Italian, Polish, and Dutch are exact reviewed production
-runtime catalogs. FocusHaven follows a supported device language by default and
-provides local, reversible Device, English, Español, Français, Deutsch,
-Português (Brasil), 日本語, 한국어, Italiano, Polski, and Nederlands choices in
-Appearance. Store-language promotion remains a separate release decision.
+Japanese, Korean, Italian, Polish, Dutch, Indonesian, Turkish, Swedish,
+Norwegian Bokmål, Danish, and Finnish are exact reviewed production runtime
+catalogs. FocusHaven follows a supported device language by default and provides
+local, reversible Device, English, Español, Français, Deutsch, Português
+(Brasil), 日本語, 한국어, Italiano, Polski, Nederlands, Bahasa Indonesia,
+Türkçe, Svenska, Norsk bokmål, Dansk, and Suomi choices in Appearance.
+Store-language promotion remains a separate release decision.
 
 Adding a locale still requires a complete catalog, placeholder validation,
 fluent review, focused layout checks, and green application tests and builds.
@@ -841,6 +843,16 @@ repetition, script, number, and time-unit screens. Their runtime catalogs remain
 byte-identical to the reviewed approvals. Speech recognition, localized store
 promotion, and country distribution remain separate and fail closed where
 unsupported.
+
+Indonesian, Turkish, Swedish, Norwegian Bokmål, Danish, and Finnish are the
+first six-locale production batch drafted through the guarded Google-assisted
+development workflow. Provider output remained outside Git and outside runtime
+until all 5,880 messages completed independent private fluent review, anonymous
+validation, placeholder verification, and deterministic content-safety checks.
+The six runtime catalogs are byte-identical to their reviewed approvals. All
+six interfaces are left-to-right and require no exceptional font gate. Speech
+recognition, screen-reader qualification, localized store promotion, and
+country distribution remain separate and fail closed where unsupported.
 
 French is the first locale delivered through that streamlined path. Its exact
 980-message candidate received a complete anonymous fluent review: 654 entries

@@ -57,6 +57,12 @@ void main() {
       Locale('it'),
       Locale('pl'),
       Locale('nl'),
+      Locale('id'),
+      Locale('tr'),
+      Locale('sv'),
+      Locale('nb'),
+      Locale('da'),
+      Locale('fi'),
     ]);
     expect(
       AppLocalizations.supportedLocales,
@@ -72,6 +78,12 @@ void main() {
         Locale('it'),
         Locale('pl'),
         Locale('nl'),
+        Locale('id'),
+        Locale('tr'),
+        Locale('sv'),
+        Locale('nb'),
+        Locale('da'),
+        Locale('fi'),
       ]),
     );
     expect(

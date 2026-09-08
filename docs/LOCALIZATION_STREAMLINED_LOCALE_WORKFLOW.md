@@ -11,6 +11,10 @@ The first two-locale batch activated German and Brazilian Portuguese. The
 later three-locale Latin-script batch activated Italian, Polish, and Dutch only
 after independent complete fluent reviews, a focused four-row correction
 merge, and zero-issue content-safety verification across all 2,940 messages.
+The third batch activates Indonesian, Turkish, Swedish, Norwegian Bokmål,
+Danish, and Finnish only after the guarded Google-assisted drafts completed
+independent private fluent reviews and zero-issue verification across all 5,880
+messages. Provider output alone never grants approval or runtime authority.
 
 ## Goal
 

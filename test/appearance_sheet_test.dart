@@ -113,7 +113,7 @@ void main() {
     await tester.pump();
 
     const languageSummary =
-        'English / Español / Français / Deutsch / Português (Brasil) / 日本語 / 한국어 / Italiano / Polski / Nederlands';
+        'English / Español / Français / Deutsch / Português (Brasil) / 日本語 / 한국어 / Italiano / Polski / Nederlands / Bahasa Indonesia / Türkçe / Svenska / Norsk bokmål / Dansk / Suomi';
     expect(find.text(languageSummary), findsOneWidget);
     expect(find.text('Device / Dispositivo'), findsOneWidget);
     expect(find.text('English'), findsOneWidget);
@@ -126,8 +126,17 @@ void main() {
     expect(find.text('Italiano'), findsOneWidget);
     expect(find.text('Polski'), findsOneWidget);
     expect(find.text('Nederlands'), findsOneWidget);
+    expect(find.text('Bahasa Indonesia'), findsOneWidget);
+    expect(find.text('Türkçe'), findsOneWidget);
+    expect(find.text('Svenska'), findsOneWidget);
+    expect(find.text('Norsk bokmål'), findsOneWidget);
+    expect(find.text('Dansk'), findsOneWidget);
+    expect(find.text('Suomi'), findsOneWidget);
 
-    await tester.tap(find.text('Español'));
+    final spanishOption = find.text('Español');
+    await tester.ensureVisible(spanishOption);
+    await tester.pumpAndSettle();
+    await tester.tap(spanishOption);
     await tester.pumpAndSettle();
 
     expect(localeService.selectedChoice, FocusHavenLanguageChoice.spanish);

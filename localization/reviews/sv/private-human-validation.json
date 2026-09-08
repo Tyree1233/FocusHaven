@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "sv",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "general_swedish",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "d347131e8a907c58891a0a2e624e1da69e057699ebc38711f62e2dac3f5f15fd",
+  "approvedCatalogSha256": "b1980634d25bd576116b339bdffd7d0f97f7e0368e066e23366a731c67076e39",
+  "privateReviewPayloadSha256": "2f1e0a5a702e97244ba959fbf09976aa9b687faef065f5b62f9526142dc9bcdb",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 901,
+    "revised": 79,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "havenJourneyEyebrow",
+    "havenWindowHeldSameDay"
+  ],
+  "contentSafetyIssueCount": 0,
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}

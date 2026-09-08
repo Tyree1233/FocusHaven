@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_streamlined_locale_v1",
+  "locale": "fi",
+  "status": "private_human_validation_complete",
+  "validationMode": "anonymous_private_fluent_review",
+  "reviewScope": "general_finnish",
+  "sourceCatalogSha256": "ba6e97b200060f211d3e0d73276e1132e03c8de18ac0778d38c356abe9874e87",
+  "candidateCatalogSha256": "5293eb87e5bb97d4ac2575792f23fdec5cd5f7a2bfd3b8dfc1c3bc65cd53a4c0",
+  "approvedCatalogSha256": "d5c4e4c7d781954c45fa4d5d8493cca2bdbdf04738ec898ce26455bb520e3113",
+  "privateReviewPayloadSha256": "1824b5042c2817523cbae1412b4052e283b594d9fc860298a4b9d2cb5f8cdc94",
+  "messageCount": 980,
+  "decisionCounts": {
+    "accepted": 835,
+    "revised": 145,
+    "blocked": 0
+  },
+  "riskCounts": {
+    "critical": 247,
+    "elevated": 239,
+    "standard": 494
+  },
+  "reviewApprovedSourceEqual": [
+    "focusForecastEyebrow",
+    "focusForecastSemantics",
+    "havenJourneyEyebrow",
+    "havenWindowHeldSameDay"
+  ],
+  "contentSafetyIssueCount": 0,
+  "placeholderMismatchCount": 0,
+  "sourceMutationCount": 0,
+  "personalDataIncluded": false,
+  "runtimeActivated": false
+}
