@@ -671,6 +671,11 @@ recovery correction checkpoints raw responses before decoding and adds a
 state-locked, Japanese-only repair path without automatic retry. Any later
 provider call still requires separate authorization, and every resulting
 private draft must pass its own complete fluent review before integration.
+The bounded Japanese request produced a complete preserved response with one
+adjacent duplicate of the final reserved ICU marker. A narrow offline-only
+normalizer accepts that exact echo pattern while keeping all other marker and
+HTML mismatches fail-closed; the response remains immutable and the resulting
+machine draft has no review or runtime authority.
 
 ### Phase 217 — System assistant intents
 

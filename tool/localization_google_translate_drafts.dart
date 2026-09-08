@@ -36,7 +36,10 @@ String restoreGoogleTranslationIcu({
   required GoogleTranslationProtectedMessage protected,
   required String providerHtml,
 }) {
-  var restored = providerHtml;
+  var restored = _removeAdjacentGoogleTranslationIcuMarkerEchoes(
+    protected: protected,
+    providerHtml: providerHtml,
+  );
   for (var index = 0; index < protected.syntaxTokens.length; index += 1) {
     final marker = _googleTranslationIcuMarker(index);
     final span = RegExp(
@@ -53,6 +56,36 @@ String restoreGoogleTranslationIcu({
     throw const GoogleTranslationDraftFailure('provider_html_mismatch');
   }
   return _decodeGoogleTranslationHtml(restored);
+}
+
+String _removeAdjacentGoogleTranslationIcuMarkerEchoes({
+  required GoogleTranslationProtectedMessage protected,
+  required String providerHtml,
+}) {
+  var normalized = providerHtml;
+  for (var index = 0; index < protected.syntaxTokens.length; index += 1) {
+    final marker = _googleTranslationIcuMarker(index);
+    final markerPattern = RegExp(RegExp.escape(marker), caseSensitive: false);
+    final spanPattern = RegExp(
+      '<span\\b[^>]*>\\s*${RegExp.escape(marker)}\\s*</span>',
+      caseSensitive: false,
+    );
+    final spans = spanPattern.allMatches(normalized).toList();
+    final markers = markerPattern.allMatches(normalized).toList();
+    if (spans.length != 1 || markers.length != 2) continue;
+
+    final span = spans.single;
+    final echoes = markers
+        .where((match) => match.start < span.start || match.end > span.end)
+        .toList();
+    if (echoes.length != 1) continue;
+    final echo = echoes.single;
+    if (echo.end < span.start &&
+        normalized.substring(echo.end, span.start) == ' ') {
+      normalized = normalized.replaceRange(echo.start, span.start, '');
+    }
+  }
+  return normalized;
 }
 
 String _googleTranslationIcuMarker(int index) =>

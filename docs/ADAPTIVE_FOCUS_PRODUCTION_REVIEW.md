@@ -118,6 +118,14 @@ adds a Japanese-only targeted repair whose preflight must prove the other
 fourteen bundles are byte-exact. It never retries automatically, broadens the
 locale set, or treats a recovered machine draft as fluent approval.
 
+That targeted request returned one complete bound Japanese provider response,
+but Google echoed the final reserved ICU marker immediately before its exact
+protected span. The offline recovery path may normalize only that one adjacent
+bare-marker shape; nonadjacent or repeated echoes and all other unexpected HTML
+remain blocked. The original response stays immutable, and a recovered draft
+still requires the complete private Japanese fluent review and CJK coverage
+gate.
+
 ## Authority and privacy boundary
 
 The proposal contains only public interface copy. It contains no task,

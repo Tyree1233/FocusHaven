@@ -347,6 +347,50 @@ void main() {
     },
   );
 
+  test('restores one adjacent bare ICU marker echo before its span', () {
+    const source = 'Review: {reason} Nothing changes.';
+    final protected = protectGoogleTranslationIcu(source);
+    final echoed = protected.html.replaceFirst(
+      '<span translate="no">FHICU0000X</span>',
+      'FHICU0000X <span translate="no">FHICU0000X</span>',
+    );
+
+    expect(
+      restoreGoogleTranslationIcu(protected: protected, providerHtml: echoed),
+      source,
+    );
+  });
+
+  test('rejects nonadjacent or repeated bare ICU marker echoes', () {
+    const source = 'Review: {reason} Nothing changes.';
+    final protected = protectGoogleTranslationIcu(source);
+    const span = '<span translate="no">FHICU0000X</span>';
+    final nonadjacent = protected.html.replaceFirst(
+      span,
+      'FHICU0000X translated $span',
+    );
+    final repeated = protected.html.replaceFirst(
+      span,
+      'FHICU0000X FHICU0000X $span',
+    );
+
+    for (final refused in [nonadjacent, repeated]) {
+      expect(
+        () => restoreGoogleTranslationIcu(
+          protected: protected,
+          providerHtml: refused,
+        ),
+        throwsA(
+          isA<GoogleTranslationDraftFailure>().having(
+            (error) => error.code,
+            'code',
+            'provider_html_mismatch',
+          ),
+        ),
+      );
+    }
+  });
+
   test('raw provider response is exact and bound before offline decode', () {
     final manifest = IncrementalLocaleReviewManifest.fromJson(_manifestJson());
     final config = GoogleTranslationDraftConfig.fromJson(_configJson());

@@ -281,6 +281,15 @@ quarantine or provider-response envelope present. The repair command preserves
 its own raw provider-response envelope before decoding and never overwrites any
 existing file.
 
+Some providers may echo one reserved ICU marker immediately before that
+marker's otherwise exact protected span. Offline recovery may remove only one
+such bare echo and its single separating ASCII space. The span must remain
+unique, the marker must occur exactly twice, and the echo must be directly
+adjacent to that span. Nonadjacent echoes, multiple echoes, missing or repeated
+spans, arbitrary HTML, and every other marker-shape change remain fail-closed.
+The preserved response is revalidated offline after this normalization; it is
+never edited in place and no provider retry is needed.
+
 All commands refuse repository-owned private paths and existing state outside
 their exact new-run, resume, or targeted-repair contract. They print only aggregate
 diagnostics, never message text, translated text, tokens, response bodies, or
