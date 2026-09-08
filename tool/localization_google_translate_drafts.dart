@@ -311,9 +311,12 @@ final class GoogleTranslationDraftLocaleConfig {
       'approvedSourceEqual',
     }, '$locale provider config');
     final targetLanguageCode = _requiredString(json, 'targetLanguageCode');
-    if (targetLanguageCode != locale) {
+    final isPortugueseRegionalMapping =
+        locale == 'pt-BR' && targetLanguageCode == 'pt';
+    if (targetLanguageCode != locale && !isPortugueseRegionalMapping) {
       throw FormatException(
-        '$locale targetLanguageCode must exactly match the batch locale.',
+        '$locale targetLanguageCode must exactly match the review locale, '
+        'except that pt-BR uses Google target code pt.',
       );
     }
     final glossary = _requiredString(json, 'glossary');
@@ -582,7 +585,7 @@ Future<Map<String, String>> fetchGoogleTranslationDraftTranslations({
   );
   for (final chunk in chunks) {
     final translated = await sender(
-      locale: plan.locale,
+      locale: localeConfig.targetLanguageCode,
       glossary: localeConfig.glossary,
       contents: chunk.contents,
     );
@@ -851,11 +854,11 @@ Future<void> main(List<String> arguments) async {
     }
 
     final client = operation == 'translate'
-        ? _GoogleTranslationRestClient(
+        ? GoogleTranslationRestClient(
             projectId: config.projectId,
             location: config.location,
             modelResource: config.modelResource,
-            accessToken: await _googleAccessToken(),
+            accessToken: await googleTranslationAccessToken(),
           )
         : null;
     final results = await _concurrentMap(
@@ -1008,8 +1011,8 @@ Future<void> main(List<String> arguments) async {
   }
 }
 
-final class _GoogleTranslationRestClient {
-  _GoogleTranslationRestClient({
+final class GoogleTranslationRestClient {
+  GoogleTranslationRestClient({
     required this.projectId,
     required this.location,
     required this.modelResource,
@@ -1090,7 +1093,7 @@ final class _GoogleTranslationRestClient {
   void close() => _client.close(force: true);
 }
 
-Future<String> _googleAccessToken() async {
+Future<String> googleTranslationAccessToken() async {
   try {
     final result = await Process.run('gcloud', [
       'auth',

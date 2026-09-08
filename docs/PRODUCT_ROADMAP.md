@@ -662,6 +662,11 @@ target languages, and `pt` remains a mechanical derivative of approved
 `pt-BR`. Existing runtime catalogs are not rewritten, provider access is not
 implicit, and even completed delta approvals cannot expose the card until a
 later atomic integration and production-placement phase passes all gates.
+The bounded Google-assisted incremental adapter now reuses the existing
+glossary, HTML ICU-shield, quarantine, offline-resume, and aggregate-diagnostic
+contracts for only this locked proposal. No provider request has been made;
+generation still requires separate authorization, and every resulting private
+draft must pass its own complete fluent review before integration.
 
 ### Phase 217 — System assistant intents
 

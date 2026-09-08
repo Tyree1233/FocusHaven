@@ -366,7 +366,7 @@ StreamlinedPreparationResult prepareIncrementalLocaleReview({
     'approvedSourceEqual': translationBundle['approvedSourceEqual'],
   };
   final result = prepareStreamlinedLocale(
-    plan: _planFor(manifest, entry),
+    plan: incrementalLocalePlanFor(manifest, entry),
     source: sourceProposal,
     translationBundle: normalizedBundle,
   );
@@ -405,7 +405,7 @@ StreamlinedAcceptanceResult acceptIncrementalLocaleReview({
     );
   }
   return acceptStreamlinedLocaleReview(
-    plan: _planFor(manifest, entry),
+    plan: incrementalLocalePlanFor(manifest, entry),
     source: sourceProposal,
     candidate: prepared.candidate,
     approvedSourceEqual: prepared.approvedSourceEqual,
@@ -570,7 +570,7 @@ Future<void> main(List<String> arguments) async {
   }
 }
 
-StreamlinedLocalePlan _planFor(
+StreamlinedLocalePlan incrementalLocalePlanFor(
   IncrementalLocaleReviewManifest manifest,
   IncrementalLocaleReviewEntry entry,
 ) => StreamlinedLocalePlan(

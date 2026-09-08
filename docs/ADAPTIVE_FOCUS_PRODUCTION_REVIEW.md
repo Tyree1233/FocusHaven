@@ -1,7 +1,7 @@
 # Adaptive Focus production review gate
 
-Status: Phase 216D copy lock prepared; private incremental-review foundation in
-progress; production presentation remains closed.
+Status: Phase 216D copy lock and private incremental-review/provider-draft
+foundations prepared; production presentation remains closed.
 
 ## Purpose
 
@@ -98,6 +98,17 @@ After all fifteen approved deltas exist, a separate integration phase must
 derive `pt` from reviewed `pt-BR`, atomically merge complete deltas into all
 seventeen runtime catalogs, and rerun every localization, UI, accessibility,
 test, analysis, and build gate before production placement can open.
+
+The separate provider-draft foundation in
+`tool/localization_google_incremental_drafts.dart` can prepare only the locked
+seventeen-message bundles. It reuses the guarded Google Advanced transport,
+one distinct glossary per reviewed locale, HTML ICU shielding, aggregate safe
+diagnostics, private response quarantine, and offline resume. Its `preflight`
+command is local and makes no provider request. `translate` is the only network
+operation and requires a separate explicit authorization; `resume` can consume
+only a completely bound private quarantine and never contacts Google. A
+machine draft cannot approve a row, create a validation record, edit a runtime
+catalog, derive `pt`, or expose the production card.
 
 ## Authority and privacy boundary
 

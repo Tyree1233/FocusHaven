@@ -788,6 +788,12 @@ review per language, reuses the established placeholder and content-safety
 gates, and produces only private approved delta catalogs. It cannot rewrite the
 existing 980-message catalogs, derive the base `pt` fallback before reviewed
 `pt-BR` approval, contact a provider, or activate the production card.
+Google-assisted incremental drafts use a separate development-only adapter
+that reuses the existing glossary, HTML ICU-shield, private quarantine, and
+offline-resume contracts for only those seventeen public messages. Its
+preflight never authenticates or sends text, and its translation command
+requires a separate explicit authorization. Provider output remains a private
+draft with no review, runtime, timer, deployment, or publication authority.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

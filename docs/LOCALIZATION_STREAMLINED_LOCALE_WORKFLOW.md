@@ -214,6 +214,56 @@ derivation occur only after all required fluent reviews are complete and must
 be followed by the normal localization, layout, accessibility, test, analysis,
 platform-build, commit, push, and CI gates.
 
+### Google-assisted incremental drafts
+
+`tool/localization_google_incremental_drafts.dart` applies the established
+Google Advanced draft boundary to one locked incremental-review manifest. The
+private provider config must name exactly the manifest's target locales, with
+one distinct glossary per locale. The reviewed `pt-BR` target uses Google's
+provider language code `pt`; every other target code remains identical to its
+review locale. The adapter sends only the isolated public
+English proposal, protects exact ICU syntax through the existing HTML shield,
+limits provider concurrency to three locales, and writes only the incremental
+bundle schema consumed by `localization_incremental_review.dart prepare`.
+
+Run the local no-request check first:
+
+```bash
+dart run tool/localization_google_incremental_drafts.dart preflight \
+  /private/path/incremental-review-manifest.json \
+  /private/path/google-incremental-config.json \
+  /private/path/incremental-translation-bundles
+```
+
+After the account, project, billing boundary, glossaries, exact volume, and
+private paths are independently verified, only an
+explicitly authorized `translate` operation may contact Google:
+
+```bash
+dart run tool/localization_google_incremental_drafts.dart translate \
+  /private/path/incremental-review-manifest.json \
+  /private/path/google-incremental-config.json \
+  /private/path/incremental-translation-bundles
+```
+
+Each complete response is first written to a private, provider-bound
+quarantine. A local safety refusal preserves that quarantine. After correcting
+only the private policy input, `resume` revalidates the preserved response
+offline and never authenticates or sends another request:
+
+```bash
+dart run tool/localization_google_incremental_drafts.dart resume \
+  /private/path/incremental-review-manifest.json \
+  /private/path/google-incremental-config.json \
+  /private/path/incremental-translation-bundles
+```
+
+All three commands refuse repository-owned private paths and existing state
+outside their exact new-run or resume contract. They print only aggregate
+diagnostics, never message text, translated text, tokens, response bodies, or
+request identifiers. A successful draft still has no fluent-review,
+acceptance, runtime, fallback, UI, timer, deployment, or publication authority.
+
 ## Optional Google Cloud draft adapter
 
 `tool/localization_google_translate_drafts.dart` can create the private
