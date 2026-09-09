@@ -808,6 +808,19 @@ five reviewed shapes and rejects added time, queue edits, break starts, other
 surfaces, widened expiry, incomplete copy, or missing confirmation. No
 production provider or screen consumes this bridge yet, and Siri, App Intents,
 Shortcuts, and Android App Actions remain unregistered.
+
+Phase 217C adds an isolated **system-assistant review presentation
+foundation** without opening production or native input. The accessible card
+can display only the already-localized interpretation and effect exposed by
+one opaque Phase 217B review. Its caller must supply complete, reviewed
+source, privacy, freshness, confirmation, risk, semantic-summary, dismiss, and
+confirm strings; the widget performs no localization, interpolation, or
+sentence assembly. Both visible choices are one-shot and disable together
+before the selected callback receives the same opaque review. The card cannot
+prepare, inspect, confirm, dismiss, or execute the private proposal and imports
+no engine, timer, queue, provider, persistence, network, AI, or platform owner.
+No production screen consumes it, no source-specific runtime copy is added,
+and Siri, App Intents, Shortcuts, and Android App Actions remain unregistered.
 The next review foundation treats those seventeen messages as a separately
 locked delta for the fifteen non-English production languages. It hashes every
 existing runtime catalog before preparing one private bundle and one private

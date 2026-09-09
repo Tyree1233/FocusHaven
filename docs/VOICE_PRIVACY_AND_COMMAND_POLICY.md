@@ -108,6 +108,13 @@ route requires a separate exact visual confirmation. Speech never calls
 `TimerService`, `FocusQueueService`, navigation, or another mutation path
 directly.
 
+The isolated Phase 217C presentation does not accept speech, a transcript, or
+an arbitrary string. It can display only one opaque reviewed capability and
+complete copy supplied by its caller. Dismiss and confirm are separate visual
+choices that disable together before either callback runs. The card cannot
+settle the review itself, and no production or native system-assistant input
+consumes it in Phase 217C.
+
 ### Eligible through the shared typed-and-voice policy
 
 - read the current timer status;

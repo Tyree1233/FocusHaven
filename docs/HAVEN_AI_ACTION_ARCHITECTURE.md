@@ -706,3 +706,34 @@ platform owner. No production screen or provider consumes it in Phase 217B,
 and no Siri/App Intent, Shortcut, Android App Action, permission, dependency,
 deep link, manifest, or external service is added. Native registration and
 production presentation remain separate review and release gates.
+
+## Phase 217C isolated system-intent review presentation
+
+`HavenSystemIntentReviewCard` is a localization-neutral presentation for one
+opaque Phase 217B capability. It receives only the exact
+`HavenSystemIntentReview`, one complete `HavenSystemIntentReviewCopy`, and
+separate dismiss and confirm callbacks. The review exposes its already-
+localized interpretation and effect while its underlying proposal remains
+private to `HavenSystemIntentReviewService`.
+
+The copy object requires complete source, privacy, freshness, confirmation,
+risk, semantic-summary, and action strings. The widget performs no
+localization, interpolation, or sentence assembly, so a later production
+adapter cannot silently combine a partially translated source label with an
+otherwise reviewed proposal. One live semantic summary describes the review;
+dismiss and confirm remain separate semantic buttons and neither is inferred
+from a gesture, timeout, system response, or spoken acknowledgement.
+
+Both actions are one-shot. The card disables dismiss and confirm together
+before passing the same opaque review to the chosen callback. A different
+review identity may reset the presentation, but the widget cannot prepare,
+inspect, confirm, dismiss, or execute the private proposal. Replay, expiry,
+live-state revalidation, and settlement remain exclusively with the Phase 217B
+bridge and Haven Action Engine.
+
+The presentation imports no localization, engine, timer, queue, persistence,
+provider, network, AI, or native platform owner. No production screen or
+provider consumes it in Phase 217C, no source-specific runtime catalog copy is
+added, and no Siri/App Intent, Shortcut, Android App Action, permission,
+dependency, deep link, manifest, or external service is registered. Copy
+review, production hosting, and native registration remain separate gates.

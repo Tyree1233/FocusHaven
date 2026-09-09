@@ -253,6 +253,12 @@ void main() {
       'Every system-intent proposal requires an exact confirmation',
       'A changed owner state rejects the proposal',
       'No production screen or provider consumes it in Phase 217B',
+      'Phase 217C isolated system-intent review presentation',
+      '`HavenSystemIntentReviewCard`',
+      'one complete `HavenSystemIntentReviewCopy`',
+      'performs no localization, interpolation, or sentence assembly',
+      'Both actions are one-shot',
+      'No production screen or provider consumes it in Phase 217C',
     ]) {
       expect(architecture, contains(required));
     }
