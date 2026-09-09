@@ -76,9 +76,11 @@ settings goes through the existing screens. Protected actions remain
 unavailable from this engine.
 
 Phase 213 safe voice runtime implemented the `voiceTranscript` provenance
-without expanding the allowlist. The interpreter and policy accept only
-`typed` and `voiceTranscript` sources. `localCoach` and `systemIntent` remain
-model values for future design work but are rejected as proposal authority.
+without expanding the speech allowlist. The free-text interpreter accepts only
+`typed` and `voiceTranscript` sources. `localCoach` remains rejected as
+proposal authority, and an unreviewed system-intent draft is never accepted as
+a proposal. Phase 217B separately permits only its exact in-app-reviewed
+`systemIntent` proposal shape.
 Editing a voice draft does not erase its voice provenance, and discarding voice
 restores the exact pre-listening typed draft.
 
@@ -663,12 +665,44 @@ is not a `HavenActionProposal`. It has no current-state token, proposal
 identifier, expiry, explanation, confirmation, or executor reference; it
 declares that in-app review is required and that it cannot execute.
 
-The existing action policy still admits only typed and reviewed voice sources,
-so a forged `HavenActionSource.systemIntent` proposal fails closed. The service
-does not import the engine, timer, queue, persistence, network, AI, or platform
-owners. No Siri/App Intent, Shortcut, Android App Action, deep link, dependency,
-permission, manifest, provider, or production UI is registered in Phase 217A.
-A later reviewed bridge must bind the draft to fresh app state, complete
-localized explanation, exact confirmation policy, and the existing Haven
-Action Engine before any platform registration may be added. The replay set is
-bounded and fails closed at capacity instead of evicting an older invocation.
+The Phase 217A service does not import the engine, timer, queue, persistence,
+network, AI, or platform owners. No Siri/App Intent, Shortcut, Android App
+Action, deep link, dependency, permission, manifest, provider, or production UI
+is registered in Phase 217A. A reviewed bridge must bind the draft to fresh app
+state, complete localized explanation, exact confirmation policy, and the
+existing Haven Action Engine before any platform registration may be added.
+The replay set is bounded and fails closed at capacity instead of evicting an
+older invocation.
+
+## Phase 217B reviewed system-intent proposal bridge
+
+`HavenSystemIntentReviewService` is the only bridge from a Phase 217A draft to
+the Haven Action Engine. It verifies the exact intent/action/argument pairing,
+consumes the bounded opaque invocation ID once, asks the engine for a fresh
+read-only owner snapshot, and builds one two-minute proposal with localized
+interpretation and effect copy already present in every production catalog.
+The proposal itself remains private to the bridge; presentation receives one
+opaque `HavenSystemIntentReview` with only display-safe action metadata.
+
+Every system-intent proposal requires an exact confirmation even when the
+route is informational or navigational. Calling `confirm()` consumes the one
+active review before `HavenActionEngine` revalidates proposal expiry, the live
+timer/queue state token, engine replay, and action availability. A changed
+owner state rejects the proposal, a second settlement fails, a newer review
+supersedes its predecessor, dismissal is final, and an unavailable invocation
+cannot be replayed after conditions change. The bridge remembers at most 128
+invocations and refuses new work at capacity without reopening an older ID.
+
+The policy accepts `HavenActionSource.systemIntent` only for the exact five
+reviewed shapes: status with no arguments, Focus-only start, argument-free
+pause or resume, and Focus Queue navigation. Each must carry the matching risk,
+complete trimmed localized copy, safe-undo marker, exact-confirmation marker,
+and the fixed two-minute lifetime. Added time, queue edits, break starts, other
+surfaces, incomplete copy, missing confirmation, or extended lifetime fail
+closed as invalid proposals.
+
+The bridge holds no timer, queue, persistence, provider, network, AI, or native
+platform owner. No production screen or provider consumes it in Phase 217B,
+and no Siri/App Intent, Shortcut, Android App Action, permission, dependency,
+deep link, manifest, or external service is added. Native registration and
+production presentation remain separate review and release gates.

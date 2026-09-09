@@ -20,6 +20,7 @@ class HavenActionPolicy {
   static const maxSessionSeconds = 24 * 60 * 60;
   static const maxAddedSeconds = 60 * 60;
   static const maxQueueTitleLength = 100;
+  static const systemIntentProposalLifetime = Duration(minutes: 2);
 
   HavenActionPolicyDecision evaluate({
     required HavenActionProposal proposal,
@@ -30,7 +31,8 @@ class HavenActionPolicy {
     final l10n = localizations ?? defaultServiceLocalizations();
     final supportedSource =
         proposal.source == HavenActionSource.typed ||
-        proposal.source == HavenActionSource.voiceTranscript;
+        proposal.source == HavenActionSource.voiceTranscript ||
+        _isExactReviewedSystemIntent(proposal);
     if (proposal.schemaVersion != 1 ||
         proposal.id.isEmpty ||
         !supportedSource ||
@@ -147,6 +149,48 @@ class HavenActionPolicy {
     if (!proposal.confirmationRequired) return _invalid(l10n);
     return const HavenActionPolicyDecision.allowed();
   }
+
+  bool _isExactReviewedSystemIntent(HavenActionProposal proposal) {
+    if (proposal.source != HavenActionSource.systemIntent ||
+        !proposal.confirmationRequired ||
+        !proposal.safeUndoAvailable ||
+        proposal.expiresAtUtc.difference(proposal.createdAtUtc) !=
+            systemIntentProposalLifetime ||
+        proposal.interpretation.trim().isEmpty ||
+        proposal.interpretation != proposal.interpretation.trim() ||
+        proposal.effect.trim().isEmpty ||
+        proposal.effect != proposal.effect.trim()) {
+      return false;
+    }
+
+    return switch (proposal.kind) {
+      HavenActionKind.readTimerStatus =>
+        proposal.risk == HavenActionRisk.informational &&
+            _hasNoArguments(proposal.arguments),
+      HavenActionKind.startTimer =>
+        proposal.risk == HavenActionRisk.reversibleControl &&
+            proposal.arguments.session == HavenSessionKind.focus &&
+            proposal.arguments.durationSeconds == null &&
+            proposal.arguments.surface == null &&
+            proposal.arguments.queueTitle == null,
+      HavenActionKind.pauseTimer || HavenActionKind.resumeTimer =>
+        proposal.risk == HavenActionRisk.reversibleControl &&
+            _hasNoArguments(proposal.arguments),
+      HavenActionKind.openSurface =>
+        proposal.risk == HavenActionRisk.informational &&
+            proposal.arguments.session == null &&
+            proposal.arguments.durationSeconds == null &&
+            proposal.arguments.surface == HavenActionSurface.focusQueue &&
+            proposal.arguments.queueTitle == null,
+      HavenActionKind.addTime || HavenActionKind.draftQueueItem => false,
+    };
+  }
+
+  bool _hasNoArguments(HavenActionArguments arguments) =>
+      arguments.session == null &&
+      arguments.durationSeconds == null &&
+      arguments.surface == null &&
+      arguments.queueTitle == null;
 
   HavenActionPolicyDecision _invalid(AppLocalizations l10n) =>
       HavenActionPolicyDecision.rejected(

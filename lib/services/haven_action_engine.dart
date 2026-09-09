@@ -115,6 +115,12 @@ class HavenActionEngine {
   final Set<String> _consumedProposalIds = <String>{};
   final List<String> _consumptionOrder = <String>[];
 
+  /// Returns one fresh read-only snapshot from the existing service owners.
+  ///
+  /// Reviewed bridges use this to bind a proposal to current timer and queue
+  /// control state without receiving either mutable service directly.
+  HavenActionState snapshot() => _executor.snapshot();
+
   HavenActionPolicyDecision evaluate(
     HavenActionProposal proposal, {
     AppLocalizations? localizations,
@@ -128,7 +134,7 @@ class HavenActionEngine {
     }
     return _policy.evaluate(
       proposal: proposal,
-      state: _executor.snapshot(),
+      state: snapshot(),
       nowUtc: _clock().toUtc(),
       localizations: l10n,
     );
@@ -222,7 +228,7 @@ class HavenActionEngine {
       outcome: outcome,
       reason: reason,
       occurredAtUtc: _clock().toUtc(),
-      resultingStateToken: _executor.snapshot().token,
+      resultingStateToken: snapshot().token,
     ),
     message: message,
   );

@@ -634,8 +634,10 @@ anything: the person must separately tap **Review action**, inspect the
 source-labelled proposal, and then choose **Run reviewed action** or **Confirm
 exact action**. Typed and voice proposals share the same allowlist, current
 state, expiry, argument bounds, protected-action rejection, exact confirmation,
-and replay protection. Local Coach output and system intents are rejected as
-proposal sources; general AI orchestration remains future work.
+and replay protection. Local Coach output and raw system-intent drafts are
+rejected as proposal sources; the later Phase 217B bridge admits only one exact
+reviewed five-route system-intent shape. General AI orchestration remains
+future work.
 
 Phase 214A adds the first **local Haven planner foundation**. From the Focus
 timer, **Plan a goal** turns only the goal and time the person enters into an
@@ -792,10 +794,20 @@ action. Each bounded opaque invocation ID is accepted once within the
 ephemeral preparer lifetime, and the preparer fails closed when its bounded
 replay memory fills. Arbitrary utterances, transcripts, task titles, coaching,
 journals, reflections, account data, and free-form parameters have no field in
-the contract. The existing action policy still rejects the system-intent
-source. No platform registration, permission, dependency, production provider,
-UI, persistence, AI, or network path is added; a later reviewed in-app bridge
-must create a fresh state-bound proposal before any platform exposure.
+the contract. No platform registration, permission, dependency, production
+provider, UI, persistence, AI, or network path is added.
+
+Phase 217B adds the closed **system-assistant in-app review bridge**. One exact
+Phase 217A draft can become one opaque, localized, two-minute review bound to a
+fresh Haven Action Engine snapshot. Every one of the five routes requires
+exact visual confirmation. Confirmation consumes the review before the engine
+rechecks live state, expiry, replay, and service-owner policy; newer, dismissed,
+stale, unavailable, duplicate, or capacity-exceeded work fails closed. The
+underlying proposal never leaves the bridge. The policy admits only the exact
+five reviewed shapes and rejects added time, queue edits, break starts, other
+surfaces, widened expiry, incomplete copy, or missing confirmation. No
+production provider or screen consumes this bridge yet, and Siri, App Intents,
+Shortcuts, and Android App Actions remain unregistered.
 The next review foundation treats those seventeen messages as a separately
 locked delta for the fifteen non-English production languages. It hashes every
 existing runtime catalog before preparing one private bundle and one private

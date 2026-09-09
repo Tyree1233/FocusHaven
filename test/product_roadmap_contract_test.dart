@@ -107,6 +107,8 @@ void main() {
     expect(readme, contains('Seventeen complete English messages'));
     expect(readme, contains('system-assistant intent contract foundation'));
     expect(readme, contains('cannot execute a timer or queue action'));
+    expect(readme, contains('system-assistant in-app review bridge'));
+    expect(readme, contains('Every one of the five routes requires'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -135,7 +137,8 @@ void main() {
       'every execution attempt settles the visible proposal',
       'Phase 213 safe voice runtime implemented',
       '`typed` and `voiceTranscript` sources',
-      '`localCoach` and `systemIntent`',
+      '`localCoach` remains rejected',
+      '`systemIntent` proposal shape',
       'tap **Review action**, inspect the proposal',
       'Phase 214A local planner foundation',
       'HavenPlannerService',
@@ -244,6 +247,12 @@ void main() {
       'seventeen source messages',
       'immediately after Focus Forecast',
       'leaving the timer stopped',
+      'Phase 217B reviewed system-intent proposal bridge',
+      '`HavenSystemIntentReviewService`',
+      'one two-minute proposal',
+      'Every system-intent proposal requires an exact confirmation',
+      'A changed owner state rejects the proposal',
+      'No production screen or provider consumes it in Phase 217B',
     ]) {
       expect(architecture, contains(required));
     }
@@ -296,8 +305,9 @@ void main() {
       'Nothing is sent to Focus Coach until the user taps **Send**',
       'Nothing is proposed to the Haven Action Engine until the user taps **Review action**',
       'Nothing executes until the user taps the separate visual **Run reviewed action**',
-      'Only `typed` and `voiceTranscript` are accepted proposal sources',
-      '`localCoach` and `systemIntent` are rejected',
+      'Only `typed` and `voiceTranscript` enter through the free-text interpreter',
+      '`localCoach` and raw `systemIntent` drafts are rejected there',
+      'every such route requires a separate exact visual confirmation',
     ]) {
       expect(policy, contains(required));
     }

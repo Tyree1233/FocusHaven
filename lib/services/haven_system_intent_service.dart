@@ -4,8 +4,8 @@ import '../models/haven_system_intent.dart';
 ///
 /// This service owns no platform registration, presentation, localization,
 /// timer, queue, persistence, network, AI, or Haven Action Engine capability.
-/// It emits only an ephemeral, non-executable route that a later reviewed
-/// in-app bridge must rebind to current state.
+/// It emits only an ephemeral, non-executable route that the Phase 217B
+/// reviewed in-app bridge must rebind to current state.
 final class HavenSystemIntentService {
   static const schemaVersion = 1;
   static const maxInvocationIdLength = 128;

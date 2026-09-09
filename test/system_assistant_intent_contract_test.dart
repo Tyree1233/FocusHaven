@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Phase 217A is text-free, bounded, and non-executable', () {
+  test('Phase 217A draft remains text-free, bounded, and non-executable', () {
     final model = _read('lib/models/haven_system_intent.dart');
     final service = _read('lib/services/haven_system_intent_service.dart');
     final policy = _read('lib/services/haven_action_policy.dart');
@@ -50,13 +50,16 @@ void main() {
       policy,
       contains('proposal.source == HavenActionSource.voiceTranscript'),
     );
+    expect(policy, contains('_isExactReviewedSystemIntent(proposal)'));
     expect(
       policy,
-      isNot(contains('proposal.source == HavenActionSource.systemIntent')),
+      contains('proposal.source != HavenActionSource.systemIntent'),
     );
+    expect(policy, contains('proposal.confirmationRequired'));
+    expect(policy, contains('systemIntentProposalLifetime'));
   });
 
-  test('Phase 217A changes no platform registration or production owner', () {
+  test('Phase 217B changes no platform registration or production owner', () {
     final roadmap = _normalize(_read('docs/PRODUCT_ROADMAP.md'));
     final architecture = _normalize(
       _read('docs/HAVEN_AI_ACTION_ARCHITECTURE.md'),
@@ -68,7 +71,7 @@ void main() {
 
     expect(
       roadmap,
-      contains('Phase 217A system-assistant intent contract implemented'),
+      contains('Phase 217B reviewed in-app proposal bridge implemented'),
     );
     expect(
       architecture,
@@ -76,6 +79,11 @@ void main() {
     );
     expect(readme, contains('system-assistant intent contract foundation'));
     expect(readme, contains('cannot execute a timer or queue action'));
+    expect(readme, contains('system-assistant in-app review bridge'));
+    expect(
+      architecture,
+      contains('Phase 217B reviewed system-intent proposal bridge'),
+    );
 
     expect(iosInfo, isNot(contains('INIntentsSupported')));
     expect(iosInfo, isNot(contains('NSSiriUsageDescription')));

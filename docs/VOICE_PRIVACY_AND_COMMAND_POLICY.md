@@ -100,8 +100,11 @@ Voice receives no authority beyond typed input. A reviewed transcript passes
 through the same Haven Action Engine described in
 [`HAVEN_AI_ACTION_ARCHITECTURE.md`](HAVEN_AI_ACTION_ARCHITECTURE.md).
 
-Only `typed` and `voiceTranscript` are accepted proposal sources.
-`localCoach` and `systemIntent` are rejected. Speech never calls
+Only `typed` and `voiceTranscript` enter through the free-text interpreter.
+`localCoach` and raw `systemIntent` drafts are rejected there. Separately, the
+Phase 217B bridge can produce only an exact five-route, fresh-state, two-minute
+`systemIntent` proposal after preparing a localized in-app review; every such
+route requires a separate exact visual confirmation. Speech never calls
 `TimerService`, `FocusQueueService`, navigation, or another mutation path
 directly.
 

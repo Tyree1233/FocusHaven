@@ -40,6 +40,11 @@ void main() {
         policy,
         contains('proposal.source == HavenActionSource.voiceTranscript'),
       );
+      expect(policy, contains('_isExactReviewedSystemIntent(proposal)'));
+      expect(
+        policy,
+        contains('systemIntentProposalLifetime = Duration(minutes: 2)'),
+      );
       expect(interpreter, contains('source = HavenActionSource.typed'));
       expect(
         interpreter,
@@ -59,6 +64,7 @@ void main() {
     expect(engine, contains('timer.addTime'));
     expect(engine, contains('focusQueue.add'));
     expect(engine, contains('_consumedProposalIds'));
+    expect(engine, contains('HavenActionState snapshot()'));
     expect(timer, contains('bool addTime(Duration duration)'));
     expect(screen, contains("ValueKey('openHavenActions')"));
     expect(screen, contains('HavenActionSheet('));

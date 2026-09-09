@@ -49,9 +49,9 @@ final class HavenSystemIntentRequest {
 ///
 /// This is deliberately not a [HavenActionProposal]. It has no proposal ID,
 /// current-state token, localized explanation, expiry, confirmation, or
-/// execution capability. A later reviewed in-app bridge must construct and
-/// display a fresh state-bound proposal before [HavenActionSource.systemIntent]
-/// can ever reach the Haven Action Engine.
+/// execution capability. The Phase 217B reviewed in-app bridge must construct
+/// and display a fresh state-bound proposal before
+/// [HavenActionSource.systemIntent] can ever reach the Haven Action Engine.
 final class HavenSystemIntentDraft {
   const HavenSystemIntentDraft._({
     required this.invocationId,
