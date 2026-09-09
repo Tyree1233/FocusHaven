@@ -259,6 +259,11 @@ void main() {
       'performs no localization, interpolation, or sentence assembly',
       'Both actions are one-shot',
       'No production screen or provider consumes it in Phase 217C',
+      'Phase 217D locked system-assistant production copy',
+      'eleven complete English messages',
+      'exactly three string placeholders',
+      'no production provider or screen consumer',
+      'Copy approval cannot register a platform request or execute a Haven Action',
     ]) {
       expect(architecture, contains(required));
     }

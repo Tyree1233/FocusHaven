@@ -737,3 +737,33 @@ provider consumes it in Phase 217C, no source-specific runtime catalog copy is
 added, and no Siri/App Intent, Shortcut, Android App Action, permission,
 dependency, deep link, manifest, or external service is registered. Copy
 review, production hosting, and native registration remain separate gates.
+
+## Phase 217D locked system-assistant production copy
+
+Phase 217D isolates eleven complete English messages in
+`localization/proposals/app_en_system_assistant_review.arb`. The proposal
+covers the source and no-action disclosure, exact text-free privacy boundary,
+two-minute freshness and stale-owner warning, mandatory visual confirmation,
+separate informational and reversible-control risk explanations, a complete
+semantic summary, and distinct dismiss and confirm labels.
+
+The semantic summary has exactly three string placeholders:
+`interpretation`, `effect`, and `risk`. Those values already come from the
+reviewed service and risk mapping. Each language may reorder them only inside
+one complete reviewed message; neither the card nor a future production host
+may concatenate translated sentence fragments. The visible Confirm action
+label exactly matches the confirmation disclosure.
+
+The proposal sits outside `lib/l10n`, and every existing runtime catalog
+remains byte-unchanged. It contains no transcript, task, journal, reflection,
+coaching, account, reviewer, device, or provider data. A later incremental
+review must produce one complete independent approval for each of the fifteen
+non-English production languages; base `pt` may be derived only from approved
+`pt-BR`.
+
+Phase 217D adds no production provider or screen consumer, native adapter,
+Siri/App Intent, Shortcut, Android App Action, permission, dependency, deep
+link, manifest, entitlement, persistence, provider, network, or AI path. Copy
+approval cannot register a platform request or execute a Haven Action.
+Production localization, app-level hosting, and each native adapter remain
+separate later gates.

@@ -821,6 +821,18 @@ prepare, inspect, confirm, dismiss, or execute the private proposal and imports
 no engine, timer, queue, provider, persistence, network, AI, or platform owner.
 No production screen consumes it, no source-specific runtime copy is added,
 and Siri, App Intents, Shortcuts, and Android App Actions remain unregistered.
+
+Phase 217D locks the complete English **system-assistant production review
+copy** without opening production or native input. The isolated eleven-message
+proposal covers the source disclosure, text-free privacy boundary, exact
+two-minute freshness warning, in-app confirmation requirement, separate
+informational and reversible-control risk explanations, one complete semantic
+summary, and both action labels. The summary carries only the already-
+localized interpretation, effect, and risk placeholders, so languages may
+reorder complete reviewed copy without fragment assembly. All seventeen
+runtime catalogs remain unchanged, no production host consumes the card, and
+every Apple and Android registration remains disabled until the fifteen non-
+English reviews and a later integration pass independently.
 The next review foundation treats those seventeen messages as a separately
 locked delta for the fifteen non-English production languages. It hashes every
 existing runtime catalog before preparing one private bundle and one private

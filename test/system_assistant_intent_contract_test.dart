@@ -59,7 +59,7 @@ void main() {
     expect(policy, contains('systemIntentProposalLifetime'));
   });
 
-  test('Phase 217C changes no platform registration or production owner', () {
+  test('Phase 217D changes no platform registration or production owner', () {
     final roadmap = _normalize(_read('docs/PRODUCT_ROADMAP.md'));
     final architecture = _normalize(
       _read('docs/HAVEN_AI_ACTION_ARCHITECTURE.md'),
@@ -71,9 +71,7 @@ void main() {
 
     expect(
       roadmap,
-      contains(
-        'Phase 217C isolated review presentation foundation implemented',
-      ),
+      contains('Phase 217D English production-copy proposal locked'),
     );
     expect(
       architecture,
@@ -83,6 +81,7 @@ void main() {
     expect(readme, contains('cannot execute a timer or queue action'));
     expect(readme, contains('system-assistant in-app review bridge'));
     expect(readme, contains('system-assistant review presentation foundation'));
+    expect(readme, contains('system-assistant production review copy'));
     expect(
       architecture,
       contains('Phase 217B reviewed system-intent proposal bridge'),
@@ -90,6 +89,10 @@ void main() {
     expect(
       architecture,
       contains('Phase 217C isolated system-intent review presentation'),
+    );
+    expect(
+      architecture,
+      contains('Phase 217D locked system-assistant production copy'),
     );
 
     expect(iosInfo, isNot(contains('INIntentsSupported')));
