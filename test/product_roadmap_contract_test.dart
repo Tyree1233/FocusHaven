@@ -32,7 +32,7 @@ void main() {
       '| Enhanced remote coach | Foundation shipped, disabled |',
       '| Haven AI planner | Foundation shipped |',
       '| Unified Haven Loop | Shipped |',
-      '| Adaptive Focus Engine | Production review gate in progress |',
+      '| Adaptive Focus Engine | Shipped |',
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
     ]) {
@@ -97,7 +97,7 @@ void main() {
     expect(readme, contains('text-free enums, booleans'));
     expect(readme, contains('never persisted or serialized'));
     expect(readme, contains('Adaptive Focus Engine foundation'));
-    expect(readme, contains('No production control consumes it yet'));
+    expect(readme, contains('reviewed production card'));
     expect(readme, contains('Adaptive Focus review foundation'));
     expect(readme, contains('one-time local review ticket'));
     expect(readme, contains('Adaptive Focus owner-delegation foundation'));
@@ -237,8 +237,8 @@ void main() {
       'updates both saved defaults and the ready Focus countdown atomically',
       'never selects a session or starts, pauses, resets, resumes, or completes one',
       'No production screen consumes it in Phase 216C',
-      'Phase 216D production review copy lock',
-      'seventeen proposed messages',
+      'Phase 216D reviewed production adapter',
+      'seventeen source messages',
       'immediately after Focus Forecast',
       'leaving the timer stopped',
     ]) {

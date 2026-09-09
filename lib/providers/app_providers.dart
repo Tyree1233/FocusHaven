@@ -25,6 +25,7 @@ import '../models/parked_thought.dart';
 import '../models/pro_entitlement.dart';
 import '../models/system_focus_snapshot.dart';
 import '../services/account_deletion_service.dart';
+import '../services/adaptive_focus_delegation_service.dart';
 import '../services/adaptive_focus_service.dart';
 import '../services/auth_service.dart';
 import '../services/cloud_sync_service.dart';
@@ -116,6 +117,13 @@ typedef AdaptiveFocusRequest = ({
   int currentFocusMinutes,
   int currentBreakMinutes,
   bool preserveCurrentChoice,
+});
+
+/// Exact timer-owner state needed to present one Adaptive Focus review.
+typedef AdaptiveFocusOwnerState = ({
+  bool canReview,
+  int focusMinutes,
+  int breakMinutes,
 });
 
 /// Immutable journal data used by the Reflection Journal sheet.
@@ -230,6 +238,13 @@ final adaptiveFocusServiceProvider = Provider<AdaptiveFocusService>(
   (ref) => const AdaptiveFocusService(),
   name: 'adaptiveFocusServiceProvider',
 );
+
+final adaptiveFocusDelegationServiceProvider =
+    Provider<AdaptiveFocusDelegationService>(
+      (ref) =>
+          AdaptiveFocusDelegationService(timer: ref.read(timerServiceProvider)),
+      name: 'adaptiveFocusDelegationServiceProvider',
+    );
 
 final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(
   (ref) => FocusProfileService(),
@@ -524,6 +539,25 @@ final timerSessionStateProvider = Provider<TimerSessionState>((ref) {
     completedFocusSessionFit: timer.completedFocusSessionFit,
   );
 }, name: 'timerSessionStateProvider');
+
+/// Narrow live owner snapshot for the optional Adaptive Focus review.
+///
+/// Whole-minute conversion happens only after the authoritative timer reports
+/// that a review can be applied. The record avoids rebuilding the dashboard on
+/// each countdown tick.
+final adaptiveFocusOwnerStateProvider = Provider<AdaptiveFocusOwnerState>((
+  ref,
+) {
+  final timer = ref.watch(timerServiceProvider);
+  return (
+    canReview:
+        timer.canApplyReviewedAdaptiveDurations &&
+        timer.focusDurationSeconds % 60 == 0 &&
+        timer.shortBreakDurationSeconds % 60 == 0,
+    focusMinutes: timer.focusDurationSeconds ~/ 60,
+    breakMinutes: timer.shortBreakDurationSeconds ~/ 60,
+  );
+}, name: 'adaptiveFocusOwnerStateProvider');
 
 /// Narrow read model for progress cards and daily encouragement.
 final timerSummaryStateProvider = Provider<TimerSummaryState>((ref) {

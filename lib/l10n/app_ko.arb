@@ -5107,5 +5107,125 @@
   "weekdayWednesdayShort": "수",
   "@weekdayWednesdayShort": {
     "description": "Phase 215G-B5 source-catalog copy for weekdayWednesdayShort."
+  },
+  "adaptiveFocusApplied": "향후 집중 세션은 {focusMinutes} 분을 사용하며, {breakMinutes} 분의 짧은 휴식 시간이 포함됩니다. 세션은 시작되지 않았습니다.",
+  "@adaptiveFocusApplied": {
+    "description": "Confirmation after the timer owner applies the exact reviewed Adaptive Focus defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusChanged": "타이머가 바뀌어서 이 제안은 적용되지 않았습니다.",
+  "@adaptiveFocusChanged": {
+    "description": "Fail-closed message when timer state changes before an Adaptive Focus review settles."
+  },
+  "adaptiveFocusCurrentPlan": "현재: {focusMinutes}분 집중 · {breakMinutes}분 휴식",
+  "@adaptiveFocusCurrentPlan": {
+    "description": "Complete line describing the person's current Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusEyebrow": "적응형 집중",
+  "@adaptiveFocusEyebrow": {
+    "description": "Short uppercase label above the Adaptive Focus review card."
+  },
+  "adaptiveFocusForecastContext": "집중 예측 창은 시간적 맥락만 추가할 뿐, 이러한 기간을 변경하지는 않습니다.",
+  "@adaptiveFocusForecastContext": {
+    "description": "Optional disclosure when a qualified Focus Forecast window accompanies the duration suggestion."
+  },
+  "adaptiveFocusGentlerTitle": "좀 더 부드러운 세션이 적합할 수 있습니다.",
+  "@adaptiveFocusGentlerTitle": {
+    "description": "Adaptive Focus review heading when the bounded suggestion reduces focus pressure or adds recovery time."
+  },
+  "adaptiveFocusGrowthTitle": "조금 더 집중하는 것이 좋을 것 같습니다.",
+  "@adaptiveFocusGrowthTitle": {
+    "description": "Adaptive Focus review heading when repeated evidence supports one bounded increase in focus time."
+  },
+  "adaptiveFocusKeepCurrent": "현재 설정 유지",
+  "@adaptiveFocusKeepCurrent": {
+    "description": "Button that dismisses an Adaptive Focus suggestion without changing timer defaults."
+  },
+  "adaptiveFocusKept": "현재 집중 설정이 유지되었습니다.",
+  "@adaptiveFocusKept": {
+    "description": "Confirmation after the person explicitly keeps the current timer defaults."
+  },
+  "adaptiveFocusNoAutomaticChange": "'제안 사용'을 선택하지 않는 한 아무것도 변경되지 않습니다. 타이머는 멈춘 상태로 유지됩니다.",
+  "@adaptiveFocusNoAutomaticChange": {
+    "description": "Disclosure that the suggestion is optional and cannot start the timer."
+  },
+  "adaptiveFocusPrivacy": "텍스트가 없는 집중 신호를 기반으로 구축되었습니다. 작업, 일지, 코칭, 녹취록 또는 계정 관련 텍스트는 전혀 사용되지 않습니다.",
+  "@adaptiveFocusPrivacy": {
+    "description": "Privacy disclosure for the local Adaptive Focus suggestion."
+  },
+  "adaptiveFocusRecoveryReason": "최근 재개된 사례들을 보면 시작 압력을 낮추면 복귀가 더 쉬워질 수 있음을 알 수 있습니다.",
+  "@adaptiveFocusRecoveryReason": {
+    "description": "Reason shown when repeated recent recovery signals lead the Adaptive Focus suggestion."
+  },
+  "adaptiveFocusReflectionReason": "최근 개인적인 소감에서 이번 세션이 너무 과했다고 하셨기에, 이번 제안은 좀 더 부드러운 방향으로 수정했습니다.",
+  "@adaptiveFocusReflectionReason": {
+    "description": "Reason shown when the latest private session-fit reflection leads a gentler suggestion."
+  },
+  "adaptiveFocusReviewSummary": "적응형 집중 검토. 현재: {currentFocusMinutes}분 집중 및 {currentBreakMinutes}분 휴식. 권장 설정: {suggestedFocusMinutes}분 집중 및 {suggestedBreakMinutes}분 휴식. {reason} '제안 사용'을 선택하지 않는 한 아무런 변경 사항이 없습니다. 타이머는 정지된 상태로 유지됩니다.",
+  "@adaptiveFocusReviewSummary": {
+    "description": "Complete screen-reader summary for one Adaptive Focus review.",
+    "placeholders": {
+      "currentFocusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "currentBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "suggestedFocusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "suggestedBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "reason": {
+        "type": "String",
+        "example": "Recent restarts suggest that lowering the starting pressure may make returning easier."
+      }
+    }
+  },
+  "adaptiveFocusRhythmReason": "반복되는 개인적인 리듬 신호는 작은 한 걸음을 내딛을 여지가 있을지도 모른다는 것을 시사합니다.",
+  "@adaptiveFocusRhythmReason": {
+    "description": "Reason shown when repeated Haven Rhythm evidence supports one bounded focus increase."
+  },
+  "adaptiveFocusSuggestedPlan": "권장 사항: {focusMinutes}분 집중 · {breakMinutes}분 휴식",
+  "@adaptiveFocusSuggestedPlan": {
+    "description": "Complete line describing the locally suggested Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusUseSuggestion": "제안 사용",
+  "@adaptiveFocusUseSuggestion": {
+    "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
   }
 }

@@ -96,7 +96,11 @@ void main() {
     },
   );
 
-  test('Phase 216D proposal is isolated from every runtime catalog', () {
+  test('Phase 216D reviewed delta is complete in every runtime catalog', () {
+    final source = proposal();
+    final sourceKeys = source.keys
+        .where((key) => key != '@@locale' && !key.startsWith('@'))
+        .toSet();
     final catalogs = Directory('lib/l10n')
         .listSync()
         .whereType<File>()
@@ -105,15 +109,38 @@ void main() {
 
     expect(catalogs, hasLength(17));
     for (final catalog in catalogs) {
-      expect(
-        catalog.readAsStringSync(),
-        isNot(contains('adaptiveFocusEyebrow')),
-        reason: catalog.path,
-      );
+      final arb =
+          jsonDecode(catalog.readAsStringSync()) as Map<String, Object?>;
+      final keys = arb.keys
+          .where((key) => key.startsWith('adaptiveFocus'))
+          .toSet();
+      expect(keys, sourceKeys, reason: catalog.path);
+      for (final key in sourceKeys) {
+        expect(arb[key], isA<String>(), reason: '${catalog.path}:$key');
+        expect((arb[key]! as String).trim(), isNotEmpty);
+        expect(arb['@$key'], source['@$key'], reason: '${catalog.path}:@$key');
+      }
     }
+
+    final english =
+        jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())
+            as Map<String, Object?>;
+    for (final key in sourceKeys) {
+      expect(english[key], source[key], reason: key);
+    }
+
+    final ptBr =
+        jsonDecode(File('lib/l10n/app_pt_BR.arb').readAsStringSync())
+            as Map<String, Object?>;
+    final pt =
+        jsonDecode(File('lib/l10n/app_pt.arb').readAsStringSync())
+            as Map<String, Object?>;
+    ptBr.remove('@@locale');
+    pt.remove('@@locale');
+    expect(pt, ptBr);
   });
 
-  test('Phase 216D keeps production placement and owner authority closed', () {
+  test('Phase 216D opens only the reviewed owner-bounded placement', () {
     final timerScreen = File(
       'lib/screens/timer_screen.dart',
     ).readAsStringSync();
@@ -124,22 +151,24 @@ void main() {
       'docs/ADAPTIVE_FOCUS_PRODUCTION_REVIEW.md',
     ).readAsStringSync().replaceAll(RegExp(r'\s+'), ' ');
 
-    expect(timerScreen, isNot(contains('AdaptiveFocusReviewCard')));
-    expect(timerScreen, isNot(contains('AdaptiveFocusDelegationService')));
-    expect(
-      providers,
-      isNot(contains('adaptiveFocusDelegationServiceProvider')),
-    );
+    final forecast = timerScreen.indexOf('FocusForecastCard(');
+    final adaptive = timerScreen.indexOf('AdaptiveFocusProductionReview(');
+    final window = timerScreen.indexOf('HavenWindowCard(');
+    expect(forecast, greaterThanOrEqualTo(0));
+    expect(adaptive, greaterThan(forecast));
+    expect(window, greaterThan(adaptive));
+    expect(providers, contains('adaptiveFocusDelegationServiceProvider'));
+    expect(providers, contains('adaptiveFocusOwnerStateProvider'));
     for (final required in <String>[
-      'production presentation remains closed',
+      'production presentation is open',
       'immediately after Focus Forecast',
       'fresh, stopped, incomplete Focus session',
       'The card must disappear',
-      'other fifteen active languages',
+      'fifteen independently reviewed languages',
       'mechanical base `pt` fallback',
       'must not assemble a production sentence from translated fragments',
-      'grants no persistence, timer-start, queue, calendar, Haven Action, '
-          'local-AI, remote-AI, network, deployment, or publication authority',
+      'grants no timer-start, queue, calendar, Haven Action, local-AI, '
+          'remote-AI, network, deployment, or publication authority',
     ]) {
       expect(policy, contains(required), reason: required);
     }

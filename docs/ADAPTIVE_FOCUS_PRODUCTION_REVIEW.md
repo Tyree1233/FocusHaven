@@ -1,7 +1,7 @@
 # Adaptive Focus production review gate
 
-Status: Phase 216D copy lock and private incremental-review/provider-draft
-foundations prepared; production presentation remains closed.
+Status: Phase 216D reviewed runtime integration implemented; production
+presentation is open only through the owner-revalidated review adapter.
 
 ## Purpose
 
@@ -11,17 +11,16 @@ reviewed duration pair without starting a session. Phase 216D prepares the
 missing production copy and placement contract without weakening those
 boundaries or invalidating the sixteen reviewed runtime catalogs.
 
-The English proposal is isolated at
-`localization/proposals/app_en_adaptive_focus_review.arb`. It is not a Flutter
-runtime catalog. No generated localization class or production screen reads
-it, so preparing or revising this copy cannot expose an English fallback in a
-non-English interface.
+The English proposal remains locked at
+`localization/proposals/app_en_adaptive_focus_review.arb`. Its seventeen
+messages were merged into English and fifteen independently reviewed languages;
+Flutter's mechanical base `pt` fallback is derived from reviewed `pt-BR`.
+No non-English interface receives English proposal fallback copy.
 
 ## Proposed placement
 
-After every active locale has a complete reviewed version of the proposal, the
-card may appear on the timer dashboard immediately after Focus Forecast. It may
-appear only for a fresh, stopped, incomplete Focus session when:
+The card may appear on the timer dashboard immediately after Focus Forecast.
+It may appear only for a fresh, stopped, incomplete Focus session when:
 
 - timer initialization has completed;
 - Focus and short-break defaults are whole minutes;
@@ -50,20 +49,21 @@ Translators may reorder placeholders as their language requires. Placeholder
 names, counts, and types must remain exact. The product must not assemble a
 production sentence from translated fragments.
 
-## Review and activation sequence
+## Completed review and activation sequence
 
-1. Lock this English proposal and its metadata.
-2. Create private draft translations for the other fifteen active languages.
-3. Run independent fluent review of every proposed message and placeholder.
-4. Merge only complete approved deltas into the English source, the sixteen
-   production catalogs, and the mechanical base `pt` fallback.
-5. Regenerate Flutter localization and verify no existing catalog message
-   changed.
-6. Add the production adapter and deliberate dashboard placement.
-7. Verify keep-current, accept, stale-state rejection, no-start behavior,
-   persistence, semantics, large text, narrow layouts, and all active locales.
-8. Run the complete Flutter suite, analysis, and fresh web, Android, and
-   unsigned iOS builds before committing or pushing the activation.
+1. The English proposal and metadata were locked.
+2. Private drafts were created for the other fifteen active languages.
+3. Independent fluent review completed all 255 decisions: 153 accepted, 102
+   revised, and zero blocked.
+4. Only complete approved deltas were merged into English, the fifteen reviewed
+   catalogs, and the mechanical base `pt` fallback.
+5. Flutter localization is regenerated without rewriting any prior message.
+6. The production adapter is placed deliberately after Focus Forecast.
+7. Keep-current, accept, stale-state rejection, no-start behavior, persistence,
+   semantics, large text, narrow layouts, and all active locales are gated by
+   the Phase 216D verification suite.
+8. The complete Flutter suite, analysis, and fresh web, Android, and unsigned
+   iOS builds remain mandatory before commit or push.
 
 ## Incremental delta-review foundation
 
@@ -94,10 +94,10 @@ The workflow deliberately excludes the 980 already-reviewed messages in each
 language. Existing runtime catalogs are read only to verify their exact hashes,
 locale identities, and absence of the new keys. Acceptance still does not edit
 `lib/l10n`, generated localization, the language registry, or the timer screen.
-After all fifteen approved deltas exist, a separate integration phase must
-derive `pt` from reviewed `pt-BR`, atomically merge complete deltas into all
-seventeen runtime catalogs, and rerun every localization, UI, accessibility,
-test, analysis, and build gate before production placement can open.
+All fifteen approved deltas now exist. The integration derives `pt` from
+reviewed `pt-BR`, merges complete deltas into all seventeen runtime catalogs,
+and opens production placement only with localization, UI, accessibility,
+test, analysis, and build gates.
 
 The separate provider-draft foundation in
 `tool/localization_google_incremental_drafts.dart` can prepare only the locked
@@ -130,6 +130,7 @@ gate.
 
 The proposal contains only public interface copy. It contains no task,
 journal, reflection, coaching, transcript, account, calendar, or reviewer data.
-It grants no persistence, timer-start, queue, calendar, Haven Action, local-AI,
-remote-AI, network, deployment, or publication authority. The existing timer
-service remains the only owner allowed to persist a reviewed duration pair.
+The adapter grants only one explicit, owner-revalidated persistence request for
+the reviewed future defaults. It grants no timer-start, queue, calendar, Haven
+Action, local-AI, remote-AI, network, deployment, or publication authority. The
+existing timer service remains the only owner allowed to persist that pair.

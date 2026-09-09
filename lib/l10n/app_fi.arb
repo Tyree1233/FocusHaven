@@ -5107,5 +5107,125 @@
   "weekdayWednesdayShort": "Ke",
   "@weekdayWednesdayShort": {
     "description": "Phase 215G-B5 source-catalog copy for weekdayWednesdayShort."
+  },
+  "adaptiveFocusApplied": "Tulevissa Focus-istunnoissa käytetään {focusMinutes} minuuttia {breakMinutes} minuutin lyhyillä tauoilla. Istuntoa ei aloitettu.",
+  "@adaptiveFocusApplied": {
+    "description": "Confirmation after the timer owner applies the exact reviewed Adaptive Focus defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusChanged": "Ajastin muuttui, joten tätä ehdotusta ei otettu käyttöön.",
+  "@adaptiveFocusChanged": {
+    "description": "Fail-closed message when timer state changes before an Adaptive Focus review settles."
+  },
+  "adaptiveFocusCurrentPlan": "Nykyinen: {focusMinutes} min keskittymisaika · {breakMinutes} min tauko",
+  "@adaptiveFocusCurrentPlan": {
+    "description": "Complete line describing the person's current Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusEyebrow": "ADAPTIVE FOCUS",
+  "@adaptiveFocusEyebrow": {
+    "description": "Short uppercase label above the Adaptive Focus review card."
+  },
+  "adaptiveFocusForecastContext": "Mahdollinen Focus Forecast -ikkuna lisää vain ajoituskontekstin; se ei muuttanut näitä kestoja.",
+  "@adaptiveFocusForecastContext": {
+    "description": "Optional disclosure when a qualified Focus Forecast window accompanies the duration suggestion."
+  },
+  "adaptiveFocusGentlerTitle": "Lempeämpi istunto voi sopia",
+  "@adaptiveFocusGentlerTitle": {
+    "description": "Adaptive Focus review heading when the bounded suggestion reduces focus pressure or adds recovery time."
+  },
+  "adaptiveFocusGrowthTitle": "Hieman enemmän keskittymistä voisi sopia",
+  "@adaptiveFocusGrowthTitle": {
+    "description": "Adaptive Focus review heading when repeated evidence supports one bounded increase in focus time."
+  },
+  "adaptiveFocusKeepCurrent": "Säilytä nykyiset asetukset",
+  "@adaptiveFocusKeepCurrent": {
+    "description": "Button that dismisses an Adaptive Focus suggestion without changing timer defaults."
+  },
+  "adaptiveFocusKept": "Nykyiset Focus-asetukset säilytettiin.",
+  "@adaptiveFocusKept": {
+    "description": "Confirmation after the person explicitly keeps the current timer defaults."
+  },
+  "adaptiveFocusNoAutomaticChange": "Mikään ei muutu, ellet valitse Käytä ehdotusta. Ajastin pysyy pysäytettynä.",
+  "@adaptiveFocusNoAutomaticChange": {
+    "description": "Disclosure that the suggestion is optional and cannot start the timer."
+  },
+  "adaptiveFocusPrivacy": "Rakennettu tälle laitteelle tekstittömien keskittymissignaalien perusteella. Ei käytetä tehtävä-, päiväkirja-, valmennus-, transkriptio- tai tilitekstejä.",
+  "@adaptiveFocusPrivacy": {
+    "description": "Privacy disclosure for the local Adaptive Focus suggestion."
+  },
+  "adaptiveFocusRecoveryReason": "Viimeaikaiset uudelleenkäynnistykset viittaavat siihen, että käynnistyspaineen alentaminen voi helpottaa paluuta.",
+  "@adaptiveFocusRecoveryReason": {
+    "description": "Reason shown when repeated recent recovery signals lead the Adaptive Focus suggestion."
+  },
+  "adaptiveFocusReflectionReason": "Viimeisimmässä yksityisessä pohdinnassasi sanoit, että sessio tuntui liian raskaalta, joten tämä ehdotus on vain lempeämpi.",
+  "@adaptiveFocusReflectionReason": {
+    "description": "Reason shown when the latest private session-fit reflection leads a gentler suggestion."
+  },
+  "adaptiveFocusReviewSummary": "Mukautuvan Focus-tarkistuksen yhteenveto. Nykyinen: {currentFocusMinutes} min keskittymisaikaa ja {currentBreakMinutes} min taukoa. Ehdotus: {suggestedFocusMinutes} min keskittymisaikaa ja {suggestedBreakMinutes} min taukoa. {reason} Mikään ei muutu, ellet valitse Käytä ehdotusta. Ajastin pysyy pysäytettynä.",
+  "@adaptiveFocusReviewSummary": {
+    "description": "Complete screen-reader summary for one Adaptive Focus review.",
+    "placeholders": {
+      "currentFocusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "currentBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "suggestedFocusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "suggestedBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "reason": {
+        "type": "String",
+        "example": "Recent restarts suggest that lowering the starting pressure may make returning easier."
+      }
+    }
+  },
+  "adaptiveFocusRhythmReason": "Toistuvat yksityiset Haven Rhythm -signaalit viittaavat siihen, että yhdelle pienelle askeleelle saattaa olla tilaa.",
+  "@adaptiveFocusRhythmReason": {
+    "description": "Reason shown when repeated Haven Rhythm evidence supports one bounded focus increase."
+  },
+  "adaptiveFocusSuggestedPlan": "Ehdotettu: {focusMinutes} min keskittyminen · {breakMinutes} min tauko",
+  "@adaptiveFocusSuggestedPlan": {
+    "description": "Complete line describing the locally suggested Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusUseSuggestion": "Käytä ehdotusta",
+  "@adaptiveFocusUseSuggestion": {
+    "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
   }
 }

@@ -5107,5 +5107,125 @@
   "weekdayWednesdayShort": "Ons",
   "@weekdayWednesdayShort": {
     "description": "Phase 215G-B5 source-catalog copy for weekdayWednesdayShort."
+  },
+  "adaptiveFocusApplied": "Fremtidige fokusøkter vil bruke {focusMinutes} minutter med korte pauser på {breakMinutes} minutter. Ingen økt ble startet.",
+  "@adaptiveFocusApplied": {
+    "description": "Confirmation after the timer owner applies the exact reviewed Adaptive Focus defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusChanged": "Timeren ble endret, så dette forslaget ble ikke brukt.",
+  "@adaptiveFocusChanged": {
+    "description": "Fail-closed message when timer state changes before an Adaptive Focus review settles."
+  },
+  "adaptiveFocusCurrentPlan": "Nåværende: {focusMinutes} min fokus · {breakMinutes} min pause",
+  "@adaptiveFocusCurrentPlan": {
+    "description": "Complete line describing the person's current Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusEyebrow": "ADAPTIV FOKUS",
+  "@adaptiveFocusEyebrow": {
+    "description": "Short uppercase label above the Adaptive Focus review card."
+  },
+  "adaptiveFocusForecastContext": "Et mulig Focus Forecast-vindu legger kun til tidskontekst; det endret ikke disse varighetene.",
+  "@adaptiveFocusForecastContext": {
+    "description": "Optional disclosure when a qualified Focus Forecast window accompanies the duration suggestion."
+  },
+  "adaptiveFocusGentlerTitle": "En mildere økt kan passe",
+  "@adaptiveFocusGentlerTitle": {
+    "description": "Adaptive Focus review heading when the bounded suggestion reduces focus pressure or adds recovery time."
+  },
+  "adaptiveFocusGrowthTitle": "Litt mer fokus kan passe",
+  "@adaptiveFocusGrowthTitle": {
+    "description": "Adaptive Focus review heading when repeated evidence supports one bounded increase in focus time."
+  },
+  "adaptiveFocusKeepCurrent": "Behold gjeldende innstillinger",
+  "@adaptiveFocusKeepCurrent": {
+    "description": "Button that dismisses an Adaptive Focus suggestion without changing timer defaults."
+  },
+  "adaptiveFocusKept": "Gjeldende fokusinnstillinger ble beholdt.",
+  "@adaptiveFocusKept": {
+    "description": "Confirmation after the person explicitly keeps the current timer defaults."
+  },
+  "adaptiveFocusNoAutomaticChange": "Ingenting endres med mindre du velger Bruk forslag. Timeren vil forbli stoppet.",
+  "@adaptiveFocusNoAutomaticChange": {
+    "description": "Disclosure that the suggestion is optional and cannot start the timer."
+  },
+  "adaptiveFocusPrivacy": "Bygget på denne enheten fra tekstfrie fokussignaler. Ingen tekst for oppgaver, journaler, coaching, transkripsjoner eller kontoer brukes.",
+  "@adaptiveFocusPrivacy": {
+    "description": "Privacy disclosure for the local Adaptive Focus suggestion."
+  },
+  "adaptiveFocusRecoveryReason": "Nylige omstarter tyder på at det å senke starttrykket kan gjøre det enklere å komme tilbake.",
+  "@adaptiveFocusRecoveryReason": {
+    "description": "Reason shown when repeated recent recovery signals lead the Adaptive Focus suggestion."
+  },
+  "adaptiveFocusReflectionReason": "Din siste private refleksjon sa at økten føltes for mye, så dette forslaget virker bare mildere.",
+  "@adaptiveFocusReflectionReason": {
+    "description": "Reason shown when the latest private session-fit reflection leads a gentler suggestion."
+  },
+  "adaptiveFocusReviewSummary": "Gjennomgang av adaptiv fokus. Nåværende: {currentFocusMinutes} min. fokus og {currentBreakMinutes} min. pause. Foreslått: {suggestedFocusMinutes} min. fokus og {suggestedBreakMinutes} min. pause. {reason} Ingenting endres med mindre du velger Bruk forslag. Timeren vil forbli stoppet.",
+  "@adaptiveFocusReviewSummary": {
+    "description": "Complete screen-reader summary for one Adaptive Focus review.",
+    "placeholders": {
+      "currentFocusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "currentBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "suggestedFocusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "suggestedBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "reason": {
+        "type": "String",
+        "example": "Recent restarts suggest that lowering the starting pressure may make returning easier."
+      }
+    }
+  },
+  "adaptiveFocusRhythmReason": "Gjentatte private Haven Rhythm-signaler antyder at det kan være rom for ett lite skritt.",
+  "@adaptiveFocusRhythmReason": {
+    "description": "Reason shown when repeated Haven Rhythm evidence supports one bounded focus increase."
+  },
+  "adaptiveFocusSuggestedPlan": "Foreslått: {focusMinutes} min fokus · {breakMinutes} min pause",
+  "@adaptiveFocusSuggestedPlan": {
+    "description": "Complete line describing the locally suggested Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusUseSuggestion": "Bruk forslag",
+  "@adaptiveFocusUseSuggestion": {
+    "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
   }
 }

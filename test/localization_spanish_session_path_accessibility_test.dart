@@ -18,6 +18,8 @@ import 'package:focushaven/widgets/focus_queue_sheet.dart';
 import 'package:focushaven/widgets/guided_breathing_sheet.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/localization_catalog_prefix.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -266,10 +268,15 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  test('C3C keeps the reviewed catalog and production allowlist unchanged', () {
+  test('C3C keeps the reviewed base and production allowlist intact', () {
     const digest =
         '611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f';
-    expect(_sha256('lib/l10n/app_es.arb'), digest);
+    expect(
+      catalogBytesBeforeAdaptiveFocus('lib/l10n/app_es.arb'),
+      orderedEquals(
+        File('localization/candidates/app_es.arb').readAsBytesSync(),
+      ),
+    );
     expect(_sha256('localization/candidates/app_es.arb'), digest);
     expect(
       FocusHavenLocales.productionLocales,

@@ -10,8 +10,8 @@ typedef AdaptiveFocusReviewCallback =
 /// Complete reviewed copy for one Adaptive Focus presentation.
 ///
 /// The widget deliberately performs no localization or sentence assembly.
-/// A future production caller must supply complete copy from reviewed locale
-/// catalogs for the exact suggestion being shown.
+/// The production adapter supplies complete copy from reviewed locale catalogs
+/// for the exact suggestion being shown.
 class AdaptiveFocusReviewCopy {
   const AdaptiveFocusReviewCopy({
     required this.eyebrow,
@@ -19,6 +19,7 @@ class AdaptiveFocusReviewCopy {
     required this.currentPlan,
     required this.suggestedPlan,
     required this.reason,
+    this.forecastContext,
     required this.privacyBoundary,
     required this.noAutomaticChange,
     required this.summarySemantics,
@@ -31,6 +32,7 @@ class AdaptiveFocusReviewCopy {
   final String currentPlan;
   final String suggestedPlan;
   final String reason;
+  final String? forecastContext;
   final String privacyBoundary;
   final String noAutomaticChange;
   final String summarySemantics;
@@ -139,6 +141,10 @@ class _AdaptiveFocusReviewCardState extends State<AdaptiveFocusReviewCard> {
                       ),
                       const SizedBox(height: 12),
                       Text(copy.reason),
+                      if (copy.forecastContext case final context?) ...[
+                        const SizedBox(height: 8),
+                        Text(context),
+                      ],
                       const SizedBox(height: 12),
                       _ReviewLine(
                         icon: Icons.lock_outline_rounded,

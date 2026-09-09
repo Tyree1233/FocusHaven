@@ -6,11 +6,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/l10n/focus_haven_locales.dart';
 
 import '../tool/localization_spanish_review_packet_builder.dart';
+import 'support/localization_catalog_prefix.dart';
 
 void main() {
   test('C2A prepares a complete critical-first packet in memory', () {
     final result = prepareSpanishReviewPacket(
-      source: _json(spanishReviewSourceCatalog),
+      source: catalogBeforeAdaptiveFocus(spanishReviewSourceCatalog),
       candidate: _json(spanishReviewCandidateCatalog),
       structuralAudit: _json(spanishReviewStructuralAudit),
     );

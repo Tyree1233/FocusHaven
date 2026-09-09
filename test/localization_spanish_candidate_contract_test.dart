@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/l10n/focus_haven_locales.dart';
 
 import '../tool/localization_catalog_qualification.dart';
+import 'support/localization_catalog_prefix.dart';
 
 const _approvedSourceEqual = <String>{
   'appTitle',
@@ -23,7 +24,7 @@ const _approvedSourceEqual = <String>{
 
 void main() {
   test('C1B candidate passes the complete structural audit', () {
-    final source = _json('lib/l10n/app_en.arb');
+    final source = catalogBeforeAdaptiveFocus('lib/l10n/app_en.arb');
     final candidate = _json('localization/candidates/app_es.arb');
     final review = _json('localization/reviews/es/qualification.json');
     final evidence = _json('localization/reviews/es/structural-audit.json');

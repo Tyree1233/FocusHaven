@@ -5107,5 +5107,125 @@
   "weekdayWednesdayShort": "Mer",
   "@weekdayWednesdayShort": {
     "description": "Phase 215G-B5 source-catalog copy for weekdayWednesdayShort."
+  },
+  "adaptiveFocusApplied": "Le sessioni Focus future utilizzeranno {focusMinutes} minuti con brevi pause di {breakMinutes} minuti. Nessuna sessione è stata avviata.",
+  "@adaptiveFocusApplied": {
+    "description": "Confirmation after the timer owner applies the exact reviewed Adaptive Focus defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusChanged": "Il timer è cambiato, quindi questo suggerimento non è stato applicato.",
+  "@adaptiveFocusChanged": {
+    "description": "Fail-closed message when timer state changes before an Adaptive Focus review settles."
+  },
+  "adaptiveFocusCurrentPlan": "Corrente: {focusMinutes} min di focus · {breakMinutes} min di pausa",
+  "@adaptiveFocusCurrentPlan": {
+    "description": "Complete line describing the person's current Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusEyebrow": "FOCUS ADATTIVO",
+  "@adaptiveFocusEyebrow": {
+    "description": "Short uppercase label above the Adaptive Focus review card."
+  },
+  "adaptiveFocusForecastContext": "Una possibile finestra di previsione Focus aggiunge solo un contesto temporale; non ha modificato queste durate.",
+  "@adaptiveFocusForecastContext": {
+    "description": "Optional disclosure when a qualified Focus Forecast window accompanies the duration suggestion."
+  },
+  "adaptiveFocusGentlerTitle": "Una sessione più delicata potrebbe essere adatta",
+  "@adaptiveFocusGentlerTitle": {
+    "description": "Adaptive Focus review heading when the bounded suggestion reduces focus pressure or adds recovery time."
+  },
+  "adaptiveFocusGrowthTitle": "Un po' più di focus potrebbe essere utile",
+  "@adaptiveFocusGrowthTitle": {
+    "description": "Adaptive Focus review heading when repeated evidence supports one bounded increase in focus time."
+  },
+  "adaptiveFocusKeepCurrent": "Mantieni le impostazioni attuali",
+  "@adaptiveFocusKeepCurrent": {
+    "description": "Button that dismisses an Adaptive Focus suggestion without changing timer defaults."
+  },
+  "adaptiveFocusKept": "Le impostazioni Focus correnti sono state mantenute.",
+  "@adaptiveFocusKept": {
+    "description": "Confirmation after the person explicitly keeps the current timer defaults."
+  },
+  "adaptiveFocusNoAutomaticChange": "Non cambia nulla a meno che non si scelga \"Usa suggerimento\". Il timer rimarrà fermo.",
+  "@adaptiveFocusNoAutomaticChange": {
+    "description": "Disclosure that the suggestion is optional and cannot start the timer."
+  },
+  "adaptiveFocusPrivacy": "Realizzato su questo dispositivo a partire da segnali di Focus privi di testo. Non vengono utilizzati testi relativi a compiti, diari, coaching, trascrizioni o account.",
+  "@adaptiveFocusPrivacy": {
+    "description": "Privacy disclosure for the local Adaptive Focus suggestion."
+  },
+  "adaptiveFocusRecoveryReason": "I recenti riavvii suggeriscono che abbassare la pressione di avviamento potrebbe facilitare il ritorno.",
+  "@adaptiveFocusRecoveryReason": {
+    "description": "Reason shown when repeated recent recovery signals lead the Adaptive Focus suggestion."
+  },
+  "adaptiveFocusReflectionReason": "Nella tua ultima riflessione personale hai affermato che la sessione ti è sembrata eccessiva, quindi questo suggerimento mira ad essere più delicato.",
+  "@adaptiveFocusReflectionReason": {
+    "description": "Reason shown when the latest private session-fit reflection leads a gentler suggestion."
+  },
+  "adaptiveFocusReviewSummary": "Revisione Focus adattivo. Impostazioni attuali: {currentFocusMinutes} min di focus e {currentBreakMinutes} min di pausa. Impostazioni suggerite: {suggestedFocusMinutes} min di focus e {suggestedBreakMinutes} min di pausa. {reason} Non cambia nulla a meno che non si scelga \"Usa suggerimento\". Il timer rimarrà fermo.",
+  "@adaptiveFocusReviewSummary": {
+    "description": "Complete screen-reader summary for one Adaptive Focus review.",
+    "placeholders": {
+      "currentFocusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "currentBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "suggestedFocusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "suggestedBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "reason": {
+        "type": "String",
+        "example": "Recent restarts suggest that lowering the starting pressure may make returning easier."
+      }
+    }
+  },
+  "adaptiveFocusRhythmReason": "I segnali ripetuti e privati di Rhythm suggeriscono che potrebbe esserci spazio per un piccolo passo avanti.",
+  "@adaptiveFocusRhythmReason": {
+    "description": "Reason shown when repeated Haven Rhythm evidence supports one bounded focus increase."
+  },
+  "adaptiveFocusSuggestedPlan": "Suggerimento: {focusMinutes} min di focus · {breakMinutes} min di pausa",
+  "@adaptiveFocusSuggestedPlan": {
+    "description": "Complete line describing the locally suggested Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusUseSuggestion": "Usa suggerimento",
+  "@adaptiveFocusUseSuggestion": {
+    "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
   }
 }

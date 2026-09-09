@@ -741,20 +741,19 @@ session without repeated matching Rhythm evidence. A qualified Forecast may
 add an optional time window but cannot change duration. The preview contains
 no task, journal, mood, coach, account, or localized text; is not persisted;
 and has no timer, calendar, action, network, or remote-model authority.
-No production control consumes it yet, so every visible timer choice remains
-unchanged while the later reviewed presentation gate is prepared.
+Phase 216D now consumes it through one reviewed production card while keeping
+the underlying suggestion text-free, local, and advisory.
 
 Phase 216B adds the isolated **Adaptive Focus review foundation** while keeping
 that production boundary closed. A one-time local review ticket binds an
 explicit keep-current or accept choice to the exact text-free suggestion and
 the exact current focus and break values. Superseded, stale, replayed,
 mismatched, unchanged-accept, or owner-changed attempts fail closed. A reusable
-accessible card accepts only complete copy injected by a future reviewed
-locale-specific caller and emits the exact immutable suggestion through one of
-two one-shot callbacks. The card and settlement service do not import or call
-the timer, localization catalogs, persistence, AI, or network services. No
-production screen consumes the card, no new user-visible catalog message was
-added, and an accepted result is not yet a timer command.
+accessible card accepts only complete copy injected by its reviewed locale-
+specific production adapter and emits the exact immutable suggestion through
+one of two one-shot callbacks. The card and settlement service do not import or
+call localization catalogs, AI, or network services; Phase 216D alone connects
+the card to the owner-delegation boundary.
 
 Phase 216C adds the closed **Adaptive Focus owner-delegation foundation**
 without placing the review in production. A coordinator can open one opaque,
@@ -765,22 +764,24 @@ Acceptance rechecks the latest suggestion and live defaults, then asks the
 timer owner to update both defaults atomically through one guarded method.
 Stale, replayed, superseded, mismatched, active, paused, completed, non-Focus,
 invalid, or unchanged attempts fail closed. A successful update persists
-through the timer's existing storage but never starts a session. No production
-screen consumes this coordinator, no catalog message changed, and no AI,
-network, calendar, queue, task, or action authority was added.
+through the timer's existing storage but never starts a session. Phase 216D now
+consumes this coordinator through one bounded adapter; no AI, network,
+calendar, queue, task, or action authority was added.
 
-Phase 216D begins the **Adaptive Focus production review gate** without yet
-changing the timer UI or any runtime locale catalog. Seventeen complete English
-messages and their placeholder metadata are locked in an isolated proposal for
+Phase 216D completes the **Adaptive Focus production review gate**. Seventeen
+complete English messages and their placeholder metadata remain locked in an
+isolated proposal for
 the gentler and room-to-grow headings, current and suggested plans, bounded
 reasons, optional Forecast context, privacy and no-start disclosures, one
 screen-reader summary, two explicit choices, and all settlement outcomes. The
-proposal is not a Flutter ARB input and no production file reads it. Production
-placement remains closed until all fifteen other active languages complete a
-private delta review and the resulting copy can be merged atomically across
-the sixteen language choices plus Flutter's mechanical base `pt` fallback.
-The planned card location is immediately after Focus Forecast and remains
-limited to a fresh, stopped Focus timer with one exact owner-issued ticket.
+proposal is not read directly by production. All 255 private fluent-review
+decisions completed with zero blocked rows; the approved deltas are integrated
+across the sixteen language choices plus Flutter's mechanical base `pt`
+fallback. The reviewed production card appears immediately after Focus Forecast
+and remains limited to a fresh, stopped Focus timer with one exact owner-issued
+ticket. It offers keep or use, revalidates the latest suggestion and timer state
+at the tap, persists only reviewed future defaults through the timer owner, and
+never starts a session.
 The next review foundation treats those seventeen messages as a separately
 locked delta for the fifteen non-English production languages. It hashes every
 existing runtime catalog before preparing one private bundle and one private

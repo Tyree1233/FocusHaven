@@ -18,6 +18,7 @@ import '../services/focus_queue_service.dart';
 import '../services/journal_service.dart';
 import '../services/timer_service.dart';
 import '../widgets/account_sheet.dart';
+import '../widgets/adaptive_focus_production_review.dart';
 import '../widgets/cloud_backup_actions.dart';
 import '../widgets/coaching_sheet.dart';
 import '../widgets/completed_tasks_sheet.dart';
@@ -1094,6 +1095,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
       focusForecastReflectionConnectionProvider,
     );
     final focusForecast = ref.watch(focusForecastProvider);
+    final adaptiveFocusOwner = ref.watch(adaptiveFocusOwnerStateProvider);
+    final adaptiveFocusSuggestion = ref.watch(
+      adaptiveFocusSuggestionProvider((
+        currentFocusMinutes: adaptiveFocusOwner.focusMinutes,
+        currentBreakMinutes: adaptiveFocusOwner.breakMinutes,
+        preserveCurrentChoice: false,
+      )),
+    );
     final havenWindow = ref.watch(havenWindowSuggestionProvider);
     final calendarAvailability = ref.watch(privateCalendarAvailabilityProvider);
     final havenWindowHold = ref.watch(havenWindowHoldStateProvider);
@@ -1561,6 +1570,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
                         HavenRhythmCard(insight: havenRhythm),
                         const SizedBox(height: 14),
                         FocusForecastCard(forecast: focusForecast),
+                        if (adaptiveFocusOwner.canReview &&
+                            adaptiveFocusSuggestion != null &&
+                            adaptiveFocusSuggestion.changesAnything) ...[
+                          const SizedBox(height: 14),
+                          AdaptiveFocusProductionReview(
+                            suggestion: adaptiveFocusSuggestion,
+                          ),
+                        ],
                         const SizedBox(height: 14),
                         HavenWindowCard(
                           suggestion: havenWindow,

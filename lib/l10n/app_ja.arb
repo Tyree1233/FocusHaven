@@ -5107,5 +5107,125 @@
   "weekdayWednesdayShort": "水",
   "@weekdayWednesdayShort": {
     "description": "Phase 215G-B5 source-catalog copy for weekdayWednesdayShort."
+  },
+  "adaptiveFocusApplied": "今後のフォーカスセッションは、{focusMinutes}分間のセッションと、{breakMinutes}分間の短い休憩で構成されます。セッションは開始されませんでした。",
+  "@adaptiveFocusApplied": {
+    "description": "Confirmation after the timer owner applies the exact reviewed Adaptive Focus defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusChanged": "タイマーが変更されたため、この提案は適用されませんでした。",
+  "@adaptiveFocusChanged": {
+    "description": "Fail-closed message when timer state changes before an Adaptive Focus review settles."
+  },
+  "adaptiveFocusCurrentPlan": "現在：{focusMinutes}分フォーカス · {breakMinutes}分休憩",
+  "@adaptiveFocusCurrentPlan": {
+    "description": "Complete line describing the person's current Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusEyebrow": "適応型フォーカス",
+  "@adaptiveFocusEyebrow": {
+    "description": "Short uppercase label above the Adaptive Focus review card."
+  },
+  "adaptiveFocusForecastContext": "フォーカス予測ウィンドウは、タイミングに関するコンテキストを追加するだけであり、これらの期間を変更するものではありません。",
+  "@adaptiveFocusForecastContext": {
+    "description": "Optional disclosure when a qualified Focus Forecast window accompanies the duration suggestion."
+  },
+  "adaptiveFocusGentlerTitle": "より穏やかなセッションが適しているかもしれません",
+  "@adaptiveFocusGentlerTitle": {
+    "description": "Adaptive Focus review heading when the bounded suggestion reduces focus pressure or adds recovery time."
+  },
+  "adaptiveFocusGrowthTitle": "もう少しフォーカスの時間が適しているかもしれません",
+  "@adaptiveFocusGrowthTitle": {
+    "description": "Adaptive Focus review heading when repeated evidence supports one bounded increase in focus time."
+  },
+  "adaptiveFocusKeepCurrent": "現在の設定を保持する",
+  "@adaptiveFocusKeepCurrent": {
+    "description": "Button that dismisses an Adaptive Focus suggestion without changing timer defaults."
+  },
+  "adaptiveFocusKept": "現在のフォーカス設定は保持されました。",
+  "@adaptiveFocusKept": {
+    "description": "Confirmation after the person explicitly keeps the current timer defaults."
+  },
+  "adaptiveFocusNoAutomaticChange": "「提案を使用する」を選択しない限り、何も変更されません。タイマーは停止したままです。",
+  "@adaptiveFocusNoAutomaticChange": {
+    "description": "Disclosure that the suggestion is optional and cannot start the timer."
+  },
+  "adaptiveFocusPrivacy": "テキストを含まないフォーカス信号に基づいて、このデバイス上に構築されています。タスク、日記、コーチング、トランスクリプト、アカウントのテキストは一切使用されません。",
+  "@adaptiveFocusPrivacy": {
+    "description": "Privacy disclosure for the local Adaptive Focus suggestion."
+  },
+  "adaptiveFocusRecoveryReason": "最近の再起動事例から、始動時の圧力を下げることで、復帰が容易になる可能性が示唆されています。",
+  "@adaptiveFocusRecoveryReason": {
+    "description": "Reason shown when repeated recent recovery signals lead the Adaptive Focus suggestion."
+  },
+  "adaptiveFocusReflectionReason": "最新の個人的な振り返りでは、セッションの負担が大きすぎたと感じたとのことでしたので、今回の提案はより穏やかなものにするためのものです。",
+  "@adaptiveFocusReflectionReason": {
+    "description": "Reason shown when the latest private session-fit reflection leads a gentler suggestion."
+  },
+  "adaptiveFocusReviewSummary": "適応型フォーカスの確認。現在：{currentFocusMinutes}分フォーカス、{currentBreakMinutes}分休憩。推奨：{suggestedFocusMinutes}分フォーカス、{suggestedBreakMinutes}分休憩。{reason}「提案を使用する」を選択しない限り、何も変更されません。タイマーは停止したままになります。",
+  "@adaptiveFocusReviewSummary": {
+    "description": "Complete screen-reader summary for one Adaptive Focus review.",
+    "placeholders": {
+      "currentFocusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "currentBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "suggestedFocusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "suggestedBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "reason": {
+        "type": "String",
+        "example": "Recent restarts suggest that lowering the starting pressure may make returning easier."
+      }
+    }
+  },
+  "adaptiveFocusRhythmReason": "繰り返し現れる個人的なリズム信号は、小さな一歩を踏み出す余地があることを示唆しています。",
+  "@adaptiveFocusRhythmReason": {
+    "description": "Reason shown when repeated Haven Rhythm evidence supports one bounded focus increase."
+  },
+  "adaptiveFocusSuggestedPlan": "推奨: {focusMinutes}分フォーカス · {breakMinutes}分休憩",
+  "@adaptiveFocusSuggestedPlan": {
+    "description": "Complete line describing the locally suggested Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusUseSuggestion": "提案を使用する",
+  "@adaptiveFocusUseSuggestion": {
+    "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
   }
 }

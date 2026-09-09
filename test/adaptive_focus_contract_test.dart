@@ -76,24 +76,19 @@ void main() {
     expect(providers, contains('focusForecastProvider'));
   });
 
-  test('Phase 216A through 216C keep the production boundary honest', () {
+  test('Phase 216A through 216D keep the production boundary honest', () {
     final roadmap = read('docs/PRODUCT_ROADMAP.md');
     final architecture = read('docs/HAVEN_AI_ACTION_ARCHITECTURE.md');
     final readme = read('README.md');
 
+    expect(roadmap, contains('| Adaptive Focus Engine | Shipped |'));
     expect(
       roadmap,
       contains(
-        '| Adaptive Focus Engine | Production review gate in progress |',
+        'Phase 216A local advisory, Phase 216B isolated review, Phase 216C',
       ),
     );
-    expect(
-      roadmap,
-      contains(
-        'Phase 216A local advisory, Phase 216B isolated review, and Phase 216C',
-      ),
-    );
-    expect(roadmap, contains('is not consumed by a production screen'));
+    expect(roadmap, contains('reviewed production card'));
     expect(architecture, contains('## Phase 216A text-free adaptive preview'));
     expect(architecture, contains('## Phase 216B isolated adaptive review'));
     expect(
@@ -102,7 +97,7 @@ void main() {
     );
     expect(architecture, contains('no timer or scheduling authority'));
     expect(readme, contains('Adaptive Focus Engine foundation'));
-    expect(readme, contains('No production control consumes it yet'));
+    expect(readme, contains('reviewed production card'));
     expect(readme, contains('Adaptive Focus review foundation'));
     expect(readme, contains('Adaptive Focus owner-delegation foundation'));
     expect(readme, contains('Adaptive Focus production review gate'));
@@ -172,43 +167,21 @@ void main() {
     }
   });
 
-  test('Phase 216B foundation has no production consumer or new catalog', () {
-    const foundationFiles = <String>{
-      'lib/models/adaptive_focus_review.dart',
-      'lib/services/adaptive_focus_review_service.dart',
-      'lib/widgets/adaptive_focus_review_card.dart',
-    };
-    final productionDart = Directory('lib')
+  test('Phase 216B card has exactly one production adapter', () {
+    final consumers = Directory('lib')
         .listSync(recursive: true)
         .whereType<File>()
         .where((file) => file.path.endsWith('.dart'))
         .where(
-          (file) => !foundationFiles.contains(
-            file.path.replaceFirst('${Directory.current.path}/', ''),
-          ),
-        );
-
-    for (final file in productionDart) {
-      expect(
-        file.readAsStringSync(),
-        isNot(contains('AdaptiveFocusReviewCard')),
-        reason: file.path,
-      );
-    }
-
-    final catalogs = Directory('lib/l10n')
-        .listSync()
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.arb'))
+          (file) => file.path != 'lib/widgets/adaptive_focus_review_card.dart',
+        )
+        .where(
+          (file) => file.readAsStringSync().contains('AdaptiveFocusReviewCard'),
+        )
+        .map((file) => file.path.replaceFirst('${Directory.current.path}/', ''))
         .toList(growable: false);
-    expect(catalogs, hasLength(17));
-    for (final catalog in catalogs) {
-      expect(
-        catalog.readAsStringSync(),
-        isNot(contains('adaptiveFocusReview')),
-        reason: catalog.path,
-      );
-    }
+
+    expect(consumers, ['lib/widgets/adaptive_focus_production_review.dart']);
   });
 
   test('Phase 216C delegation result stays text-free and ephemeral', () {
@@ -318,58 +291,32 @@ void main() {
     },
   );
 
-  test('Phase 216C has no production consumer and changes no catalog', () {
-    const foundationFiles = <String>{
-      'lib/models/adaptive_focus_delegation.dart',
-      'lib/services/adaptive_focus_delegation_service.dart',
-      'lib/services/timer_service.dart',
-    };
-    final productionDart = Directory('lib')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.dart'))
-        .where(
-          (file) => !foundationFiles.contains(
-            file.path.replaceFirst('${Directory.current.path}/', ''),
-          ),
-        );
+  test('Phase 216C delegation is exposed only through the bounded adapter', () {
+    final providers = read('lib/providers/app_providers.dart');
+    final adapter = read('lib/widgets/adaptive_focus_production_review.dart');
+    final timerScreen = read('lib/screens/timer_screen.dart');
 
-    for (final file in productionDart) {
-      expect(
-        file.readAsStringSync(),
-        isNot(contains('AdaptiveFocusDelegationService')),
-        reason: file.path,
-      );
-    }
-
-    final catalogs = Directory('lib/l10n')
-        .listSync()
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.arb'))
-        .toList(growable: false);
-    expect(catalogs, hasLength(17));
-    for (final catalog in catalogs) {
-      expect(
-        catalog.readAsStringSync(),
-        isNot(contains('adaptiveFocusDelegation')),
-        reason: catalog.path,
-      );
-    }
+    expect(providers, contains('adaptiveFocusDelegationServiceProvider'));
+    expect(adapter, contains('AdaptiveFocusOwnerReviewTicket'));
+    expect(adapter, contains('_latestSuggestion()'));
+    expect(adapter, contains('AdaptiveFocusDelegationOutcome.rejected'));
+    expect(timerScreen, contains('adaptiveFocusOwner.canReview'));
+    expect(timerScreen, contains('adaptiveFocusSuggestion.changesAnything'));
   });
 
-  test('Phase 216D locks proposed copy without opening production', () {
+  test('Phase 216D activates only fully reviewed production copy', () {
     final roadmap = read('docs/PRODUCT_ROADMAP.md');
     final architecture = read('docs/HAVEN_AI_ACTION_ARCHITECTURE.md');
     final policy = read('docs/ADAPTIVE_FOCUS_PRODUCTION_REVIEW.md');
 
-    expect(roadmap, contains('seventeen-message proposal'));
-    expect(architecture, contains('## Phase 216D production review copy lock'));
+    expect(roadmap, contains('Seventeen reviewed messages'));
+    expect(architecture, contains('## Phase 216D reviewed production adapter'));
+    expect(architecture, contains('reviewed production adapter'));
     expect(
-      architecture,
-      contains('Runtime catalog merge, generated localization, production'),
+      policy,
+      contains('opens production placement only with localization'),
     );
-    expect(policy, contains('production presentation remains closed'));
-    expect(policy, contains('other fifteen active languages'));
+    expect(policy, contains('fifteen independently reviewed languages'));
     expect(policy, contains('immediately after Focus Forecast'));
   });
 }

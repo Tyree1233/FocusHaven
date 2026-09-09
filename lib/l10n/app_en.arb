@@ -3984,5 +3984,125 @@
   "livingLanternServiceReadyWithHistoryDetail": "Past focus still counts. This next session can begin without proving anything.",
   "@livingLanternServiceReadyWithHistoryDetail": {"description": "Living Lantern ready detail when bounded completed history exists."},
   "livingLanternServiceReadyWithoutHistoryDetail": "Choose one reachable step. The lantern begins with presence, not pressure.",
-  "@livingLanternServiceReadyWithoutHistoryDetail": {"description": "Living Lantern ready detail without recent completed history."}
+  "@livingLanternServiceReadyWithoutHistoryDetail": {"description": "Living Lantern ready detail without recent completed history."},
+  "adaptiveFocusEyebrow": "ADAPTIVE FOCUS",
+  "@adaptiveFocusEyebrow": {
+    "description": "Short uppercase label above the Adaptive Focus review card."
+  },
+  "adaptiveFocusGentlerTitle": "A gentler session may fit",
+  "@adaptiveFocusGentlerTitle": {
+    "description": "Adaptive Focus review heading when the bounded suggestion reduces focus pressure or adds recovery time."
+  },
+  "adaptiveFocusGrowthTitle": "A little more focus may fit",
+  "@adaptiveFocusGrowthTitle": {
+    "description": "Adaptive Focus review heading when repeated evidence supports one bounded increase in focus time."
+  },
+  "adaptiveFocusCurrentPlan": "Current: {focusMinutes} min focus · {breakMinutes} min break",
+  "@adaptiveFocusCurrentPlan": {
+    "description": "Complete line describing the person's current Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusSuggestedPlan": "Suggested: {focusMinutes} min focus · {breakMinutes} min break",
+  "@adaptiveFocusSuggestedPlan": {
+    "description": "Complete line describing the locally suggested Focus and short-break defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusRecoveryReason": "Recent restarts suggest that lowering the starting pressure may make returning easier.",
+  "@adaptiveFocusRecoveryReason": {
+    "description": "Reason shown when repeated recent recovery signals lead the Adaptive Focus suggestion."
+  },
+  "adaptiveFocusReflectionReason": "Your latest private reflection said the session felt like too much, so this suggestion only moves gentler.",
+  "@adaptiveFocusReflectionReason": {
+    "description": "Reason shown when the latest private session-fit reflection leads a gentler suggestion."
+  },
+  "adaptiveFocusRhythmReason": "Repeated private Rhythm signals suggest there may be room for one small step.",
+  "@adaptiveFocusRhythmReason": {
+    "description": "Reason shown when repeated Haven Rhythm evidence supports one bounded focus increase."
+  },
+  "adaptiveFocusForecastContext": "A possible Focus Forecast window adds timing context only; it did not change these durations.",
+  "@adaptiveFocusForecastContext": {
+    "description": "Optional disclosure when a qualified Focus Forecast window accompanies the duration suggestion."
+  },
+  "adaptiveFocusPrivacy": "Built on this device from text-free focus signals. No task, journal, coaching, transcript, or account text is used.",
+  "@adaptiveFocusPrivacy": {
+    "description": "Privacy disclosure for the local Adaptive Focus suggestion."
+  },
+  "adaptiveFocusNoAutomaticChange": "Nothing changes unless you choose Use suggestion. The timer will stay stopped.",
+  "@adaptiveFocusNoAutomaticChange": {
+    "description": "Disclosure that the suggestion is optional and cannot start the timer."
+  },
+  "adaptiveFocusReviewSummary": "Adaptive Focus review. Current: {currentFocusMinutes} min focus and {currentBreakMinutes} min break. Suggested: {suggestedFocusMinutes} min focus and {suggestedBreakMinutes} min break. {reason} Nothing changes unless you choose Use suggestion. The timer will stay stopped.",
+  "@adaptiveFocusReviewSummary": {
+    "description": "Complete screen-reader summary for one Adaptive Focus review.",
+    "placeholders": {
+      "currentFocusMinutes": {
+        "type": "int",
+        "example": "25"
+      },
+      "currentBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "suggestedFocusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "suggestedBreakMinutes": {
+        "type": "int",
+        "example": "5"
+      },
+      "reason": {
+        "type": "String",
+        "example": "Recent restarts suggest that lowering the starting pressure may make returning easier."
+      }
+    }
+  },
+  "adaptiveFocusKeepCurrent": "Keep current settings",
+  "@adaptiveFocusKeepCurrent": {
+    "description": "Button that dismisses an Adaptive Focus suggestion without changing timer defaults."
+  },
+  "adaptiveFocusUseSuggestion": "Use suggestion",
+  "@adaptiveFocusUseSuggestion": {
+    "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
+  },
+  "adaptiveFocusApplied": "Future Focus sessions will use {focusMinutes} minutes with {breakMinutes}-minute short breaks. No session was started.",
+  "@adaptiveFocusApplied": {
+    "description": "Confirmation after the timer owner applies the exact reviewed Adaptive Focus defaults.",
+    "placeholders": {
+      "focusMinutes": {
+        "type": "int",
+        "example": "15"
+      },
+      "breakMinutes": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "adaptiveFocusKept": "Current Focus settings were kept.",
+  "@adaptiveFocusKept": {
+    "description": "Confirmation after the person explicitly keeps the current timer defaults."
+  },
+  "adaptiveFocusChanged": "The timer changed, so this suggestion was not applied.",
+  "@adaptiveFocusChanged": {
+    "description": "Fail-closed message when timer state changes before an Adaptive Focus review settles."
+  }
 }

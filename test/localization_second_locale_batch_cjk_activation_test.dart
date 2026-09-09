@@ -9,12 +9,14 @@ import 'package:focushaven/main.dart';
 import 'package:focushaven/services/locale_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/localization_catalog_prefix.dart';
+
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  test('Japanese and Korean physical CJK records authorize activation', () {
+  test('Japanese and Korean physical CJK records remain exact', () {
     _expectPhysicalAcceptance(
       locale: 'ja',
       catalogSha:
@@ -122,7 +124,7 @@ void _expectPhysicalAcceptance({
   final approved = File(
     'localization/reviews/$locale/app_$locale.approved.arb',
   ).readAsBytesSync();
-  final runtime = File('lib/l10n/app_$locale.arb').readAsBytesSync();
+  final runtime = catalogBytesBeforeAdaptiveFocus('lib/l10n/app_$locale.arb');
 
   expect(runtime, orderedEquals(approved));
   expect(validation['approvedCatalogSha256'], catalogSha);

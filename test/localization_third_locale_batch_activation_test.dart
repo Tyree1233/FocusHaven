@@ -9,12 +9,14 @@ import 'package:focushaven/main.dart';
 import 'package:focushaven/services/locale_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/localization_catalog_prefix.dart';
+
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  test('six independently reviewed catalogs authorize exact activation', () {
+  test('six independently reviewed bases remain exact after activation', () {
     _expectReviewedRuntime(
       locale: 'id',
       accepted: 881,
@@ -200,7 +202,7 @@ void _expectReviewedRuntime({
   final approved = File(
     'localization/reviews/$locale/app_$locale.approved.arb',
   ).readAsBytesSync();
-  final runtime = File('lib/l10n/app_$locale.arb').readAsBytesSync();
+  final runtime = catalogBytesBeforeAdaptiveFocus('lib/l10n/app_$locale.arb');
 
   expect(runtime, orderedEquals(approved));
   expect(plan['runtimeCatalog'], 'lib/l10n/app_$locale.arb');

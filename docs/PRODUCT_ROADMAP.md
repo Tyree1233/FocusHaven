@@ -66,7 +66,7 @@ Every future phase must preserve these rules:
 | Enhanced remote coach | Foundation shipped, disabled | The callable is deployed but gated; client and server enablement remain off. | Remain separate from voice and action execution until entitlement, quota, enforcement, consent, and release gates pass. |
 | Haven AI planner | Foundation shipped | A deterministic local planner turns an explicit goal and time window into an ephemeral proposal with inputs, assumptions, uncertainty, independently reviewable queue tasks, session-size guidance, and a calendar-free free-time suggestion. It has no remote model or execution authority. | Add an optional, separately disclosed remote drafting path whose output still returns through the same local review and action policy. |
 | Unified Haven Loop | Shipped | An explicitly selected active queue-item identity can follow one Focus session. Completion pauses for an exact task decision before optional reflection, Rhythm, Forecast, Journey, and Local Coach context. During an interruption, one ephemeral single-use ticket may preserve the same unchanged link through an explicit Smart Reset choice. The Local Coach bridge copies only text-free enums, booleans, and the exact current completion identity; it is never serialized remotely. Queue and timer services retain ownership. | Preserve these service-owned boundaries as later adaptive features consume the Loop. |
-| Adaptive Focus Engine | Production review gate in progress | A deterministic local service can create one ephemeral, text-free focus/break/timing preview only from explicit current choices and bounded Focus Event, Rhythm, and Forecast signals. Isolated review and owner-delegation foundations bind one keep or accept choice to the exact current preview, revalidate the live timer, and allow only the timer owner to atomically persist a reviewed duration pair without starting. Phase 216D locks seventeen complete English proposal messages outside the runtime catalogs, and a closed incremental-review foundation prepares only that delta for fifteen private fluent reviews; nothing consumes the card in production yet. | Complete every private delta review, merge the reviewed copy atomically, and place the card immediately after Focus Forecast for an eligible fresh Focus timer. |
+| Adaptive Focus Engine | Shipped | A deterministic local service creates one ephemeral, text-free focus/break/timing preview only from explicit current choices and bounded Focus Event, Rhythm, and Forecast signals. The reviewed production card appears after Focus Forecast only for an eligible fresh, stopped Focus timer. Seventeen reviewed messages are complete in English and fifteen independently reviewed languages, with a mechanical base Portuguese fallback. One explicit keep or accept choice is bound to the exact preview and live owner state; only the timer owner can persist the reviewed future defaults, and it never starts a session. | Monitor comprehension and accessibility while preserving the one-use, local-only, owner-revalidated boundary. |
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Sixteen reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, Dutch, Indonesian, Turkish, Swedish, Norwegian Bokmål, Danish, and Finnish; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. The six Google-assisted draft locales retain independent private fluent reviews, anonymous validation records, zero content-safety issues across 5,880 messages, and exact reviewed-to-runtime locks; provider output itself granted no approval or runtime authority. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, screen-reader, right-to-left, store promotion, and country distribution behind their separate gates. |
@@ -596,11 +596,9 @@ Offer explainable local adjustments to session length, break shape, and timing
 using bounded text-free signals. Recovery needs and explicit user choices
 override learned patterns.
 
-Status: Phase 216A local advisory, Phase 216B isolated review, and Phase 216C
-owner-revalidated delegation foundations implemented in the current source.
-Phase 216D has locked the complete English production-copy proposal outside
-the runtime catalogs while the sixteen-language review and placement gate
-remains closed.
+Status: Phase 216A local advisory, Phase 216B isolated review, Phase 216C
+owner-revalidated delegation, and Phase 216D reviewed production presentation
+implemented in the current source.
 `AdaptiveFocusService` accepts
 only an explicit current focus duration, current break duration, keep-current
 choice, bounded text-free Focus Events, the enum/count/suggested-duration output
@@ -623,7 +621,7 @@ accept, and owner-changed attempts fail closed. Keep-current grants no
 delegation; accept returns text-free reviewed values but is not a timer command.
 The isolated accessible card accepts complete reviewed copy from its caller,
 keeps the two choices separate, and serializes taps. It does not assemble or
-localize text and is not consumed by a production screen.
+localize text; the Phase 216D adapter is its only production caller.
 
 The Phase 216C coordinator adds an opaque one-use owner ticket only for an
 untouched, ready Focus timer whose whole-minute Focus and short-break defaults
@@ -639,19 +637,19 @@ the authoritative timer persists a successfully reviewed pair; it cannot start
 a session, schedule work, write a calendar, create an action proposal, or
 contact local or remote AI. Phases 216A, 216B, and 216C add no new catalog copy,
 translation, dependency, permission, account requirement, backend, or
-deployment. Production presentation-copy review and deliberate card placement
-remain separate work.
+deployment. The reviewed Phase 216D adapter supplies the production copy and
+deliberate placement without broadening those authorities.
 
-Phase 216D defines that separate work without prematurely exposing it. The
-isolated seventeen-message proposal covers both suggestion directions, exact
+Phase 216D completes that separate work. The seventeen-message proposal covers
+both suggestion directions, exact
 current and suggested duration lines, each bounded evidence explanation,
 optional Forecast context, local privacy and stopped-timer disclosures, one
 complete semantic summary, separate keep and use actions, and all settlement
-outcomes. No runtime ARB contains these keys and no production Dart file reads
-the proposal. After private delta review across every active locale, the copy
-may be merged atomically and the card may be placed immediately after Focus
-Forecast only for a fresh, stopped, owner-matched Focus timer. Until then the
-production behavior and sixteen reviewed catalogs remain unchanged.
+outcomes. Its seventeen messages are integrated across English, fifteen fluent-
+reviewed languages, and the mechanical base `pt` fallback. The production card
+is placed immediately after Focus Forecast only for a fresh, stopped, owner-
+matched Focus timer, and every tap revalidates the latest suggestion and timer
+state before the timer owner may persist future defaults.
 
 The next bounded foundation locks that proposal and the exact current digest
 of every non-English runtime catalog in one external manifest. It prepares and

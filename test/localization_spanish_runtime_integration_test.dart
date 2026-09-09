@@ -10,12 +10,14 @@ import 'package:focushaven/screens/onboarding_screen.dart';
 import 'package:focushaven/services/locale_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/localization_catalog_prefix.dart';
+
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  test('reviewed Spanish catalog is exact and production active', () {
+  test('reviewed Spanish base remains exact and production active', () {
     const digest =
         '611d1afcc6eb688f92d56928f08cad5dbfdef2b5031c537c53615accfb16b83f';
     final integration = File('lib/l10n/app_es.arb');
@@ -29,8 +31,11 @@ void main() {
             as Map<String, dynamic>;
 
     expect(integration.existsSync(), isTrue);
-    expect(integration.readAsBytesSync(), candidate.readAsBytesSync());
-    expect(_sha256(integration.path), digest);
+    expect(
+      catalogBytesBeforeAdaptiveFocus(integration.path),
+      orderedEquals(candidate.readAsBytesSync()),
+    );
+    expect(_sha256(candidate.path), digest);
     expect(qualification['runtimeIntegrationPhase'], '215G-C3A');
     expect(qualification['runtimeIntegrationStatus'], 'production_active');
     expect(qualification['runtimeCatalogSha256'], digest);

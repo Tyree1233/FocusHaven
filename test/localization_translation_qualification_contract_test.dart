@@ -6,11 +6,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/l10n/focus_haven_locales.dart';
 
 import '../tool/localization_catalog_qualification.dart';
+import 'support/localization_catalog_prefix.dart';
 
 void main() {
   test('C0 freezes the complete English source catalog for Spanish intake', () {
-    final source =
-        jsonDecode(_read('lib/l10n/app_en.arb')) as Map<String, dynamic>;
+    final source = catalogBeforeAdaptiveFocus('lib/l10n/app_en.arb');
     final review =
         jsonDecode(_read('localization/reviews/es/qualification.json'))
             as Map<String, dynamic>;

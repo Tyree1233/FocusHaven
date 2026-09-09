@@ -9,52 +9,51 @@ import 'package:focushaven/main.dart';
 import 'package:focushaven/services/locale_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/localization_catalog_prefix.dart';
+
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  test(
-    'reviewed French catalog is integrated exactly and production active',
-    () {
-      final plan = _json('localization/plans/fr.json');
-      final validation = _json(
-        'localization/reviews/fr/private-human-validation.json',
-      );
-      final approved = File(
-        'localization/reviews/fr/app_fr.approved.arb',
-      ).readAsBytesSync();
-      final runtime = File('lib/l10n/app_fr.arb').readAsBytesSync();
+  test('reviewed French base remains exact and production active', () {
+    final plan = _json('localization/plans/fr.json');
+    final validation = _json(
+      'localization/reviews/fr/private-human-validation.json',
+    );
+    final approved = File(
+      'localization/reviews/fr/app_fr.approved.arb',
+    ).readAsBytesSync();
+    final runtime = catalogBytesBeforeAdaptiveFocus('lib/l10n/app_fr.arb');
 
-      expect(runtime, orderedEquals(approved));
-      expect(plan['runtimeCatalog'], 'lib/l10n/app_fr.arb');
-      expect(plan['exceptionalGates'], {
-        'rightToLeft': false,
-        'fontCoverage': false,
-        'physicalScreenReader': false,
-        'physicalSpeechRecognition': false,
-        'storePromotion': false,
-      });
-      expect(validation['messageCount'], 980);
-      expect(validation['decisionCounts'], {
-        'accepted': 654,
-        'revised': 326,
-        'blocked': 0,
-      });
-      expect(validation['personalDataIncluded'], isFalse);
-      expect(validation['runtimeActivated'], isFalse);
-      expect(validation['reviewApprovedSourceEqual'], hasLength(8));
+    expect(runtime, orderedEquals(approved));
+    expect(plan['runtimeCatalog'], 'lib/l10n/app_fr.arb');
+    expect(plan['exceptionalGates'], {
+      'rightToLeft': false,
+      'fontCoverage': false,
+      'physicalScreenReader': false,
+      'physicalSpeechRecognition': false,
+      'storePromotion': false,
+    });
+    expect(validation['messageCount'], 980);
+    expect(validation['decisionCounts'], {
+      'accepted': 654,
+      'revised': 326,
+      'blocked': 0,
+    });
+    expect(validation['personalDataIncluded'], isFalse);
+    expect(validation['runtimeActivated'], isFalse);
+    expect(validation['reviewApprovedSourceEqual'], hasLength(8));
 
-      final french = FocusHavenLocales.production.singleWhere(
-        (definition) => definition.languageCode == 'fr',
-      );
-      expect(french.nativeName, 'Français');
-      expect(french.status, FocusHavenLocaleStatus.production);
-      expect(FocusHavenLocales.productionLocales, contains(const Locale('fr')));
-      expect(AppLocalizations.supportedLocales, contains(const Locale('fr')));
-      expect(FocusHavenLocales.integrationLocales, isEmpty);
-    },
-  );
+    final french = FocusHavenLocales.production.singleWhere(
+      (definition) => definition.languageCode == 'fr',
+    );
+    expect(french.nativeName, 'Français');
+    expect(french.status, FocusHavenLocaleStatus.production);
+    expect(FocusHavenLocales.productionLocales, contains(const Locale('fr')));
+    expect(AppLocalizations.supportedLocales, contains(const Locale('fr')));
+    expect(FocusHavenLocales.integrationLocales, isEmpty);
+  });
 
   testWidgets('device French and explicit French preference render in French', (
     tester,

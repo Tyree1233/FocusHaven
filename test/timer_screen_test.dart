@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:focushaven/models/coaching_message.dart';
+import 'package:focushaven/models/adaptive_focus_suggestion.dart';
 import 'package:focushaven/models/focus_event.dart';
 import 'package:focushaven/models/focus_forecast.dart';
 import 'package:focushaven/models/focus_shield_state.dart';
@@ -24,6 +25,7 @@ import 'package:focushaven/services/haven_window_platform_bridge.dart';
 import 'package:focushaven/services/haven_window_hold_service.dart';
 import 'package:focushaven/services/timer_service.dart';
 import 'package:focushaven/widgets/coaching_sheet.dart';
+import 'package:focushaven/widgets/adaptive_focus_production_review.dart';
 import 'package:focushaven/widgets/focus_session_reflection_card.dart';
 import 'package:focushaven/widgets/focus_forecast_card.dart';
 import 'package:focushaven/widgets/focus_forecast_reflection_connection_card.dart';
@@ -67,6 +69,7 @@ Widget _app(
   HavenWindowHoldService? havenWindowHoldService,
   HavenWindowSuggestion? havenWindowSuggestion,
   DateTime Function()? havenWindowCurrentTime,
+  AdaptiveFocusSuggestion? adaptiveFocusSuggestion,
 }) {
   return ProviderScope(
     overrides: [
@@ -108,6 +111,12 @@ Widget _app(
         havenWindowCurrentTimeProvider.overrideWithValue(
           havenWindowCurrentTime,
         ),
+      if (adaptiveFocusSuggestion != null)
+        adaptiveFocusSuggestionProvider((
+          currentFocusMinutes: 25,
+          currentBreakMinutes: 5,
+          preserveCurrentChoice: false,
+        )).overrideWithValue(adaptiveFocusSuggestion),
     ],
     child: MaterialApp(
       locale: locale,
@@ -341,6 +350,48 @@ void main() {
     expect(find.byTooltip('Daily focus reminder'), findsOneWidget);
     expect(find.byTooltip('Sign in'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('places an eligible Adaptive Focus review after Forecast', (
+    tester,
+  ) async {
+    final timer = await _createTimer(tester);
+    await timer.initialized;
+    const suggestion = AdaptiveFocusSuggestion(
+      currentFocusMinutes: 25,
+      currentBreakMinutes: 5,
+      suggestedFocusMinutes: 15,
+      suggestedBreakMinutes: 10,
+      direction: AdaptiveFocusDirection.gentler,
+      breakDirection: AdaptiveFocusBreakDirection.moreRecovery,
+      basis: AdaptiveFocusBasis.recoveryPriority,
+      evidenceStrength: AdaptiveFocusEvidenceStrength.supported,
+      relevantSignalCount: 2,
+      usesRecoveryPattern: true,
+      usesLatestReflection: false,
+      usesRepeatedRhythm: false,
+      usesForecast: false,
+    );
+
+    await tester.pumpWidget(_app(timer, adaptiveFocusSuggestion: suggestion));
+    await tester.pump();
+
+    expect(find.byType(AdaptiveFocusProductionReview), findsOneWidget);
+    expect(find.text('ADAPTIVE FOCUS'), findsOneWidget);
+    final forecast = find.byType(FocusForecastCard);
+    final adaptive = find.byType(AdaptiveFocusProductionReview);
+    final window = find.byType(HavenWindowCard);
+    expect(
+      tester.getTopLeft(adaptive).dy,
+      greaterThan(tester.getTopLeft(forecast).dy),
+    );
+    expect(
+      tester.getTopLeft(window).dy,
+      greaterThan(tester.getTopLeft(adaptive).dy),
+    );
+    expect(timer.isRunning, isFalse);
+    expect(timer.focusDurationSeconds, 25 * 60);
+    expect(timer.shortBreakDurationSeconds, 5 * 60);
   });
 
   testWidgets(

@@ -8,6 +8,8 @@ import 'package:focushaven/l10n/focus_haven_locales.dart';
 import 'package:focushaven/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'support/localization_catalog_prefix.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -15,7 +17,7 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  test('reviewed CJK catalogs are exact production runtime copies', () {
+  test('reviewed CJK bases remain exact in production runtime', () {
     _expectReviewedRuntime(
       locale: 'ja',
       accepted: 647,
@@ -135,7 +137,7 @@ void _expectReviewedRuntime({
   final approved = File(
     'localization/reviews/$locale/app_$locale.approved.arb',
   ).readAsBytesSync();
-  final runtime = File('lib/l10n/app_$locale.arb').readAsBytesSync();
+  final runtime = catalogBytesBeforeAdaptiveFocus('lib/l10n/app_$locale.arb');
 
   expect(runtime, orderedEquals(approved));
   expect(plan['runtimeCatalog'], 'lib/l10n/app_$locale.arb');

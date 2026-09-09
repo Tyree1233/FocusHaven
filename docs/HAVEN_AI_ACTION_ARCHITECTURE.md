@@ -617,13 +617,13 @@ in Phase 216C, and no ARB catalog changes are included. Reviewed presentation
 copy and a deliberate production placement remain required before a person can
 use the adaptive review.
 
-## Phase 216D production review copy lock
+## Phase 216D reviewed production adapter
 
-Phase 216D locks the complete English presentation proposal without weakening
-the closed runtime boundary. The seventeen proposed messages live only in
-`localization/proposals/app_en_adaptive_focus_review.arb`; that file is not a
-Flutter localization input, no generated localization class includes it, and
-no production screen or provider reads it.
+Phase 216D carries the complete reviewed presentation into production without
+weakening the timer-owner boundary. The seventeen source messages remain locked
+in `localization/proposals/app_en_adaptive_focus_review.arb` and are present in
+all seventeen Flutter catalogs: English, fifteen independently reviewed
+languages, and the mechanical base Portuguese fallback derived from `pt-BR`.
 
 The proposal contains complete gentler and room-to-grow headings, current and
 suggested duration lines, separate recovery/reflection/Rhythm explanations,
@@ -633,17 +633,16 @@ actions, and applied, kept, and stale-state outcomes. Placeholder names and
 types are explicit so every language can reorder them without fragment-based
 sentence assembly.
 
-Production placement remains defined but inactive. After every active locale
-has a complete privately reviewed delta, the card may appear immediately after
-Focus Forecast only while the authoritative timer is a fresh, stopped,
+The reviewed production adapter may appear immediately after Focus Forecast
+only while the authoritative timer is a fresh, stopped,
 incomplete Focus session and the exact suggestion receives a new
 `AdaptiveFocusOwnerReviewTicket`. Losing eligibility removes the card and
 invalidates its ticket. Keep-current changes nothing; use-suggestion must still
 pass the Phase 216C live-state checks and can only persist future Focus and
 short-break defaults while leaving the timer stopped.
 
-This copy lock adds no task, journal, reflection, coaching, transcript,
-account, calendar, or reviewer data and grants no timer-start, queue, calendar,
-Haven Action, local-AI, remote-AI, network, deployment, publication, or external
-authority. Runtime catalog merge, generated localization, production placement,
-and activation remain later gates.
+The reviewed production adapter adds no task, journal, reflection, coaching,
+transcript, account, calendar, or reviewer data. It may request only the exact
+reviewed future defaults from the timer owner; it grants no timer-start, queue,
+calendar, Haven Action, local-AI, remote-AI, network, deployment, publication,
+or external authority.
