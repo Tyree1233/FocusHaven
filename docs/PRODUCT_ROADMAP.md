@@ -70,7 +70,7 @@ Every future phase must preserve these rules:
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Sixteen reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, Dutch, Indonesian, Turkish, Swedish, Norwegian Bokmål, Danish, and Finnish; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. The six Google-assisted draft locales retain independent private fluent reviews, anonymous validation records, zero content-safety issues across 5,880 messages, and exact reviewed-to-runtime locks; provider output itself granted no approval or runtime authority. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, screen-reader, right-to-left, store promotion, and country distribution behind their separate gates. |
-| Siri, Shortcuts, and Android App Actions | Planned | Existing widgets and watches use private, bounded timer commands; general assistant intents do not exist. | Expose a small reviewed action subset after the engine is proven in-app. |
+| Siri, Shortcuts, and Android App Actions | Foundation shipped, disabled | Phase 217A defines five text-free, replay-bounded system-intent routes into the existing Haven Action vocabulary. They create only non-executable drafts; the action policy still rejects the system-intent source, and no Apple or Android registration exists. | Add a reviewed in-app proposal bridge before separately registering any platform intent. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
 | Focus Score | Replaced | FocusHaven intentionally avoids a productivity score. | If a summary is useful, design **Haven Momentum** as non-punitive, explainable, private, and never competitive. |
@@ -680,6 +680,32 @@ machine draft has no review or runtime authority.
 Publish the proven safe subset through Siri/App Intents, Shortcuts, and Android
 App Actions. System assistants receive bounded action parameters, not coaching
 history or arbitrary private text.
+
+Status: Phase 217A system-assistant intent contract implemented; every platform
+adapter and execution path remains disabled.
+
+Phase 217A defines exactly five structured request kinds: read timer status,
+start a Focus timer, pause, resume, and open Focus Queue. A request contains
+only schema version, a bounded opaque invocation ID, and one allowlisted enum.
+It cannot carry a transcript, utterance, task title, coaching history, journal,
+reflection, account value, or arbitrary parameter.
+
+The local preparation service consumes each valid invocation ID once within
+one bounded ephemeral service lifetime and maps the request only into the
+existing `HavenActionKind` and `HavenActionArguments` vocabulary. The result is
+deliberately not a `HavenActionProposal`: it has no current-state token,
+localized explanation, expiry, confirmation, or execution capability and is
+explicitly marked for in-app review. `HavenActionPolicy` continues to reject
+`HavenActionSource.systemIntent`.
+
+This foundation adds no Siri or App Intent registration, Shortcut, Android App
+Action capability, deep link, permission, dependency, platform configuration,
+production provider, UI, persistence, network request, or timer/queue call. A
+later phase must add a reviewed in-app bridge that creates a fresh
+state-bound proposal and preserves the existing explain, confirm, replay, and
+service-owner checks before platform exposure can be considered. Once its
+bounded replay memory is full, the service rejects new requests rather than
+forgetting an old invocation and reopening replay.
 
 ### Phase 218 — Soundscapes and focus environments
 

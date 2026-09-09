@@ -646,3 +646,29 @@ transcript, account, calendar, or reviewer data. It may request only the exact
 reviewed future defaults from the timer owner; it grants no timer-start, queue,
 calendar, Haven Action, local-AI, remote-AI, network, deployment, publication,
 or external authority.
+
+## Phase 217A closed system-intent preparation
+
+Phase 217A reserves a platform-neutral entry contract without opening an
+execution path. `HavenSystemIntentRequest` contains only schema version, one
+bounded opaque invocation ID, and one of five typed requests: read timer
+status, start a Focus timer, pause, resume, or open Focus Queue. It contains no
+utterance, transcript, task title, coaching history, journal, reflection,
+account value, localized copy, or arbitrary private parameter.
+
+`HavenSystemIntentService` consumes a valid invocation ID once within its
+bounded ephemeral lifetime and emits one `HavenSystemIntentDraft` expressed
+through existing `HavenActionKind` and `HavenActionArguments` values. The draft
+is not a `HavenActionProposal`. It has no current-state token, proposal
+identifier, expiry, explanation, confirmation, or executor reference; it
+declares that in-app review is required and that it cannot execute.
+
+The existing action policy still admits only typed and reviewed voice sources,
+so a forged `HavenActionSource.systemIntent` proposal fails closed. The service
+does not import the engine, timer, queue, persistence, network, AI, or platform
+owners. No Siri/App Intent, Shortcut, Android App Action, deep link, dependency,
+permission, manifest, provider, or production UI is registered in Phase 217A.
+A later reviewed bridge must bind the draft to fresh app state, complete
+localized explanation, exact confirmation policy, and the existing Haven
+Action Engine before any platform registration may be added. The replay set is
+bounded and fails closed at capacity instead of evicting an older invocation.

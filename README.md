@@ -782,6 +782,20 @@ and remains limited to a fresh, stopped Focus timer with one exact owner-issued
 ticket. It offers keep or use, revalidates the latest suggestion and timer state
 at the tap, persists only reviewed future defaults through the timer owner, and
 never starts a session.
+
+Phase 217A adds a closed **system-assistant intent contract foundation** while
+keeping Siri, Shortcuts, and Android App Actions disabled. Five typed,
+text-free request kinds can prepare only an ephemeral route into the existing
+Haven Action vocabulary. The draft has no live-state token, localized
+explanation, confirmation, or executor and cannot execute a timer or queue
+action. Each bounded opaque invocation ID is accepted once within the
+ephemeral preparer lifetime, and the preparer fails closed when its bounded
+replay memory fills. Arbitrary utterances, transcripts, task titles, coaching,
+journals, reflections, account data, and free-form parameters have no field in
+the contract. The existing action policy still rejects the system-intent
+source. No platform registration, permission, dependency, production provider,
+UI, persistence, AI, or network path is added; a later reviewed in-app bridge
+must create a fresh state-bound proposal before any platform exposure.
 The next review foundation treats those seventeen messages as a separately
 locked delta for the fifteen non-English production languages. It hashes every
 existing runtime catalog before preparing one private bundle and one private

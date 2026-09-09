@@ -35,6 +35,8 @@ void main() {
       '| Adaptive Focus Engine | Shipped |',
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
+      '| Siri, Shortcuts, and Android App Actions | '
+          'Foundation shipped, disabled |',
     ]) {
       expect(
         roadmap,
@@ -44,7 +46,6 @@ void main() {
     }
 
     for (final futureExperience in <String>[
-      '| Siri, Shortcuts, and Android App Actions | Planned |',
       '| Soundscapes and focus environments | Planned |',
       '| Haven Rooms and body doubling | Deferred |',
       '| Focus Score | Replaced |',
@@ -104,6 +105,8 @@ void main() {
     expect(readme, contains('update both defaults atomically'));
     expect(readme, contains('Adaptive Focus production review gate'));
     expect(readme, contains('Seventeen complete English messages'));
+    expect(readme, contains('system-assistant intent contract foundation'));
+    expect(readme, contains('cannot execute a timer or queue action'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
