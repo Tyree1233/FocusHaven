@@ -224,6 +224,15 @@ Korean font-coverage gates, and one later `pt-BR`-to-`pt` derivation. The
 foundation itself creates no provider config, draft bundle, real workbook,
 review, approval, runtime catalog, production host, or native registration.
 
+After all 165 System Assistant decisions passed independent fluent review and
+the complete local qualification gate, the reviewed production integration
+appended only those eleven messages and their source metadata to all seventeen
+runtime catalogs. Base `pt` received the exact approved `pt-BR` values; it was
+not treated as a sixteenth review. The catalog merge and app-level host leave
+every private draft, returned workbook, completed CSV, approved delta, and
+anonymous validation unchanged. Apple and Android native registration remain
+separate release gates.
+
 ### Google-assisted incremental drafts
 
 `tool/localization_google_incremental_drafts.dart` applies the established

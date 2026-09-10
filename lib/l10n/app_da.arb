@@ -5227,5 +5227,63 @@
   "adaptiveFocusUseSuggestion": "Brug forslag",
   "@adaptiveFocusUseSuggestion": {
     "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
+  },
+  "systemAssistantReviewEyebrow": "SYSTEMASSISTENT",
+  "@systemAssistantReviewEyebrow": {
+    "description": "Short uppercase source label above a system-assistant request review."
+  },
+  "systemAssistantReviewTitle": "Gennemgå denne anmodning",
+  "@systemAssistantReviewTitle": {
+    "description": "Heading for the in-app review of one supported system-assistant request."
+  },
+  "systemAssistantReviewSource": "En understøttet systemassistent har udarbejdet denne anmodning. FocusHaven har ikke handlet på den.",
+  "@systemAssistantReviewSource": {
+    "description": "Disclosure that the request came from a supported system assistant but has not executed."
+  },
+  "systemAssistantReviewPrivacy": "Kun handlingstypen og en privat anmodningskode indtastes i FocusHaven. Ingen tekst til transskription, opgave, journal, coaching eller konto er inkluderet.",
+  "@systemAssistantReviewPrivacy": {
+    "description": "Privacy disclosure describing the exact text-free system-assistant input boundary."
+  },
+  "systemAssistantReviewFreshness": "Denne gennemgang udløber efter to minutter. Hvis timeren eller køen ændres først, vil anmodningen blive afvist.",
+  "@systemAssistantReviewFreshness": {
+    "description": "Disclosure of the short review lifetime and stale-state rejection."
+  },
+  "systemAssistantReviewConfirmation": "Der sker intet, medmindre du vælger Bekræft handling i FocusHaven.",
+  "@systemAssistantReviewConfirmation": {
+    "description": "Disclosure that an explicit in-app confirmation is required before every system-assistant action."
+  },
+  "systemAssistantReviewInformationalRisk": "Denne anmodning kan ikke ændre din timer eller kø.",
+  "@systemAssistantReviewInformationalRisk": {
+    "description": "Risk explanation for reading timer status or opening Focus Queue without changing timer or queue data."
+  },
+  "systemAssistantReviewReversibleRisk": "Denne anmodning kan muligvis styre timeren. Du kan trygt ændre den igen i FocusHaven.",
+  "@systemAssistantReviewReversibleRisk": {
+    "description": "Risk explanation for a reversible start, pause, or resume timer request."
+  },
+  "systemAssistantReviewSummary": "Systemassistentgennemgang. {interpretation} {effect} {risk} Kun handlingstypen og en privat anmodningskode blev indtastet i FocusHaven; der blev ikke inkluderet nogen transskription eller privat indhold. Denne gennemgang udløber efter to minutter og afvises, hvis timeren eller køen ændres. Der sker intet, medmindre du vælger Bekræft handling i FocusHaven.",
+  "@systemAssistantReviewSummary": {
+    "description": "Complete screen-reader summary for one system-assistant request review.",
+    "placeholders": {
+      "interpretation": {
+        "type": "String",
+        "example": "Start a Focus timer."
+      },
+      "effect": {
+        "type": "String",
+        "example": "This will start the ready Focus session."
+      },
+      "risk": {
+        "type": "String",
+        "example": "This request may control the timer. You can safely change it again in FocusHaven."
+      }
+    }
+  },
+  "systemAssistantReviewDismiss": "Ignorer anmodning",
+  "@systemAssistantReviewDismiss": {
+    "description": "Button that dismisses one system-assistant request without executing it."
+  },
+  "systemAssistantReviewConfirm": "Bekræft handling",
+  "@systemAssistantReviewConfirm": {
+    "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
   }
 }

@@ -240,6 +240,21 @@ final class HavenSystemIntentReviewService {
     return HavenSystemIntentReviewSettlement.completed(result);
   }
 
+  /// Whether [review] is still the one active, policy-valid capability.
+  ///
+  /// Production presentation uses this read-only check to remove a review as
+  /// soon as its owner state changes or its two-minute lifetime ends. The
+  /// proposal remains private and this check never confirms or consumes it.
+  bool isCurrent(
+    HavenSystemIntentReview review, {
+    AppLocalizations? localizations,
+  }) {
+    if (_activeGeneration != review._generation) return false;
+    return _engine
+        .evaluate(review._proposal, localizations: localizations)
+        .allowed;
+  }
+
   bool dismiss(HavenSystemIntentReview review) {
     if (_activeGeneration != review._generation) return false;
     _activeGeneration = null;

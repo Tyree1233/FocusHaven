@@ -5227,5 +5227,63 @@
   "adaptiveFocusUseSuggestion": "제안 사용",
   "@adaptiveFocusUseSuggestion": {
     "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
+  },
+  "systemAssistantReviewEyebrow": "시스템 어시스턴트",
+  "@systemAssistantReviewEyebrow": {
+    "description": "Short uppercase source label above a system-assistant request review."
+  },
+  "systemAssistantReviewTitle": "이 요청을 검토해 주세요.",
+  "@systemAssistantReviewTitle": {
+    "description": "Heading for the in-app review of one supported system-assistant request."
+  },
+  "systemAssistantReviewSource": "지원되는 시스템 어시스턴트가 이 요청을 작성했습니다. FocusHaven은 이 요청에 대해 조치를 취하지 않았습니다.",
+  "@systemAssistantReviewSource": {
+    "description": "Disclosure that the request came from a supported system assistant but has not executed."
+  },
+  "systemAssistantReviewPrivacy": "FocusHaven에는 작업 유형과 개인 요청 코드만 입력됩니다. 녹취록, 작업, 일지, 코칭 또는 계정 정보는 포함되지 않습니다.",
+  "@systemAssistantReviewPrivacy": {
+    "description": "Privacy disclosure describing the exact text-free system-assistant input boundary."
+  },
+  "systemAssistantReviewFreshness": "이 검토는 2분 후에 만료됩니다. 타이머 또는 대기열이 먼저 변경될 경우 요청이 거부됩니다.",
+  "@systemAssistantReviewFreshness": {
+    "description": "Disclosure of the short review lifetime and stale-state rejection."
+  },
+  "systemAssistantReviewConfirmation": "FocusHaven 에서 '작업 확인'을 선택하지 않으면 아무 일도 일어나지 않습니다.",
+  "@systemAssistantReviewConfirmation": {
+    "description": "Disclosure that an explicit in-app confirmation is required before every system-assistant action."
+  },
+  "systemAssistantReviewInformationalRisk": "이 요청으로는 타이머나 대기열을 변경할 수 없습니다.",
+  "@systemAssistantReviewInformationalRisk": {
+    "description": "Risk explanation for reading timer status or opening Focus Queue without changing timer or queue data."
+  },
+  "systemAssistantReviewReversibleRisk": "이 요청이 타이머를 제어할 수 있습니다. FocusHaven 에서 안전하게 다시 변경할 수 있습니다.",
+  "@systemAssistantReviewReversibleRisk": {
+    "description": "Risk explanation for a reversible start, pause, or resume timer request."
+  },
+  "systemAssistantReviewSummary": "시스템 지원 검토. {interpretation} {effect} {risk} FocusHaven에 입력된 것은 작업 유형과 비공개 요청 코드뿐입니다. 녹취록이나 비공개 콘텐츠는 포함되지 않았습니다. 이 검토는 2분 후에 만료되며 타이머 또는 대기열이 변경되면 거부됩니다. FocusHaven에서 '작업 확인'을 선택하지 않으면 아무 일도 일어나지 않습니다.",
+  "@systemAssistantReviewSummary": {
+    "description": "Complete screen-reader summary for one system-assistant request review.",
+    "placeholders": {
+      "interpretation": {
+        "type": "String",
+        "example": "Start a Focus timer."
+      },
+      "effect": {
+        "type": "String",
+        "example": "This will start the ready Focus session."
+      },
+      "risk": {
+        "type": "String",
+        "example": "This request may control the timer. You can safely change it again in FocusHaven."
+      }
+    }
+  },
+  "systemAssistantReviewDismiss": "요청 무시",
+  "@systemAssistantReviewDismiss": {
+    "description": "Button that dismisses one system-assistant request without executing it."
+  },
+  "systemAssistantReviewConfirm": "작업 확인",
+  "@systemAssistantReviewConfirm": {
+    "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
   }
 }

@@ -41,6 +41,7 @@ import '../services/haven_loop_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_planner_service.dart';
 import '../services/haven_rhythm_service.dart';
+import '../services/haven_system_intent_inbox.dart';
 import '../services/haven_window_hold_service.dart';
 import '../services/haven_window_service.dart';
 import '../services/haven_window_platform_bridge.dart';
@@ -244,6 +245,16 @@ final adaptiveFocusDelegationServiceProvider =
       (ref) =>
           AdaptiveFocusDelegationService(timer: ref.read(timerServiceProvider)),
       name: 'adaptiveFocusDelegationServiceProvider',
+    );
+
+/// Text-free, memory-only entry seam for a future reviewed native adapter.
+///
+/// No platform is registered in Phase 217D, so production creates the inbox
+/// and app-level host while leaving it without an external producer.
+final havenSystemIntentInboxProvider =
+    ChangeNotifierProvider<HavenSystemIntentInbox>(
+      (ref) => HavenSystemIntentInbox(),
+      name: 'havenSystemIntentInboxProvider',
     );
 
 final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(

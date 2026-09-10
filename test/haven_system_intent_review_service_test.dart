@@ -193,7 +193,9 @@ void main() {
           const HavenSystemIntentDraft.startFocusTimer('stale-start'),
         )
         .review!;
+    expect(owned.bridge.isCurrent(review), isTrue);
     owned.timer.selectSession(SessionType.shortBreak);
+    expect(owned.bridge.isCurrent(review), isFalse);
 
     final stale = await owned.bridge.confirm(review);
     final replay = await owned.bridge.confirm(review);

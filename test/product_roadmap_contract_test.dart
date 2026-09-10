@@ -36,7 +36,7 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Foundation shipped, disabled |',
+          'Reviewed app host shipped; native adapters disabled |',
     ]) {
       expect(
         roadmap,
@@ -262,8 +262,12 @@ void main() {
       'Phase 217D locked system-assistant production copy',
       'eleven complete English messages',
       'exactly three string placeholders',
-      'no production provider or screen consumer',
-      'Copy approval cannot register a platform request or execute a Haven Action',
+      'all fifteen independent reviews pass',
+      'all seventeen runtime catalogs',
+      'memory-only inbox',
+      'rejects a second pending request',
+      'Siri/App Intent, Shortcut, Android App Action',
+      'cannot register a platform request or bypass exact in-app confirmation',
     ]) {
       expect(architecture, contains(required));
     }

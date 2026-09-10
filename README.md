@@ -822,17 +822,17 @@ no engine, timer, queue, provider, persistence, network, AI, or platform owner.
 No production screen consumes it, no source-specific runtime copy is added,
 and Siri, App Intents, Shortcuts, and Android App Actions remain unregistered.
 
-Phase 217D locks the complete English **system-assistant production review
-copy** without opening production or native input. The isolated eleven-message
+Phase 217D first locked the complete English **system-assistant production
+review copy** without opening production or native input. The isolated eleven-message
 proposal covers the source disclosure, text-free privacy boundary, exact
 two-minute freshness warning, in-app confirmation requirement, separate
 informational and reversible-control risk explanations, one complete semantic
 summary, and both action labels. The summary carries only the already-
 localized interpretation, effect, and risk placeholders, so languages may
-reorder complete reviewed copy without fragment assembly. All seventeen
-runtime catalogs remain unchanged, no production host consumes the card, and
-every Apple and Android registration remains disabled until the fifteen non-
-English reviews and a later integration pass independently.
+reorder complete reviewed copy without fragment assembly. Fifteen independent
+fluent reviews then approved all 165 decisions. The eleven complete messages
+are now present in all seventeen runtime catalogs, with base Portuguese derived
+only from approved Brazilian Portuguese.
 
 The closed incremental-review foundation treats those eleven messages as a
 separately locked delta for the fifteen non-English production languages. It
@@ -842,14 +842,23 @@ content-safety gates, and produces only private approved delta catalogs. It
 cannot rewrite the existing runtime catalogs, derive the base `pt` fallback
 before reviewed `pt-BR` approval, contact a provider, or activate the production
 card. Google-assisted drafts, real review workbooks, approvals, catalog
-integration, production hosting, and Apple or Android registration remain
-separate later gates.
+integration, production hosting, and Apple or Android registration were kept
+as separate gates during review.
 
 Google-assisted incremental drafts remain a separately authorized,
 development-only option for those eleven public messages. Their no-request
 preflight, provider response, ICU shielding, quarantine, offline recovery, and
 private draft boundaries grant no fluent-review, runtime, production-host, or
 native-registration authority.
+
+The reviewed production integration now places one localized, ephemeral
+system-assistant review host above the current app route. Its memory-only inbox
+accepts only the Phase 217A text-free request object; the host prepares one
+opaque review, removes it on dismissal, confirmation, supersession, expiry, or
+owner-state change, and can settle it only through the Phase 217B service and
+existing Haven Action Engine. A second pending inbox request is rejected, no
+review is persisted, and the app still registers no Siri, App Intent, Shortcut,
+or Android App Action producer.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

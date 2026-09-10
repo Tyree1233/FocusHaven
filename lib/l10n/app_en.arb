@@ -4104,5 +4104,63 @@
   "adaptiveFocusChanged": "The timer changed, so this suggestion was not applied.",
   "@adaptiveFocusChanged": {
     "description": "Fail-closed message when timer state changes before an Adaptive Focus review settles."
+  },
+  "systemAssistantReviewEyebrow": "SYSTEM ASSISTANT",
+  "@systemAssistantReviewEyebrow": {
+    "description": "Short uppercase source label above a system-assistant request review."
+  },
+  "systemAssistantReviewTitle": "Review this request",
+  "@systemAssistantReviewTitle": {
+    "description": "Heading for the in-app review of one supported system-assistant request."
+  },
+  "systemAssistantReviewSource": "A supported system assistant prepared this request. FocusHaven has not acted on it.",
+  "@systemAssistantReviewSource": {
+    "description": "Disclosure that the request came from a supported system assistant but has not executed."
+  },
+  "systemAssistantReviewPrivacy": "Only the action type and a private request code enter FocusHaven. No transcript, task, journal, coaching, or account text is included.",
+  "@systemAssistantReviewPrivacy": {
+    "description": "Privacy disclosure describing the exact text-free system-assistant input boundary."
+  },
+  "systemAssistantReviewFreshness": "This review expires after two minutes. If the timer or queue changes first, the request will be rejected.",
+  "@systemAssistantReviewFreshness": {
+    "description": "Disclosure of the short review lifetime and stale-state rejection."
+  },
+  "systemAssistantReviewConfirmation": "Nothing happens unless you choose Confirm action in FocusHaven.",
+  "@systemAssistantReviewConfirmation": {
+    "description": "Disclosure that an explicit in-app confirmation is required before every system-assistant action."
+  },
+  "systemAssistantReviewInformationalRisk": "This request cannot change your timer or queue.",
+  "@systemAssistantReviewInformationalRisk": {
+    "description": "Risk explanation for reading timer status or opening Focus Queue without changing timer or queue data."
+  },
+  "systemAssistantReviewReversibleRisk": "This request may control the timer. You can safely change it again in FocusHaven.",
+  "@systemAssistantReviewReversibleRisk": {
+    "description": "Risk explanation for a reversible start, pause, or resume timer request."
+  },
+  "systemAssistantReviewSummary": "System assistant review. {interpretation} {effect} {risk} Only the action type and a private request code entered FocusHaven; no transcript or private content was included. This review expires after two minutes and is rejected if the timer or queue changes. Nothing happens unless you choose Confirm action in FocusHaven.",
+  "@systemAssistantReviewSummary": {
+    "description": "Complete screen-reader summary for one system-assistant request review.",
+    "placeholders": {
+      "interpretation": {
+        "type": "String",
+        "example": "Start a Focus timer."
+      },
+      "effect": {
+        "type": "String",
+        "example": "This will start the ready Focus session."
+      },
+      "risk": {
+        "type": "String",
+        "example": "This request may control the timer. You can safely change it again in FocusHaven."
+      }
+    }
+  },
+  "systemAssistantReviewDismiss": "Dismiss request",
+  "@systemAssistantReviewDismiss": {
+    "description": "Button that dismisses one system-assistant request without executing it."
+  },
+  "systemAssistantReviewConfirm": "Confirm action",
+  "@systemAssistantReviewConfirm": {
+    "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
   }
 }

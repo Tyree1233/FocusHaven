@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'
-    show ConsumerWidget, ProviderScope, WidgetRef;
+    show ConsumerState, ConsumerStatefulWidget, ProviderScope;
 
 import 'config/feature_flags.dart';
 import 'firebase_options.dart';
@@ -25,6 +25,7 @@ import 'services/theme_service.dart';
 import 'services/timer_service.dart';
 import 'widgets/focus_shield_platform_host.dart';
 import 'widgets/haven_window_platform_host.dart';
+import 'widgets/haven_system_intent_production_host.dart';
 import 'widgets/system_focus_platform_host.dart';
 
 Future<void> main() =>
@@ -194,7 +195,7 @@ class FocusHavenApp extends StatelessWidget {
 }
 
 /// Rebuilds only the application theme when the selected palette changes.
-class _FocusHavenMaterialApp extends ConsumerWidget {
+class _FocusHavenMaterialApp extends ConsumerStatefulWidget {
   const _FocusHavenMaterialApp({
     required this.showOnboarding,
     required this.locale,
@@ -206,15 +207,25 @@ class _FocusHavenMaterialApp extends ConsumerWidget {
   final List<Locale> supportedLocales;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_FocusHavenMaterialApp> createState() =>
+      _FocusHavenMaterialAppState();
+}
+
+class _FocusHavenMaterialAppState
+    extends ConsumerState<_FocusHavenMaterialApp> {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  Widget build(BuildContext context) {
     final selectedTheme = ref.watch(selectedThemeProvider);
     final selectedLocale = ref.watch(selectedLocaleProvider);
 
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
-      locale: locale ?? selectedLocale,
-      supportedLocales: supportedLocales,
+      locale: widget.locale ?? selectedLocale,
+      supportedLocales: widget.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -235,7 +246,11 @@ class _FocusHavenMaterialApp extends ConsumerWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: showOnboarding ? '/' : '/timer',
+      builder: (context, child) => HavenSystemIntentProductionHost(
+        navigatorKey: _navigatorKey,
+        child: child ?? const SizedBox.shrink(),
+      ),
+      initialRoute: widget.showOnboarding ? '/' : '/timer',
       routes: {
         '/': (_) => const OnboardingScreen(),
         '/timer': (_) => const TimerScreen(),

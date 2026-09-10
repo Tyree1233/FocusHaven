@@ -5227,5 +5227,63 @@
   "adaptiveFocusUseSuggestion": "Gebruik suggestie",
   "@adaptiveFocusUseSuggestion": {
     "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
+  },
+  "systemAssistantReviewEyebrow": "SYSTEEMASSISTENT",
+  "@systemAssistantReviewEyebrow": {
+    "description": "Short uppercase source label above a system-assistant request review."
+  },
+  "systemAssistantReviewTitle": "Beoordeel dit verzoek",
+  "@systemAssistantReviewTitle": {
+    "description": "Heading for the in-app review of one supported system-assistant request."
+  },
+  "systemAssistantReviewSource": "Een ondersteunde systeemassistent heeft dit verzoek opgesteld. FocusHaven heeft er geen actie op ondernomen.",
+  "@systemAssistantReviewSource": {
+    "description": "Disclosure that the request came from a supported system assistant but has not executed."
+  },
+  "systemAssistantReviewPrivacy": "Alleen het actietype en een privéverzoekcode worden naar FocusHaven verzonden. Geen transcripten, taken, logboeken, coachingsgesprekken of accountteksten worden meegestuurd.",
+  "@systemAssistantReviewPrivacy": {
+    "description": "Privacy disclosure describing the exact text-free system-assistant input boundary."
+  },
+  "systemAssistantReviewFreshness": "Deze beoordeling verloopt na twee minuten. Als de timer of de wachtrij eerder verandert, wordt het verzoek afgewezen.",
+  "@systemAssistantReviewFreshness": {
+    "description": "Disclosure of the short review lifetime and stale-state rejection."
+  },
+  "systemAssistantReviewConfirmation": "Er gebeurt niets tenzij je 'Bevestig actie' selecteert in FocusHaven.",
+  "@systemAssistantReviewConfirmation": {
+    "description": "Disclosure that an explicit in-app confirmation is required before every system-assistant action."
+  },
+  "systemAssistantReviewInformationalRisk": "Dit verzoek kan je timer of wachtrij niet wijzigen.",
+  "@systemAssistantReviewInformationalRisk": {
+    "description": "Risk explanation for reading timer status or opening Focus Queue without changing timer or queue data."
+  },
+  "systemAssistantReviewReversibleRisk": "Dit verzoek kan de timer besturen. Je kunt deze veilig opnieuw wijzigen in FocusHaven.",
+  "@systemAssistantReviewReversibleRisk": {
+    "description": "Risk explanation for a reversible start, pause, or resume timer request."
+  },
+  "systemAssistantReviewSummary": "Systeemassistent beoordeling. {interpretation} {effect} {risk} Alleen het actietype en een privéverzoekcode zijn ingevoerd in FocusHaven; er is geen transcript of privé-inhoud toegevoegd. Deze beoordeling verloopt na twee minuten en wordt afgewezen als de timer of wachtrij verandert. Er gebeurt niets tenzij je 'Bevestig actie' selecteert in FocusHaven.",
+  "@systemAssistantReviewSummary": {
+    "description": "Complete screen-reader summary for one system-assistant request review.",
+    "placeholders": {
+      "interpretation": {
+        "type": "String",
+        "example": "Start a Focus timer."
+      },
+      "effect": {
+        "type": "String",
+        "example": "This will start the ready Focus session."
+      },
+      "risk": {
+        "type": "String",
+        "example": "This request may control the timer. You can safely change it again in FocusHaven."
+      }
+    }
+  },
+  "systemAssistantReviewDismiss": "Verzoek negeren",
+  "@systemAssistantReviewDismiss": {
+    "description": "Button that dismisses one system-assistant request without executing it."
+  },
+  "systemAssistantReviewConfirm": "Bevestig actie",
+  "@systemAssistantReviewConfirm": {
+    "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
   }
 }

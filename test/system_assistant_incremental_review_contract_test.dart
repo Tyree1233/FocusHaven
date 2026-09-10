@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../tool/localization_incremental_review.dart';
+import 'support/localization_catalog_prefix.dart';
 
 void main() {
   const digest =
@@ -105,8 +106,7 @@ void main() {
       ...value.locales.map((entry) => entry.runtimeCatalog),
       ...value.derivedFallbacks.map((entry) => entry.runtimeCatalog),
     }) {
-      catalogs[path] =
-          jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+      catalogs[path] = catalogBeforeSystemAssistant(path);
       digests[path] = digest;
     }
 
@@ -138,8 +138,7 @@ void main() {
       ...value.locales.map((entry) => entry.runtimeCatalog),
       ...value.derivedFallbacks.map((entry) => entry.runtimeCatalog),
     }) {
-      catalogs[path] =
-          jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
+      catalogs[path] = catalogBeforeSystemAssistant(path);
       digests[path] = digest;
     }
     catalogs['lib/l10n/app_es.arb']![firstKey] = 'Already present';
@@ -159,25 +158,42 @@ void main() {
   });
 
   test(
-    'documentation keeps provider, runtime, host, and native gates closed',
+    'documentation preserves review history and keeps native gates closed',
     () {
-      final readme = File('README.md').readAsStringSync();
-      final policy = File(
-        'docs/SYSTEM_ASSISTANT_PRODUCTION_REVIEW.md',
-      ).readAsStringSync();
-      final workflow = File(
-        'docs/LOCALIZATION_STREAMLINED_LOCALE_WORKFLOW.md',
-      ).readAsStringSync();
-      final roadmap = File('docs/PRODUCT_ROADMAP.md').readAsStringSync();
+      String normalize(String value) =>
+          value.replaceAll(RegExp(r'\s+'), ' ').trim();
+
+      final readme = normalize(File('README.md').readAsStringSync());
+      final policy = normalize(
+        File('docs/SYSTEM_ASSISTANT_PRODUCTION_REVIEW.md').readAsStringSync(),
+      );
+      final workflow = normalize(
+        File(
+          'docs/LOCALIZATION_STREAMLINED_LOCALE_WORKFLOW.md',
+        ).readAsStringSync(),
+      );
+      final roadmap = normalize(
+        File('docs/PRODUCT_ROADMAP.md').readAsStringSync(),
+      );
 
       expect(readme, contains('those eleven messages as a'));
+      expect(readme, contains('reviewed production integration now places'));
       expect(policy, contains('## Incremental delta-review foundation'));
       expect(policy, contains('One language cannot approve another'));
       expect(policy, contains('no provider configuration'));
+      expect(policy, contains('No production native producer is registered'));
       expect(workflow, contains('exactly eleven messages'));
       expect(workflow, contains('creates no provider config'));
+      expect(
+        workflow,
+        contains('native registration remain separate release gates'),
+      );
       expect(roadmap, contains('incremental-review foundation'));
       expect(roadmap, contains('creates no provider draft'));
+      expect(
+        roadmap,
+        contains('subsequent Phase 217D integration accepts all 165'),
+      );
     },
   );
 }

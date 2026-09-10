@@ -87,7 +87,7 @@ void main() {
     );
   });
 
-  test('proposal remains absent from all seventeen runtime catalogs', () {
+  test('reviewed proposal is complete in all seventeen runtime catalogs', () {
     final sourceKeys = proposal().keys
         .where((key) => key.startsWith('systemAssistantReview'))
         .toSet();
@@ -103,21 +103,23 @@ void main() {
       final arb =
           jsonDecode(catalog.readAsStringSync()) as Map<String, Object?>;
       for (final key in sourceKeys) {
-        expect(arb, isNot(contains(key)), reason: '${catalog.path}:$key');
-        expect(arb, isNot(contains('@$key')), reason: '${catalog.path}:@$key');
+        expect(arb[key], isA<String>(), reason: '${catalog.path}:$key');
+        expect((arb[key]! as String).trim(), isNotEmpty);
+        expect(arb['@$key'], proposal()['@$key'], reason: catalog.path);
       }
     }
   });
 
-  test('Phase 217D keeps production placement and native authority closed', () {
+  test('Phase 217D opens only the reviewed app host', () {
     final policy = File(
       'docs/SYSTEM_ASSISTANT_PRODUCTION_REVIEW.md',
     ).readAsStringSync().replaceAll(RegExp(r'\s+'), ' ');
     final providers = File(
       'lib/providers/app_providers.dart',
     ).readAsStringSync();
-    final timerScreen = File(
-      'lib/screens/timer_screen.dart',
+    final main = File('lib/main.dart').readAsStringSync();
+    final host = File(
+      'lib/widgets/haven_system_intent_production_host.dart',
     ).readAsStringSync();
     final iosInfo = File('ios/Runner/Info.plist').readAsStringSync();
     final androidManifest = File(
@@ -129,14 +131,17 @@ void main() {
       'fifteen non-English production languages',
       'Derive base `pt` only',
       'must not assemble a sentence from translated fragments',
-      'does not choose or implement a production host',
+      'memory-only inbox',
       'Review Apple and Android native adapters separately',
-      'grants no timer, queue, navigation, persistence, provider, network, AI',
+      'Haven Action Engine remain the only path',
     ]) {
       expect(policy, contains(required), reason: required);
     }
-    expect(providers, isNot(contains('HavenSystemIntentReviewCard')));
-    expect(timerScreen, isNot(contains('HavenSystemIntentReviewCard')));
+    expect(providers, contains('havenSystemIntentInboxProvider'));
+    expect(main, contains('HavenSystemIntentProductionHost'));
+    expect(host, contains('HavenSystemIntentReviewCard'));
+    expect(host, contains('HavenSystemIntentReviewService'));
+    expect(host, contains('HavenActionEngine'));
     expect(iosInfo, isNot(contains('INIntentsSupported')));
     expect(iosInfo, isNot(contains('NSSiriUsageDescription')));
     expect(androidManifest, isNot(contains('actions.intent')));

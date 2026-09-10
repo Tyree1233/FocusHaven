@@ -754,16 +754,24 @@ one complete reviewed message; neither the card nor a future production host
 may concatenate translated sentence fragments. The visible Confirm action
 label exactly matches the confirmation disclosure.
 
-The proposal sits outside `lib/l10n`, and every existing runtime catalog
-remains byte-unchanged. It contains no transcript, task, journal, reflection,
+The proposal remains the immutable review source outside `lib/l10n`. It
+contains no transcript, task, journal, reflection,
 coaching, account, reviewer, device, or provider data. A later incremental
 review must produce one complete independent approval for each of the fifteen
 non-English production languages; base `pt` may be derived only from approved
 `pt-BR`.
 
-Phase 217D adds no production provider or screen consumer, native adapter,
-Siri/App Intent, Shortcut, Android App Action, permission, dependency, deep
-link, manifest, entitlement, persistence, provider, network, or AI path. Copy
-approval cannot register a platform request or execute a Haven Action.
-Production localization, app-level hosting, and each native adapter remain
-separate later gates.
+After all fifteen independent reviews pass, Phase 217D derives base `pt` only
+from approved `pt-BR`, merges the eleven complete messages into all seventeen
+runtime catalogs, and adds one app-level production host. Its memory-only inbox
+accepts only a typed `HavenSystemIntentRequest`, rejects a second pending
+request, and has no persistence or native producer. The host prepares one
+opaque review, removes it on dismissal, confirmation, supersession, expiry, or
+owner-state change, and delegates confirmation only to the issuing
+`HavenSystemIntentReviewService` and existing Haven Action Engine.
+
+Phase 217D adds no native adapter, Siri/App Intent, Shortcut, Android App
+Action, permission, dependency, deep link, manifest, entitlement, persistence,
+provider, network, or AI path. Copy approval and production hosting cannot
+register a platform request or bypass exact in-app confirmation. Each native
+adapter remains a separate later gate.

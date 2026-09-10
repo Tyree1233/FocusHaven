@@ -5227,5 +5227,63 @@
   "adaptiveFocusUseSuggestion": "Öneriyi Kullan",
   "@adaptiveFocusUseSuggestion": {
     "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
+  },
+  "systemAssistantReviewEyebrow": "SİSTEM ASİSTANI",
+  "@systemAssistantReviewEyebrow": {
+    "description": "Short uppercase source label above a system-assistant request review."
+  },
+  "systemAssistantReviewTitle": "Bu isteği inceleyin",
+  "@systemAssistantReviewTitle": {
+    "description": "Heading for the in-app review of one supported system-assistant request."
+  },
+  "systemAssistantReviewSource": "Bu istek, desteklenen bir sistem asistanı tarafından hazırlanmıştır. FocusHaven bu istek üzerinde herhangi bir işlem yapmamıştır.",
+  "@systemAssistantReviewSource": {
+    "description": "Disclosure that the request came from a supported system assistant but has not executed."
+  },
+  "systemAssistantReviewPrivacy": "FocusHaven'a yalnızca işlem türü ve özel istek kodu girilir. Transkript, görev, günlük, koçluk veya hesap metni dahil edilmez.",
+  "@systemAssistantReviewPrivacy": {
+    "description": "Privacy disclosure describing the exact text-free system-assistant input boundary."
+  },
+  "systemAssistantReviewFreshness": "Bu inceleme iki dakika sonra sona erecektir. Zamanlayıcı veya kuyruk değişirse, istek reddedilecektir.",
+  "@systemAssistantReviewFreshness": {
+    "description": "Disclosure of the short review lifetime and stale-state rejection."
+  },
+  "systemAssistantReviewConfirmation": "FocusHaven'da \"İşlemi onaylayın\" seçeneğini seçmediğiniz sürece hiçbir şey olmaz.",
+  "@systemAssistantReviewConfirmation": {
+    "description": "Disclosure that an explicit in-app confirmation is required before every system-assistant action."
+  },
+  "systemAssistantReviewInformationalRisk": "Bu istek zamanlayıcınızı veya kuyruğunuzu değiştiremez.",
+  "@systemAssistantReviewInformationalRisk": {
+    "description": "Risk explanation for reading timer status or opening Focus Queue without changing timer or queue data."
+  },
+  "systemAssistantReviewReversibleRisk": "Bu istek zamanlayıcıyı kontrol edebilir. Bunu FocusHaven'da güvenle tekrar değiştirebilirsiniz.",
+  "@systemAssistantReviewReversibleRisk": {
+    "description": "Risk explanation for a reversible start, pause, or resume timer request."
+  },
+  "systemAssistantReviewSummary": "Sistem asistanı incelemesi. {interpretation} {effect} {risk} Yalnızca işlem türü ve özel istek kodu FocusHaven'a girildi; hiçbir transkript veya özel içerik eklenmedi. Bu inceleme iki dakika sonra sona erer ve zamanlayıcı veya kuyruk değişirse reddedilir. FocusHaven'da \"İşlemi onaylayın\" seçeneğini seçmediğiniz sürece hiçbir şey olmaz.",
+  "@systemAssistantReviewSummary": {
+    "description": "Complete screen-reader summary for one system-assistant request review.",
+    "placeholders": {
+      "interpretation": {
+        "type": "String",
+        "example": "Start a Focus timer."
+      },
+      "effect": {
+        "type": "String",
+        "example": "This will start the ready Focus session."
+      },
+      "risk": {
+        "type": "String",
+        "example": "This request may control the timer. You can safely change it again in FocusHaven."
+      }
+    }
+  },
+  "systemAssistantReviewDismiss": "İsteği yoksay",
+  "@systemAssistantReviewDismiss": {
+    "description": "Button that dismisses one system-assistant request without executing it."
+  },
+  "systemAssistantReviewConfirm": "İşlemi onaylayın",
+  "@systemAssistantReviewConfirm": {
+    "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
   }
 }

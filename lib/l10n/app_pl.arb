@@ -5227,5 +5227,63 @@
   "adaptiveFocusUseSuggestion": "Użyj sugestii",
   "@adaptiveFocusUseSuggestion": {
     "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
+  },
+  "systemAssistantReviewEyebrow": "ASYSTENT SYSTEMU",
+  "@systemAssistantReviewEyebrow": {
+    "description": "Short uppercase source label above a system-assistant request review."
+  },
+  "systemAssistantReviewTitle": "Przejrzyj to żądanie",
+  "@systemAssistantReviewTitle": {
+    "description": "Heading for the in-app review of one supported system-assistant request."
+  },
+  "systemAssistantReviewSource": "Obsługiwany asystent systemowy przygotował to żądanie. FocusHaven nie podjął w związku z nim żadnych działań.",
+  "@systemAssistantReviewSource": {
+    "description": "Disclosure that the request came from a supported system assistant but has not executed."
+  },
+  "systemAssistantReviewPrivacy": "Do FocusHaven wprowadzany jest tylko typ akcji i prywatny kod żądania. Transkrypt, zadanie, dziennik, coaching ani tekst konta nie są uwzględniane.",
+  "@systemAssistantReviewPrivacy": {
+    "description": "Privacy disclosure describing the exact text-free system-assistant input boundary."
+  },
+  "systemAssistantReviewFreshness": "Ten przegląd wygasa po dwóch minutach. Jeśli timer lub kolejka zmienią się wcześniej, żądanie zostanie odrzucone.",
+  "@systemAssistantReviewFreshness": {
+    "description": "Disclosure of the short review lifetime and stale-state rejection."
+  },
+  "systemAssistantReviewConfirmation": "Nic się nie stanie, dopóki nie wybierzesz opcji Potwierdź akcję w FocusHaven.",
+  "@systemAssistantReviewConfirmation": {
+    "description": "Disclosure that an explicit in-app confirmation is required before every system-assistant action."
+  },
+  "systemAssistantReviewInformationalRisk": "To żądanie nie może zmienić Twojego timera ani kolejki.",
+  "@systemAssistantReviewInformationalRisk": {
+    "description": "Risk explanation for reading timer status or opening Focus Queue without changing timer or queue data."
+  },
+  "systemAssistantReviewReversibleRisk": "To żądanie może sterować timerem. Możesz go bezpiecznie zmienić ponownie w FocusHaven.",
+  "@systemAssistantReviewReversibleRisk": {
+    "description": "Risk explanation for a reversible start, pause, or resume timer request."
+  },
+  "systemAssistantReviewSummary": "Przegląd asystenta systemu. {interpretation} {effect} {risk} W FocusHaven wprowadzono tylko typ akcji i prywatny kod żądania; nie uwzględniono transkryptu ani treści prywatnych. Ten przegląd wygasa po dwóch minutach i jest odrzucany, jeśli zmieni się timer lub kolejka. Nic się nie dzieje, dopóki nie wybierzesz opcji Potwierdź akcję w FocusHaven.",
+  "@systemAssistantReviewSummary": {
+    "description": "Complete screen-reader summary for one system-assistant request review.",
+    "placeholders": {
+      "interpretation": {
+        "type": "String",
+        "example": "Start a Focus timer."
+      },
+      "effect": {
+        "type": "String",
+        "example": "This will start the ready Focus session."
+      },
+      "risk": {
+        "type": "String",
+        "example": "This request may control the timer. You can safely change it again in FocusHaven."
+      }
+    }
+  },
+  "systemAssistantReviewDismiss": "Zignoruj żądanie",
+  "@systemAssistantReviewDismiss": {
+    "description": "Button that dismisses one system-assistant request without executing it."
+  },
+  "systemAssistantReviewConfirm": "Potwierdź akcję",
+  "@systemAssistantReviewConfirm": {
+    "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
   }
 }

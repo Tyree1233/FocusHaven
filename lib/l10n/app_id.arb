@@ -5227,5 +5227,63 @@
   "adaptiveFocusUseSuggestion": "Gunakan saran",
   "@adaptiveFocusUseSuggestion": {
     "description": "Button that explicitly applies the reviewed Focus and short-break defaults without starting a session."
+  },
+  "systemAssistantReviewEyebrow": "ASISTEN SISTEM",
+  "@systemAssistantReviewEyebrow": {
+    "description": "Short uppercase source label above a system-assistant request review."
+  },
+  "systemAssistantReviewTitle": "Tinjau permintaan ini",
+  "@systemAssistantReviewTitle": {
+    "description": "Heading for the in-app review of one supported system-assistant request."
+  },
+  "systemAssistantReviewSource": "Permintaan ini disiapkan oleh asisten sistem yang didukung. FocusHaven tidak menindaklanjutinya.",
+  "@systemAssistantReviewSource": {
+    "description": "Disclosure that the request came from a supported system assistant but has not executed."
+  },
+  "systemAssistantReviewPrivacy": "Hanya tipe tindakan dan kode permintaan pribadi yang masuk ke FocusHaven. Tidak ada transkrip, tugas, jurnal, coaching, atau teks akun yang disertakan.",
+  "@systemAssistantReviewPrivacy": {
+    "description": "Privacy disclosure describing the exact text-free system-assistant input boundary."
+  },
+  "systemAssistantReviewFreshness": "Tinjauan ini akan berakhir setelah dua menit. Jika pengatur waktu atau antrean berubah terlebih dahulu, permintaan akan ditolak.",
+  "@systemAssistantReviewFreshness": {
+    "description": "Disclosure of the short review lifetime and stale-state rejection."
+  },
+  "systemAssistantReviewConfirmation": "Tidak akan terjadi apa pun kecuali Anda memilih Konfirmasi tindakan di FocusHaven.",
+  "@systemAssistantReviewConfirmation": {
+    "description": "Disclosure that an explicit in-app confirmation is required before every system-assistant action."
+  },
+  "systemAssistantReviewInformationalRisk": "Permintaan ini tidak dapat mengubah pengatur waktu atau antrean Anda.",
+  "@systemAssistantReviewInformationalRisk": {
+    "description": "Risk explanation for reading timer status or opening Focus Queue without changing timer or queue data."
+  },
+  "systemAssistantReviewReversibleRisk": "Permintaan ini dapat mengontrol pengatur waktu. Anda dapat mengubahnya kembali dengan aman di FocusHaven.",
+  "@systemAssistantReviewReversibleRisk": {
+    "description": "Risk explanation for a reversible start, pause, or resume timer request."
+  },
+  "systemAssistantReviewSummary": "Tinjauan asisten sistem. {interpretation} {effect} {risk} Hanya jenis tindakan dan kode permintaan pribadi yang dimasukkan ke FocusHaven; tidak ada transkrip atau konten pribadi yang disertakan. Tinjauan ini berakhir setelah dua menit dan ditolak jika pengatur waktu atau antrean berubah. Tidak ada yang terjadi kecuali Anda memilih Konfirmasi tindakan di FocusHaven.",
+  "@systemAssistantReviewSummary": {
+    "description": "Complete screen-reader summary for one system-assistant request review.",
+    "placeholders": {
+      "interpretation": {
+        "type": "String",
+        "example": "Start a Focus timer."
+      },
+      "effect": {
+        "type": "String",
+        "example": "This will start the ready Focus session."
+      },
+      "risk": {
+        "type": "String",
+        "example": "This request may control the timer. You can safely change it again in FocusHaven."
+      }
+    }
+  },
+  "systemAssistantReviewDismiss": "Abaikan permintaan",
+  "@systemAssistantReviewDismiss": {
+    "description": "Button that dismisses one system-assistant request without executing it."
+  },
+  "systemAssistantReviewConfirm": "Konfirmasi tindakan",
+  "@systemAssistantReviewConfirm": {
+    "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
   }
 }

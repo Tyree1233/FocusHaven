@@ -115,13 +115,15 @@ choices that disable together before either callback runs. The card cannot
 settle the review itself, and no production or native system-assistant input
 consumes it in Phase 217C.
 
-Phase 217D locks only the complete public English review-copy proposal. Its
+Phase 217D first locks the complete public English review-copy proposal. Its
 privacy disclosure states that only the action type and a private request code
 enter FocusHaven; no transcript, task, journal, coaching, or account text is
-included. The proposal is absent from every runtime catalog, and no production
-or native system-assistant path consumes it. Copy review cannot authorize a
-spoken acknowledgement, background callback, notification action, or system-
-assistant success response to confirm a Haven Action.
+included. After fifteen independent fluent approvals, the complete copy is
+present in every runtime catalog and one app-level host can consume only a
+typed, text-free request from its memory-only inbox. The inbox currently has no
+native producer. Copy review and app hosting cannot authorize a spoken
+acknowledgement, background callback, notification action, or system-assistant
+success response to confirm a Haven Action.
 
 ### Eligible through the shared typed-and-voice policy
 
