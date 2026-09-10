@@ -246,7 +246,6 @@ void main() {
   test(
     'workflow documentation keeps provider and runtime authority closed',
     () {
-      final readme = File('README.md').readAsStringSync();
       final productionReview = File(
         'docs/ADAPTIVE_FOCUS_PRODUCTION_REVIEW.md',
       ).readAsStringSync();
@@ -255,7 +254,12 @@ void main() {
       ).readAsStringSync();
       final roadmap = File('docs/PRODUCT_ROADMAP.md').readAsStringSync();
 
-      expect(readme, contains('seventeen messages as a separately'));
+      expect(
+        localeWorkflow,
+        contains(
+          'For Adaptive Focus, the reviewed scope was exactly seventeen',
+        ),
+      );
       expect(
         productionReview,
         contains('## Incremental delta-review foundation'),

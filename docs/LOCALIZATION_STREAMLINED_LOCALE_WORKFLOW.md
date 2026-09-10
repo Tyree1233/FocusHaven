@@ -176,9 +176,12 @@ language, `tool/localization_incremental_review.dart` avoids reopening the
 complete locale catalogs. Its locked manifest identifies one English proposal
 under `localization/proposals`, the proposal digest, one through twenty target
 runtime catalogs and their exact current digests, and any mechanical fallback
-relationship. For Adaptive Focus, the scope is exactly seventeen messages in
-fifteen independently reviewed target languages; Flutter's base `pt` catalog is
-derived only from the approved `pt-BR` delta during later integration.
+relationship. For Adaptive Focus, the reviewed scope was exactly seventeen
+messages in fifteen independently reviewed target languages. For the closed
+system-assistant production review, the new scope is exactly eleven messages
+for the same fifteen independent reviews. In both workflows, Flutter's base
+`pt` catalog is derived only from the approved `pt-BR` delta during later
+integration.
 
 Run its commands from the repository root:
 
@@ -213,6 +216,13 @@ drafts require a separate explicit authorization. Runtime merge and fallback
 derivation occur only after all required fluent reviews are complete and must
 be followed by the normal localization, layout, accessibility, test, analysis,
 platform-build, commit, push, and CI gates.
+
+The system-assistant incremental-review foundation reuses this same tool and
+the existing private Excel helpers. Its manifest locks the isolated eleven-
+message English proposal, fifteen exact runtime-catalog digests, Japanese and
+Korean font-coverage gates, and one later `pt-BR`-to-`pt` derivation. The
+foundation itself creates no provider config, draft bundle, real workbook,
+review, approval, runtime catalog, production host, or native registration.
 
 ### Google-assisted incremental drafts
 

@@ -833,27 +833,23 @@ reorder complete reviewed copy without fragment assembly. All seventeen
 runtime catalogs remain unchanged, no production host consumes the card, and
 every Apple and Android registration remains disabled until the fifteen non-
 English reviews and a later integration pass independently.
-The next review foundation treats those seventeen messages as a separately
-locked delta for the fifteen non-English production languages. It hashes every
-existing runtime catalog before preparing one private bundle and one private
-review per language, reuses the established placeholder and content-safety
-gates, and produces only private approved delta catalogs. It cannot rewrite the
-existing 980-message catalogs, derive the base `pt` fallback before reviewed
-`pt-BR` approval, contact a provider, or activate the production card.
-Google-assisted incremental drafts use a separate development-only adapter
-that reuses the existing glossary, HTML ICU-shield, private quarantine, and
-offline-resume contracts for only those seventeen public messages. Its
-preflight never authenticates or sends text, and its translation command
-requires a separate explicit authorization. Provider output remains a private
-draft with no review, runtime, timer, deployment, or publication authority.
-Every complete provider response is now preserved in a bound private envelope
-before HTML or ICU decoding. If one locale fails locally after the provider
-returns, a targeted repair preflight can prove every successful peer bundle is
-exact and keep any later provider authority limited to only the missing locale.
-The resulting Japanese response exposed one exact provider quirk: one reserved
-ICU marker was echoed immediately before its otherwise valid protected span.
-Offline recovery accepts only that single adjacent echo shape while retaining
-fail-closed handling for every broader marker or HTML change.
+
+The closed incremental-review foundation treats those eleven messages as a
+separately locked delta for the fifteen non-English production languages. It
+hashes every existing runtime catalog before preparing one private bundle and
+one private review per language, reuses the established placeholder and
+content-safety gates, and produces only private approved delta catalogs. It
+cannot rewrite the existing runtime catalogs, derive the base `pt` fallback
+before reviewed `pt-BR` approval, contact a provider, or activate the production
+card. Google-assisted drafts, real review workbooks, approvals, catalog
+integration, production hosting, and Apple or Android registration remain
+separate later gates.
+
+Google-assisted incremental drafts remain a separately authorized,
+development-only option for those eleven public messages. Their no-request
+preflight, provider response, ICU shielding, quarantine, offline recovery, and
+private draft boundaries grant no fluent-review, runtime, production-host, or
+native-registration authority.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

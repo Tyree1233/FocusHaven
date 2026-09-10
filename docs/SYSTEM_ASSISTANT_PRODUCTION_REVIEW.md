@@ -1,7 +1,8 @@
 # System assistant production review gate
 
-Status: Phase 217D English copy proposal locked; every runtime catalog,
-production host, and native system-assistant adapter remains disabled.
+Status: Phase 217D English copy and incremental-review foundation locked;
+every runtime catalog, production host, and native system-assistant adapter
+remains disabled.
 
 ## Purpose
 
@@ -80,6 +81,31 @@ gates pass.
 7. Add one production host only after the localized integration is complete.
 8. Review Apple and Android native adapters separately; neither platform
    receives authority from copy approval.
+
+## Incremental delta-review foundation
+
+The external incremental-review manifest locks the exact eleven-message
+English proposal, the current digest of every one of the fifteen target runtime
+catalogs, and the current base Portuguese fallback. It reuses
+`tool/localization_incremental_review.dart`; no system-assistant-specific
+translation or workbook engine is added. Japanese and Korean retain their
+explicit font-coverage gates, and base `pt` remains a mechanical derivative of
+the completely approved `pt-BR` delta rather than a sixteenth review.
+
+The committed preflight may read those locked public files and report only
+aggregate counts. `prepare` may turn separately supplied private draft bundles
+into one private review CSV per language, and `accept` may write private
+approved deltas only after every row in that language has one immutable fluent
+decision. One language cannot approve another, a partial set cannot authorize
+integration, and neither machine output nor a workbook formula can approve a
+row.
+
+This foundation creates no provider configuration, glossary, machine draft,
+real workbook, review, approval, runtime merge, generated localization, or
+production consumer. Any Google-assisted draft run requires separate explicit
+authorization. All fifteen complete approvals and the derived Portuguese
+fallback must pass a later atomic catalog-integration phase before the card can
+receive production copy.
 
 ## Authority boundary
 
