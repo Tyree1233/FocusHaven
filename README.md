@@ -860,6 +860,22 @@ existing Haven Action Engine. A second pending inbox request is rejected, no
 review is persisted, and the app still registers no Siri, App Intent, Shortcut,
 or Android App Action producer.
 
+Phase 217E adds the private **Apple system-assistant ingress foundation**. One
+iOS-native process-memory slot may carry only schema version `1`, a bounded
+opaque invocation ID, and one of the same five text-free routes. The Dart side
+revalidates the exact payload and acknowledges it only when the existing
+single-slot inbox accepts it. The Apple adapter clears only that acknowledged
+request; it cannot prepare, inspect, confirm, or execute a Haven Action and it
+has no timer, queue, transcript, persistence, network, or AI access.
+
+Public Siri and Shortcuts registration is still disabled. The Runner declares
+no App Intent, App Shortcut provider, Siri entitlement, Siri usage description,
+deep link, dependency, or native assistant copy. Those user-visible strings
+require a separate fifteen-language review before availability-gated Apple
+registration, signed builds, real-device Siri/Shortcuts and VoiceOver checks,
+store review, or distribution. Android App Actions remain unchanged and
+separate.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

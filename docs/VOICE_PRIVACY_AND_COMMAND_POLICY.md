@@ -125,6 +125,20 @@ native producer. Copy review and app hosting cannot authorize a spoken
 acknowledgement, background callback, notification action, or system-assistant
 success response to confirm a Haven Action.
 
+Phase 217E adds one private Apple delivery seam, not a public Siri or Shortcuts
+capability. Swift can hold one exact three-field, text-free request only in
+process memory; Flutter acknowledges it only after the existing single-slot
+inbox accepts it. The native copy cannot include a transcript or arbitrary
+parameter, cannot inspect timer or queue state, and cannot confirm or execute a
+proposal. Failed delivery is not a spoken acknowledgement and never becomes
+action consent.
+
+Native Apple titles, invocation phrases, parameter summaries, and result
+dialogue remain absent because they have not completed independent review in
+all production languages. App Intent and App Shortcut declarations, Siri
+entitlements, real-device invocation, store disclosure, and distribution stay
+closed. Android App Actions remain a separate later gate.
+
 ### Eligible through the shared typed-and-voice policy
 
 - read the current timer status;

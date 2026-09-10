@@ -54,6 +54,9 @@
 		A18600000000000000000006 /* FocusHavenWatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = A18600000000000000000012 /* FocusHavenWatchWidget.swift */; };
 		A18600000000000000000007 /* FocusHavenWatchWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A18600000000000000000015 /* FocusHavenWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A18600000000000000000008 /* SystemFocusWatchSnapshotStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A12000000000000000000015 /* SystemFocusWatchSnapshotStore.swift */; };
+		A217E0000000000000000001 /* HavenSystemAssistantAppleIngress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217E0000000000000000011 /* HavenSystemAssistantAppleIngress.swift */; };
+		A217E0000000000000000002 /* HavenSystemAssistantApplePlatformAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217E0000000000000000012 /* HavenSystemAssistantApplePlatformAdapter.swift */; };
+		A217E0000000000000000003 /* HavenSystemAssistantAppleIngressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217E0000000000000000013 /* HavenSystemAssistantAppleIngressTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -188,6 +191,9 @@
 		A18600000000000000000014 /* FocusHavenWatchWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusHavenWatchWidget.entitlements; sourceTree = "<group>"; };
 		A18600000000000000000015 /* FocusHavenWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FocusHavenWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A18600000000000000000016 /* FocusHavenWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FocusHavenWatch.entitlements; sourceTree = "<group>"; };
+		A217E0000000000000000011 /* HavenSystemAssistantAppleIngress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantAppleIngress.swift; sourceTree = "<group>"; };
+		A217E0000000000000000012 /* HavenSystemAssistantApplePlatformAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantApplePlatformAdapter.swift; sourceTree = "<group>"; };
+		A217E0000000000000000013 /* HavenSystemAssistantAppleIngressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantAppleIngressTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -239,6 +245,7 @@
 				A12000000000000000000018 /* SystemFocusWatchSnapshotTests.swift */,
 				A12600000000000000000014 /* FocusShieldCapabilityPayloadTests.swift */,
 				A13400000000000000000014 /* HavenWindowAvailabilityTests.swift */,
+				A217E0000000000000000013 /* HavenSystemAssistantAppleIngressTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -307,6 +314,8 @@
 				A13400000000000000000011 /* HavenWindowAvailabilityPayload.swift */,
 				A13400000000000000000012 /* HavenWindowNativeController.swift */,
 				A13400000000000000000013 /* HavenWindowPlatformAdapter.swift */,
+				A217E0000000000000000011 /* HavenSystemAssistantAppleIngress.swift */,
+				A217E0000000000000000012 /* HavenSystemAssistantApplePlatformAdapter.swift */,
 				A11800000000000000000012 /* Runner.entitlements */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
@@ -605,6 +614,7 @@
 				A12000000000000000000008 /* SystemFocusWatchSnapshotTests.swift in Sources */,
 				A12600000000000000000004 /* FocusShieldCapabilityPayloadTests.swift in Sources */,
 				A13400000000000000000004 /* HavenWindowAvailabilityTests.swift in Sources */,
+				A217E0000000000000000003 /* HavenSystemAssistantAppleIngressTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -629,6 +639,8 @@
 				A13400000000000000000001 /* HavenWindowAvailabilityPayload.swift in Sources */,
 				A13400000000000000000002 /* HavenWindowNativeController.swift in Sources */,
 				A13400000000000000000003 /* HavenWindowPlatformAdapter.swift in Sources */,
+				A217E0000000000000000001 /* HavenSystemAssistantAppleIngress.swift in Sources */,
+				A217E0000000000000000002 /* HavenSystemAssistantApplePlatformAdapter.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 			);

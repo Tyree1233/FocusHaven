@@ -36,7 +36,7 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Reviewed app host shipped; native adapters disabled |',
+          'Apple ingress foundation active; public native registration disabled |',
     ]) {
       expect(
         roadmap,
@@ -109,6 +109,7 @@ void main() {
     expect(readme, contains('cannot execute a timer or queue action'));
     expect(readme, contains('system-assistant in-app review bridge'));
     expect(readme, contains('Every one of the five routes requires'));
+    expect(readme, contains('Apple system-assistant ingress foundation'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {

@@ -6,6 +6,7 @@ import UIKit
   private var systemFocusAdapter: SystemFocusPlatformAdapter?
   private var focusShieldAdapter: FocusShieldPlatformAdapter?
   private var havenWindowAdapter: HavenWindowPlatformAdapter?
+  private var systemAssistantAppleAdapter: HavenSystemAssistantApplePlatformAdapter?
   private lazy var systemFocusURLCommands = SystemFocusURLCommandHandler(
     deliverPendingCommand: { [weak self] in
       self?.deliverSystemFocusPendingCommand()
@@ -47,11 +48,20 @@ import UIKit
       havenWindowAdapter.install(binaryMessenger: havenWindowRegistrar.messenger())
       self.havenWindowAdapter = havenWindowAdapter
     }
+
+    if let systemAssistantRegistrar = engineBridge.pluginRegistry.registrar(
+      forPlugin: "FocusHavenSystemAssistantAppleAdapter"
+    ) {
+      let systemAssistantAppleAdapter = HavenSystemAssistantApplePlatformAdapter()
+      systemAssistantAppleAdapter.install(binaryMessenger: systemAssistantRegistrar.messenger())
+      self.systemAssistantAppleAdapter = systemAssistantAppleAdapter
+    }
   }
 
   override func applicationDidBecomeActive(_ application: UIApplication) {
     super.applicationDidBecomeActive(application)
     focusShieldAdapter?.refreshAfterActivation()
+    systemAssistantAppleAdapter?.deliverPendingRequest()
   }
 
   override func application(

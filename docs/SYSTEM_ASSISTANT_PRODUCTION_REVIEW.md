@@ -1,8 +1,8 @@
 # System assistant production review gate
 
-Status: Phase 217D reviewed production integration active; all seventeen
-runtime catalogs and the app-level review host are enabled, while every native
-system-assistant adapter remains disabled.
+Status: Phase 217E private Apple ingress foundation active; all seventeen
+runtime catalogs and the app-level review host are enabled, while public Apple
+and Android system-assistant registration remains disabled.
 
 ## Purpose
 
@@ -121,3 +121,10 @@ changes no dependency, permission, entitlement, manifest, deep link, or
 platform file. The Phase 217B bridge and Haven Action Engine remain the only
 path that can settle a fresh, explicitly confirmed review. Siri, App Intents,
 Shortcuts, and Android App Actions remain unregistered.
+
+Phase 217E adds only the private Apple delivery seam described in
+`APPLE_SYSTEM_ASSISTANT_INGRESS_REVIEW.md`. Its exact three-field payload may
+enter the existing memory inbox, but no Siri or Shortcuts capability is
+declared and no unreviewed native copy is exposed. Public Apple registration,
+native-copy localization, real-device acceptance, signed release validation,
+store review, and distribution remain separate gates. Android is unchanged.

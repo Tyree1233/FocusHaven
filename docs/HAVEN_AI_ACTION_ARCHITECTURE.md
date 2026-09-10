@@ -775,3 +775,32 @@ Action, permission, dependency, deep link, manifest, entitlement, persistence,
 provider, network, or AI path. Copy approval and production hosting cannot
 register a platform request or bypass exact in-app confirmation. Each native
 adapter remains a separate later gate.
+
+## Phase 217E private Apple system-assistant ingress
+
+Phase 217E installs one Apple-only method-channel transport and lifecycle host
+without registering a public system action. Swift mirrors exactly the five
+Phase 217A routes and constructs only a three-field payload: schema version,
+bounded opaque invocation ID, and route kind. Dart independently validates the
+same exact shape before the existing memory-only inbox may acknowledge it.
+Unknown fields, raw text, invalid identifiers, unsupported routes, overlapping
+delivery polls, and a second pending request fail closed.
+
+The native pending store has one process-memory slot and no persistence API.
+It clears only when Flutter returns `true` for the matching invocation ID. A
+missing engine, unavailable channel, malformed payload, occupied app inbox, or
+negative acknowledgement retains the native request only for another
+foreground attempt in that same process; process termination discards it.
+
+The Apple adapter cannot import or call a timer, queue, review service, or Haven
+Action Engine. Its successful delivery stops at `HavenSystemIntentInbox`.
+Phase 217A preparation, Phase 217B state binding and policy, the Phase 217C
+one-shot card, and the reviewed Phase 217D production host remain the only path
+to an explicitly confirmed owner mutation.
+
+No App Intents import or conformance, App Shortcut provider, Siri entitlement,
+usage description, deep link, native public copy, dependency, or Android
+registration is added. Public Apple discovery and invocation must wait for a
+separate complete-copy and fifteen-language review, availability-gated iOS
+registration, real-device Siri/Shortcuts and VoiceOver acceptance, signed
+release builds, store review, and explicit distribution approval.

@@ -41,6 +41,7 @@ import '../services/haven_loop_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_planner_service.dart';
 import '../services/haven_rhythm_service.dart';
+import '../services/haven_system_assistant_apple_platform_bridge.dart';
 import '../services/haven_system_intent_inbox.dart';
 import '../services/haven_window_hold_service.dart';
 import '../services/haven_window_service.dart';
@@ -249,13 +250,31 @@ final adaptiveFocusDelegationServiceProvider =
 
 /// Text-free, memory-only entry seam for a future reviewed native adapter.
 ///
-/// No platform is registered in Phase 217D, so production creates the inbox
-/// and app-level host while leaving it without an external producer.
+/// Phase 217E adds only a private Apple producer. Public Apple and Android
+/// system-assistant registration remains closed.
 final havenSystemIntentInboxProvider =
     ChangeNotifierProvider<HavenSystemIntentInbox>(
       (ref) => HavenSystemIntentInbox(),
       name: 'havenSystemIntentInboxProvider',
     );
+
+final havenSystemAssistantApplePlatformBackendProvider =
+    Provider<HavenSystemAssistantApplePlatformBackend>(
+      (ref) => MethodChannelHavenSystemAssistantAppleBackend(),
+      name: 'havenSystemAssistantApplePlatformBackendProvider',
+    );
+
+/// Private Apple-to-Flutter delivery only; public App Intent registration is
+/// intentionally absent until its native copy and release gates are complete.
+final havenSystemAssistantApplePlatformControllerProvider =
+    Provider<HavenSystemAssistantApplePlatformController>((ref) {
+      final controller = HavenSystemAssistantApplePlatformController(
+        backend: ref.watch(havenSystemAssistantApplePlatformBackendProvider),
+        inbox: ref.read(havenSystemIntentInboxProvider),
+      );
+      ref.onDispose(controller.dispose);
+      return controller;
+    }, name: 'havenSystemAssistantApplePlatformControllerProvider');
 
 final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(
   (ref) => FocusProfileService(),

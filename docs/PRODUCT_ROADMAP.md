@@ -70,7 +70,7 @@ Every future phase must preserve these rules:
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Sixteen reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, Dutch, Indonesian, Turkish, Swedish, Norwegian Bokmål, Danish, and Finnish; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. The six Google-assisted draft locales retain independent private fluent reviews, anonymous validation records, zero content-safety issues across 5,880 messages, and exact reviewed-to-runtime locks; provider output itself granted no approval or runtime authority. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, screen-reader, right-to-left, store promotion, and country distribution behind their separate gates. |
-| Siri, Shortcuts, and Android App Actions | Reviewed app host shipped; native adapters disabled | Phases 217A–217C define five text-free, replay-bounded drafts, one fresh-state two-minute review bridge, and a one-shot accessible card. Phase 217D adds 165 independently reviewed decisions to all seventeen runtime catalogs and one memory-only app-level host that settles only through the Haven Action Engine. No Apple or Android registration exists. | Review one platform adapter at a time without broadening the five-route allowlist, persisting requests, or bypassing in-app confirmation. |
+| Siri, Shortcuts, and Android App Actions | Apple ingress foundation active; public native registration disabled | Phases 217A–217C define five text-free, replay-bounded drafts, one fresh-state two-minute review bridge, and a one-shot accessible card. Phase 217D adds 165 independently reviewed decisions to all seventeen runtime catalogs and one memory-only app-level host. Phase 217E adds a private, single-slot Apple-to-Flutter delivery seam without declaring an App Intent or Shortcut. | Review and localize Apple-native discovery copy before registration; keep Android separate and preserve in-app confirmation. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
 | Focus Score | Replaced | FocusHaven intentionally avoids a productivity score. | If a summary is useful, design **Haven Momentum** as non-punitive, explainable, private, and never competitive. |
@@ -681,8 +681,8 @@ Publish the proven safe subset through Siri/App Intents, Shortcuts, and Android
 App Actions. System assistants receive bounded action parameters, not coaching
 history or arbitrary private text.
 
-Status: Phase 217D reviewed production localization and app-level host active;
-Apple and Android platform adapters remain disabled.
+Status: Phase 217E private Apple ingress foundation active; public Apple and
+Android system-assistant registration remains disabled.
 
 Phase 217A defines exactly five structured request kinds: read timer status,
 start a Focus timer, pause, resume, and open Focus Queue. A request contains
@@ -789,6 +789,28 @@ Settlement still requires the exact in-app Confirm action and existing Haven
 Action Engine. No Siri/App Intent, Shortcut, Android App Action, permission,
 entitlement, manifest entry, deep link, or platform dependency is registered.
 Apple and Android adapters remain separate future gates.
+
+Phase 217E adds one Apple-only native ingress seam without publishing an Apple
+system-assistant capability. The native and Dart transports accept exactly the
+Phase 217A schema version, opaque invocation ID, and five-route enum. Both
+sides reject added fields, invalid IDs, unsupported routes, and free-form
+parameters. A single native request is held only in process memory, a second
+request is rejected, and the first is cleared only after the existing Flutter
+inbox acknowledges that exact request.
+
+The iOS lifecycle host asks for delivery only after Flutter has installed its
+handler and when the app resumes. An accepted request terminates at the Phase
+217D inbox; all preparation, fresh-state review, expiry, confirmation, policy,
+and execution ownership remains in the existing Dart path. The native seam
+cannot read or change timer or queue state and cannot claim success.
+
+Phase 217E adds no App Intents framework import, App Intent conformance, App
+Shortcut provider, Siri entitlement or usage description, native public copy,
+deep link, dependency, Android manifest entry, persistence, provider, network,
+or AI path. Apple-native discovery copy, fifteen-language review,
+availability-gated registration, signed builds, real-device Siri/Shortcuts and
+VoiceOver checks, store disclosure review, and distribution authorization stay
+closed. Android remains a separate later adapter and release gate.
 
 ### Phase 218 — Soundscapes and focus environments
 
