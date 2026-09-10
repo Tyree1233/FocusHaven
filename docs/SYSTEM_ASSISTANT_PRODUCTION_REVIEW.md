@@ -1,8 +1,9 @@
 # System assistant production review gate
 
-Status: Phase 217E private Apple ingress foundation active; all seventeen
-runtime catalogs and the app-level review host are enabled, while public Apple
-and Android system-assistant registration remains disabled.
+Status: Phase 217F Apple-native English copy and fifteen-language review
+foundation active; all seventeen Flutter runtime catalogs and the app-level
+review host are enabled, while public Apple and Android system-assistant
+registration remains disabled.
 
 ## Purpose
 
@@ -128,3 +129,12 @@ enter the existing memory inbox, but no Siri or Shortcuts capability is
 declared and no unreviewed native copy is exposed. Public Apple registration,
 native-copy localization, real-device acceptance, signed release validation,
 store review, and distribution remain separate gates. Android is unchanged.
+
+Phase 217F locks that Apple-native copy as a separate twenty-eight-message
+English proposal and fifteen-language incremental-review manifest. It remains
+outside every Flutter runtime catalog and every Runner source. The five
+invocation phrases use only the `applicationName` placeholder; all native
+outcomes preserve the truth that submission is not confirmation and no action
+has run. Approval may later authorize an exact Apple string-catalog transform,
+but cannot register an App Intent, publish a Shortcut, add a Siri entitlement,
+execute a Haven Action, authorize Android, or release a build.

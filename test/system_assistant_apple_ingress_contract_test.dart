@@ -88,6 +88,9 @@ void main() {
       ),
     );
     expect(review, contains('independent fifteen-language review'));
+    expect(review, contains('twenty-eight complete messages'));
+    expect(review, contains('not imported by Runner'));
+    expect(review, contains('No provider draft, CSV, workbook'));
   });
 
   test('production wiring terminates at the existing review inbox', () {

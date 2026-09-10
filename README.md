@@ -876,6 +876,25 @@ registration, signed builds, real-device Siri/Shortcuts and VoiceOver checks,
 store review, or distribution. Android App Actions remain unchanged and
 separate.
 
+Phase 217F adds the closed **Apple system-assistant native copy review
+foundation** without registering a native action. One isolated English
+proposal locks twenty-eight complete messages: discovery and privacy copy,
+five route titles, five route descriptions, five invocation phrases, six
+truthful handoff or failure outcomes, and two accessibility labels. Each phrase
+contains only the `applicationName` placeholder, every route asks the person to
+review the request in FocusHaven, and no result claims that a timer or queue
+action already happened.
+
+The reusable incremental-review workflow locks fifteen independent language
+reviews plus the later reviewed Brazilian-Portuguese-to-base-Portuguese
+derivation. Existing Flutter runtime catalog hashes are freshness locks only:
+this Apple-native copy is not Flutter runtime content and must never be merged
+into those ARB catalogs. The foundation creates no provider configuration,
+translation draft, review workbook, approval, Apple string catalog, native
+copy accessor, App Intent, App Shortcut, Siri entitlement, production
+consumer, or public registration. Those remain separately verified and
+explicitly authorized later gates.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

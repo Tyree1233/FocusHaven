@@ -139,6 +139,20 @@ all production languages. App Intent and App Shortcut declarations, Siri
 entitlements, real-device invocation, store disclosure, and distribution stay
 closed. Android App Actions remain a separate later gate.
 
+Phase 217F isolates the complete English proposal for those native Apple
+strings without exposing them. Every invocation phrase asks to review one of
+the five allowlisted routes and accepts only the application name placeholder.
+The privacy copy states that only the action type and a private request code
+enter FocusHaven; the parameter copy rejects time, task, and queue details.
+Handoff and accessibility results say that review is required and no action has
+run. They cannot represent a spoken acknowledgement as consent.
+
+Fifteen independent language approvals are required before an Apple string
+catalog may be built. Copy approval alone grants no App Intent, Shortcut, Siri,
+timer, queue, confirmation, execution, deployment, publication, or phone
+authority. Public native registration, real-device accessibility and assistant
+checks, signed validation, store review, and distribution remain separate.
+
 ### Eligible through the shared typed-and-voice policy
 
 - read the current timer status;

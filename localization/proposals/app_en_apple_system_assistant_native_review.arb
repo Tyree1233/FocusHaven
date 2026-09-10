@@ -1,0 +1,145 @@
+{
+  "@@locale": "en",
+  "appleSystemAssistantNativeCollectionTitle": "FocusHaven requests",
+  "@appleSystemAssistantNativeCollectionTitle": {
+    "description": "Short collection title for the future reviewed FocusHaven shortcuts offered by Apple system surfaces."
+  },
+  "appleSystemAssistantNativeDiscoveryDescription": "Prepare a supported FocusHaven request for review in the app.",
+  "@appleSystemAssistantNativeDiscoveryDescription": {
+    "description": "Discovery description stating that a native request is prepared for later in-app review rather than executed."
+  },
+  "appleSystemAssistantNativePrivacySummary": "Only the action type and a private request code enter FocusHaven. No transcript or private content is included.",
+  "@appleSystemAssistantNativePrivacySummary": {
+    "description": "Native privacy summary for the exact text-free Apple-to-FocusHaven request boundary."
+  },
+  "appleSystemAssistantNativeNoParametersSummary": "No time, task, or queue details can be added to this request.",
+  "@appleSystemAssistantNativeNoParametersSummary": {
+    "description": "Disclosure that the five supported native routes accept no free-form or action-specific parameter."
+  },
+  "appleSystemAssistantNativeReviewInstruction": "Open FocusHaven, review the exact effect, then choose Confirm action or Dismiss request.",
+  "@appleSystemAssistantNativeReviewInstruction": {
+    "description": "Instruction requiring the existing in-app review and one explicit app choice before any action can execute."
+  },
+  "appleSystemAssistantNativeReadTimerStatusTitle": "Check Focus timer status",
+  "@appleSystemAssistantNativeReadTimerStatusTitle": {
+    "description": "Short native title for preparing the read-timer-status request."
+  },
+  "appleSystemAssistantNativeReadTimerStatusDescription": "Prepare a request to review the current Focus timer status in FocusHaven.",
+  "@appleSystemAssistantNativeReadTimerStatusDescription": {
+    "description": "Complete native description for the read-timer-status route without claiming the status has been read."
+  },
+  "appleSystemAssistantNativeReadTimerStatusPhrase": "Review my Focus timer status in {applicationName}",
+  "@appleSystemAssistantNativeReadTimerStatusPhrase": {
+    "description": "Future Apple invocation phrase for preparing a read-timer-status request for in-app review.",
+    "placeholders": {
+      "applicationName": {
+        "type": "String",
+        "example": "FocusHaven"
+      }
+    }
+  },
+  "appleSystemAssistantNativeStartFocusTimerTitle": "Start Focus timer",
+  "@appleSystemAssistantNativeStartFocusTimerTitle": {
+    "description": "Short native title for preparing the parameter-free start-Focus-timer request."
+  },
+  "appleSystemAssistantNativeStartFocusTimerDescription": "Prepare a request to review starting the ready Focus session in FocusHaven.",
+  "@appleSystemAssistantNativeStartFocusTimerDescription": {
+    "description": "Complete native description for starting only the ready Focus session after in-app review."
+  },
+  "appleSystemAssistantNativeStartFocusTimerPhrase": "Review starting a Focus timer in {applicationName}",
+  "@appleSystemAssistantNativeStartFocusTimerPhrase": {
+    "description": "Future Apple invocation phrase for preparing the parameter-free start-Focus-timer request.",
+    "placeholders": {
+      "applicationName": {
+        "type": "String",
+        "example": "FocusHaven"
+      }
+    }
+  },
+  "appleSystemAssistantNativePauseTimerTitle": "Pause Focus timer",
+  "@appleSystemAssistantNativePauseTimerTitle": {
+    "description": "Short native title for preparing the pause-timer request."
+  },
+  "appleSystemAssistantNativePauseTimerDescription": "Prepare a request to review pausing the current Focus timer in FocusHaven.",
+  "@appleSystemAssistantNativePauseTimerDescription": {
+    "description": "Complete native description for pausing the current Focus timer only after in-app review."
+  },
+  "appleSystemAssistantNativePauseTimerPhrase": "Review pausing my Focus timer in {applicationName}",
+  "@appleSystemAssistantNativePauseTimerPhrase": {
+    "description": "Future Apple invocation phrase for preparing a pause-timer request for in-app review.",
+    "placeholders": {
+      "applicationName": {
+        "type": "String",
+        "example": "FocusHaven"
+      }
+    }
+  },
+  "appleSystemAssistantNativeResumeTimerTitle": "Resume Focus timer",
+  "@appleSystemAssistantNativeResumeTimerTitle": {
+    "description": "Short native title for preparing the resume-timer request."
+  },
+  "appleSystemAssistantNativeResumeTimerDescription": "Prepare a request to review resuming the paused Focus timer in FocusHaven.",
+  "@appleSystemAssistantNativeResumeTimerDescription": {
+    "description": "Complete native description for resuming a paused Focus timer only after in-app review."
+  },
+  "appleSystemAssistantNativeResumeTimerPhrase": "Review resuming my Focus timer in {applicationName}",
+  "@appleSystemAssistantNativeResumeTimerPhrase": {
+    "description": "Future Apple invocation phrase for preparing a resume-timer request for in-app review.",
+    "placeholders": {
+      "applicationName": {
+        "type": "String",
+        "example": "FocusHaven"
+      }
+    }
+  },
+  "appleSystemAssistantNativeOpenFocusQueueTitle": "Open Focus Queue",
+  "@appleSystemAssistantNativeOpenFocusQueueTitle": {
+    "description": "Short native title for preparing the open-Focus-Queue request."
+  },
+  "appleSystemAssistantNativeOpenFocusQueueDescription": "Prepare a request to review opening Focus Queue in FocusHaven.",
+  "@appleSystemAssistantNativeOpenFocusQueueDescription": {
+    "description": "Complete native description for opening Focus Queue only after in-app review."
+  },
+  "appleSystemAssistantNativeOpenFocusQueuePhrase": "Review opening Focus Queue in {applicationName}",
+  "@appleSystemAssistantNativeOpenFocusQueuePhrase": {
+    "description": "Future Apple invocation phrase for preparing the open-Focus-Queue request for in-app review.",
+    "placeholders": {
+      "applicationName": {
+        "type": "String",
+        "example": "FocusHaven"
+      }
+    }
+  },
+  "appleSystemAssistantNativeReviewRequiredResult": "Open FocusHaven to review this request. Nothing has happened yet.",
+  "@appleSystemAssistantNativeReviewRequiredResult": {
+    "description": "Truthful native handoff result after one request is queued without claiming that its action executed."
+  },
+  "appleSystemAssistantNativePendingRequestResult": "FocusHaven already has a request waiting. Open the app to review or dismiss it before trying again.",
+  "@appleSystemAssistantNativePendingRequestResult": {
+    "description": "Truthful native result when the single process-memory request slot is already occupied."
+  },
+  "appleSystemAssistantNativeUnavailableResult": "This FocusHaven request is unavailable. Nothing changed.",
+  "@appleSystemAssistantNativeUnavailableResult": {
+    "description": "Fail-closed native result when the route or app handoff is unavailable."
+  },
+  "appleSystemAssistantNativeCancelledResult": "Request cancelled. FocusHaven did not change your timer or queue.",
+  "@appleSystemAssistantNativeCancelledResult": {
+    "description": "Truthful native cancellation result that explicitly denies timer or queue mutation."
+  },
+  "appleSystemAssistantNativeExpiredResult": "This request expired before confirmation. FocusHaven did not change your timer or queue.",
+  "@appleSystemAssistantNativeExpiredResult": {
+    "description": "Truthful expiration result for a request that never received in-app confirmation."
+  },
+  "appleSystemAssistantNativeRejectedResult": "FocusHaven could not accept this request. Nothing changed.",
+  "@appleSystemAssistantNativeRejectedResult": {
+    "description": "Fail-closed native result for a malformed, unsupported, or otherwise rejected request."
+  },
+  "appleSystemAssistantNativeReviewRequiredAccessibilityLabel": "FocusHaven request ready for review. No action has run.",
+  "@appleSystemAssistantNativeReviewRequiredAccessibilityLabel": {
+    "description": "Complete VoiceOver label for a native handoff that is waiting for explicit in-app review."
+  },
+  "appleSystemAssistantNativePendingRequestAccessibilityLabel": "Another FocusHaven request is waiting for review.",
+  "@appleSystemAssistantNativePendingRequestAccessibilityLabel": {
+    "description": "Complete VoiceOver label for the occupied single-request state."
+  }
+}

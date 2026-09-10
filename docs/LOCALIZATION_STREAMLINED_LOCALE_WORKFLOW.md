@@ -233,6 +233,26 @@ every private draft, returned workbook, completed CSV, approved delta, and
 anonymous validation unchanged. Apple and Android native registration remain
 separate release gates.
 
+### Apple-native system-assistant copy delta
+
+Phase 217F reuses the same bounded manifest, preflight, private CSV, workbook,
+and approval contracts for twenty-eight complete Apple-native messages. The
+fifteen independent review targets and Japanese/Korean font-coverage gates are
+unchanged, and base `pt` may be derived only from fully reviewed `pt-BR`.
+
+This source is **not Flutter runtime content**. Runtime ARB digests in the
+manifest are freshness locks for the exact active language set; prepared or
+approved Apple-native keys must never be merged into those catalogs. A later
+Apple-only integration must transform all approved values into a native string
+catalog under an exact key and placeholder map. Until that separately verified
+integration, public App Intent registration stays closed.
+
+The foundation does not contact a provider or create a configuration, draft,
+CSV, real workbook, completed review, approval, Apple string catalog, native
+copy accessor, production consumer, App Intent, Shortcut, entitlement, or
+release artifact. Provider-assisted drafting and every resulting review remain
+separately authorized private operations.
+
 ### Google-assisted incremental drafts
 
 `tool/localization_google_incremental_drafts.dart` applies the established

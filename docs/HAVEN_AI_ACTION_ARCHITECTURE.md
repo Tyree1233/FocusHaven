@@ -804,3 +804,33 @@ registration is added. Public Apple discovery and invocation must wait for a
 separate complete-copy and fifteen-language review, availability-gated iOS
 registration, real-device Siri/Shortcuts and VoiceOver acceptance, signed
 release builds, store review, and explicit distribution approval.
+
+## Phase 217F locked Apple-native assistant copy
+
+Phase 217F isolates twenty-eight complete English messages for a future Apple
+native discovery surface. The set contains one collection title, one discovery
+description, privacy and no-parameter summaries, one review instruction, five
+route titles, five route descriptions, five invocation phrases, six truthful
+handoff or failure outcomes, and two accessibility labels. Invocation phrases
+carry only one `applicationName` string placeholder. There is no duration,
+task, queue-item, transcript, utterance, account, or other free-form input.
+
+Every route asks to prepare or review a request. Native handoff says only that
+FocusHaven must be opened for review and that nothing has happened yet. The
+copy never converts submission, Siri dialogue, a timeout, a cancellation, or a
+system acknowledgement into confirmation or successful execution.
+
+Fifteen independent fluent reviews are required. Base Portuguese may be
+derived only from the completely approved Brazilian Portuguese delta. The
+existing Flutter runtime-catalog digests are freshness locks, not destinations:
+the Apple-native messages must never enter Flutter ARBs. A later integration
+may map approved values into an Apple string catalog while preserving exact
+keys and placeholders.
+
+Phase 217F adds no Runner source, native accessor, Apple string catalog, App
+Intent, App Shortcut provider, Siri entitlement, dependency, permission,
+platform registration, production consumer, or execution path. Public Apple
+registration, real-device acceptance, signed builds, store review, and
+distribution remain separately reviewed and authorized. Android stays a
+separate adapter and release gate, and copy approval alone grants no App Intent,
+Shortcut, Siri, Android, execution, publication, or distribution authority.

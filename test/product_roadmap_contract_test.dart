@@ -36,7 +36,7 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Apple ingress foundation active; public native registration disabled |',
+          'Apple native copy review foundation active; public native registration disabled |',
     ]) {
       expect(
         roadmap,
@@ -110,6 +110,7 @@ void main() {
     expect(readme, contains('system-assistant in-app review bridge'));
     expect(readme, contains('Every one of the five routes requires'));
     expect(readme, contains('Apple system-assistant ingress foundation'));
+    expect(readme, contains('Apple system-assistant native copy review'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -269,6 +270,10 @@ void main() {
       'rejects a second pending request',
       'Siri/App Intent, Shortcut, Android App Action',
       'cannot register a platform request or bypass exact in-app confirmation',
+      'Phase 217F locked Apple-native assistant copy',
+      'twenty-eight complete English messages',
+      'must never enter Flutter ARBs',
+      'copy approval alone grants no App Intent',
     ]) {
       expect(architecture, contains(required));
     }

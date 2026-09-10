@@ -1,7 +1,8 @@
 # Apple system-assistant ingress review gate
 
-Status: Phase 217E private Apple ingress foundation active; public Siri,
-App Intent, and App Shortcut registration disabled.
+Status: Phase 217F Apple-native English copy and fifteen-language review
+foundation active; public Siri, App Intent, and App Shortcut registration
+disabled.
 
 ## Purpose
 
@@ -79,3 +80,25 @@ Before public Apple registration, a separate phase must:
 
 Apple registration cannot authorize Android registration. Android App Actions
 remain a separate later adapter, copy, test, and release gate.
+
+## Phase 217F native-copy review foundation
+
+Phase 217F completes the first two preparation steps without opening the third.
+The isolated English proposal in
+`localization/proposals/app_en_apple_system_assistant_native_review.arb`
+contains exactly twenty-eight complete messages and metadata records. The
+external incremental-review manifest locks fifteen independent fluent reviews,
+Japanese and Korean font-coverage gates, and one later derivation from approved
+Brazilian Portuguese to base Portuguese.
+
+The proposal is not imported by Runner, copied into Swift, or merged into the
+Flutter runtime catalogs. Existing runtime-catalog hashes are only freshness
+locks for the supported-language set. No provider draft, CSV, workbook,
+approval, Apple string catalog, App Intent, App Shortcut provider, Siri
+entitlement, or native public copy is created by this foundation.
+
+Public registration remains a later Apple-only integration. It must consume
+only all-language approved native copy, preserve the Phase 217E three-field
+request and the in-app confirmation boundary, remain availability-gated above
+iOS 15, and pass real-device Siri, Shortcuts, large-text, and VoiceOver review.
+The independent fifteen-language review grants no Android or release authority.
