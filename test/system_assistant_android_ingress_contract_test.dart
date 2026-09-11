@@ -123,17 +123,20 @@ void main() {
   );
 
   test('Apple registration and all localization catalogs stay unchanged', () {
-    final status = Process.runSync('git', [
-      'diff',
-      '--name-only',
-      '3f7c8e1b6502d180c4b55a794dbdd29fb596341e',
-      '--',
-      'ios',
-      'lib/l10n',
-      'localization',
-    ]);
-    expect(status.exitCode, 0);
-    expect((status.stdout as String).trim(), isEmpty);
+    const unchangedSubtrees = <String, String>{
+      'ios': 'f7e23f4aa168c7ed57b3ba7198fe963abd37c064',
+      'lib/l10n': 'aa4f2428f72e9a226290de58fd9df89f651a0ba5',
+      'localization': 'ce1465a8184e13b5bbcaf4a38e3e678de2be7413',
+    };
+
+    for (final subtree in unchangedSubtrees.entries) {
+      final status = Process.runSync('git', [
+        'rev-parse',
+        'HEAD:${subtree.key}',
+      ]);
+      expect(status.exitCode, 0, reason: (status.stderr as String).trim());
+      expect((status.stdout as String).trim(), subtree.value);
+    }
   });
 }
 
