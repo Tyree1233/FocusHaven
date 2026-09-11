@@ -189,6 +189,22 @@ permission, persistence, provider, or execution route. Android copy review,
 registration, Assistant/device testing, signed validation, Play disclosure,
 and distribution remain separate closed gates.
 
+Phase 217I isolates the complete English proposal for Android-native strings
+without exposing them. Every long label and invocation example asks to review
+one of the five allowlisted routes and accepts no placeholder or parameter.
+The privacy copy states that only the action type and a private request code
+enter FocusHaven; the parameter copy rejects time, task, and queue details.
+Handoff and TalkBack results say that review is required and no action has run.
+They cannot represent an Assistant acknowledgement as consent.
+
+Fifteen independent language approvals are required before Android string
+resources may be built. Copy approval alone grants no `shortcuts.xml`,
+capability, query pattern, manifest entry, App Action, timer, queue,
+confirmation, execution, deployment, publication, or phone authority. Public
+registration, official Assistant preview, real-device accessibility and
+language checks, signed validation, Play review, and distribution remain
+separate.
+
 ### Eligible through the shared typed-and-voice policy
 
 - read the current timer status;

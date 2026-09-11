@@ -914,3 +914,36 @@ network, AI, or action-execution path. Android-native copy review, capability
 mapping, official Assistant preview and real-device validation, TalkBack and
 large-text review, signed release builds, Play disclosure review, candidate
 validation, and distribution remain separately authorized gates.
+
+## Phase 217I locked Android-native assistant copy
+
+Phase 217I isolates twenty-eight complete English messages for a future Android
+native discovery surface. The set contains one collection title, one discovery
+description, privacy and no-parameter summaries, one review instruction, five
+short labels, five long labels, five invocation examples, six truthful handoff
+or failure outcomes, and two TalkBack labels. The proposal contains no
+placeholder, duration, task, queue-item, transcript, utterance, account, or
+other free-form input.
+
+Every long label and invocation example asks to review a request. Native
+handoff says only that FocusHaven must be opened for review and that nothing
+has happened yet. The copy never converts submission, Assistant dialogue, a
+timeout, a cancellation, or a system acknowledgement into confirmation or
+successful execution.
+
+Android App Actions distinguish built-in intent models from custom-intent
+query patterns. Phase 217I selects neither and creates no query-pattern
+resource. Fifteen independent fluent reviews are required before a later
+Android-only integration may map approved values into string resources. Base
+Portuguese may be derived only from the completely approved Brazilian
+Portuguese delta. Flutter runtime-catalog digests are freshness locks, not
+destinations; the Android-native messages must never enter Flutter ARBs.
+
+Phase 217I adds no Android resource, copy accessor, `shortcuts.xml`, capability,
+query pattern, manifest metadata, fulfillment intent, deep link, dependency,
+permission, public registration, production consumer, or execution path.
+Official Assistant preview, real-device accessibility and language checks,
+signed builds, Play disclosure review, candidate validation, and distribution
+remain separately reviewed and authorized. Apple approval cannot authorize
+Android, and copy approval alone grants no App Action, Assistant, execution,
+publication, or distribution authority.

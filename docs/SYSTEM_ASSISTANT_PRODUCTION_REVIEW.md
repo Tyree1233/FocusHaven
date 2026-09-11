@@ -2,8 +2,8 @@
 
 Status: Phase 217G availability-gated Apple review registration active on iOS
 16 and later; all seventeen Flutter runtime catalogs and the app-level review
-host are enabled; Phase 217H private Android ingress is active; execution,
-release, and public Android registration remain closed.
+host are enabled; Phase 217I Android-native copy review foundation is active;
+execution, release, and public Android registration remain closed.
 
 ## Purpose
 
@@ -173,3 +173,13 @@ Android-native discovery copy, fifteen-language review, exact capability
 mapping, official Assistant preview, real-device TalkBack and large-text
 testing, signed builds, Play disclosure review, candidate validation, and
 distribution authorization remain separate closed gates.
+
+Phase 217I locks that Android-native copy as a separate twenty-eight-message
+English proposal and fifteen-language incremental-review manifest. It remains
+outside every Flutter runtime catalog and every Android resource. The five
+invocation examples contain no placeholder or parameter; all native outcomes
+preserve the truth that submission is not confirmation and no action has run.
+Approval may later authorize an exact Android string-resource transform, but
+cannot create `shortcuts.xml`, choose a built-in or custom intent, publish an
+App Action, add manifest metadata, execute a Haven Action, authorize Apple, or
+release a build.

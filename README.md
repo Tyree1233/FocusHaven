@@ -937,6 +937,24 @@ review, public registration, real-device Assistant and TalkBack checks, signed
 builds, Play disclosure review, candidate validation, and distribution remain
 separate gates.
 
+Phase 217I adds the closed **Android system-assistant native copy review
+foundation** without registering an App Action. One isolated English proposal
+locks twenty-eight complete messages: discovery and privacy copy, five short
+labels, five long labels, five review-only invocation examples, six truthful
+handoff or failure outcomes, and two TalkBack labels. The proposal contains no
+placeholder or parameter, every route asks the person to review the request,
+and no result claims that a timer or queue action already happened.
+
+The reusable incremental-review workflow locks fifteen independent language
+reviews plus later reviewed Brazilian-Portuguese-to-base-Portuguese derivation.
+Existing Flutter runtime-catalog hashes are freshness locks only: this
+Android-native copy is not Flutter runtime content and must never be merged
+into those ARB catalogs. The foundation creates no provider configuration,
+translation draft, review workbook, approval, Android string resource,
+`shortcuts.xml`, capability, query pattern, manifest metadata, production
+consumer, or public registration. Those remain separately verified and
+explicitly authorized later gates.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

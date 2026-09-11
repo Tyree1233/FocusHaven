@@ -253,6 +253,26 @@ copy accessor, production consumer, App Intent, Shortcut, entitlement, or
 release artifact. Provider-assisted drafting and every resulting review remain
 separately authorized private operations.
 
+### Android-native system-assistant copy delta
+
+Phase 217I reuses the same bounded manifest, preflight, private CSV, workbook,
+and approval contracts for twenty-eight complete Android-native messages. The
+fifteen independent review targets and Japanese/Korean font-coverage gates are
+unchanged, and base `pt` may be derived only from fully reviewed `pt-BR`.
+
+This source is **not Flutter runtime content**. Runtime ARB digests in the
+manifest are freshness locks for the exact active language set; prepared or
+approved Android-native keys must never be merged into those catalogs. A later
+Android-only integration must transform all approved values into native string
+resources under an exact, placeholder-free key map. Until that separately
+verified integration, public App Actions registration stays closed.
+
+The foundation does not contact a provider or create a configuration, draft,
+CSV, real workbook, completed review, approval, Android string resource,
+native copy accessor, production consumer, `shortcuts.xml`, capability, query
+pattern, manifest metadata, or release artifact. Provider-assisted drafting
+and every resulting review remain separately authorized private operations.
+
 ### Google-assisted incremental drafts
 
 `tool/localization_google_incremental_drafts.dart` applies the established

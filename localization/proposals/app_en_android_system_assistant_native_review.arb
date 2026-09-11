@@ -1,0 +1,115 @@
+{
+  "@@locale": "en",
+  "androidSystemAssistantNativeCollectionTitle": "FocusHaven requests",
+  "@androidSystemAssistantNativeCollectionTitle": {
+    "description": "Short collection title for future reviewed FocusHaven actions offered by Android system surfaces."
+  },
+  "androidSystemAssistantNativeDiscoveryDescription": "Prepare a supported FocusHaven request for review in the app.",
+  "@androidSystemAssistantNativeDiscoveryDescription": {
+    "description": "Discovery description stating that an Android request is prepared for later in-app review rather than executed."
+  },
+  "androidSystemAssistantNativePrivacySummary": "Only the action type and a private request code enter FocusHaven. No transcript or private content is included.",
+  "@androidSystemAssistantNativePrivacySummary": {
+    "description": "Native privacy summary for the exact text-free Android-to-FocusHaven request boundary."
+  },
+  "androidSystemAssistantNativeNoParametersSummary": "No time, task, or queue details can be added to this request.",
+  "@androidSystemAssistantNativeNoParametersSummary": {
+    "description": "Disclosure that the five supported Android routes accept no free-form or action-specific parameter."
+  },
+  "androidSystemAssistantNativeReviewInstruction": "Open FocusHaven, review the exact effect, then choose Confirm action or Dismiss request.",
+  "@androidSystemAssistantNativeReviewInstruction": {
+    "description": "Instruction requiring the existing in-app review and one explicit app choice before any action can execute."
+  },
+  "androidSystemAssistantNativeReadTimerStatusShortLabel": "Check Focus timer",
+  "@androidSystemAssistantNativeReadTimerStatusShortLabel": {
+    "description": "Brief Android shortcut label for preparing the read-timer-status request."
+  },
+  "androidSystemAssistantNativeReadTimerStatusLongLabel": "Review current Focus timer status",
+  "@androidSystemAssistantNativeReadTimerStatusLongLabel": {
+    "description": "Complete Android shortcut label for reviewing the current Focus timer status without claiming it was read."
+  },
+  "androidSystemAssistantNativeReadTimerStatusInvocationExample": "Review my Focus timer status",
+  "@androidSystemAssistantNativeReadTimerStatusInvocationExample": {
+    "description": "Parameter-free example of requesting the read-timer-status route for later in-app review."
+  },
+  "androidSystemAssistantNativeStartFocusTimerShortLabel": "Start Focus timer",
+  "@androidSystemAssistantNativeStartFocusTimerShortLabel": {
+    "description": "Brief Android shortcut label for preparing the parameter-free start-Focus-timer request."
+  },
+  "androidSystemAssistantNativeStartFocusTimerLongLabel": "Review starting the ready Focus session",
+  "@androidSystemAssistantNativeStartFocusTimerLongLabel": {
+    "description": "Complete Android shortcut label for starting only the ready Focus session after in-app review."
+  },
+  "androidSystemAssistantNativeStartFocusTimerInvocationExample": "Review starting a Focus timer",
+  "@androidSystemAssistantNativeStartFocusTimerInvocationExample": {
+    "description": "Parameter-free example of requesting the start-Focus-timer route for later in-app review."
+  },
+  "androidSystemAssistantNativePauseTimerShortLabel": "Pause Focus timer",
+  "@androidSystemAssistantNativePauseTimerShortLabel": {
+    "description": "Brief Android shortcut label for preparing the pause-timer request."
+  },
+  "androidSystemAssistantNativePauseTimerLongLabel": "Review pausing the current Focus timer",
+  "@androidSystemAssistantNativePauseTimerLongLabel": {
+    "description": "Complete Android shortcut label for pausing the current Focus timer only after in-app review."
+  },
+  "androidSystemAssistantNativePauseTimerInvocationExample": "Review pausing my Focus timer",
+  "@androidSystemAssistantNativePauseTimerInvocationExample": {
+    "description": "Parameter-free example of requesting the pause-timer route for later in-app review."
+  },
+  "androidSystemAssistantNativeResumeTimerShortLabel": "Resume Focus timer",
+  "@androidSystemAssistantNativeResumeTimerShortLabel": {
+    "description": "Brief Android shortcut label for preparing the resume-timer request."
+  },
+  "androidSystemAssistantNativeResumeTimerLongLabel": "Review resuming the paused Focus timer",
+  "@androidSystemAssistantNativeResumeTimerLongLabel": {
+    "description": "Complete Android shortcut label for resuming a paused Focus timer only after in-app review."
+  },
+  "androidSystemAssistantNativeResumeTimerInvocationExample": "Review resuming my Focus timer",
+  "@androidSystemAssistantNativeResumeTimerInvocationExample": {
+    "description": "Parameter-free example of requesting the resume-timer route for later in-app review."
+  },
+  "androidSystemAssistantNativeOpenFocusQueueShortLabel": "Open Focus Queue",
+  "@androidSystemAssistantNativeOpenFocusQueueShortLabel": {
+    "description": "Brief Android shortcut label for preparing the open-Focus-Queue request."
+  },
+  "androidSystemAssistantNativeOpenFocusQueueLongLabel": "Review opening Focus Queue",
+  "@androidSystemAssistantNativeOpenFocusQueueLongLabel": {
+    "description": "Complete Android shortcut label for opening Focus Queue only after in-app review."
+  },
+  "androidSystemAssistantNativeOpenFocusQueueInvocationExample": "Review opening Focus Queue",
+  "@androidSystemAssistantNativeOpenFocusQueueInvocationExample": {
+    "description": "Parameter-free example of requesting the open-Focus-Queue route for later in-app review."
+  },
+  "androidSystemAssistantNativeReviewRequiredResult": "Open FocusHaven to review this request. Nothing has happened yet.",
+  "@androidSystemAssistantNativeReviewRequiredResult": {
+    "description": "Truthful Android handoff result after one request is queued without claiming that its action executed."
+  },
+  "androidSystemAssistantNativePendingRequestResult": "FocusHaven already has a request waiting. Open the app to review or dismiss it before trying again.",
+  "@androidSystemAssistantNativePendingRequestResult": {
+    "description": "Truthful Android result when the single process-memory request slot is already occupied."
+  },
+  "androidSystemAssistantNativeUnavailableResult": "This FocusHaven request is unavailable. Nothing changed.",
+  "@androidSystemAssistantNativeUnavailableResult": {
+    "description": "Fail-closed Android result when the route or app handoff is unavailable."
+  },
+  "androidSystemAssistantNativeCancelledResult": "Request cancelled. FocusHaven did not change your timer or queue.",
+  "@androidSystemAssistantNativeCancelledResult": {
+    "description": "Truthful Android cancellation result that explicitly denies timer or queue mutation."
+  },
+  "androidSystemAssistantNativeExpiredResult": "This request expired before confirmation. FocusHaven did not change your timer or queue.",
+  "@androidSystemAssistantNativeExpiredResult": {
+    "description": "Truthful expiration result for a request that never received in-app confirmation."
+  },
+  "androidSystemAssistantNativeRejectedResult": "FocusHaven could not accept this request. Nothing changed.",
+  "@androidSystemAssistantNativeRejectedResult": {
+    "description": "Fail-closed Android result for a malformed, unsupported, or otherwise rejected request."
+  },
+  "androidSystemAssistantNativeReviewRequiredAccessibilityLabel": "FocusHaven request ready for review. No action has run.",
+  "@androidSystemAssistantNativeReviewRequiredAccessibilityLabel": {
+    "description": "Complete TalkBack label for an Android handoff that is waiting for explicit in-app review."
+  },
+  "androidSystemAssistantNativePendingRequestAccessibilityLabel": "Another FocusHaven request is waiting for review.",
+  "@androidSystemAssistantNativePendingRequestAccessibilityLabel": {
+    "description": "Complete TalkBack label for the occupied single-request state."
+  }
+}

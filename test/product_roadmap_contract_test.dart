@@ -37,7 +37,7 @@ void main() {
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
           'Availability-gated Apple review registration active; '
-          'private Android ingress active |',
+          'Android native copy review foundation active |',
     ]) {
       expect(
         roadmap,
@@ -113,6 +113,7 @@ void main() {
     expect(readme, contains('Apple system-assistant ingress foundation'));
     expect(readme, contains('Apple system-assistant native copy review'));
     expect(readme, contains('Android system-assistant ingress foundation'));
+    expect(readme, contains('Android system-assistant native copy review'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -280,6 +281,10 @@ void main() {
       'Phase 217H private Android system-assistant ingress',
       'opens FocusHaven for the existing in-app review',
       'never confirms or executes an action',
+      'Phase 217I locked Android-native assistant copy',
+      'five invocation examples',
+      'must never enter Flutter ARBs',
+      'copy approval alone grants no App Action',
     ]) {
       expect(architecture, contains(required));
     }

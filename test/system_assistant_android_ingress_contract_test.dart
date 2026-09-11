@@ -119,6 +119,9 @@ void main() {
       expect(review, contains('process memory'));
       expect(review, contains('shortcuts.xml'));
       expect(review, contains('remain closed'));
+      expect(review, contains('twenty-eight complete messages'));
+      expect(review, contains('outside every Flutter runtime catalog'));
+      expect(review, contains('no `res/values` string'));
     },
   );
 
