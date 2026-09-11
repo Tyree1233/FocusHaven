@@ -1,0 +1,3030 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "appleSystemAssistantNativeCancelledResult": {
+      "comment": "Truthful native cancellation result that explicitly denies timer or queue mutation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request cancelled. FocusHaven did not change your timer or queue."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitud cancelada. FocusHaven no modificó su temporizador ni su cola."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requête annulée. FocusHaven n'a pas modifié votre minuteur ni votre file d'attente."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anfrage abgebrochen. FocusHaven hat weder Ihren Timer noch Ihre Warteschlange geändert."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitação cancelada. O FocusHaven não alterou seu temporizador nem sua fila."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitação cancelada. O FocusHaven não alterou seu temporizador nem sua fila."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リクエストはキャンセルされました。FocusHavenはタイマーやキューを変更していません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "요청이 취소되었습니다. FocusHaven은 타이머나 대기열을 변경하지 않았습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesta annullata. FocusHaven non ha modificato il timer o la coda."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prośba anulowana. FocusHaven nie zmienił Twojego timera ani kolejki."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verzoek geannuleerd. FocusHaven heeft uw timer of wachtrij niet gewijzigd."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permintaan dibatalkan. FocusHaven tidak mengubah pengatur waktu atau antrean Anda."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İstek iptal edildi. FocusHaven zamanlayıcınızda veya sıranızda herhangi bir değişiklik yapmadı."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Begäran avbröts. FocusHaven ändrade inte din timer eller kö."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forespørselen ble avbrutt. FocusHaven endret ikke timeren eller køen din."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anmodning annulleret. FocusHaven ændrede ikke din timer eller kø."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pyyntö peruttu. FocusHaven ei muuttanut ajastinta tai jonoa."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeCollectionTitle": {
+      "comment": "Short collection title for the future reviewed FocusHaven shortcuts offered by Apple system surfaces.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven requests"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitudes de FocusHaven"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demandes de FocusHaven"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-Anfragen"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitações da FocusHaven"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitações da FocusHaven"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenのリクエスト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven 요청"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richieste FocusHaven"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prośby FocusHaven"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-verzoeken"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permintaan FocusHaven"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven istekleri"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-förfrågningar"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-forespørsler"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-anmodninger"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-pyynnöt"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeDiscoveryDescription": {
+      "comment": "Discovery description stating that a native request is prepared for later in-app review rather than executed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare a supported FocusHaven request for review in the app."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare una solicitud de FocusHaven compatible para su revisión en la aplicación."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparez une demande FocusHaven prise en charge pour examen dans l'application."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereiten Sie eine unterstützte FocusHaven-Anfrage zur Überprüfung in der App vor."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação FocusHaven compatível para análise no aplicativo."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação FocusHaven compatível para análise no aplicativo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アプリ内で審査を受けるための、サポート対象のFocusHavenリクエストを準備してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱에서 검토할 수 있도록 지원되는 FocusHaven 요청을 준비하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepara una richiesta FocusHaven supportata per la revisione nell'app."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przygotuj obsługiwaną prośbę FocusHaven do przejrzenia w aplikacji."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereid een ondersteund FocusHaven-verzoek voor ter beoordeling in de app."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siapkan permintaan FocusHaven yang didukung untuk ditinjau di dalam aplikasi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulamada incelenmek üzere desteklenen bir FocusHaven talebi hazırlayın."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förbered en FocusHaven-förfrågan som stöds för granskning i appen."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en støttet FocusHaven-forespørsel for gjennomgang i appen."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en understøttet FocusHaven-anmodning til gennemgang i appen."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valmistele tuettu FocusHavenin pyyntö tarkistettavaksi sovelluksessa."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeExpiredResult": {
+      "comment": "Truthful expiration result for a request that never received in-app confirmation.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This request expired before confirmation. FocusHaven did not change your timer or queue."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta solicitud caducó antes de ser confirmada. FocusHaven no modificó su temporizador ni su cola."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette requête a expiré avant confirmation. FocusHaven n'a pas modifié votre minuteur ni votre file d'attente."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Anfrage ist vor der Bestätigung abgelaufen. FocusHaven hat weder Ihren Timer noch Ihre Warteschlange geändert."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta solicitação expirou antes da confirmação. O FocusHaven não alterou seu temporizador ou fila."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta solicitação expirou antes da confirmação. O FocusHaven não alterou seu temporizador ou fila."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリクエストは確認前に期限切れとなりました。FocusHavenはタイマーやキューを変更していません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 요청은 확인 전에 만료되었습니다. FocusHaven은 타이머나 대기열을 변경하지 않았습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La richiesta è scaduta prima della conferma. FocusHaven non ha modificato il timer o la coda."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta prośba wygasła przed potwierdzeniem. FocusHaven nie zmienił Twojego timera ani kolejki."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit verzoek is verlopen voordat het bevestigd kon worden. FocusHaven heeft uw timer of wachtrij niet gewijzigd."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permintaan ini kedaluwarsa sebelum dikonfirmasi. FocusHaven tidak mengubah pengatur waktu atau antrean Anda."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu istek onaylanmadan önce süresi doldu. FocusHaven zamanlayıcınızı veya sıranızı değiştirmedi."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denna begäran upphörde att gälla innan bekräftelse. FocusHaven ändrade inte din timer eller kö."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne forespørselen utløp før bekreftelse. FocusHaven endret ikke timeren eller køen din."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne anmodning udløb før bekræftelse. FocusHaven ændrede ikke din timer eller kø."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä pyyntö vanheni ennen vahvistusta. FocusHaven ei muuttanut ajastinta tai jonoa."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeNoParametersSummary": {
+      "comment": "Disclosure that the five supported native routes accept no free-form or action-specific parameter.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No time, task, or queue details can be added to this request."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pueden añadir detalles de tiempo, tarea o cola a esta solicitud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il est impossible d'ajouter des détails concernant l'heure, la tâche ou la file d'attente à cette requête."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Anfrage können keine Zeit-, Aufgaben- oder Warteschlangendetails hinzugefügt werden."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível adicionar detalhes de tempo, tarefa ou fila a esta solicitação."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível adicionar detalhes de tempo, tarefa ou fila a esta solicitação."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このリクエストには、時間、タスク、キューの詳細を追加することはできません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 요청에는 시간, 작업 또는 대기열 세부 정보를 추가할 수 없습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è possibile aggiungere dettagli relativi a orari, attività o code a questa richiesta."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do tej prośby nie można dodać szczegółów dotyczących czasu, zadania ani kolejki."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aan dit verzoek kunnen geen tijds-, taak- of wachtrijdetails worden toegevoegd."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada detail waktu, tugas, atau antrian yang dapat ditambahkan ke permintaan ini."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu isteğe zaman, görev veya sıra bilgisi eklenemez."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen tid, uppgift eller köinformation kan läggas till i den här begäran."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen detaljer om tid, oppgave eller kø kan legges til denne forespørselen."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der kan ikke tilføjes oplysninger om tid, opgave eller kø til denne anmodning."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tähän pyyntöön ei voi lisätä aikaa, tehtävää tai jonoa koskevia tietoja."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeOpenFocusQueueDescription": {
+      "comment": "Complete native description for opening Focus Queue only after in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare a request to review opening Focus Queue in FocusHaven."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare una solicitud para revisar la apertura de la cola de enfoque en FocusHaven."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparez une demande d'examen de l'ouverture de la file d'attente de concentration dans FocusHaven."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereiten Sie eine Anfrage zur Überprüfung des Öffnens der Fokus-Warteschlange in FocusHaven vor."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar a abertura da fila de foco no FocusHaven."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar a abertura da fila de foco no FocusHaven."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenでフォーカスキューを開くためのレビュー依頼を準備してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven에서 포커스 큐를 열기 위한 검토 요청을 준비하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepara una richiesta di revisione per l'apertura della coda Focus in FocusHaven."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przygotuj prośbę o rozpatrzenie możliwości otwarcia kolejki skupienia w FocusHaven."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereid een verzoek voor om de opening van de Focus-wachtrij in FocusHaven te laten beoordelen."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siapkan permintaan untuk meninjau pembukaan Antrian Fokus di FocusHaven."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'da Odak Kuyruğu'nun açılmasını incelemek için bir talep hazırlayın."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förbered en begäran om att granska öppningen av fokuskön i FocusHaven."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en forespørsel om å gjennomgå åpningen av fokuskøen i FocusHaven."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en anmodning om at gennemgå åbningen af fokuskø i FocusHaven."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laadi pyyntö FocusHavenissa avattavan keskittymisjonon tarkistamiseksi."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeOpenFocusQueuePhrase": {
+      "comment": "Future Apple invocation phrase for preparing the open-Focus-Queue request for in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review opening Focus Queue in %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar la apertura de la cola de enfoque en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Examen de l'ouverture de la file d'attente de concentration dans %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überprüfung des Öffnens der Fokus-Warteschlange in %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar a abertura da fila de foco em %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar a abertura da fila de foco em %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@のフォーカスキューの開始を確認する"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@에서 포커스 큐 열기에 대한 검토"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisione dell'apertura della coda Focus in %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejrzyj otwarcie kolejki skupienia w %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer het openen van de Focus-wachtrij in %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinjau pembukaan Antrian Fokus di %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Odak Kuyruğunun açılmasını inceleyin."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Granska öppnandet av fokuskö i %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gjennomgang av åpning av fokuskø i %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gennemgå åbning af fokuskø i %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarkista %@n keskittymisjonon avaaminen"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeOpenFocusQueueTitle": {
+      "comment": "Short native title for preparing the open-Focus-Queue request.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Focus Queue"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir cola de enfoque"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir la file d'attente de concentration"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus-Warteschlange öffnen"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir fila de foco"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir fila de foco"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォーカスキューを開く"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "포커스 큐 열기"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri coda Focus"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otwórz kolejkę skupienia"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Focus-wachtrij"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buka Antrian Fokus"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odak Kuyruğunu Aç"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öppna fokuskön"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åpne fokuskøen"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åbn fokuskø"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avaa keskittymisjono"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativePauseTimerDescription": {
+      "comment": "Complete native description for pausing the current Focus timer only after in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare a request to review pausing the current Focus timer in FocusHaven."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare una solicitud para revisar la pausa del temporizador de enfoque actual en FocusHaven."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparez une demande de révision de la mise en pause du minuteur de concentration actuel dans FocusHaven."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereiten Sie eine Anfrage zur Überprüfung des Anhaltens des aktuellen Fokus-Timers in FocusHaven vor."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar a pausa do temporizador de foco atual no FocusHaven."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar a pausa do temporizador de foco atual no FocusHaven."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenで現在のフォーカスタイマーを一時停止する件について、レビュー依頼を準備してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven에서 현재 포커스 타이머를 일시 중지하는 것에 대한 검토 요청을 준비하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepara una richiesta di revisione per mettere in pausa il timer Focus corrente in FocusHaven."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przygotuj prośbę o sprawdzenie możliwości wstrzymania bieżącego timera skupienia w FocusHaven."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereid een verzoek voor om het pauzeren van de huidige Focus-timer in FocusHaven te laten beoordelen."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siapkan permintaan untuk meninjau penghentian sementara pengatur waktu Fokus saat ini di FocusHaven."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'da mevcut Odak zamanlayıcısının duraklatılmasının incelenmesi için bir talep hazırlayın."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förbered en begäran om att granska pausningen av den aktuella fokustimern i FocusHaven."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en forespørsel om å gjennomgå pausering av gjeldende fokustimer i FocusHaven."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en anmodning om at gennemgå pausering af den aktuelle fokustimer i FocusHaven."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valmistele pyyntö FocusHavenissa olevan nykyisen keskittymisajastimen keskeyttämisen tarkistamiseksi."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativePauseTimerPhrase": {
+      "comment": "Future Apple invocation phrase for preparing a pause-timer request for in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review pausing my Focus timer in %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar la pausa de mi temporizador de enfoque en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Examen de la mise en pause de mon minuteur de concentration dans %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überprüfung des Anhaltens meines Fokus-Timers in %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisão da pausa do meu temporizador de foco em %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisão da pausa do meu temporizador de foco em %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@でフォーカスタイマーの一時停止を確認する"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@에서 포커스 타이머 일시 중지에 대한 검토"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisione della pausa del timer Focus in %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejrzyj wstrzymanie timera skupienia w %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer het pauzeren van mijn Focus-timer in %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinjau penghentian sementara pengatur waktu Fokus saya di %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Odak zamanlayıcımı duraklatmayı inceleyin."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Granska pausning av min fokustimer i %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gjennomgang av pausing av fokustimeren i %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gennemgang af pausering af min fokustimer i %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarkista keskittymisajastimeni pysäyttäminen %@:ssä"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativePauseTimerTitle": {
+      "comment": "Short native title for preparing the pause-timer request.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause Focus timer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausar el temporizador de enfoque"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mettre en pause le minuteur de concentration"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus-Timer pausieren"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausar o temporizador de foco"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausar o temporizador de foco"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォーカスタイマーを一時停止"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "포커스 타이머 일시 중지"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metti in pausa il timer Focus"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wstrzymaj timer skupienia"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pauzeer de Focus-timer"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeda pengatur waktu Fokus"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odak zamanlayıcısını duraklat"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausa fokustimern"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause fokustimeren"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausér fokustimeren"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keskeytä keskittymisajastin"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativePendingRequestAccessibilityLabel": {
+      "comment": "Complete VoiceOver label for the occupied single-request state.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Another FocusHaven request is waiting for review."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hay otra solicitud de FocusHaven pendiente de revisión."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une autre requête FocusHaven est en attente d'examen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine weitere FocusHaven-Anfrage wartet auf die Überprüfung."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outra solicitação da FocusHaven está aguardando análise."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outra solicitação da FocusHaven está aguardando análise."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenの別のリクエストが審査待ちです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "또 다른 FocusHaven 요청이 검토를 기다리고 있습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un'altra richiesta FocusHaven è in attesa di revisione."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kolejna prośba FocusHaven czeka na rozpatrzenie."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een ander FocusHaven-verzoek wacht op beoordeling."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permintaan FocusHaven lainnya sedang menunggu peninjauan."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başka bir FocusHaven talebi inceleme aşamasında bekliyor."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ännu en förfrågan från FocusHaven väntar på granskning."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En annen FocusHaven-forespørsel venter på vurdering."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Endnu en FocusHaven-anmodning venter på gennemgang."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toinen FocusHavenin pyyntö odottaa tarkistusta."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativePendingRequestResult": {
+      "comment": "Truthful native result when the single process-memory request slot is already occupied.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven already has a request waiting. Open the app to review or dismiss it before trying again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven ya tiene una solicitud pendiente. Abre la aplicación para revisarla o descartarla antes de intentarlo de nuevo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven a déjà une requête en attente. Ouvrez l'application pour la consulter ou l'ignorer avant de réessayer."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven hat bereits eine Anfrage. Öffnen Sie die App, um sie zu überprüfen oder zu verwerfen, bevor Sie es erneut versuchen."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O FocusHaven já tem uma solicitação em espera. Abra o aplicativo para analisá-la ou descartá-la antes de tentar novamente."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O FocusHaven já tem uma solicitação em espera. Abra o aplicativo para analisá-la ou descartá-la antes de tentar novamente."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenには既にリクエストが届いています。アプリを開いて内容を確認するか無視してから、再度お試しください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven에는 이미 대기 중인 요청이 있습니다. 앱을 열어 요청을 확인하거나 해제한 후 다시 시도하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven ha già una richiesta in sospeso. Apri l'app per esaminarla o ignorarla prima di riprovare."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven ma już oczekującą prośbę. Otwórz aplikację, aby ją przejrzeć lub zignorować, a następnie spróbuj ponownie."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven heeft al een verzoek in behandeling. Open de app om het verzoek te bekijken of te negeren voordat u het opnieuw probeert."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven sudah memiliki permintaan yang menunggu. Buka aplikasi untuk meninjau atau mengabaikannya sebelum mencoba lagi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'da halihazırda bekleyen bir istek var. Tekrar denemeden önce incelemek veya yoksaymak için uygulamayı açın."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven har redan en väntande förfrågan. Öppna appen för att granska eller ignorera den innan du försöker igen."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven har allerede en forespørsel som venter. Åpne appen for å se gjennom den eller ignorere den før du prøver på nytt."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven har allerede en ventende anmodning. Åbn appen for at gennemgå den, eller ignorere den, før du prøver igen."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven on jo odottava pyyntö. Avaa sovellus tarkistaaksesi tai ohittaaksesi sen ennen kuin yrität uudelleen."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativePrivacySummary": {
+      "comment": "Native privacy summary for the exact text-free Apple-to-FocusHaven request boundary.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only the action type and a private request code enter FocusHaven. No transcript or private content is included."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo el tipo de acción y un código de solicitud privado ingresan a FocusHaven. No se incluye ninguna transcripción ni contenido privado."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seuls le type d'action et un code de requête privé sont transmis à FocusHaven. Aucune transcription ni contenu privé n'est inclus."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lediglich der Aktionstyp und ein privater Anforderungscode gelangen in FocusHaven. Es werden weder Transkripte noch private Inhalte übermittelt."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Somente o tipo de ação e um código de solicitação privado são inseridos no FocusHaven. Nenhuma transcrição ou conteúdo privado é incluído."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Somente o tipo de ação e um código de solicitação privado são inseridos no FocusHaven. Nenhuma transcrição ou conteúdo privado é incluído."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenには、アクションの種類とプライベートリクエストコードのみが送信されます。文字起こしやプライベートコンテンツは含まれません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven에는 작업 유형과 비공개 요청 코드만 입력됩니다. 녹취록이나 비공개 콘텐츠는 포함되지 않습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A FocusHaven vengono inviati solo il tipo di azione e un codice di richiesta privato. Non vengono incluse trascrizioni o contenuti privati."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do FocusHaven wprowadzany jest tylko typ akcji i prywatny kod prośby. Transkrypcja ani prywatna treść nie jest uwzględniana."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven ontvangt alleen het actietype en een privéverzoekcode. Er wordt geen transcript of privé-inhoud meegestuurd."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hanya jenis tindakan dan kode permintaan pribadi yang masuk ke FocusHaven. Tidak ada transkrip atau konten pribadi yang disertakan."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'a yalnızca işlem türü ve özel istek kodu girilir. Transkript veya özel içerik dahil edilmez."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Endast åtgärdstypen och en privat förfrågningskod anges i FocusHaven. Inget transkript eller privat innehåll inkluderas."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bare handlingstypen og en privat forespørselskode går inn i FocusHaven. Ingen transkripsjon eller privat innhold er inkludert."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kun handlingstypen og en privat anmodningskode indtastes i FocusHaven. Ingen transskription eller privat indhold er inkluderet."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vain toimintotyyppi ja yksityinen pyyntökoodi syötetään FocusHaven. Transkriptiä tai yksityistä sisältöä ei sisällytetä."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeReadTimerStatusDescription": {
+      "comment": "Complete native description for the read-timer-status route without claiming the status has been read.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare a request to review the current Focus timer status in FocusHaven."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare una solicitud para revisar el estado actual del temporizador de enfoque en FocusHaven."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparez une demande de révision de l'état actuel du minuteur de concentration dans FocusHaven."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereiten Sie eine Anfrage zur Überprüfung des aktuellen Fokus-Timer-Status in FocusHaven vor."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar o status atual do temporizador de foco no FocusHaven."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar o status atual do temporizador de foco no FocusHaven."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenで現在のフォーカスタイマーの状態を確認するレビュー依頼を準備してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven에서 현재 포커스 타이머 상태에 대한 검토 요청을 준비하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepara una richiesta per verificare lo stato attuale del timer Focus in FocusHaven."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przygotuj prośbę o sprawdzenie aktualnego stanu timera skupienia w FocusHaven."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereid een verzoek voor om de huidige status van de Focus-timer in FocusHaven te bekijken."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siapkan permintaan untuk meninjau status pengatur waktu Fokus saat ini di FocusHaven."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'da mevcut Odak zamanlayıcısı durumunun incelenmesi için bir talep hazırlayın."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förbered en begäran om att granska den aktuella statusen för fokustimern i FocusHaven."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en forespørsel om å gjennomgå gjeldende status for fokustimeren i FocusHaven."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en anmodning om at gennemgå den aktuelle status for fokustimeren i FocusHaven."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laadi pyyntö tarkistaaksesi FocusHavenissa olevan keskittymisajastimen nykyisen tilan."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeReadTimerStatusPhrase": {
+      "comment": "Future Apple invocation phrase for preparing a read-timer-status request for in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review my Focus timer status in %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar el estado de mi temporizador de enfoque en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Examen de l'état de mon minuteur de concentration dans %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überprüfung meines Fokus-Timer-Status in %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique o status do meu temporizador de foco em %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique o status do meu temporizador de foco em %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@でフォーカスタイマーの状態を確認する"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@에서 제 포커스 타이머 상태에 대한 검토"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisione dello stato del timer Focus in %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejrzyj status mojego timera skupienia w %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer de status van mijn Focus-timer in %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinjau status pengatur waktu Fokus saya di %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Odak zamanlayıcımın durumunu inceleyin."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Granska min fokustimerstatus i %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gjennomgang av status for fokustimeren min i %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gennemgå min fokustimerstatus i %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarkista keskittymisajastimen tila %@:ssa"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeReadTimerStatusTitle": {
+      "comment": "Short native title for preparing the read-timer-status request.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check Focus timer status"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprobar el estado del temporizador de enfoque"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifier l'état du minuteur de concentration"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status des Fokus-Timers prüfen"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique o status do temporizador de foco"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique o status do temporizador de foco"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォーカスタイマーの状態を確認"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "포커스 타이머 상태 확인"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica lo stato del timer Focus"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprawdź stan timera skupienia"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer de status van de Focus-timer"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Periksa status pengatur waktu Fokus"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odak zamanlayıcısının durumunu kontrol et"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrollera fokustimerns status"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sjekk statusen til fokustimeren"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tjek status for fokustimeren"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarkista keskittymisajastimen tila"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeRejectedResult": {
+      "comment": "Fail-closed native result for a malformed, unsupported, or otherwise rejected request.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven could not accept this request. Nothing changed."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven no pudo aceptar esta solicitud. Nada cambió."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven n'a pas pu accepter cette requête. Rien n'a changé."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven konnte diese Anfrage nicht annehmen. Es hat sich nichts geändert."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O FocusHaven não pôde aceitar esta solicitação. Nada mudou."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O FocusHaven não pôde aceitar esta solicitação. Nada mudou."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenはこのリクエストを受け付けられませんでした。何も変更されませんでした。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven이 이 요청을 수락할 수 없습니다. 아무것도 변경되지 않았습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven non ha potuto accettare questa richiesta. Non è cambiato nulla."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven nie mógł zaakceptować tej prośby. Nic się nie zmieniło."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven kon dit verzoek niet accepteren. Er is niets veranderd."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven tidak dapat menerima permintaan ini. Tidak ada yang berubah."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven bu isteği kabul edemedi. Hiçbir şey değişmedi."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven kunde inte acceptera denna begäran. Ingenting har ändrats."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven kunne ikke godta denne forespørselen. Ingenting endret seg."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven kunne ikke acceptere denne anmodning. Intet ændrede sig."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven ei voinut hyväksyä tätä pyyntöä. Mikään ei muuttunut."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeResumeTimerDescription": {
+      "comment": "Complete native description for resuming a paused Focus timer only after in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare a request to review resuming the paused Focus timer in FocusHaven."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare una solicitud para revisar la reanudación del temporizador de enfoque pausado en FocusHaven."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparez une demande de révision de la reprise du minuteur de concentration mis en pause dans FocusHaven."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereiten Sie eine Anfrage zur Überprüfung der Wiederaufnahme des pausierten Fokus-Timers in FocusHaven vor."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar a retomada do temporizador de foco pausado no FocusHaven."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar a retomada do temporizador de foco pausado no FocusHaven."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenで一時停止中のフォーカスタイマーの再開についてのレビュー依頼を準備してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven에서 일시 중지된 포커스 타이머를 재개하는 것에 대한 검토 요청을 준비하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepara una richiesta di revisione per riprendere il timer Focus in pausa in FocusHaven."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przygotuj prośbę o sprawdzenie możliwości wznowienia wstrzymanego timera skupienia w FocusHaven."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereid een verzoek voor om het hervatten van de gepauzeerde Focus-timer in FocusHaven te laten beoordelen."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siapkan permintaan untuk meninjau pengaktifan kembali pengatur waktu Fokus yang dijeda di FocusHaven."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'da duraklatılmış Odak zamanlayıcısının devam ettirilmesinin incelenmesi için bir talep hazırlayın."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förbered en begäran om att granska återupptagandet av den pausade fokustimern i FocusHaven."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en forespørsel om å gjennomgå gjenopptak av den pausede fokustimeren i FocusHaven."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en anmodning om at gennemgå genoptagelsen af den pausede fokustimer i FocusHaven."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laadi pyyntö keskeytyneen keskittymisajastimen palauttamisen tarkistamiseksi FocusHavenissa."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeResumeTimerPhrase": {
+      "comment": "Future Apple invocation phrase for preparing a resume-timer request for in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review resuming my Focus timer in %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar la reanudación de mi temporizador de enfoque en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Examen de la reprise de mon minuteur de concentration dans %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überprüfung der Fortsetzung meines Fokus-Timers in %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisão da retomada do meu temporizador de foco em %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisão da retomada do meu temporizador de foco em %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@でフォーカスタイマーの再開を確認する"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@에서 포커스 타이머 재개에 대한 검토"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisione della ripresa del timer Focus in %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejrzyj wznowienie timera skupienia w %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer het hervatten van mijn Focus-timer in %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinjau pelanjutan pengatur waktu Fokus saya di %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Odak zamanlayıcımı devam ettirmeyi inceleyin."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Granska återupptagande av min fokustimer i %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gjennomgang av gjenopptak av fokustimeren min i %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gennemgang af genoptagelse af min fokustimer i %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keskittymisajastimen palauttamisen tarkastelu %@:ssa"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeResumeTimerTitle": {
+      "comment": "Short native title for preparing the resume-timer request.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume Focus timer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudar el temporizador de enfoque"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reprendre le minuteur de concentration"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus-Timer fortsetzen"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retomar o temporizador de foco"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retomar o temporizador de foco"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォーカスタイマーを再開"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "포커스 타이머 재개"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprendi il timer Focus"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wznów timer skupienia"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hervat de Focus-timer"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lanjutkan pengatur waktu Fokus"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odak zamanlayıcısını sürdür"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Återuppta fokustimern"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gjenoppta fokustimeren"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Genoptag fokustimeren"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jatka keskittymisajastinta"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeReviewInstruction": {
+      "comment": "Instruction requiring the existing in-app review and one explicit app choice before any action can execute.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open FocusHaven, review the exact effect, then choose Confirm action or Dismiss request."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abra FocusHaven, revise el efecto exacto y, a continuación, elija Confirmar acción o Descartar solicitud."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez FocusHaven, examinez l'effet exact, puis choisissez Confirmer l'action ou Ignorer la requête."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnen Sie FocusHaven, überprüfen Sie die genauen Auswirkungen und wählen Sie dann „Aktion bestätigen“ oder „Anfrage verwerfen“."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abra o FocusHaven, revise o efeito exato e, em seguida, escolha Confirmar ação ou Descartar solicitação."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abra o FocusHaven, revise o efeito exato e, em seguida, escolha Confirmar ação ou Descartar solicitação."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenを開き、正確な効果を確認してから、「アクションを確認する」または「リクエストを無視する」を選択してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven을 열고 정확한 효과를 확인한 다음, 작업 확인 또는 요청 해제를 선택하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri FocusHaven, verifica l'effetto esatto, quindi scegli Conferma azione o Ignora richiesta."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otwórz FocusHaven, sprawdź dokładny efekt, a następnie wybierz opcję Potwierdź akcję lub Zignoruj prośbę."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open FocusHaven, bekijk het exacte effect en kies vervolgens 'Actie bevestigen' of 'Verzoek negeren'."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buka FocusHaven, tinjau efek pastinya, lalu pilih Konfirmasi tindakan atau Abaikan permintaan."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'ı açın, tam etkiyi inceleyin, ardından İşlemi onaylayın veya İsteği yoksay seçeneklerinden birini seçin."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öppna FocusHaven, granska den exakta effekten och välj sedan Bekräfta åtgärd eller Ignorera begäran."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åpne FocusHaven, se gjennom den nøyaktige effekten, og velg deretter Bekreft handling eller Ignorer forespørsel."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åbn FocusHaven, gennemgå den nøjagtige effekt, og vælg derefter Bekræft handling eller Ignorer anmodning."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avaa FocusHaven, tarkista tarkka vaikutus ja valitse sitten Vahvista toiminto tai Ohita pyyntö."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeReviewRequiredAccessibilityLabel": {
+      "comment": "Complete VoiceOver label for a native handoff that is waiting for explicit in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven request ready for review. No action has run."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La solicitud de FocusHaven está lista para su revisión. No se ha realizado ninguna acción."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La requête FocusHaven est prête à être examinée. Aucune action n'a été exécutée."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die FocusHaven-Anfrage ist zur Überprüfung bereit. Es wurden noch keine Aktionen ausgeführt."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A solicitação da FocusHaven está pronta para análise. Nenhuma ação foi executada."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A solicitação da FocusHaven está pronta para análise. Nenhuma ação foi executada."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenのリクエストは審査準備完了です。アクションはまだ実行されていません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven 요청이 검토 준비를 완료했습니다. 아직 실행된 작업이 없습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesta FocusHaven pronta per la revisione. Nessuna azione è stata eseguita."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prośba FocusHaven jest gotowa do rozpatrzenia. Nie wykonano żadnej akcji."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het FocusHaven-verzoek is klaar voor beoordeling. Er is nog geen actie ondernomen."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permintaan FocusHaven siap untuk ditinjau. Belum ada tindakan yang dijalankan."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven isteği incelemeye hazır. Henüz hiçbir işlem gerçekleştirilmedi."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-förfrågan är klar för granskning. Ingen åtgärd har utförts."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-forespørselen er klar til gjennomgang. Ingen handling er utført."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven-anmodning er klar til gennemgang. Der er ikke udført nogen handling."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenin pyyntö on valmis tarkistettavaksi. Mitään toimia ei ole suoritettu."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeReviewRequiredResult": {
+      "comment": "Truthful native handoff result after one request is queued without claiming that its action executed.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open FocusHaven to review this request. Nothing has happened yet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abra FocusHaven para revisar esta solicitud. Todavía no ha ocurrido nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez FocusHaven pour examiner cette demande. Aucune action n'a encore été entreprise."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnen Sie FocusHaven, um diese Anfrage zu überprüfen. Bisher ist noch nichts passiert."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acesse o FocusHaven para analisar esta solicitação. Nada aconteceu ainda."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acesse o FocusHaven para analisar esta solicitação. Nada aconteceu ainda."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenを開いてこのリクエストを確認してください。まだ何も処理されていません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven을 열어 이 요청을 검토하세요. 아직 아무런 변화가 없습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri FocusHaven per esaminare questa richiesta. Non è ancora successo nulla."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otwórz FocusHaven, aby rozpatrzyć tę prośbę. Nic się jeszcze nie wydarzyło."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open FocusHaven om dit verzoek te bekijken. Er is nog niets gebeurd."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buka FocusHaven untuk meninjau permintaan ini. Belum ada yang terjadi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu isteği incelemek için FocusHaven'ı açın. Henüz hiçbir şey olmadı."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öppna FocusHaven för att granska den här begäran. Ingenting har hänt än."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åpne FocusHaven for å gjennomgå denne forespørselen. Ingenting har skjedd ennå."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åbn FocusHaven for at gennemgå denne anmodning. Der er ikke sket noget endnu."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avaa FocusHaven tarkastellaksesi tätä pyyntöä. Mitään ei ole vielä tapahtunut."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeStartFocusTimerDescription": {
+      "comment": "Complete native description for starting only the ready Focus session after in-app review.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare a request to review starting the ready Focus session in FocusHaven."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare una solicitud para revisar el inicio de la sesión de enfoque lista en FocusHaven."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparez une demande de révision du démarrage de la session de concentration prête dans FocusHaven."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereiten Sie eine Anfrage zur Überprüfung des Starts der bereiten Fokus-Sitzung in FocusHaven vor."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar o início da sessão de foco pronta no FocusHaven."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepare uma solicitação para revisar o início da sessão de foco pronta no FocusHaven."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHavenで準備完了のフォーカスセッションを開始するためのレビュー依頼を準備してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven에서 준비된 포커스 세션을 시작하기 위한 검토 요청을 준비하세요."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prepara una richiesta di revisione per avviare la sessione Focus già pronta in FocusHaven."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przygotuj prośbę o sprawdzenie możliwości uruchomienia sesji skupienia w FocusHaven."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereid een verzoek voor om de start van de Focus-sessie in FocusHaven te beoordelen."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siapkan permintaan untuk meninjau dimulainya sesi Fokus yang siap di FocusHaven."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FocusHaven'da hazır Odak oturumunun başlatılmasını incelemek için bir talep hazırlayın."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Förbered en begäran om att granska starten av den färdiga fokussessionen i FocusHaven."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en forespørsel om å gjennomgå oppstart av den klare fokusøkten i FocusHaven."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forbered en anmodning om at gennemgå starten af den klargjorte fokussession i FocusHaven."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valmistele pyyntö FocusHavenissa olevan valmiin keskittymisistunnon aloittamiseksi."
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeStartFocusTimerPhrase": {
+      "comment": "Future Apple invocation phrase for preparing the parameter-free start-Focus-timer request.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review starting a Focus timer in %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisar el inicio de un temporizador de enfoque en %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Examen du démarrage d'un minuteur de concentration dans %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überprüfung des Startens eines Fokus-Timers in %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisão do início de um temporizador de foco em %@"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisão do início de um temporizador de foco em %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@でフォーカスタイマーの開始を確認する"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@에서 포커스 타이머 시작에 대한 검토"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revisione dell'avvio di un timer Focus in %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przejrzyj uruchomienie timera skupienia w %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer het starten van een Focus-timer in %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinjau permulaan pengatur waktu Fokus di %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ Odak zamanlayıcısını başlatmayı inceleyin."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Granska starten av en fokustimer i %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gjennomgang av oppstart av en fokustimer i %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gennemgang af start af en fokustimer i %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarkastele keskittymisajastimen käynnistämistä %@:ssä"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeStartFocusTimerTitle": {
+      "comment": "Short native title for preparing the parameter-free start-Focus-timer request.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Focus timer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar temporizador de enfoque"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Démarrer le minuteur de concentration"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fokus-Timer starten"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar temporizador de foco"
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar temporizador de foco"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォーカスタイマーを開始"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "포커스 타이머 시작"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia il timer Focus"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uruchom timer skupienia"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Focus-timer"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mulai pengatur waktu Fokus"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odak zamanlayıcısını başlat"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starta fokustimern"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start fokustimeren"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start fokustimeren"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Käynnistä keskittymisajastin"
+          }
+        }
+      }
+    },
+    "appleSystemAssistantNativeUnavailableResult": {
+      "comment": "Fail-closed native result when the route or app handoff is unavailable.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This FocusHaven request is unavailable. Nothing changed."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta solicitud de FocusHaven no está disponible. No ha cambiado nada."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette requête FocusHaven est indisponible. Rien n'a changé."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese FocusHaven-Anfrage ist nicht verfügbar. Es hat sich nichts geändert."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta solicitação do FocusHaven não está disponível. Nada foi alterado."
+          }
+        },
+        "pt": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta solicitação do FocusHaven não está disponível. Nada foi alterado."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このFocusHavenリクエストは利用できません。変更はありません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 FocusHaven 요청은 사용할 수 없습니다. 변경된 사항이 없습니다."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa richiesta FocusHaven non è disponibile. Nessuna modifica."
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta prośba FocusHaven jest niedostępna. Nic się nie zmieniło."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit FocusHaven-verzoek is niet beschikbaar. Er is niets veranderd."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permintaan FocusHaven ini tidak tersedia. Tidak ada perubahan."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu FocusHaven isteği kullanılamıyor. Hiçbir şey değişmedi."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denna FocusHaven-förfrågan är inte tillgänglig. Ingenting har ändrats."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne FocusHaven-forespørselen er ikke tilgjengelig. Ingenting er endret."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne FocusHaven-anmodning er ikke tilgængelig. Intet er ændret."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä FocusHavenin pyyntö ei ole käytettävissä. Mikään ei ole muuttunut."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

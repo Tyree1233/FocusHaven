@@ -132,9 +132,16 @@ store review, and distribution remain separate gates. Android is unchanged.
 
 Phase 217F locks that Apple-native copy as a separate twenty-eight-message
 English proposal and fifteen-language incremental-review manifest. It remains
-outside every Flutter runtime catalog and every Runner source. The five
+outside every Flutter runtime catalog. The five
 invocation phrases use only the `applicationName` placeholder; all native
 outcomes preserve the truth that submission is not confirmation and no action
 has run. Approval may later authorize an exact Apple string-catalog transform,
 but cannot register an App Intent, publish a Shortcut, add a Siri entitlement,
 execute a Haven Action, authorize Android, or release a build.
+
+All fifteen approvals now authorize exactly that closed transform. The
+Runner-local String Catalog contains the reviewed values plus base Portuguese
+derived from approved Brazilian Portuguese, and a typed accessor maps the five
+routes without calling the native store or Flutter transport. It adds no App
+Intent, Shortcut provider, entitlement, request submission, confirmation, or
+execution authority.

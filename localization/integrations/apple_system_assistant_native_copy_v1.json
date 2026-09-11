@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_phase217f_apple_native_copy_catalog_integration_v1",
+  "deltaId": "apple-system-assistant-native-copy-v1",
+  "sourceProposal": "localization/proposals/app_en_apple_system_assistant_native_review.arb",
+  "sourceProposalSha256": "b3719a2894a146981cff0a177294f2d94df222791f96e3ca8b3bbfdb53228aae",
+  "acceptanceLockSha256": "1302385ae655f6c466eae74eafb2c51f4a8e44875dd410c18618b47b65d3ed9c",
+  "approvedDeltaSha256": {
+    "es": "39b4795d68e7c0b898e00cc0a87e51349519d96d2ccf9ff63f6dbb6378f856f6",
+    "fr": "d382f63d523f3b6efb78d31f3041cd2d179e7050c993db1a7f2e8f93643f6314",
+    "de": "2ddce6b2540de32727ad3e3719ead155da6b02f676758af1484830f0bef3b9d6",
+    "pt-BR": "1ae5b6a471dd5c3b77e8cee66573e67fd97c6a8b5adcf40bc180ad994e58a2c5",
+    "ja": "55b50d5d6ddf769fe1c30c3fa1564e50aa5b7399ff5dd3d942e2b3c022a84735",
+    "ko": "73f5eafe5c378f6e1b391e20d9c1558d36bc9e5920f818286caa703675aefa5d",
+    "it": "3bcaae347944de98232ebb0df706d5ed7b7e7208395eeb7fc8f95bd8c9303218",
+    "pl": "df961d5497d8db3db393bc1e8a447065a4a1b8e17086106ade15e296a75a38e6",
+    "nl": "068129b8d293bb04772153b4dd253e1abc166b36b6a8eb21d8cbe8c7e07a726f",
+    "id": "158e6b1a9a31a5e27bb8c48316dab2f2e1ebee97e40d08301ce8c491a020aa18",
+    "tr": "86b02a982187d90599894ad49584c5396ab9c0009b5805a7df970aaacd310b2c",
+    "sv": "0980fe2f47b0fdb67b1e156262bf3f03344947c78377b8118be437c7c76128ec",
+    "nb": "caeecb427f1912617e6ad4285cd02a9640a059e5835ffa01886958666ee3d88a",
+    "da": "c9b9f267a162513353f66a9432f02bb5798b9c8ada688fe7e9f75c8c0e3eac2d",
+    "fi": "6db3ee8e7d9f4fe9c1597663e0c587841d5d10de6fc7a8606f8a603e63436878"
+  },
+  "independentlyReviewedLocales": [
+    "es",
+    "fr",
+    "de",
+    "pt-BR",
+    "ja",
+    "ko",
+    "it",
+    "pl",
+    "nl",
+    "id",
+    "tr",
+    "sv",
+    "nb",
+    "da",
+    "fi"
+  ],
+  "derivedFallbacks": [
+    {
+      "reviewedLocale": "pt-BR",
+      "fallbackLocale": "pt"
+    }
+  ],
+  "catalog": "ios/Runner/AppleSystemAssistantNativeCopy.xcstrings",
+  "catalogSha256": "c1f217c1e03f00e46597c2aa0a372a85b02b67a76583616a7be617a4a0dd8b24",
+  "catalogLocalizations": [
+    "en",
+    "es",
+    "fr",
+    "de",
+    "pt-BR",
+    "pt",
+    "ja",
+    "ko",
+    "it",
+    "pl",
+    "nl",
+    "id",
+    "tr",
+    "sv",
+    "nb",
+    "da",
+    "fi"
+  ],
+  "messageCount": 28,
+  "applicationNamePlaceholderMessageCount": 5,
+  "reviewDecisionCounts": {
+    "accepted": 189,
+    "revised": 231,
+    "blocked": 0
+  },
+  "flutterRuntimeCatalogChanged": false,
+  "publicNativeRegistrationEnabled": false,
+  "havenActionExecutionEnabled": false
+}

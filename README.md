@@ -870,11 +870,11 @@ has no timer, queue, transcript, persistence, network, or AI access.
 
 Public Siri and Shortcuts registration is still disabled. The Runner declares
 no App Intent, App Shortcut provider, Siri entitlement, Siri usage description,
-deep link, dependency, or native assistant copy. Those user-visible strings
-require a separate fifteen-language review before availability-gated Apple
-registration, signed builds, real-device Siri/Shortcuts and VoiceOver checks,
-store review, or distribution. Android App Actions remain unchanged and
-separate.
+deep link, or dependency. Its only native assistant copy is the reviewed String
+Catalog and fail-closed accessor described below; neither can submit a request.
+Availability-gated Apple registration, signed builds, real-device
+Siri/Shortcuts and VoiceOver checks, store review, and distribution remain
+separate. Android App Actions remain unchanged and separate.
 
 Phase 217F adds the closed **Apple system-assistant native copy review
 foundation** without registering a native action. One isolated English
@@ -894,6 +894,22 @@ translation draft, review workbook, approval, Apple string catalog, native
 copy accessor, App Intent, App Shortcut, Siri entitlement, production
 consumer, or public registration. Those remain separately verified and
 explicitly authorized later gates.
+
+The reviewed Phase 217F catalog integration now consumes the locked fifteen-
+language approval set and maps all twenty-eight messages into the Runner-local
+`AppleSystemAssistantNativeCopy.xcstrings` catalog. English and fifteen
+independently reviewed locales are present, while base Portuguese is derived
+only from the approved Brazilian Portuguese values. A typed Swift accessor
+accepts only the five reviewed `applicationName` placeholders and fails closed
+for missing or malformed formats. The Apple-native keys remain absent from all
+Flutter ARB catalogs.
+
+This integration supplies reviewed text only. Runner still imports no App
+Intents framework, declares no `AppIntent` or App Shortcut provider, adds no
+Siri entitlement, and grants no submission, timer, queue, confirmation, or
+Haven Action authority. Availability-gated registration, real-device Siri and
+Shortcuts checks, signed builds, store review, and distribution remain later,
+separately authorized gates. Android App Actions remain independent.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

@@ -36,7 +36,7 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Apple native copy review foundation active; public native registration disabled |',
+          'Reviewed Apple-native catalog integrated; public native registration disabled |',
     ]) {
       expect(
         roadmap,

@@ -1,8 +1,7 @@
 # Apple system-assistant ingress review gate
 
-Status: Phase 217F Apple-native English copy and fifteen-language review
-foundation active; public Siri, App Intent, and App Shortcut registration
-disabled.
+Status: Phase 217F reviewed Apple-native catalog and typed accessor active;
+public Siri, App Intent, and App Shortcut registration disabled.
 
 ## Purpose
 
@@ -102,3 +101,10 @@ only all-language approved native copy, preserve the Phase 217E three-field
 request and the in-app confirmation boundary, remain availability-gated above
 iOS 15, and pass real-device Siri, Shortcuts, large-text, and VoiceOver review.
 The independent fifteen-language review grants no Android or release authority.
+
+The completed Phase 217F integration now supplies the exact reviewed catalog
+and typed lookup needed by a later adapter. It does not call the Phase 217E
+store or platform channel, and it cannot submit, acknowledge, clear, confirm,
+or execute a request. The ingress payload remains exactly schema version,
+opaque invocation ID, and route kind. Public discovery and registration remain
+closed.

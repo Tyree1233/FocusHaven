@@ -57,6 +57,9 @@
 		A217E0000000000000000001 /* HavenSystemAssistantAppleIngress.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217E0000000000000000011 /* HavenSystemAssistantAppleIngress.swift */; };
 		A217E0000000000000000002 /* HavenSystemAssistantApplePlatformAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217E0000000000000000012 /* HavenSystemAssistantApplePlatformAdapter.swift */; };
 		A217E0000000000000000003 /* HavenSystemAssistantAppleIngressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217E0000000000000000013 /* HavenSystemAssistantAppleIngressTests.swift */; };
+		A217F0000000000000000001 /* AppleSystemAssistantNativeCopy.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A217F0000000000000000011 /* AppleSystemAssistantNativeCopy.xcstrings */; };
+		A217F0000000000000000002 /* HavenSystemAssistantAppleNativeCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217F0000000000000000012 /* HavenSystemAssistantAppleNativeCopy.swift */; };
+		A217F0000000000000000003 /* HavenSystemAssistantAppleNativeCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A217F0000000000000000013 /* HavenSystemAssistantAppleNativeCopyTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -194,6 +197,9 @@
 		A217E0000000000000000011 /* HavenSystemAssistantAppleIngress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantAppleIngress.swift; sourceTree = "<group>"; };
 		A217E0000000000000000012 /* HavenSystemAssistantApplePlatformAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantApplePlatformAdapter.swift; sourceTree = "<group>"; };
 		A217E0000000000000000013 /* HavenSystemAssistantAppleIngressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantAppleIngressTests.swift; sourceTree = "<group>"; };
+		A217F0000000000000000011 /* AppleSystemAssistantNativeCopy.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = AppleSystemAssistantNativeCopy.xcstrings; sourceTree = "<group>"; };
+		A217F0000000000000000012 /* HavenSystemAssistantAppleNativeCopy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantAppleNativeCopy.swift; sourceTree = "<group>"; };
+		A217F0000000000000000013 /* HavenSystemAssistantAppleNativeCopyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HavenSystemAssistantAppleNativeCopyTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -246,6 +252,7 @@
 				A12600000000000000000014 /* FocusShieldCapabilityPayloadTests.swift */,
 				A13400000000000000000014 /* HavenWindowAvailabilityTests.swift */,
 				A217E0000000000000000013 /* HavenSystemAssistantAppleIngressTests.swift */,
+				A217F0000000000000000013 /* HavenSystemAssistantAppleNativeCopyTests.swift */,
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
@@ -316,6 +323,8 @@
 				A13400000000000000000013 /* HavenWindowPlatformAdapter.swift */,
 				A217E0000000000000000011 /* HavenSystemAssistantAppleIngress.swift */,
 				A217E0000000000000000012 /* HavenSystemAssistantApplePlatformAdapter.swift */,
+				A217F0000000000000000011 /* AppleSystemAssistantNativeCopy.xcstrings */,
+				A217F0000000000000000012 /* HavenSystemAssistantAppleNativeCopy.swift */,
 				A11800000000000000000012 /* Runner.entitlements */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 			);
@@ -506,6 +515,22 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				es,
+				fr,
+				de,
+				"pt-BR",
+				pt,
+				ja,
+				ko,
+				it,
+				pl,
+				nl,
+				id,
+				tr,
+				sv,
+				nb,
+				da,
+				fi,
 				Base,
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
@@ -537,6 +562,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A217F0000000000000000001 /* AppleSystemAssistantNativeCopy.xcstrings in Resources */,
 				97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */,
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
@@ -615,6 +641,7 @@
 				A12600000000000000000004 /* FocusShieldCapabilityPayloadTests.swift in Sources */,
 				A13400000000000000000004 /* HavenWindowAvailabilityTests.swift in Sources */,
 				A217E0000000000000000003 /* HavenSystemAssistantAppleIngressTests.swift in Sources */,
+				A217F0000000000000000003 /* HavenSystemAssistantAppleNativeCopyTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -641,6 +668,7 @@
 				A13400000000000000000003 /* HavenWindowPlatformAdapter.swift in Sources */,
 				A217E0000000000000000001 /* HavenSystemAssistantAppleIngress.swift in Sources */,
 				A217E0000000000000000002 /* HavenSystemAssistantApplePlatformAdapter.swift in Sources */,
+				A217F0000000000000000002 /* HavenSystemAssistantAppleNativeCopy.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 			);

@@ -834,3 +834,20 @@ registration, real-device acceptance, signed builds, store review, and
 distribution remain separately reviewed and authorized. Android stays a
 separate adapter and release gate, and copy approval alone grants no App Intent,
 Shortcut, Siri, Android, execution, publication, or distribution authority.
+
+### Phase 217F reviewed Apple-native catalog integration
+
+After all fifteen reviews pass, the isolated integration maps the twenty-eight
+approved keys into one Runner-local Apple String Catalog. English and fifteen
+reviewed locales are direct inputs; base Portuguese is an exact derivation from
+approved Brazilian Portuguese. The only format parameter is one `%@`
+application-name token in each of the five invocation phrases. A typed Swift
+accessor validates that shape and maps the existing five text-free routes to
+their title, description, and phrase keys.
+
+The catalog and accessor are copy authority, not request authority. They do not
+import App Intents, conform to `AppIntent`, publish shortcuts, call the Phase
+217E store, cross the Flutter channel, or touch timer, queue, confirmation, or
+execution owners. The Flutter localization catalogs remain unchanged. Public
+registration, native assistant behavior, signed release validation, real-device
+accessibility checks, store review, and distribution remain later gates.

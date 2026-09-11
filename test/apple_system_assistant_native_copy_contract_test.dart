@@ -166,39 +166,54 @@ void main() {
     );
   });
 
-  test('proposal remains absent from runtime and native registration', () {
-    final arb = proposal();
-    final sourceKeys = arb.keys
-        .where((key) => key != '@@locale' && !key.startsWith('@'))
-        .toSet();
-    final catalogs = Directory('lib/l10n')
-        .listSync()
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.arb'))
-        .toList(growable: false);
-    final runnerSource = Directory('ios/Runner')
-        .listSync()
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.swift'))
-        .map((file) => file.readAsStringSync())
-        .join('\n');
-
-    expect(sourceKeys, hasLength(28));
-    expect(catalogs, hasLength(17));
-    for (final catalog in catalogs) {
-      final runtime =
-          jsonDecode(catalog.readAsStringSync()) as Map<String, Object?>;
-      expect(
-        runtime.keys.toSet().intersection(sourceKeys),
-        isEmpty,
-        reason: catalog.path,
+  test(
+    'reviewed copy stays outside Flutter runtime and native registration',
+    () {
+      final arb = proposal();
+      final sourceKeys = arb.keys
+          .where((key) => key != '@@locale' && !key.startsWith('@'))
+          .toSet();
+      final catalogs = Directory('lib/l10n')
+          .listSync()
+          .whereType<File>()
+          .where((file) => file.path.endsWith('.arb'))
+          .toList(growable: false);
+      final runnerSources = Directory('ios/Runner')
+          .listSync()
+          .whereType<File>()
+          .where((file) => file.path.endsWith('.swift'))
+          .toList(growable: false);
+      final accessor = runnerSources.singleWhere(
+        (file) =>
+            file.path.endsWith('HavenSystemAssistantAppleNativeCopy.swift'),
       );
-    }
-    for (final key in sourceKeys) {
-      expect(runnerSource, isNot(contains(key)), reason: key);
-    }
-    expect(runnerSource, isNot(contains('import AppIntents')));
-    expect(runnerSource, isNot(contains(': AppIntent')));
-    expect(runnerSource, isNot(contains('AppShortcutsProvider')));
-  });
+      final accessorSource = accessor.readAsStringSync();
+      final otherRunnerSource = runnerSources
+          .where((file) => file.path != accessor.path)
+          .map((file) => file.readAsStringSync())
+          .join('\n');
+      final completeRunnerSource = runnerSources
+          .map((file) => file.readAsStringSync())
+          .join('\n');
+
+      expect(sourceKeys, hasLength(28));
+      expect(catalogs, hasLength(17));
+      for (final catalog in catalogs) {
+        final runtime =
+            jsonDecode(catalog.readAsStringSync()) as Map<String, Object?>;
+        expect(
+          runtime.keys.toSet().intersection(sourceKeys),
+          isEmpty,
+          reason: catalog.path,
+        );
+      }
+      for (final key in sourceKeys) {
+        expect(accessorSource, contains(key), reason: key);
+        expect(otherRunnerSource, isNot(contains(key)), reason: key);
+      }
+      expect(completeRunnerSource, isNot(contains('import AppIntents')));
+      expect(completeRunnerSource, isNot(contains(': AppIntent')));
+      expect(completeRunnerSource, isNot(contains('AppShortcutsProvider')));
+    },
+  );
 }

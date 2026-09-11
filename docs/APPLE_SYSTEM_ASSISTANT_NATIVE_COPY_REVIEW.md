@@ -1,14 +1,17 @@
 # Apple system-assistant native copy review gate
 
-Status: Phase 217F English native-copy proposal and fifteen-language review
-foundation active; public Siri, App Intent, and App Shortcut registration
-disabled.
+Status: Phase 217F fifteen-language review accepted and reviewed Apple String
+Catalog integration active; public Siri, App Intent, and App Shortcut
+registration disabled.
 
 ## Purpose
 
-Phase 217F locks the complete English copy that a future Apple system-assistant
-adapter may expose. It does not add that copy to the Runner, an Apple string
-catalog, Siri, Shortcuts, or any production consumer. The isolated source is
+The Phase 217F copy-lock foundation isolates the complete English copy that a
+future Apple system-assistant adapter may expose. It did not add that copy to
+Runner, an Apple String Catalog, Siri, Shortcuts, or a production consumer. The
+reviewed integration described below now maps the approved values into a
+Runner-local catalog without registering an adapter. The isolated English
+source remains
 `localization/proposals/app_en_apple_system_assistant_native_review.arb`.
 
 The proposal contains exactly twenty-eight complete messages and twenty-eight
@@ -90,14 +93,38 @@ provider configuration, glossary, translation request, draft, CSV, workbook,
 review, approval, Apple string catalog, runtime catalog, or production native
 consumer. Provider-assisted drafts require separate explicit authorization.
 
+## Reviewed catalog integration
+
+All fifteen independent reviews are now complete: 420 decisions contain 189
+accepted draft values, 231 fluent revisions, and zero blocked messages. The
+anonymous private acceptance lock is the sole authority for the deterministic
+catalog transform. Review workbooks, completed-review CSVs, validation records,
+and provider responses remain outside Git.
+
+`ios/Runner/AppleSystemAssistantNativeCopy.xcstrings` contains the exact
+twenty-eight keys in English, the fifteen independently reviewed locales, and
+one base-Portuguese fallback derived only from approved Brazilian Portuguese.
+The transform replaces the five reviewed `{applicationName}` placeholders with
+Apple's single `%@` format token and rejects any other placeholder or percent
+shape. `HavenSystemAssistantAppleNativeCopy` exposes only typed, fail-closed
+lookup and exact five-route key mapping. It cannot submit or deliver a request.
+
+`localization/integrations/apple_system_assistant_native_copy_v1.json` records
+the source proposal, acceptance-lock, approved-delta, catalog, locale,
+placeholder, and decision-count provenance without translation text or
+reviewer identity. Contract tests prove all seventeen Apple localizations,
+exact `pt-BR`-to-`pt` derivation, complete key coverage, catalog compilation,
+and continued separation from the seventeen Flutter runtime catalogs.
+
 ## Deliberately closed placement and release boundary
 
-The Phase 217F commit contains no App Intents framework import, `AppIntent`
-conformance, App Shortcut provider, native copy accessor, generated Apple
-string catalog, Siri entitlement, Siri usage description, supported-intent
-declaration, deep link, dependency, Android resource, or Android manifest
-change. All twenty-eight proposal keys remain absent from every Flutter runtime
-catalog and every iOS Runner source.
+The original Phase 217F copy-lock commit contained no native catalog or
+accessor. The reviewed catalog integration adds only those two copy resources
+and their tests. It contains no App Intents framework import, `AppIntent`
+conformance, App Shortcut provider, Siri entitlement, Siri usage description,
+supported-intent declaration, deep link, dependency, Android resource, or
+Android manifest change. All twenty-eight keys remain absent from every Flutter
+runtime catalog and from every Runner source except the typed copy accessor.
 
 A later Apple-only integration may proceed only after all fifteen reviews are
 complete and must:

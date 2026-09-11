@@ -70,7 +70,7 @@ Every future phase must preserve these rules:
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Sixteen reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, Dutch, Indonesian, Turkish, Swedish, Norwegian Bokmål, Danish, and Finnish; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. The six Google-assisted draft locales retain independent private fluent reviews, anonymous validation records, zero content-safety issues across 5,880 messages, and exact reviewed-to-runtime locks; provider output itself granted no approval or runtime authority. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, screen-reader, right-to-left, store promotion, and country distribution behind their separate gates. |
-| Siri, Shortcuts, and Android App Actions | Apple native copy review foundation active; public native registration disabled | Phases 217A–217C define five text-free, replay-bounded drafts, one fresh-state two-minute review bridge, and a one-shot accessible card. Phase 217D adds 165 independently reviewed decisions to all seventeen runtime catalogs and one memory-only app-level host. Phase 217E adds a private, single-slot Apple-to-Flutter delivery seam. Phase 217F locks twenty-eight complete Apple-native English messages and fifteen independent review targets without registering an App Intent or Shortcut. | Complete all Apple-native fluent reviews before a separate availability-gated registration; keep Android separate and preserve in-app confirmation. |
+| Siri, Shortcuts, and Android App Actions | Reviewed Apple-native catalog integrated; public native registration disabled | Phases 217A–217C define five text-free, replay-bounded drafts, one fresh-state two-minute review bridge, and a one-shot accessible card. Phase 217D adds 165 independently reviewed decisions to all seventeen runtime catalogs and one memory-only app-level host. Phase 217E adds a private, single-slot Apple-to-Flutter delivery seam. Phase 217F locks and accepts twenty-eight Apple-native messages in fifteen languages, derives base Portuguese from approved Brazilian Portuguese, and adds only a typed Runner-local catalog accessor. | Build a separately authorized availability-gated Apple registration; preserve iOS 15 behavior and in-app confirmation, complete real-device and signed-release gates, and keep Android separate. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
 | Focus Score | Replaced | FocusHaven intentionally avoids a productivity score. | If a summary is useful, design **Haven Momentum** as non-punitive, explainable, private, and never competitive. |
@@ -681,8 +681,8 @@ Publish the proven safe subset through Siri/App Intents, Shortcuts, and Android
 App Actions. System assistants receive bounded action parameters, not coaching
 history or arbitrary private text.
 
-Status: Phase 217F Apple-native copy review foundation active; public Apple and
-Android system-assistant registration remains disabled.
+Status: Phase 217F reviewed Apple-native catalog integration active; public
+Apple and Android system-assistant registration remains disabled.
 
 Phase 217A defines exactly five structured request kinds: read timer status,
 start a Focus timer, pause, resume, and open Focus Queue. A request contains
@@ -825,12 +825,16 @@ The external incremental-review manifest locks fifteen independent reviews,
 explicit Japanese and Korean font-coverage gates, and later base-Portuguese
 derivation only from approved Brazilian Portuguese. Flutter runtime catalog
 hashes are freshness locks only because the proposal is Apple-native, not
-Flutter runtime copy. No provider draft, real workbook, approval, Apple string
-catalog, native accessor, App Intent, Shortcut provider, entitlement,
-production registration, or execution path is created in Phase 217F.
+Flutter runtime copy. The original copy-lock foundation created no provider
+draft, real workbook, approval, Apple string catalog, native accessor, App
+Intent, Shortcut provider, entitlement, production registration, or execution
+path.
 
-All fifteen approvals, an exact native string-catalog transform,
-availability-gated Apple registration, unchanged iOS 15 behavior, real-device
+All fifteen approvals and the exact native string-catalog transform are now
+complete. The catalog contains English, fifteen independently reviewed
+localizations, and base Portuguese derived only from approved Brazilian
+Portuguese; its typed accessor owns no request or execution behavior.
+Availability-gated Apple registration, unchanged iOS 15 behavior, real-device
 Siri/Shortcuts and VoiceOver checks, signed builds, store review, candidate
 validation, and explicit distribution authorization remain later gates.
 Android App Actions stay independent.

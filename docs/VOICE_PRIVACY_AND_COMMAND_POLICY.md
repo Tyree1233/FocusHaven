@@ -134,10 +134,10 @@ proposal. Failed delivery is not a spoken acknowledgement and never becomes
 action consent.
 
 Native Apple titles, invocation phrases, parameter summaries, and result
-dialogue remain absent because they have not completed independent review in
-all production languages. App Intent and App Shortcut declarations, Siri
-entitlements, real-device invocation, store disclosure, and distribution stay
-closed. Android App Actions remain a separate later gate.
+dialogue have completed independent review and exist only in the Runner-local
+String Catalog and typed accessor. App Intent and App Shortcut declarations,
+Siri entitlements, real-device invocation, store disclosure, and distribution
+stay closed. Android App Actions remain a separate later gate.
 
 Phase 217F isolates the complete English proposal for those native Apple
 strings without exposing them. Every invocation phrase asks to review one of
@@ -147,11 +147,18 @@ enter FocusHaven; the parameter copy rejects time, task, and queue details.
 Handoff and accessibility results say that review is required and no action has
 run. They cannot represent a spoken acknowledgement as consent.
 
-Fifteen independent language approvals are required before an Apple string
-catalog may be built. Copy approval alone grants no App Intent, Shortcut, Siri,
+Fifteen independent language approvals were required before the Apple String
+Catalog could be built. Copy approval alone grants no App Intent, Shortcut, Siri,
 timer, queue, confirmation, execution, deployment, publication, or phone
 authority. Public native registration, real-device accessibility and assistant
 checks, signed validation, store review, and distribution remain separate.
+
+Those fifteen approvals now feed one exact Runner-local String Catalog and a
+typed, fail-closed copy accessor. The catalog transform records no reviewer
+identity and sends no text externally. Base Portuguese is derived only from the
+approved Brazilian Portuguese values. Catalog availability still grants no
+App Intent, Shortcut, Siri, timer, queue, confirmation, execution, deployment,
+publication, phone, Android, or distribution authority.
 
 ### Eligible through the shared typed-and-voice policy
 
