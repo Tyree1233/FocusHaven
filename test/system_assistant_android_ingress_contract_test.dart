@@ -129,7 +129,7 @@ void main() {
     const unchangedSubtrees = <String, String>{
       'ios': 'f7e23f4aa168c7ed57b3ba7198fe963abd37c064',
       'lib/l10n': 'aa4f2428f72e9a226290de58fd9df89f651a0ba5',
-      'localization': 'ce1465a8184e13b5bbcaf4a38e3e678de2be7413',
+      'localization': 'c8383c00cb9346ed814a178ec1899ba6f78384d6',
     };
 
     for (final subtree in unchangedSubtrees.entries) {
