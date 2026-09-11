@@ -175,6 +175,20 @@ new retention, analytics, persistence, network, provider, or Android capability
 is added. Real-device accessibility, assistant, signed-release, privacy/store,
 candidate, and distribution review remains required.
 
+Phase 217H adds the matching private Android transport without making any route
+discoverable to Google Assistant. One process-memory slot may contain only the
+schema version, bounded opaque invocation ID, and one of the same five route
+kinds. Kotlin and Dart reject extra fields and free-form parameters, and the
+slot clears only after the existing single-slot Flutter inbox accepts the exact
+request.
+
+Android delivery is not confirmation and cannot read or change timer or queue
+state. The phase adds no `shortcuts.xml`, manifest capability metadata,
+Assistant built-in or custom intent, query pattern, public native copy,
+permission, persistence, provider, or execution route. Android copy review,
+registration, Assistant/device testing, signed validation, Play disclosure,
+and distribution remain separate closed gates.
+
 ### Eligible through the shared typed-and-voice policy
 
 - read the current timer status;

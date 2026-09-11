@@ -2,8 +2,8 @@
 
 Status: Phase 217G availability-gated Apple review registration active on iOS
 16 and later; all seventeen Flutter runtime catalogs and the app-level review
-host are enabled, while execution, release, and Android registration remain
-closed.
+host are enabled; Phase 217H private Android ingress is active; execution,
+release, and public Android registration remain closed.
 
 ## Purpose
 
@@ -129,7 +129,8 @@ Phase 217E adds only the private Apple delivery seam described in
 enter the existing memory inbox, but no Siri or Shortcuts capability is
 declared and no unreviewed native copy is exposed. Public Apple registration,
 native-copy localization, real-device acceptance, signed release validation,
-store review, and distribution remain separate gates. Android is unchanged.
+store review, and distribution remain separate gates. Phase 217E leaves
+Android unchanged.
 
 Phase 217F locks that Apple-native copy as a separate twenty-eight-message
 English proposal and fifteen-language incremental-review manifest. It remains
@@ -160,3 +161,15 @@ third-party dependency, Android registration, persistence, timer/queue owner,
 or Haven Action execution call is added. Real-device Siri, Shortcuts, VoiceOver,
 large-text, signed-release, store-review, candidate, and distribution gates
 remain closed.
+
+Phase 217H adds only the private Android delivery seam described in
+`ANDROID_SYSTEM_ASSISTANT_INGRESS_REVIEW.md`. It mirrors the exact three-field
+payload and single-slot process-memory rules, and delivery stops at the same
+existing app inbox. No `shortcuts.xml`, `android.app.shortcuts` metadata,
+Assistant intent, query pattern, public Android copy, permission, dependency,
+deep link, persistence, review settlement, or execution authority is added.
+
+Android-native discovery copy, fifteen-language review, exact capability
+mapping, official Assistant preview, real-device TalkBack and large-text
+testing, signed builds, Play disclosure review, candidate validation, and
+distribution authorization remain separate closed gates.

@@ -919,6 +919,24 @@ confirmation, or Haven Action authority. Real-device checks, signed builds,
 store review, and distribution remain later, separately authorized gates.
 Android App Actions remain independent.
 
+Phase 217H adds the private **Android system-assistant ingress foundation**
+without publishing an App Action. One Android process-memory slot can hold only
+schema version `1`, a bounded opaque invocation ID, and one of the same five
+text-free routes. Kotlin and Dart independently reject extra fields, malformed
+IDs, unsupported routes, and arbitrary parameters. Flutter acknowledges a
+request only after the existing app-level inbox accepts it, and only that exact
+acknowledgement can clear the native slot.
+
+The Android lifecycle host requests delivery after its handler is installed
+and when the app resumes. Delivery stops at the existing two-minute in-app
+review and cannot read timer or queue state, confirm a review, or execute a
+Haven Action. No `shortcuts.xml`, manifest capability metadata, Assistant
+built-in or custom intent, query pattern, public Android copy, permission,
+dependency, persistence, provider, or deep link is added. Android-native copy
+review, public registration, real-device Assistant and TalkBack checks, signed
+builds, Play disclosure review, candidate validation, and distribution remain
+separate gates.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

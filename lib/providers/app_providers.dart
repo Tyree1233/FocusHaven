@@ -41,6 +41,7 @@ import '../services/haven_loop_service.dart';
 import '../services/haven_plan_service.dart';
 import '../services/haven_planner_service.dart';
 import '../services/haven_rhythm_service.dart';
+import '../services/haven_system_assistant_android_platform_bridge.dart';
 import '../services/haven_system_assistant_apple_platform_bridge.dart';
 import '../services/haven_system_intent_inbox.dart';
 import '../services/haven_window_hold_service.dart';
@@ -248,10 +249,10 @@ final adaptiveFocusDelegationServiceProvider =
       name: 'adaptiveFocusDelegationServiceProvider',
     );
 
-/// Text-free, memory-only entry seam for a future reviewed native adapter.
+/// Shared text-free, memory-only entry seam for reviewed native adapters.
 ///
-/// Phase 217E adds only a private Apple producer. Public Apple and Android
-/// system-assistant registration remains closed.
+/// Phase 217G registers the reviewed Apple surface. Phase 217H adds only a
+/// private Android transport; public Android registration remains closed.
 final havenSystemIntentInboxProvider =
     ChangeNotifierProvider<HavenSystemIntentInbox>(
       (ref) => HavenSystemIntentInbox(),
@@ -264,8 +265,8 @@ final havenSystemAssistantApplePlatformBackendProvider =
       name: 'havenSystemAssistantApplePlatformBackendProvider',
     );
 
-/// Private Apple-to-Flutter delivery only; public App Intent registration is
-/// intentionally absent until its native copy and release gates are complete.
+/// Apple-to-Flutter delivery for the reviewed, availability-gated App Intents.
+/// Native acknowledgement still grants no confirmation or execution authority.
 final havenSystemAssistantApplePlatformControllerProvider =
     Provider<HavenSystemAssistantApplePlatformController>((ref) {
       final controller = HavenSystemAssistantApplePlatformController(
@@ -275,6 +276,24 @@ final havenSystemAssistantApplePlatformControllerProvider =
       ref.onDispose(controller.dispose);
       return controller;
     }, name: 'havenSystemAssistantApplePlatformControllerProvider');
+
+final havenSystemAssistantAndroidPlatformBackendProvider =
+    Provider<HavenSystemAssistantAndroidPlatformBackend>(
+      (ref) => MethodChannelHavenSystemAssistantAndroidBackend(),
+      name: 'havenSystemAssistantAndroidPlatformBackendProvider',
+    );
+
+/// Private Android-to-Flutter delivery only. No App Actions capability or
+/// public shortcut is registered by this foundation.
+final havenSystemAssistantAndroidPlatformControllerProvider =
+    Provider<HavenSystemAssistantAndroidPlatformController>((ref) {
+      final controller = HavenSystemAssistantAndroidPlatformController(
+        backend: ref.watch(havenSystemAssistantAndroidPlatformBackendProvider),
+        inbox: ref.read(havenSystemIntentInboxProvider),
+      );
+      ref.onDispose(controller.dispose);
+      return controller;
+    }, name: 'havenSystemAssistantAndroidPlatformControllerProvider');
 
 final focusProfileServiceProvider = ChangeNotifierProvider<FocusProfileService>(
   (ref) => FocusProfileService(),

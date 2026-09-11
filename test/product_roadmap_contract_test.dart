@@ -36,7 +36,8 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Availability-gated Apple review registration active; Android disabled |',
+          'Availability-gated Apple review registration active; '
+          'private Android ingress active |',
     ]) {
       expect(
         roadmap,
@@ -111,6 +112,7 @@ void main() {
     expect(readme, contains('Every one of the five routes requires'));
     expect(readme, contains('Apple system-assistant ingress foundation'));
     expect(readme, contains('Apple system-assistant native copy review'));
+    expect(readme, contains('Android system-assistant ingress foundation'));
   });
 
   test('Haven actions preserve proposal policy and service ownership', () {
@@ -275,6 +277,7 @@ void main() {
       'must never enter Flutter ARBs',
       'copy approval alone grants no App Intent',
       'Phase 217G availability-gated Apple registration',
+      'Phase 217H private Android system-assistant ingress',
       'opens FocusHaven for the existing in-app review',
       'never confirms or executes an action',
     ]) {

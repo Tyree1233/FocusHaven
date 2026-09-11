@@ -25,6 +25,7 @@ import 'services/theme_service.dart';
 import 'services/timer_service.dart';
 import 'widgets/focus_shield_platform_host.dart';
 import 'widgets/haven_window_platform_host.dart';
+import 'widgets/haven_system_assistant_android_platform_host.dart';
 import 'widgets/haven_system_assistant_apple_platform_host.dart';
 import 'widgets/haven_system_intent_production_host.dart';
 import 'widgets/system_focus_platform_host.dart';
@@ -183,11 +184,13 @@ class FocusHavenApp extends StatelessWidget {
       child: HavenWindowPlatformHost(
         child: FocusShieldPlatformHost(
           child: SystemFocusPlatformHost(
-            child: HavenSystemAssistantApplePlatformHost(
-              child: _FocusHavenMaterialApp(
-                showOnboarding: showOnboarding,
-                locale: locale,
-                supportedLocales: supportedLocales,
+            child: HavenSystemAssistantAndroidPlatformHost(
+              child: HavenSystemAssistantApplePlatformHost(
+                child: _FocusHavenMaterialApp(
+                  showOnboarding: showOnboarding,
+                  locale: locale,
+                  supportedLocales: supportedLocales,
+                ),
               ),
             ),
           ),

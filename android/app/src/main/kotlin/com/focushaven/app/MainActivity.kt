@@ -8,6 +8,8 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterActivity() {
     private var systemFocusChannel: MethodChannel? = null
     private var havenWindowPlatformAdapter: HavenWindowPlatformAdapter? = null
+    private var systemAssistantAndroidPlatformAdapter:
+        HavenSystemAssistantAndroidPlatformAdapter? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -41,17 +43,24 @@ class MainActivity : FlutterActivity() {
             HavenWindowPlatformAdapter(this).also { adapter ->
                 adapter.install(flutterEngine.dartExecutor.binaryMessenger)
             }
+        systemAssistantAndroidPlatformAdapter =
+            HavenSystemAssistantAndroidPlatformAdapter().also { adapter ->
+                adapter.install(flutterEngine.dartExecutor.binaryMessenger)
+            }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         deliverWarmPendingCommand()
+        systemAssistantAndroidPlatformAdapter?.deliverPendingRequest()
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         havenWindowPlatformAdapter?.dispose()
         havenWindowPlatformAdapter = null
+        systemAssistantAndroidPlatformAdapter?.dispose()
+        systemAssistantAndroidPlatformAdapter = null
         systemFocusChannel = null
         super.cleanUpFlutterEngine(flutterEngine)
     }

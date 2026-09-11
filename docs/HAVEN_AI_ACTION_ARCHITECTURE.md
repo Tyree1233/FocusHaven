@@ -886,3 +886,31 @@ and Shortcuts behavior, cold and warm launch, VoiceOver, large text, all-languag
 device review, signed release builds, privacy/store disclosure, candidate
 validation, and distribution remain separately authorized release gates.
 Android App Actions remain independent.
+
+## Phase 217H private Android system-assistant ingress
+
+Phase 217H installs one Android-only method-channel transport and lifecycle
+host without registering an App Action. The Kotlin ingress mirrors exactly the
+five Phase 217A routes and constructs only schema version `1`, one bounded
+opaque invocation ID, and one route kind. Kotlin and Dart both reject unknown
+fields, malformed IDs, unsupported routes, and arbitrary parameters.
+
+One request may wait only in process memory. The store rejects stacking and
+clears the request only after Flutter acknowledges that the existing
+`HavenSystemIntentInbox` accepted the exact payload. A failed channel call,
+false acknowledgement, malformed request, unavailable handler, or occupied
+inbox retains or rejects the request without granting action authority.
+
+`MainActivity` installs the private adapter, while the Android-only Flutter
+host requests pending delivery after handler installation and on resume. The
+transport terminates at the existing Phase 217D inbox. It cannot prepare,
+inspect, confirm, dismiss, or execute a review and imports no timer, queue,
+review service, or Haven Action Engine owner.
+
+The phase adds no `shortcuts.xml`, `android.app.shortcuts` metadata, Assistant
+built-in or custom intent, query pattern, static shortcut, public native copy,
+deep link, exported destination, permission, dependency, persistence, provider,
+network, AI, or action-execution path. Android-native copy review, capability
+mapping, official Assistant preview and real-device validation, TalkBack and
+large-text review, signed release builds, Play disclosure review, candidate
+validation, and distribution remain separately authorized gates.
