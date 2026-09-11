@@ -58,40 +58,43 @@ void main() {
     expect(inbox, contains('if (_pendingRequest != null) return false'));
   });
 
-  test('public Apple and Android assistant registration stays closed', () {
-    final runnerSources = Directory('ios/Runner')
-        .listSync()
-        .whereType<File>()
-        .map((file) => file.readAsStringSync())
-        .join('\n');
-    final iosInfo = _read('ios/Runner/Info.plist');
-    final entitlements = _read('ios/Runner/Runner.entitlements');
-    final androidManifest = _read('android/app/src/main/AndroidManifest.xml');
-    final pubspec = _read('pubspec.yaml');
-    final review = _normalize(
-      _read('docs/APPLE_SYSTEM_ASSISTANT_INGRESS_REVIEW.md'),
-    );
+  test(
+    'Apple registration is narrow while Siri entitlement and Android stay closed',
+    () {
+      final runnerSources = Directory('ios/Runner')
+          .listSync()
+          .whereType<File>()
+          .map((file) => file.readAsStringSync())
+          .join('\n');
+      final iosInfo = _read('ios/Runner/Info.plist');
+      final entitlements = _read('ios/Runner/Runner.entitlements');
+      final androidManifest = _read('android/app/src/main/AndroidManifest.xml');
+      final pubspec = _read('pubspec.yaml');
+      final review = _normalize(
+        _read('docs/APPLE_SYSTEM_ASSISTANT_INGRESS_REVIEW.md'),
+      );
 
-    expect(runnerSources, isNot(contains('import AppIntents')));
-    expect(runnerSources, isNot(contains(': AppIntent')));
-    expect(runnerSources, isNot(contains('AppShortcutsProvider')));
-    expect(iosInfo, isNot(contains('INIntentsSupported')));
-    expect(iosInfo, isNot(contains('NSSiriUsageDescription')));
-    expect(entitlements, isNot(contains('com.apple.developer.siri')));
-    expect(androidManifest, isNot(contains('actions.intent')));
-    expect(pubspec, isNot(contains('app_intents')));
-    expect(pubspec, isNot(contains('shortcuts')));
-    expect(
-      review,
-      contains(
-        'public Siri, App Intent, and App Shortcut registration disabled',
-      ),
-    );
-    expect(review, contains('independent fifteen-language review'));
-    expect(review, contains('twenty-eight complete messages'));
-    expect(review, contains('not imported by Runner'));
-    expect(review, contains('No provider draft, CSV, workbook'));
-  });
+      expect(runnerSources, contains('import AppIntents'));
+      expect(runnerSources, contains(': AppIntent'));
+      expect(runnerSources, contains('AppShortcutsProvider'));
+      expect(iosInfo, isNot(contains('INIntentsSupported')));
+      expect(iosInfo, isNot(contains('NSSiriUsageDescription')));
+      expect(entitlements, isNot(contains('com.apple.developer.siri')));
+      expect(androidManifest, isNot(contains('actions.intent')));
+      expect(pubspec, isNot(contains('app_intents')));
+      expect(pubspec, isNot(contains('shortcuts')));
+      expect(
+        review,
+        contains(
+          'availability-gated App Intent and App Shortcut registration active',
+        ),
+      );
+      expect(review, contains('independent fifteen-language review'));
+      expect(review, contains('twenty-eight complete messages'));
+      expect(review, contains('not imported by Runner'));
+      expect(review, contains('No provider draft, CSV, workbook'));
+    },
+  );
 
   test('production wiring terminates at the existing review inbox', () {
     final app = _read('lib/main.dart');

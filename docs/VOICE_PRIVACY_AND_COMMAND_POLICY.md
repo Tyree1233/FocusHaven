@@ -135,9 +135,10 @@ action consent.
 
 Native Apple titles, invocation phrases, parameter summaries, and result
 dialogue have completed independent review and exist only in the Runner-local
-String Catalog and typed accessor. App Intent and App Shortcut declarations,
-Siri entitlements, real-device invocation, store disclosure, and distribution
-stay closed. Android App Actions remain a separate later gate.
+String Catalog and typed accessor. Phase 217G later adds parameter-free App
+Intent and App Shortcut declarations on iOS 16 and later. Siri entitlements,
+real-device acceptance, store disclosure, and distribution stay closed. Android
+App Actions remain a separate later gate.
 
 Phase 217F isolates the complete English proposal for those native Apple
 strings without exposing them. Every invocation phrase asks to review one of
@@ -159,6 +160,20 @@ identity and sends no text externally. Base Portuguese is derived only from the
 approved Brazilian Portuguese values. Catalog availability still grants no
 App Intent, Shortcut, Siri, timer, queue, confirmation, execution, deployment,
 publication, phone, Android, or distribution authority.
+
+Phase 217G exposes only the five reviewed, parameter-free Apple routes on iOS
+16 and later. The system surface receives no transcript, utterance, duration,
+task, queue item, journal, reflection, coaching history, account value, or other
+free-form field. It may submit only schema version `1`, a bounded opaque
+invocation ID, and one allowlisted route to the existing process-memory slot.
+
+Every intent opens FocusHaven for the visible review. Authentication, native
+submission, spoken acknowledgement, app launch, and Flutter delivery are not
+consent to execute and cannot substitute for the in-app Confirm action. An
+occupied slot or unavailable reviewed copy fails closed. No Siri entitlement,
+new retention, analytics, persistence, network, provider, or Android capability
+is added. Real-device accessibility, assistant, signed-release, privacy/store,
+candidate, and distribution review remains required.
 
 ### Eligible through the shared typed-and-voice policy
 

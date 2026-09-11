@@ -857,8 +857,9 @@ accepts only the Phase 217A text-free request object; the host prepares one
 opaque review, removes it on dismissal, confirmation, supersession, expiry, or
 owner-state change, and can settle it only through the Phase 217B service and
 existing Haven Action Engine. A second pending inbox request is rejected, no
-review is persisted, and the app still registers no Siri, App Intent, Shortcut,
-or Android App Action producer.
+review is persisted, and that Phase 217D integration introduced no Siri, App
+Intent, Shortcut, or Android App Action producer. Phase 217G later adds only
+the availability-gated Apple review producer described below.
 
 Phase 217E adds the private **Apple system-assistant ingress foundation**. One
 iOS-native process-memory slot may carry only schema version `1`, a bounded
@@ -868,13 +869,16 @@ single-slot inbox accepts it. The Apple adapter clears only that acknowledged
 request; it cannot prepare, inspect, confirm, or execute a Haven Action and it
 has no timer, queue, transcript, persistence, network, or AI access.
 
-Public Siri and Shortcuts registration is still disabled. The Runner declares
-no App Intent, App Shortcut provider, Siri entitlement, Siri usage description,
-deep link, or dependency. Its only native assistant copy is the reviewed String
-Catalog and fail-closed accessor described below; neither can submit a request.
-Availability-gated Apple registration, signed builds, real-device
-Siri/Shortcuts and VoiceOver checks, store review, and distribution remain
-separate. Android App Actions remain unchanged and separate.
+Phase 217G activates five parameter-free App Intents and five matching App
+Shortcuts only when iOS 16 or later is available. Each route uses the reviewed
+Apple String Catalog, requires device authentication, opens FocusHaven, and may
+place only the existing three-field request into the process-memory ingress
+slot. iOS 15 launch and app behavior remain unchanged. The native result says
+only that the request is ready for review, already pending, or unavailable; it
+cannot read timer or queue state, confirm a review, or execute a Haven Action.
+No Siri entitlement, usage description, deep link, third-party dependency, or
+Android App Action is added. Signed builds, real-device Siri/Shortcuts and
+VoiceOver checks, store review, and distribution remain separate release gates.
 
 Phase 217F adds the closed **Apple system-assistant native copy review
 foundation** without registering a native action. One isolated English
@@ -904,12 +908,16 @@ accepts only the five reviewed `applicationName` placeholders and fails closed
 for missing or malformed formats. The Apple-native keys remain absent from all
 Flutter ARB catalogs.
 
-This integration supplies reviewed text only. Runner still imports no App
-Intents framework, declares no `AppIntent` or App Shortcut provider, adds no
-Siri entitlement, and grants no submission, timer, queue, confirmation, or
-Haven Action authority. Availability-gated registration, real-device Siri and
-Shortcuts checks, signed builds, store review, and distribution remain later,
-separately authorized gates. Android App Actions remain independent.
+That catalog integration supplied reviewed text only and granted no request or
+execution authority. Phase 217G now consumes it through one dedicated
+availability-gated App Intents source and one mechanically derived
+seventeen-locale `AppShortcuts.strings` family. The five shortcuts have no parameters and
+open FocusHaven for the existing visible review. Submission stops at the Phase
+217E single-slot ingress; native acknowledgement is never the in-app Confirm
+action. The registration adds no Siri entitlement and grants no timer, queue,
+confirmation, or Haven Action authority. Real-device checks, signed builds,
+store review, and distribution remain later, separately authorized gates.
+Android App Actions remain independent.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

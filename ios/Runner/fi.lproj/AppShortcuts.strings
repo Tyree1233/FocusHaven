@@ -1,0 +1,7 @@
+/* Generated from the reviewed Phase 217F Apple-native phrase catalog. Do not edit. */
+
+"Review my Focus timer status in ${applicationName}" = "Tarkista keskittymisajastimen tila ${applicationName}:ssa";
+"Review starting a Focus timer in ${applicationName}" = "Tarkastele keskittymisajastimen käynnistämistä ${applicationName}:ssä";
+"Review pausing my Focus timer in ${applicationName}" = "Tarkista keskittymisajastimeni pysäyttäminen ${applicationName}:ssä";
+"Review resuming my Focus timer in ${applicationName}" = "Keskittymisajastimen palauttamisen tarkastelu ${applicationName}:ssa";
+"Review opening Focus Queue in ${applicationName}" = "Tarkista ${applicationName}n keskittymisjonon avaaminen";

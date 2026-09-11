@@ -1,7 +1,7 @@
 # Apple system-assistant ingress review gate
 
-Status: Phase 217F reviewed Apple-native catalog and typed accessor active;
-public Siri, App Intent, and App Shortcut registration disabled.
+Status: Phase 217G availability-gated App Intent and App Shortcut registration
+active on iOS 16 and later; execution, release, and Android registration closed.
 
 ## Purpose
 
@@ -53,22 +53,24 @@ fresh-state proposal, two-minute expiry, visible localized review, exact
 confirmation, policy revalidation, and service-owner execution path remains
 unchanged.
 
-## Deliberately closed registration boundary
+## Availability-gated registration boundary
 
-The Runner target contains no App Intents framework import, `AppIntent`
-conformance, App Shortcut provider, Siri entitlement, Siri usage description,
-supported-intent declaration, deep link, or added dependency. The iOS 15
-deployment target is unchanged. No Android manifest or resource is modified.
+Phase 217G adds one dedicated App Intents source, exactly five parameter-free
+`AppIntent` conformances, exactly five App Shortcuts, and a mechanically derived
+seventeen-locale `AppShortcuts.strings` family. The registration call is
+guarded by iOS 16 availability while the deployment target remains iOS 15. No
+Siri entitlement, Siri usage description, supported-intent declaration, deep
+link, dependency, Android manifest entry, or Android resource is added.
 
-Before public Apple registration, a separate phase must:
+The registration foundation preserves these requirements:
 
 1. lock every native title, description, phrase, parameter summary, and result
    statement as complete English copy;
 2. obtain independent fluent approval for all fifteen non-English production
    languages and derive base Portuguese only from reviewed Brazilian
    Portuguese where applicable;
-3. add availability-gated App Intents for supported Apple OS versions without
-   changing behavior on iOS 15;
+3. compile availability-gated App Intents only on supported Apple OS versions
+   without changing behavior on iOS 15;
 4. prove every invocation opens FocusHaven for review and never reports that an
    action succeeded before the in-app Confirm action settles it;
 5. test cold launch, warm launch, replay, stacking, cancellation, stale owner
@@ -96,15 +98,16 @@ locks for the supported-language set. No provider draft, CSV, workbook,
 approval, Apple string catalog, App Intent, App Shortcut provider, Siri
 entitlement, or native public copy is created by this foundation.
 
-Public registration remains a later Apple-only integration. It must consume
-only all-language approved native copy, preserve the Phase 217E three-field
-request and the in-app confirmation boundary, remain availability-gated above
-iOS 15, and pass real-device Siri, Shortcuts, large-text, and VoiceOver review.
-The independent fifteen-language review grants no Android or release authority.
+Phase 217G consumes only the all-language approved native copy, preserves the
+Phase 217E three-field request and in-app confirmation boundary, and remains
+availability-gated above iOS 15. Real-device Siri, Shortcuts, large-text, and
+VoiceOver review plus signed release and store gates remain uncompleted. The
+independent fifteen-language review grants no Android or release authority.
 
 The completed Phase 217F integration now supplies the exact reviewed catalog
 and typed lookup needed by a later adapter. It does not call the Phase 217E
 store or platform channel, and it cannot submit, acknowledge, clear, confirm,
 or execute a request. The ingress payload remains exactly schema version,
-opaque invocation ID, and route kind. Public discovery and registration remain
-closed.
+opaque invocation ID, and route kind. Phase 217G registration may submit only
+that request and opens FocusHaven; it cannot acknowledge delivery as in-app
+confirmation or call any timer, queue, review-settlement, or execution owner.

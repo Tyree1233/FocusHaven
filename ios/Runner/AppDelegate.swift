@@ -17,6 +17,15 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(deliverSubmittedSystemAssistantAppleRequest(_:)),
+      name: .havenSystemAssistantAppleRequestSubmitted,
+      object: nil
+    )
+    if #available(iOS 16.0, *) {
+      HavenSystemAssistantAppleAppShortcutRegistration.updateParameters()
+    }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
@@ -82,5 +91,11 @@ import UIKit
 
   func deliverSystemFocusPendingCommand() {
     systemFocusAdapter?.deliverWarmPendingCommand()
+  }
+
+  @objc private func deliverSubmittedSystemAssistantAppleRequest(
+    _ notification: Notification
+  ) {
+    systemAssistantAppleAdapter?.deliverPendingRequest()
   }
 }

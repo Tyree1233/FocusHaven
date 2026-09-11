@@ -1,5 +1,11 @@
 import Foundation
 
+extension Notification.Name {
+  static let havenSystemAssistantAppleRequestSubmitted = Notification.Name(
+    "HavenSystemAssistantAppleRequestSubmitted"
+  )
+}
+
 /// The complete Apple-side mirror of the Phase 217A text-free route allowlist.
 enum HavenSystemAssistantAppleRoute: String, CaseIterable {
   case readTimerStatus

@@ -1,0 +1,7 @@
+/* Generated from the reviewed Phase 217F Apple-native phrase catalog. Do not edit. */
+
+"Review my Focus timer status in ${applicationName}" = "Examen de l'état de mon minuteur de concentration dans ${applicationName}";
+"Review starting a Focus timer in ${applicationName}" = "Examen du démarrage d'un minuteur de concentration dans ${applicationName}";
+"Review pausing my Focus timer in ${applicationName}" = "Examen de la mise en pause de mon minuteur de concentration dans ${applicationName}";
+"Review resuming my Focus timer in ${applicationName}" = "Examen de la reprise de mon minuteur de concentration dans ${applicationName}";
+"Review opening Focus Queue in ${applicationName}" = "Examen de l'ouverture de la file d'attente de concentration dans ${applicationName}";

@@ -1,8 +1,8 @@
 # Apple system-assistant native copy review gate
 
-Status: Phase 217F fifteen-language review accepted and reviewed Apple String
-Catalog integration active; public Siri, App Intent, and App Shortcut
-registration disabled.
+Status: Phase 217F reviewed Apple String Catalog integrated and Phase 217G
+availability-gated App Intent and App Shortcut registration active on iOS 16+;
+execution and release authority remain closed.
 
 ## Purpose
 
@@ -116,18 +116,17 @@ reviewer identity. Contract tests prove all seventeen Apple localizations,
 exact `pt-BR`-to-`pt` derivation, complete key coverage, catalog compilation,
 and continued separation from the seventeen Flutter runtime catalogs.
 
-## Deliberately closed placement and release boundary
+## Placement and release boundary
 
 The original Phase 217F copy-lock commit contained no native catalog or
-accessor. The reviewed catalog integration adds only those two copy resources
-and their tests. It contains no App Intents framework import, `AppIntent`
-conformance, App Shortcut provider, Siri entitlement, Siri usage description,
-supported-intent declaration, deep link, dependency, Android resource, or
-Android manifest change. All twenty-eight keys remain absent from every Flutter
-runtime catalog and from every Runner source except the typed copy accessor.
+accessor, and the reviewed catalog integration added only those two copy
+resources and their tests. Phase 217G separately adds the dedicated App Intents
+source and the derived App Shortcuts catalog. It adds no Siri entitlement, Siri
+usage description, supported-intent declaration, deep link, dependency,
+Android resource, or Android manifest change. All twenty-eight keys remain
+absent from every Flutter runtime catalog.
 
-A later Apple-only integration may proceed only after all fifteen reviews are
-complete and must:
+The Apple-only registration may operate only under this locked contract:
 
 1. map approved keys into a localized Apple string catalog without changing
    their meaning or `applicationName` placeholder;
@@ -141,7 +140,12 @@ complete and must:
 6. complete large-text, VoiceOver, Siri, and Shortcuts checks in every supported
    language on real devices;
 7. complete fresh signed builds, privacy and store-disclosure review, candidate
-   validation, and explicit distribution authorization.
+   validation, and explicit distribution authorization before release.
+
+Phase 217G implements items 1–4 in an unsigned, no-device registration
+foundation. Items 5–7 remain closed release gates. Native submission may report
+only ready for review, pending review, or unavailable; it is never confirmation
+and never proof that a timer or queue action occurred.
 
 Apple copy approval cannot authorize Android registration. Android App Actions
 remain a separate later copy, adapter, review, test, and release gate.

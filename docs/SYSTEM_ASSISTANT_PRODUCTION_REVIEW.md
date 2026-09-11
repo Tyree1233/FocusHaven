@@ -1,9 +1,9 @@
 # System assistant production review gate
 
-Status: Phase 217F Apple-native English copy and fifteen-language review
-foundation active; all seventeen Flutter runtime catalogs and the app-level
-review host are enabled, while public Apple and Android system-assistant
-registration remains disabled.
+Status: Phase 217G availability-gated Apple review registration active on iOS
+16 and later; all seventeen Flutter runtime catalogs and the app-level review
+host are enabled, while execution, release, and Android registration remain
+closed.
 
 ## Purpose
 
@@ -120,8 +120,9 @@ The reviewed copy grants no timer, queue, navigation, persistence, provider,
 network, AI, deployment, publication, or phone authority. The integration
 changes no dependency, permission, entitlement, manifest, deep link, or
 platform file. The Phase 217B bridge and Haven Action Engine remain the only
-path that can settle a fresh, explicitly confirmed review. Siri, App Intents,
-Shortcuts, and Android App Actions remain unregistered.
+path that can settle a fresh, explicitly confirmed review. Phase 217G App
+Intents and Shortcuts can only submit into that review path; Android App Actions
+remain unregistered.
 
 Phase 217E adds only the private Apple delivery seam described in
 `APPLE_SYSTEM_ASSISTANT_INGRESS_REVIEW.md`. Its exact three-field payload may
@@ -145,3 +146,17 @@ derived from approved Brazilian Portuguese, and a typed accessor maps the five
 routes without calling the native store or Flutter transport. It adds no App
 Intent, Shortcut provider, entitlement, request submission, confirmation, or
 execution authority.
+
+Phase 217G separately adds availability-gated Apple entry points for those five
+reviewed routes on iOS 16 and later. Each App Intent has no parameters, requires
+authentication, opens FocusHaven, and may submit only the existing schema
+version, opaque invocation ID, and route kind to the one-slot process-memory
+ingress. A native result reports only ready for review, pending review, or
+unavailable. It never confirms the review or claims that a timer or queue action
+happened.
+
+The iOS 15 deployment target remains unchanged. No Siri entitlement, deep link,
+third-party dependency, Android registration, persistence, timer/queue owner,
+or Haven Action execution call is added. Real-device Siri, Shortcuts, VoiceOver,
+large-text, signed-release, store-review, candidate, and distribution gates
+remain closed.

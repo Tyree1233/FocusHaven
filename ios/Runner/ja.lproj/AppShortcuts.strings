@@ -1,0 +1,7 @@
+/* Generated from the reviewed Phase 217F Apple-native phrase catalog. Do not edit. */
+
+"Review my Focus timer status in ${applicationName}" = "${applicationName}でフォーカスタイマーの状態を確認する";
+"Review starting a Focus timer in ${applicationName}" = "${applicationName}でフォーカスタイマーの開始を確認する";
+"Review pausing my Focus timer in ${applicationName}" = "${applicationName}でフォーカスタイマーの一時停止を確認する";
+"Review resuming my Focus timer in ${applicationName}" = "${applicationName}でフォーカスタイマーの再開を確認する";
+"Review opening Focus Queue in ${applicationName}" = "${applicationName}のフォーカスキューの開始を確認する";

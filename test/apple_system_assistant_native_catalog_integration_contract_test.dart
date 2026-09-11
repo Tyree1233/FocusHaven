@@ -174,30 +174,37 @@ void main() {
     expect(accessor, isNot(contains('.submit(')));
   });
 
-  test('project wires only the catalog accessor and focused native test', () {
-    final project = File(
-      'ios/Runner.xcodeproj/project.pbxproj',
-    ).readAsStringSync();
+  test(
+    'project preserves the catalog foundation beside reviewed registration',
+    () {
+      final project = File(
+        'ios/Runner.xcodeproj/project.pbxproj',
+      ).readAsStringSync();
 
-    expect(
-      project,
-      contains('AppleSystemAssistantNativeCopy.xcstrings in Resources'),
-    );
-    expect(
-      project,
-      contains('HavenSystemAssistantAppleNativeCopy.swift in Sources'),
-    );
-    expect(
-      project,
-      contains('HavenSystemAssistantAppleNativeCopyTests.swift in Sources'),
-    );
-    for (final locale in expectedLocales.where((locale) => locale != 'en')) {
-      expect(project, contains(locale), reason: locale);
-    }
-    expect(project, isNot(contains('SystemAssistantAppIntent.swift')));
-    expect(project, isNot(contains('AppShortcutsProvider')));
-    expect(project, isNot(contains('Siri')));
-  });
+      expect(
+        project,
+        contains('AppleSystemAssistantNativeCopy.xcstrings in Resources'),
+      );
+      expect(
+        project,
+        contains('HavenSystemAssistantAppleNativeCopy.swift in Sources'),
+      );
+      expect(
+        project,
+        contains('HavenSystemAssistantAppleNativeCopyTests.swift in Sources'),
+      );
+      for (final locale in expectedLocales.where((locale) => locale != 'en')) {
+        expect(project, contains(locale), reason: locale);
+      }
+      expect(
+        project,
+        contains('HavenSystemAssistantAppleAppIntents.swift in Sources'),
+      );
+      expect(project, contains('AppShortcuts.strings in Resources'));
+      expect(project, isNot(contains('AppShortcuts.xcstrings')));
+      expect(project, isNot(contains('Siri')));
+    },
+  );
 
   test('Flutter runtime localization remains isolated from Apple copy', () {
     final sourceKeys = messageKeys(readJson(proposalPath));

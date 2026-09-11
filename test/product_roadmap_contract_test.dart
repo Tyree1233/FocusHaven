@@ -36,7 +36,7 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Reviewed Apple-native catalog integrated; public native registration disabled |',
+          'Availability-gated Apple review registration active; Android disabled |',
     ]) {
       expect(
         roadmap,
@@ -274,6 +274,9 @@ void main() {
       'twenty-eight complete English messages',
       'must never enter Flutter ARBs',
       'copy approval alone grants no App Intent',
+      'Phase 217G availability-gated Apple registration',
+      'opens FocusHaven for the existing in-app review',
+      'never confirms or executes an action',
     ]) {
       expect(architecture, contains(required));
     }

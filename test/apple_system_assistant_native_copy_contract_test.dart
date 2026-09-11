@@ -167,7 +167,7 @@ void main() {
   });
 
   test(
-    'reviewed copy stays outside Flutter runtime and native registration',
+    'reviewed copy stays outside Flutter runtime and the accessor stays inert',
     () {
       final arb = proposal();
       final sourceKeys = arb.keys
@@ -188,10 +188,6 @@ void main() {
             file.path.endsWith('HavenSystemAssistantAppleNativeCopy.swift'),
       );
       final accessorSource = accessor.readAsStringSync();
-      final otherRunnerSource = runnerSources
-          .where((file) => file.path != accessor.path)
-          .map((file) => file.readAsStringSync())
-          .join('\n');
       final completeRunnerSource = runnerSources
           .map((file) => file.readAsStringSync())
           .join('\n');
@@ -209,11 +205,12 @@ void main() {
       }
       for (final key in sourceKeys) {
         expect(accessorSource, contains(key), reason: key);
-        expect(otherRunnerSource, isNot(contains(key)), reason: key);
       }
-      expect(completeRunnerSource, isNot(contains('import AppIntents')));
-      expect(completeRunnerSource, isNot(contains(': AppIntent')));
-      expect(completeRunnerSource, isNot(contains('AppShortcutsProvider')));
+      expect(accessorSource, isNot(contains('import AppIntents')));
+      expect(accessorSource, isNot(contains(': AppIntent')));
+      expect(accessorSource, isNot(contains('AppShortcutsProvider')));
+      expect(completeRunnerSource, contains('import AppIntents'));
+      expect(completeRunnerSource, contains('AppShortcutsProvider'));
     },
   );
 }

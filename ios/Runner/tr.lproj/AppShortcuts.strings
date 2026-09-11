@@ -1,0 +1,7 @@
+/* Generated from the reviewed Phase 217F Apple-native phrase catalog. Do not edit. */
+
+"Review my Focus timer status in ${applicationName}" = "${applicationName} Odak zamanlayıcımın durumunu inceleyin.";
+"Review starting a Focus timer in ${applicationName}" = "${applicationName} Odak zamanlayıcısını başlatmayı inceleyin.";
+"Review pausing my Focus timer in ${applicationName}" = "${applicationName} Odak zamanlayıcımı duraklatmayı inceleyin.";
+"Review resuming my Focus timer in ${applicationName}" = "${applicationName} Odak zamanlayıcımı devam ettirmeyi inceleyin.";
+"Review opening Focus Queue in ${applicationName}" = "${applicationName} Odak Kuyruğunun açılmasını inceleyin.";

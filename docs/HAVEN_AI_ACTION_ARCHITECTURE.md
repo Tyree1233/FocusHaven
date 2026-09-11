@@ -851,3 +851,38 @@ import App Intents, conform to `AppIntent`, publish shortcuts, call the Phase
 execution owners. The Flutter localization catalogs remain unchanged. Public
 registration, native assistant behavior, signed release validation, real-device
 accessibility checks, store review, and distribution remain later gates.
+
+## Phase 217G availability-gated Apple registration
+
+Phase 217G registers exactly five parameter-free Apple intents and five App
+Shortcuts on iOS 16 and later. The app continues to target iOS 15, and the
+registration refresh is protected by an availability check. Each shortcut
+phrase is derived from the reviewed Phase 217F phrase in all seventeen Apple
+catalog locales, replacing the one native `%@` application-name format token
+with the one App Shortcuts `${applicationName}` token. No untranslated or
+independently authored shortcut phrase is admitted.
+
+An App Intent may choose only one existing `HavenSystemAssistantAppleRoute` and
+generate one bounded opaque invocation ID. The submission seam first verifies
+that the route title, description, phrase, and all three possible result
+messages exist in the reviewed catalog. It then validates the exact Phase 217E
+request and attempts to place it in that phase's single process-memory slot.
+Missing copy, an invalid ID, or an occupied slot fails closed without replacing
+the pending request.
+
+Every App Intent requires authentication and opens FocusHaven for the existing in-app review.
+The only native results are ready for review, a review already
+pending, or unavailable. The native layer never confirms or executes an action,
+and its results never claim that timer status was read, a timer changed, Focus
+Queue opened, or a Haven Action ran. Native submission and Siri dialogue are not
+the in-app Confirm action. The existing Phase 217D host, Phase 217B fresh-state
+review service, and Haven Action Engine remain the only path to settlement.
+
+The registration source contains no parameter, transcript, utterance, duration,
+task, queue item, timer or queue owner, review service, engine, persistence,
+network, or AI dependency. It adds no Siri entitlement or usage description,
+deep link, Android manifest entry, or third-party dependency. Real-device Siri
+and Shortcuts behavior, cold and warm launch, VoiceOver, large text, all-language
+device review, signed release builds, privacy/store disclosure, candidate
+validation, and distribution remain separately authorized release gates.
+Android App Actions remain independent.
