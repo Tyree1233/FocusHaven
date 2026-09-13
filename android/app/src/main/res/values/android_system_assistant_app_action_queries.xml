@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- AAPT requires a default resource for shortcuts.xml linking. The App Actions contract still limits custom-intent invocation to en-US. -->
+    <string-array name="android_system_assistant_review_focus_timer_status_queries">
+        <item>@string/android_system_assistant_native_read_timer_status_invocation_example</item>
+    </string-array>
+    <string-array name="android_system_assistant_review_start_focus_timer_queries">
+        <item>@string/android_system_assistant_native_start_focus_timer_invocation_example</item>
+    </string-array>
+    <string-array name="android_system_assistant_review_pause_focus_timer_queries">
+        <item>@string/android_system_assistant_native_pause_timer_invocation_example</item>
+    </string-array>
+    <string-array name="android_system_assistant_review_resume_focus_timer_queries">
+        <item>@string/android_system_assistant_native_resume_timer_invocation_example</item>
+    </string-array>
+</resources>

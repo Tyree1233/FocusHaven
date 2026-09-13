@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <capability
+        android:name="custom.actions.intent.REVIEW_FOCUS_TIMER_STATUS"
+        app:queryPatterns="@array/android_system_assistant_review_focus_timer_status_queries">
+        <intent
+            android:action="com.focushaven.app.action.REVIEW_FOCUS_TIMER_STATUS"
+            android:targetClass="com.focushaven.app.MainActivity"
+            android:targetPackage="com.focushaven.app" />
+    </capability>
+    <capability
+        android:name="custom.actions.intent.REVIEW_START_FOCUS_TIMER"
+        app:queryPatterns="@array/android_system_assistant_review_start_focus_timer_queries">
+        <intent
+            android:action="com.focushaven.app.action.REVIEW_START_FOCUS_TIMER"
+            android:targetClass="com.focushaven.app.MainActivity"
+            android:targetPackage="com.focushaven.app" />
+    </capability>
+    <capability
+        android:name="custom.actions.intent.REVIEW_PAUSE_FOCUS_TIMER"
+        app:queryPatterns="@array/android_system_assistant_review_pause_focus_timer_queries">
+        <intent
+            android:action="com.focushaven.app.action.REVIEW_PAUSE_FOCUS_TIMER"
+            android:targetClass="com.focushaven.app.MainActivity"
+            android:targetPackage="com.focushaven.app" />
+    </capability>
+    <capability
+        android:name="custom.actions.intent.REVIEW_RESUME_FOCUS_TIMER"
+        app:queryPatterns="@array/android_system_assistant_review_resume_focus_timer_queries">
+        <intent
+            android:action="com.focushaven.app.action.REVIEW_RESUME_FOCUS_TIMER"
+            android:targetClass="com.focushaven.app.MainActivity"
+            android:targetPackage="com.focushaven.app" />
+    </capability>
+    <capability android:name="actions.intent.OPEN_APP_FEATURE">
+        <intent
+            android:action="com.focushaven.app.action.REVIEW_OPEN_FOCUS_QUEUE"
+            android:targetClass="com.focushaven.app.MainActivity"
+            android:targetPackage="com.focushaven.app">
+            <parameter
+                android:key="feature"
+                android:name="feature"
+                app:shortcutMatchRequired="true" />
+        </intent>
+    </capability>
+    <shortcut
+        android:shortcutId="focus_queue_review"
+        android:shortcutLongLabel="@string/android_system_assistant_native_open_focus_queue_long_label"
+        android:shortcutShortLabel="@string/android_system_assistant_native_open_focus_queue_short_label">
+        <capability-binding android:key="actions.intent.OPEN_APP_FEATURE">
+            <parameter-binding
+                android:key="feature"
+                android:value="@string/android_system_assistant_native_open_focus_queue_invocation_example" />
+        </capability-binding>
+    </shortcut>
+</shortcuts>

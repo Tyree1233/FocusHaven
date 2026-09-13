@@ -164,7 +164,7 @@ void main() {
     expect(accessor, isNot(contains('.submit(')));
   });
 
-  test('Flutter catalogs and Android public registration remain closed', () {
+  test('Flutter catalogs remain separate from Android native registration', () {
     final sourceKeys = messageKeys(readJson(proposalPath));
     final runtimeCatalogs = Directory('lib/l10n')
         .listSync()
@@ -182,27 +182,20 @@ void main() {
       );
     }
 
-    expect(
-      Directory('android/app/src/main')
-          .listSync(recursive: true)
-          .whereType<File>()
-          .where((file) => file.uri.pathSegments.last == 'shortcuts.xml'),
-      isEmpty,
-    );
-    final manifest = File(
-      'android/app/src/main/AndroidManifest.xml',
-    ).readAsStringSync();
-    expect(manifest, isNot(contains('android.app.shortcuts')));
-    expect(manifest, isNot(contains('actions.intent')));
-    final resources = Directory('android/app/src/main/res')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((file) => file.path.endsWith('.xml'))
-        .map((file) => file.readAsStringSync())
-        .join('\n');
-    expect(resources, isNot(contains('app:queryPatterns')));
-    expect(resources, isNot(contains('<capability')));
-    expect(resources, isNot(contains('<shortcut')));
+    final registration =
+        jsonDecode(
+              File(
+                'docs/contracts/android_system_assistant_app_actions_registration_v1.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>;
+    expect(registration['registrationSourceEnabled'], isTrue);
+    expect(registration['requestPayloadKeys'], [
+      'schemaVersion',
+      'invocationId',
+      'kind',
+    ]);
+    expect(registration['havenActionExecutionEnabled'], isFalse);
   });
 }
 

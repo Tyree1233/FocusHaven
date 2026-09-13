@@ -2,8 +2,8 @@
 
 Status: Phase 217H private Android-to-Flutter ingress active, Phase 217I
 reviewed Android-native resource catalog integrated, and Phase 217J exact App
-Actions mapping reviewed; public registration, release, and execution remain
-closed.
+Actions mapping reviewed; Phase 217K source registration is active while
+Assistant preview, release, and execution remain closed.
 
 ## Purpose
 
@@ -135,3 +135,22 @@ intent, query pattern, fulfillment, static shortcut, manifest metadata, deep
 link, permission, dependency, request submission, or production registration.
 Copy approval and resource integration cannot authorize public registration, Assistant
 preview, request execution, signed release, Play distribution, or phone access.
+
+## Phase 217K exact registration result
+
+Phase 217K implements the Phase 217J mapping through one launcher-referenced
+`shortcuts.xml`, four en-US-only custom query arrays, one constant queue
+inventory, AndroidX Core, and one fail-closed Kotlin resolver. Cold and warm
+activity launches can submit only the existing five text-free routes into the
+same single process-memory slot.
+
+Timer fulfillments reject every extra. Queue fulfillment requires exactly one
+`feature=focus_queue_review` value and discards it before request construction.
+Unknown actions, extra inputs, URI data, `ClipData`, selectors, missing copy,
+and malformed IDs fail closed. Recognized intents are replaced after
+resolution so activity recreation cannot replay them.
+
+Registration and request submission now exist in source, but confirmation and
+execution remain closed. No native path reads or changes timer or queue state.
+Assistant preview, real-device checks, signing, Play review, candidate
+validation, and distribution remain separate gates.

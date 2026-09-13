@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "contract": "focus_haven_phase217k_android_app_actions_registration_v1",
+  "mappingReviewCommit": "127a3039ab86878417a788db40e78eaf8c9431cf",
+  "mappingReviewContract": "docs/contracts/android_system_assistant_app_actions_mapping_v1.json",
+  "registrationSourceEnabled": true,
+  "shortcutsXmlCreated": true,
+  "manifestMetadataCreated": true,
+  "queryPatternResourceCreated": true,
+  "dependencyAdded": "androidx.core:core:1.17.0",
+  "requestSubmissionEnabled": true,
+  "assistantPreviewCreated": false,
+  "signedBuildCreated": false,
+  "realDeviceValidated": false,
+  "playDisclosureValidated": false,
+  "distributionAuthorized": false,
+  "reviewSettlementEnabled": false,
+  "havenActionExecutionEnabled": false,
+  "requestPayloadKeys": [
+    "schemaVersion",
+    "invocationId",
+    "kind"
+  ],
+  "customIntentQueryPatternLocale": "en-US",
+  "openAppFeatureInventory": {
+    "parameter": "feature",
+    "shortcutId": "focus_queue_review",
+    "acceptedExtraValue": "focus_queue_review",
+    "copiedIntoRequest": false
+  },
+  "fulfillment": {
+    "targetPackage": "com.focushaven.app",
+    "targetClass": "com.focushaven.app.MainActivity",
+    "coldLaunchHandled": true,
+    "warmLaunchHandled": true,
+    "fulfillmentIntentRetainedAfterResolution": false,
+    "unknownActionRejected": true,
+    "unknownExtraRejected": true,
+    "uriDataRejected": true,
+    "clipDataRejected": true,
+    "selectorRejected": true
+  },
+  "routes": [
+    {
+      "route": "readTimerStatus",
+      "capabilityId": "custom.actions.intent.REVIEW_FOCUS_TIMER_STATUS",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_FOCUS_TIMER_STATUS",
+      "acceptedExtras": []
+    },
+    {
+      "route": "startFocusTimer",
+      "capabilityId": "custom.actions.intent.REVIEW_START_FOCUS_TIMER",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_START_FOCUS_TIMER",
+      "acceptedExtras": []
+    },
+    {
+      "route": "pauseTimer",
+      "capabilityId": "custom.actions.intent.REVIEW_PAUSE_FOCUS_TIMER",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_PAUSE_FOCUS_TIMER",
+      "acceptedExtras": []
+    },
+    {
+      "route": "resumeTimer",
+      "capabilityId": "custom.actions.intent.REVIEW_RESUME_FOCUS_TIMER",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_RESUME_FOCUS_TIMER",
+      "acceptedExtras": []
+    },
+    {
+      "route": "openFocusQueue",
+      "capabilityId": "actions.intent.OPEN_APP_FEATURE",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_OPEN_FOCUS_QUEUE",
+      "acceptedExtras": [
+        "feature=focus_queue_review"
+      ]
+    }
+  ]
+}

@@ -957,9 +957,24 @@ Existing Flutter runtime-catalog hashes are freshness locks only: this
 Android-native copy is not Flutter runtime content and must never be merged
 into those ARB catalogs. The reviewed resource integration creates no
 `shortcuts.xml`, capability, query pattern, manifest metadata, fulfillment
-intent, production registration, request submission, or execution path. Public
-App Actions registration remains disabled and is a separately reviewed and
-explicitly authorized later gate.
+intent, production registration, request submission, or execution path. At the
+Phase 217I checkpoint, public App Actions registration remained a separately
+reviewed and explicitly authorized later gate.
+
+Phase 217J then locks the exact Android capability mapping, and Phase 217K
+implements that reviewed mapping in source. The launcher activity now
+references one `shortcuts.xml` containing four parameter-free, en-US-only
+custom timer-review capabilities and one `OPEN_APP_FEATURE` queue-review
+capability. The queue inventory accepts only `focus_queue_review`, validates
+it, and discards it before the existing three-field request is created.
+
+One fail-closed Kotlin resolver rejects unknown actions, extra values, URI
+data, `ClipData`, selectors, missing reviewed copy, and invalid generated IDs.
+Cold and warm launches share that resolver, and the activity replaces a
+recognized fulfillment intent with a neutral package-scoped launch intent so
+recreation cannot replay it. Submission still stops at the visible in-app
+review; Assistant preview, signed builds, device validation, Play review,
+distribution, confirmation, and Haven Action execution remain closed.
 
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and

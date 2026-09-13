@@ -67,5 +67,6 @@ warm launch, process termination, occupied-request behavior, cancellation,
 replay, stale owner state, Siri and Shortcuts discovery, VoiceOver, large text,
 and every supported language on real devices. It must also complete fresh
 signed builds, privacy and store-disclosure review, candidate validation, and
-explicit distribution authorization. Android App Actions require their own
-copy, adapter, review, test, and release phase.
+explicit distribution authorization. Android App Actions completed their own
+copy, adapter, mapping review, and source-registration work through Phase 217K;
+their preview, device, signing, Play-review, and release gates remain separate.

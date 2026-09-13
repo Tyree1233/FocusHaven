@@ -70,7 +70,7 @@ Every future phase must preserve these rules:
 | Voice-to-Coach | Shipped | Explicit tap-to-talk creates an editable coaching draft; FocusHaven keeps no raw-audio history and sends nothing until the person taps Send. English and Spanish pass an explicit speech locale, and bounded physical Spanish recognition is accepted on Android and iOS. | Validate Spanish Local Coach language behavior plus fresh Android and Apple release, permission, and store-disclosure answers before distribution. |
 | Safe voice commands | Shipped | Explicit tap-to-talk creates an editable action draft; Review action creates a local proposal; a second visual control runs or exactly confirms it through the same policy as typing. English and Spanish now pass an explicit speech locale to the recognizer. | Complete Spanish command-interpretation review, real-device command acceptance, fresh platform builds, and store-disclosure validation before distribution. |
 | Global localization | Sixteen reviewed in-app languages active | The production runtime supports English, Spanish, French, German, Brazilian Portuguese, Japanese, Korean, Italian, Polish, Dutch, Indonesian, Turkish, Swedish, Norwegian Bokmål, Danish, and Finnish; follows a supported device language by default; and provides matching local Appearance choices. German and Brazilian Portuguese retain independent batch reviews and runtime locks. Japanese and Korean additionally passed exact physical Android and iOS CJK glyph, fallback, wrapping, large-text, branding, repetition, contamination, and control-clearance checks before activation. Italian, Polish, and Dutch retain independent 980-message reviews, anonymous validation records, zero content-safety issues, and exact reviewed-to-runtime locks. The six Google-assisted draft locales retain independent private fluent reviews, anonymous validation records, zero content-safety issues across 5,880 messages, and exact reviewed-to-runtime locks; provider output itself granted no approval or runtime authority. Flutter's required base `pt` fallback remains a mechanical derivative rather than a separate language choice. The picker remains registry-driven and English remains the fallback. | Reuse the bounded batch path for later reviewed languages; keep speech, screen-reader, right-to-left, store promotion, and country distribution behind their separate gates. |
-| Siri, Shortcuts, and Android App Actions | Availability-gated Apple review registration and reviewed Android mapping foundation active | Phases 217A–217C define five text-free, replay-bounded drafts, one fresh-state two-minute review bridge, and a one-shot accessible card. Phase 217D adds 165 independently reviewed decisions to all seventeen runtime catalogs and one memory-only app-level host. Phases 217E–217G add reviewed, availability-gated Apple ingress and registration. Phase 217H adds a private Android delivery seam. Phase 217I accepts all fifteen independent Android-native copy reviews and integrates twenty-eight placeholder-free messages into seventeen localized Android resource files plus a typed fail-closed accessor. Phase 217J reviews four parameter-free custom timer capabilities and one `OPEN_APP_FEATURE` queue capability without enabling public registration. | Implement the exact reviewed Android mapping behind fail-closed fulfillment while preserving honest locale limits, in-app confirmation, and all device, privacy, signing, store, and distribution gates. |
+| Siri, Shortcuts, and Android App Actions | Availability-gated Apple registration and source-gated Android registration active | Phases 217A–217C define five text-free, replay-bounded drafts, one fresh-state two-minute review bridge, and a one-shot accessible card. Phase 217D adds 165 independently reviewed decisions to all seventeen runtime catalogs and one memory-only app-level host. Phases 217E–217G add reviewed, availability-gated Apple ingress and registration. Phase 217H adds a private Android delivery seam. Phase 217I accepts all fifteen independent Android-native copy reviews and integrates twenty-eight placeholder-free messages into seventeen localized Android resource files plus a typed fail-closed accessor. Phase 217J reviews four parameter-free custom timer capabilities and one `OPEN_APP_FEATURE` queue capability. Phase 217K implements exactly that mapping and submits only to the existing in-app review boundary. | Complete official Assistant preview, real-device accessibility and language checks, signed builds, Play disclosure review, candidate validation, and explicit distribution authorization without widening request or execution authority. |
 | Soundscapes and focus environments | Planned | No built-in soundscape engine or generated environment exists. | Begin with bundled/offline audio and explicit playback controls before considering generated media. |
 | Haven Rooms and body doubling | Deferred | There is no social presence, matching, chat, or shared timer service. | Revisit only after identity, abuse prevention, moderation, age, reporting, privacy, and operating-cost plans exist. |
 | Focus Score | Replaced | FocusHaven intentionally avoids a productivity score. | If a summary is useful, design **Haven Momentum** as non-punitive, explainable, private, and never competitive. |
@@ -938,6 +938,27 @@ resolver, capability, static shortcut, Assistant preview, request submission,
 or execution. Implementation, official preview, real-device accessibility and
 language checks, signed builds, Play disclosure review, candidate validation,
 and distribution remain separate gates.
+
+### Phase 217K — Android App Actions registration foundation
+
+Implement the exact reviewed Phase 217J mapping with one `shortcuts.xml`, four
+en-US custom-intent query arrays, one constant `OPEN_APP_FEATURE` inventory,
+launcher-activity metadata, the required AndroidX Core dependency, and one
+fail-closed resolver. Timer routes accept no extras. Queue review accepts
+exactly one `feature` extra equal to `focus_queue_review`; the value is
+validated and discarded before the existing schema-version, opaque-ID, and
+route-kind request is submitted.
+
+Cold and warm fulfillment share the same resolver. Unknown actions, changed or
+additional extras, URI data, `ClipData`, selectors, missing reviewed copy, and
+malformed generated IDs fail closed. After a recognized attempt, the activity
+retains only a neutral package-scoped launch intent, preventing recreation
+from replaying the public fulfillment. Submission remains separate from the
+visible **Confirm action** and never reads or changes timer or queue state.
+
+Assistant preview, real-device TalkBack and language checks, signed candidate
+builds, Play disclosure review, distribution, review settlement, and Haven
+Action execution remain later, separately authorized gates.
 
 ### Phase 218 — Soundscapes and focus environments
 

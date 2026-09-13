@@ -3,8 +3,9 @@
 Status: Phase 217G availability-gated Apple review registration active on iOS
 16 and later; all seventeen Flutter runtime catalogs and the app-level review
 host are enabled; Phase 217I reviewed Android-native resource catalog is active;
-Phase 217J exact Android capability mapping is reviewed; execution, release,
-and public Android registration remain closed.
+Phase 217J exact Android capability mapping is reviewed; Phase 217K source
+registration and bounded request submission are active; execution, Assistant
+preview, device validation, signing, Play review, and release remain closed.
 
 ## Purpose
 
@@ -194,3 +195,16 @@ BIIs remain forbidden substitutes. The custom-intent locale is limited to
 `en-US`, and reviewed copy cannot create unsupported Assistant locale claims.
 The mapping creates no capability resource, manifest metadata, dependency,
 resolver, request submission, review settlement, or execution authority.
+
+Phase 217K now implements the exact reviewed Android registration in source.
+Four en-US-only custom capabilities accept no parameters. The queue BII
+requires exactly one `feature` extra equal to `focus_queue_review`; that value
+is validated and discarded before the existing three-field request is built.
+One resolver handles cold and warm launches, rejects all unreviewed input, and
+replaces a recognized fulfillment intent after resolution to prevent replay.
+
+This enables source registration and bounded request submission only. The
+request still enters the existing visible review and cannot settle itself.
+Assistant preview, signed builds, real-device validation, Play disclosures,
+distribution, timer or queue mutation, and Haven Action execution remain
+closed.

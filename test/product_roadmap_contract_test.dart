@@ -36,8 +36,8 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Availability-gated Apple review registration and reviewed '
-          'Android mapping foundation active |',
+          'Availability-gated Apple registration and source-gated Android '
+          'registration active |',
     ]) {
       expect(
         roadmap,
@@ -289,11 +289,16 @@ void main() {
       'copy approval alone grants no App Action',
       'reviewed Android-native resource catalog',
       'seventeen localized Android resource files',
-      'Public App Actions registration remains disabled',
+      'At the Phase 217I checkpoint, public App Actions registration remains '
+          'disabled',
       'Phase 217J reviewed Android capability mapping',
       'each map to a distinct parameter-free custom intent',
       '`actions.intent.OPEN_APP_FEATURE`',
       'reviewed app copy does not expand Assistant locale eligibility',
+      'Phase 217K Android App Actions registration',
+      'exactly one `feature` extra',
+      'neutral package-scoped launch intent',
+      'Assistant preview, signed candidate, Play review, distribution',
     ]) {
       expect(architecture, contains(required));
     }

@@ -947,7 +947,7 @@ closed for a missing, blank, oversized, control-bearing, or parameterized
 value. Phase 217I still adds no `shortcuts.xml`, capability, query pattern,
 manifest metadata, fulfillment intent, deep link, dependency, permission,
 public registration, request submission, production consumer, or execution path.
-Public App Actions registration remains disabled.
+At the Phase 217I checkpoint, public App Actions registration remains disabled.
 Official Assistant preview, real-device accessibility and language checks,
 signed builds, Play disclosure review, candidate validation, and distribution
 remain separately reviewed and authorized. Apple approval cannot authorize
@@ -974,3 +974,34 @@ extra cannot enter that request. Custom-intent invocation is limited to
 The mapping contract is review evidence only. It creates no `shortcuts.xml`,
 query patterns, manifest metadata, dependency, resolver, public registration,
 Assistant preview, request, review settlement, or Haven Action execution.
+
+## Phase 217K Android App Actions registration
+
+Phase 217K implements only the reviewed five-route mapping. Four distinct
+parameter-free custom intents use default-resource query arrays so Android can
+link the base `shortcuts.xml`; the separate capability contract still limits
+custom-intent eligibility to `en-US`. One
+`actions.intent.OPEN_APP_FEATURE` capability uses a single inline-inventory
+shortcut whose ID is `focus_queue_review`. Every fulfillment explicitly
+targets the existing `MainActivity`; no deep link or new exported component is
+added.
+
+`HavenSystemAssistantAndroidAppActionResolver` maps only the five exact action
+strings. Timer actions require no extras. Queue review requires exactly one
+`feature` extra with the reviewed constant, then discards it. Unknown actions,
+additional inputs, URI data, `ClipData`, selectors, incomplete reviewed copy,
+or malformed invocation IDs fail closed. A valid request still contains only
+schema version, one bounded opaque invocation ID, and one hard-coded route.
+
+Cold and warm delivery use the same resolver. A recognized fulfillment is
+replaced by a neutral package-scoped launch intent after resolution so Android
+activity recreation cannot replay it. Successful native submission ends at
+the Phase 217D memory inbox and visible review. It is not confirmation and
+cannot import or call the timer, queue, review-settlement service, or Haven
+Action Engine.
+
+The source adds the required AndroidX Core dependency and manifest shortcut
+metadata but no permission, background component, persistence, network, or AI.
+Assistant preview, signed candidate, Play review, distribution, real-device
+accessibility and locale validation, review settlement, and Haven Action
+execution remain closed.

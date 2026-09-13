@@ -2,8 +2,8 @@
 
 Status: Phase 217I English Android-native copy, fifteen-language review, and
 seventeen-locale resource integration complete; Phase 217J exact capability
-mapping reviewed; public App Actions registration, execution, and release
-authority remain closed.
+mapping reviewed; Phase 217K source registration is active while Assistant
+preview, execution, and release authority remain closed.
 
 ## Purpose
 
@@ -159,3 +159,15 @@ availability cannot widen platform eligibility.
 The exact mapping contract grants no implementation authority. Phase 217J adds
 no `shortcuts.xml`, query-pattern array, capability, static shortcut, manifest
 metadata, dependency, resolver, preview, request submission, or execution.
+
+Phase 217K separately consumes the approved resource catalog and mapping. The
+four custom capabilities reference only the reviewed English invocation
+examples in an en-US query configuration. The queue entity uses the reviewed
+short and long labels and one public `focus_queue_review` inventory ID. No new
+copy, placeholder, translation, or Flutter ARB value is introduced.
+
+The registration resolver requires complete reviewed route and outcome copy
+before it may submit the existing three-field request. Copy integration still
+grants no confirmation or execution authority, and Phase 217K creates no
+Assistant preview, signed build, Play upload, device validation, or
+distribution authorization.

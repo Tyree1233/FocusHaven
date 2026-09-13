@@ -330,3 +330,18 @@ Safe Voice Commands acceptance, language-aware coaching and action checks,
 signed candidate validation, and final store privacy answers remain required
 before distribution. Prior App Store and Play artifacts are not evidence for
 this changed permission, dependency, and action-input boundary.
+
+## Phase 217K Android App Actions privacy boundary
+
+Phase 217K implements only the reviewed Android registration. Four custom
+timer capabilities accept no parameter, and the queue capability accepts
+exactly one public inventory constant that is validated and discarded. Unknown
+actions, additional extras, URI data, `ClipData`, and selectors are rejected
+before the existing text-free request can be created. No transcript, utterance,
+task, duration, or queue content crosses the boundary.
+
+Native submission opens the existing review path but is not consent and cannot
+confirm or execute. Source registration adds no microphone behavior,
+permission, persistence, network, provider, or AI. Assistant preview, phone
+validation, signing, Play review, distribution, and Haven Action execution
+remain closed.

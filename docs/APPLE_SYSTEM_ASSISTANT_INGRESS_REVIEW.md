@@ -1,7 +1,8 @@
 # Apple system-assistant ingress review gate
 
 Status: Phase 217G availability-gated App Intent and App Shortcut registration
-active on iOS 16 and later; execution, release, and Android registration closed.
+active on iOS 16 and later; Phase 217K Android source registration is separate;
+execution and release remain closed on both platforms.
 
 ## Purpose
 

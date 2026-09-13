@@ -1,8 +1,8 @@
 # Android system-assistant App Actions mapping review
 
-Status: Phase 217J exact capability and fulfillment mapping reviewed; public
-Android registration, Assistant preview, request submission, execution, and
-release authority remain closed.
+Status: Phase 217J exact capability and fulfillment mapping reviewed; Phase
+217K separately implements the source registration while Assistant preview,
+execution, and release authority remain closed.
 
 ## Why this review exists
 

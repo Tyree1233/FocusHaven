@@ -134,19 +134,8 @@ void main() {
     );
   });
 
-  test('review creates no public Android registration or authority', () {
+  test('review evidence grants no registration or execution authority', () {
     final contract = readContract();
-    final manifest = File(
-      'android/app/src/main/AndroidManifest.xml',
-    ).readAsStringSync();
-    final gradle = File('android/app/build.gradle.kts').readAsStringSync();
-    final files = Directory(
-      'android/app/src/main',
-    ).listSync(recursive: true).whereType<File>().toList(growable: false);
-    final resourceText = files
-        .where((file) => file.path.endsWith('.xml'))
-        .map((file) => file.readAsStringSync())
-        .join('\n');
 
     for (final key in <String>[
       'registrationEnabled',
@@ -159,15 +148,19 @@ void main() {
     ]) {
       expect(contract[key], isFalse, reason: key);
     }
+    final registration =
+        jsonDecode(
+              File(
+                'docs/contracts/android_system_assistant_app_actions_registration_v1.json',
+              ).readAsStringSync(),
+            )
+            as Map<String, dynamic>;
     expect(
-      files.where((file) => file.path.endsWith('/shortcuts.xml')),
-      isEmpty,
+      registration['mappingReviewContract'],
+      'docs/contracts/android_system_assistant_app_actions_mapping_v1.json',
     );
-    expect(manifest, isNot(contains('android.app.shortcuts')));
-    expect(manifest, isNot(contains('actions.intent')));
-    expect(resourceText, isNot(contains('<capability')));
-    expect(resourceText, isNot(contains('app:queryPatterns')));
-    expect(gradle, isNot(contains('androidx.core:core')));
+    expect(registration['reviewSettlementEnabled'], isFalse);
+    expect(registration['havenActionExecutionEnabled'], isFalse);
   });
 
   test('documentation keeps registration and release gates closed', () {

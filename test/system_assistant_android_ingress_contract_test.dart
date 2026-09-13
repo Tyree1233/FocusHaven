@@ -94,7 +94,7 @@ void main() {
   });
 
   test(
-    'public Android Assistant registration and new authority stay closed',
+    'Android registration terminates at the existing review-only ingress',
     () {
       final manifest = _read('android/app/src/main/AndroidManifest.xml');
       final gradle = _read('android/app/build.gradle.kts');
@@ -107,22 +107,21 @@ void main() {
         _read('docs/ANDROID_SYSTEM_ASSISTANT_INGRESS_REVIEW.md'),
       );
 
-      expect(manifest, isNot(contains('android.app.shortcuts')));
-      expect(manifest, isNot(contains('actions.intent')));
+      expect(manifest, contains('android.app.shortcuts'));
       expect(manifest, isNot(contains('com.google.android.gms.actions')));
       expect(
         resources.where((path) => path.endsWith('/xml/shortcuts.xml')),
-        isEmpty,
+        hasLength(1),
       );
-      expect(gradle, isNot(contains('androidx.core:core')));
+      expect(gradle, contains('androidx.core:core:1.17.0'));
       expect(review, contains('five text-free routes'));
       expect(review, contains('process memory'));
       expect(review, contains('shortcuts.xml'));
-      expect(review, contains('remain closed'));
+      expect(review, contains('Phase 217K'));
       expect(review, contains('twenty-eight complete messages'));
       expect(review, contains('outside every Flutter runtime catalog'));
       expect(review, contains('seventeen isolated Android resource files'));
-      expect(review, contains('adds no `shortcuts.xml`'));
+      expect(review, contains('execution remain closed'));
     },
   );
 
