@@ -1005,3 +1005,27 @@ metadata but no permission, background component, persistence, network, or AI.
 Assistant preview, signed candidate, Play review, distribution, real-device
 accessibility and locale validation, review settlement, and Haven Action
 execution remain closed.
+
+## Phase 217L Android App Actions candidate validation
+
+Phase 217L adds only a machine-readable validation contract and human review
+plan for the exact Phase 217K source registration. The matrix binds all five
+routes to cold and warm delivery, the existing in-app review destination, no
+mutation, and neutral-intent replay rejection. It also enumerates the complete
+negative-input, TalkBack, large-text, display-size, locale, signed-candidate,
+and Play-review evidence required before Android distribution can be
+considered.
+
+The four custom intents retain matching `en-US` device and Assistant locale
+requirements. `OPEN_APP_FEATURE` remains bounded by its own official BII locale
+support; reviewed Android copy cannot widen either contract. Candidate evidence
+must identify one exact source tree, artifact hash, signing-certificate hash,
+tool version, platform version, and locale combination without preserving
+credentials, signing material, account identifiers, device identifiers, or
+private user content.
+
+This foundation contacts no Google account, creates no Assistant preview or
+signed candidate, accesses no phone or Play Console, uploads no artifact, and
+requests no review. App review, App Actions review, and FocusHaven distribution
+authorization remain three separate gates. Review settlement, timer or queue
+mutation, and Haven Action execution remain closed.

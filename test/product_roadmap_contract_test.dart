@@ -37,7 +37,7 @@ void main() {
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
           'Availability-gated Apple registration and source-gated Android '
-          'registration active |',
+          'registration active; Android candidate-validation contract ready |',
     ]) {
       expect(
         roadmap,
@@ -299,6 +299,9 @@ void main() {
       'exactly one `feature` extra',
       'neutral package-scoped launch intent',
       'Assistant preview, signed candidate, Play review, distribution',
+      'Phase 217L Android App Actions candidate validation',
+      'App review, App Actions review, and FocusHaven distribution',
+      'contacts no Google account',
     ]) {
       expect(architecture, contains(required));
     }

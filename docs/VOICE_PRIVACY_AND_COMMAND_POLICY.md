@@ -345,3 +345,19 @@ confirm or execute. Source registration adds no microphone behavior,
 permission, persistence, network, provider, or AI. Assistant preview, phone
 validation, signing, Play review, distribution, and Haven Action execution
 remain closed.
+
+## Phase 217L Android candidate-validation privacy boundary
+
+Phase 217L records the exact evidence required for later Assistant preview,
+device, signed-candidate, and Play validation without collecting that evidence.
+The future route matrix may retain only bounded technical identities and
+text-free pass or fail observations. Credentials, keystores, private keys,
+access tokens, account identifiers, device identifiers, transcripts, task and
+queue content, journal text, and coaching content are forbidden from Git and
+the evidence summary.
+
+Future screenshots or recordings must contain no private user content. A
+preview, app launch, Assistant acknowledgement, Play upload, app approval, or
+App Actions approval is not consent to settle a review or run an action. This
+foundation contacts no Google account, accesses no phone or Play Console, and
+creates no signed build, upload, review request, or distribution authority.

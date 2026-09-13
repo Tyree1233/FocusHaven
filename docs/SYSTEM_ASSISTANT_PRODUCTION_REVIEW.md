@@ -4,8 +4,9 @@ Status: Phase 217G availability-gated Apple review registration active on iOS
 16 and later; all seventeen Flutter runtime catalogs and the app-level review
 host are enabled; Phase 217I reviewed Android-native resource catalog is active;
 Phase 217J exact Android capability mapping is reviewed; Phase 217K source
-registration and bounded request submission are active; execution, Assistant
-preview, device validation, signing, Play review, and release remain closed.
+registration and bounded request submission are active; Phase 217L candidate
+validation requirements are locked; execution, Assistant preview, device
+validation, signing, Play review, and release remain closed.
 
 ## Purpose
 
@@ -207,4 +208,16 @@ This enables source registration and bounded request submission only. The
 request still enters the existing visible review and cannot settle itself.
 Assistant preview, signed builds, real-device validation, Play disclosures,
 distribution, timer or queue mutation, and Haven Action execution remain
+closed.
+
+Phase 217L locks the exact next-gate matrix without performing it. All five
+routes require cold and warm delivery into the same visible review, replay
+rejection, malformed-input rejection, honest locale eligibility, TalkBack and
+large-text checks, exact signed-candidate identity, current Play disclosures,
+separate App Actions review status, and explicit distribution authorization.
+
+No Google account, Assistant preview, signing identity, device, Play Console,
+upload, review request, or approval is part of the foundation. App approval,
+App Actions approval, and FocusHaven distribution authorization cannot
+substitute for one another. Review settlement and Haven Action execution remain
 closed.

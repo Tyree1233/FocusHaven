@@ -976,6 +976,15 @@ recreation cannot replay it. Submission still stops at the visible in-app
 review; Assistant preview, signed builds, device validation, Play review,
 distribution, confirmation, and Haven Action execution remain closed.
 
+Phase 217L adds the **Android App Actions candidate-validation contract**. It
+binds all five routes to cold and warm delivery, the visible in-app review, no
+mutation, replay rejection, malformed-input rejection, honest Assistant locale
+eligibility, TalkBack and large-text checks, one exact signed-candidate
+identity, current Play disclosures, separate App Actions review status, and an
+explicit distribution decision. It is a local foundation only: no Google
+account, Assistant preview, signing identity, phone, Play Console, upload,
+review request, settlement, execution, or release is accessed or authorized.
+
 Because Phases 212 and 213 use native microphone and speech-recognition
 capabilities, fresh Android and Apple release builds, real-device permission and
 command checks, accessibility verification, store disclosures, and candidate

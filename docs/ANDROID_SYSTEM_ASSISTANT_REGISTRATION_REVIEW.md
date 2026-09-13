@@ -3,7 +3,8 @@
 Status: Phase 217K exact registration source and fail-closed fulfillment are
 implemented locally; Assistant preview, device validation, signing, Play
 review, distribution, review settlement, and Haven Action execution remain
-closed.
+closed. Phase 217L now locks their required validation evidence without
+performing an external operation.
 
 ## What is registered in source
 
@@ -65,6 +66,15 @@ Real-device Assistant behavior, TalkBack, large text, cold/warm launches,
 supported locales, rejection cases, signed builds, Play disclosures,
 candidate validation, and explicit distribution authorization remain separate
 required gates.
+
+Phase 217L enumerates those gates in
+`docs/contracts/android_system_assistant_candidate_validation_v1.json`. The
+contract requires the exact five-route cold/warm matrix, neutral-intent replay
+rejection, the complete negative-input set, honest custom-intent and BII locale
+checks, accessibility results, signed-artifact identity, current Play
+disclosures, separate App Actions review status, and explicit distribution
+authorization. It is not itself preview, device, signing, upload, approval, or
+release evidence.
 
 Official Android references checked for this implementation:
 
