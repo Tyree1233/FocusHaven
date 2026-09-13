@@ -3,7 +3,8 @@
 Status: Phase 217G availability-gated Apple review registration active on iOS
 16 and later; all seventeen Flutter runtime catalogs and the app-level review
 host are enabled; Phase 217I reviewed Android-native resource catalog is active;
-execution, release, and public Android registration remain closed.
+Phase 217J exact Android capability mapping is reviewed; execution, release,
+and public Android registration remain closed.
 
 ## Purpose
 
@@ -184,3 +185,12 @@ parameter; all native outcomes preserve the truth that submission is not
 confirmation and no action has run. Resource integration cannot create
 `shortcuts.xml`, choose a built-in or custom intent, publish an App Action, add
 manifest metadata, execute a Haven Action, authorize Apple, or release a build.
+
+Phase 217J separately chooses the exact mapping without implementing it. Four
+parameter-free custom intents cover the timer-review routes; the queue route
+uses `actions.intent.OPEN_APP_FEATURE` with one constant inventory match that
+is discarded before the existing request boundary. Exercise, search, and list
+BIIs remain forbidden substitutes. The custom-intent locale is limited to
+`en-US`, and reviewed copy cannot create unsupported Assistant locale claims.
+The mapping creates no capability resource, manifest metadata, dependency,
+resolver, request submission, review settlement, or execution authority.

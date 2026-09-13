@@ -953,3 +953,24 @@ signed builds, Play disclosure review, candidate validation, and distribution
 remain separately reviewed and authorized. Apple approval cannot authorize
 Android, and copy approval alone grants no App Action, Assistant, execution,
 publication, or distribution authority.
+
+## Phase 217J reviewed Android capability mapping
+
+Phase 217J records, without implementing, the exact public-capability mapping
+for the existing five-route Android ingress. Timer status, start, pause, and
+resume each map to a distinct parameter-free custom intent. No timer BII exists
+in the current third-party App Actions catalog, and exercise, search, or list
+BIIs cannot be repurposed. Open Focus Queue maps to
+`actions.intent.OPEN_APP_FEATURE` with one exact public inline-inventory
+constant that is validated and discarded before request construction.
+
+Every future fulfillment targets the existing `MainActivity`, selects one
+hard-coded Phase 217H route, generates a bounded invocation ID, and may submit
+only schema version, invocation ID, and route kind. An Assistant parameter,
+query fragment, task value, duration, queue value, transcript, or arbitrary
+extra cannot enter that request. Custom-intent invocation is limited to
+`en-US`; reviewed app copy does not expand Assistant locale eligibility.
+
+The mapping contract is review evidence only. It creates no `shortcuts.xml`,
+query patterns, manifest metadata, dependency, resolver, public registration,
+Assistant preview, request, review settlement, or Haven Action execution.

@@ -207,6 +207,18 @@ registration, official Assistant preview, real-device accessibility and
 language checks, signed validation, Play review, and distribution remain
 separate.
 
+Phase 217J reviews the Android platform mapping without widening this policy.
+The four timer routes use parameter-free custom intents, and only Open Focus
+Queue uses the relevant `OPEN_APP_FEATURE` BII. Its one public inventory
+constant is validated and discarded before the existing text-free request is
+created. Exercise, search, and list BIIs cannot be repurposed, and no query,
+parameter, transcript, duration, task, or queue value may enter the request.
+
+The platform currently limits custom-intent invocation to `en-US`; reviewed
+native copy does not authorize unsupported Assistant language claims. The
+mapping review creates no capability, query-pattern resource, manifest
+registration, request submission, confirmation, or execution authority.
+
 ### Eligible through the shared typed-and-voice policy
 
 - read the current timer status;

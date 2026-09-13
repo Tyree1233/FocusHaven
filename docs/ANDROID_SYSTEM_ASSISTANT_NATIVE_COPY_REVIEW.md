@@ -1,8 +1,9 @@
 # Android system-assistant native copy review gate
 
 Status: Phase 217I English Android-native copy, fifteen-language review, and
-seventeen-locale resource integration complete; public App Actions
-registration, execution, and release authority remain closed.
+seventeen-locale resource integration complete; Phase 217J exact capability
+mapping reviewed; public App Actions registration, execution, and release
+authority remain closed.
 
 ## Purpose
 
@@ -140,3 +141,21 @@ Before any public Android registration, a separately authorized phase must:
 Apple registration cannot authorize Android registration. Copy approval alone
 grants no App Action, shortcut, Assistant, timer, queue, confirmation,
 execution, publication, or distribution authority.
+
+## Phase 217J mapping result
+
+The separate Phase 217J review maps the four timer-review routes to four
+parameter-free custom intents and maps only `openFocusQueue` to
+`actions.intent.OPEN_APP_FEATURE`. Exercise, search, and item-list BIIs are not
+truthful substitutes for FocusHaven timer review. The queue BII's required
+`feature` match is locked to one public constant and cannot enter the Phase
+217H request.
+
+Custom-intent user invocation remains limited to `en-US` by the current
+platform contract. The queue BII's supported Assistant locales are recorded
+separately from the seventeen reviewed Android resource configurations. Copy
+availability cannot widen platform eligibility.
+
+The exact mapping contract grants no implementation authority. Phase 217J adds
+no `shortcuts.xml`, query-pattern array, capability, static shortcut, manifest
+metadata, dependency, resolver, preview, request submission, or execution.

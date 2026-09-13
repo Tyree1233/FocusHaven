@@ -1,8 +1,9 @@
 # Android system-assistant ingress review gate
 
-Status: Phase 217H private Android-to-Flutter ingress active and Phase 217I
-reviewed Android-native resource catalog integrated; public App Actions
-registration, release, and execution remain closed.
+Status: Phase 217H private Android-to-Flutter ingress active, Phase 217I
+reviewed Android-native resource catalog integrated, and Phase 217J exact App
+Actions mapping reviewed; public registration, release, and execution remain
+closed.
 
 ## Purpose
 
@@ -85,6 +86,27 @@ The platform contract is documented by Android's official
 and
 [shortcuts capability schema](https://developer.android.com/develop/devices/assistant/action-schema).
 Apple registration cannot authorize Android registration or release.
+
+## Phase 217J exact mapping review
+
+Phase 217J completes only the first mapping decision above. Four timer routes
+use parameter-free custom intents because the current built-in-intent catalog
+has no truthful third-party timer BII. Health-and-fitness exercise BIIs and
+search or list BIIs are explicitly rejected. The queue route alone maps to
+`actions.intent.OPEN_APP_FEATURE`; its required `feature` inventory value is
+one public constant used only for matching and is discarded before the
+existing three-field request is constructed.
+
+The custom-intent invocation boundary is honestly limited to `en-US` under the
+current Android contract. The queue BII has its own narrower documented locale
+set. Seventeen reviewed native resource configurations do not imply seventeen
+Assistant invocation locales.
+
+The exact mapping is recorded in
+`ANDROID_SYSTEM_ASSISTANT_APP_ACTIONS_MAPPING_REVIEW.md` and its machine-readable
+contract. This review creates no `shortcuts.xml`, query-pattern resource,
+manifest metadata, dependency, resolver, App Action, Assistant preview, request
+submission, or execution path. Public registration remains a separate phase.
 
 ## Phase 217I reviewed native-resource catalog
 

@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "contract": "focus_haven_phase217j_android_app_actions_mapping_review_v1",
+  "reviewedOn": "2026-09-12",
+  "registrationEnabled": false,
+  "shortcutsXmlCreated": false,
+  "manifestMetadataCreated": false,
+  "queryPatternResourceCreated": false,
+  "dependencyAdded": false,
+  "requestSubmissionEnabled": false,
+  "havenActionExecutionEnabled": false,
+  "targetPackage": "com.focushaven.app",
+  "targetClass": "com.focushaven.app.MainActivity",
+  "requestPayloadKeys": [
+    "schemaVersion",
+    "invocationId",
+    "kind"
+  ],
+  "platformConstraints": {
+    "customIntentQueryPatternLocale": "en-US",
+    "customIntentUserInvocationLocales": [
+      "en-US"
+    ],
+    "openAppFeatureUserInvocationLocales": [
+      "en-US",
+      "en-GB",
+      "en-CA",
+      "en-IN",
+      "en-BE",
+      "en-SG",
+      "en-AU",
+      "es-ES",
+      "pt-BR"
+    ],
+    "forbiddenBuiltInIntents": [
+      "actions.intent.START_EXERCISE",
+      "actions.intent.PAUSE_EXERCISE",
+      "actions.intent.RESUME_EXERCISE",
+      "actions.intent.GET_EXERCISE_OBSERVATION",
+      "actions.intent.GET_THING",
+      "actions.intent.GET_ITEM_LIST"
+    ],
+    "unsupportedLocaleClaimsForbidden": true
+  },
+  "routes": [
+    {
+      "route": "readTimerStatus",
+      "capabilityType": "customIntent",
+      "capabilityId": "custom.actions.intent.REVIEW_FOCUS_TIMER_STATUS",
+      "queryPatternResource": "@array/android_system_assistant_review_focus_timer_status_queries",
+      "queryPatternSourceKey": "androidSystemAssistantNativeReadTimerStatusInvocationExample",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_FOCUS_TIMER_STATUS",
+      "assistantParameterKeys": [],
+      "assistantValuesAcceptedIntoRequest": []
+    },
+    {
+      "route": "startFocusTimer",
+      "capabilityType": "customIntent",
+      "capabilityId": "custom.actions.intent.REVIEW_START_FOCUS_TIMER",
+      "queryPatternResource": "@array/android_system_assistant_review_start_focus_timer_queries",
+      "queryPatternSourceKey": "androidSystemAssistantNativeStartFocusTimerInvocationExample",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_START_FOCUS_TIMER",
+      "assistantParameterKeys": [],
+      "assistantValuesAcceptedIntoRequest": []
+    },
+    {
+      "route": "pauseTimer",
+      "capabilityType": "customIntent",
+      "capabilityId": "custom.actions.intent.REVIEW_PAUSE_FOCUS_TIMER",
+      "queryPatternResource": "@array/android_system_assistant_review_pause_focus_timer_queries",
+      "queryPatternSourceKey": "androidSystemAssistantNativePauseTimerInvocationExample",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_PAUSE_FOCUS_TIMER",
+      "assistantParameterKeys": [],
+      "assistantValuesAcceptedIntoRequest": []
+    },
+    {
+      "route": "resumeTimer",
+      "capabilityType": "customIntent",
+      "capabilityId": "custom.actions.intent.REVIEW_RESUME_FOCUS_TIMER",
+      "queryPatternResource": "@array/android_system_assistant_review_resume_focus_timer_queries",
+      "queryPatternSourceKey": "androidSystemAssistantNativeResumeTimerInvocationExample",
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_RESUME_FOCUS_TIMER",
+      "assistantParameterKeys": [],
+      "assistantValuesAcceptedIntoRequest": []
+    },
+    {
+      "route": "openFocusQueue",
+      "capabilityType": "builtInIntent",
+      "capabilityId": "actions.intent.OPEN_APP_FEATURE",
+      "queryPatternResource": null,
+      "queryPatternSourceKey": null,
+      "fulfillmentAction": "com.focushaven.app.action.REVIEW_OPEN_FOCUS_QUEUE",
+      "assistantParameterKeys": [
+        "feature"
+      ],
+      "requiredInlineInventory": {
+        "parameter": "feature",
+        "shortcutId": "focus_queue_review",
+        "constantValue": "focus_queue_review"
+      },
+      "assistantValuesAcceptedIntoRequest": []
+    }
+  ],
+  "officialReferences": [
+    "https://developer.android.com/develop/devices/assistant/overview",
+    "https://developer.android.com/develop/devices/assistant/action-schema",
+    "https://developer.android.com/develop/devices/assistant/custom-intents",
+    "https://developer.android.com/reference/app-actions/built-in-intents/common/open-app-feature",
+    "https://developer.android.com/develop/devices/assistant/get-started"
+  ]
+}

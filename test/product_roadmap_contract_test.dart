@@ -37,7 +37,7 @@ void main() {
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
           'Availability-gated Apple review registration and reviewed '
-          'Android-native resource catalog active |',
+          'Android mapping foundation active |',
     ]) {
       expect(
         roadmap,
@@ -290,6 +290,10 @@ void main() {
       'reviewed Android-native resource catalog',
       'seventeen localized Android resource files',
       'Public App Actions registration remains disabled',
+      'Phase 217J reviewed Android capability mapping',
+      'each map to a distinct parameter-free custom intent',
+      '`actions.intent.OPEN_APP_FEATURE`',
+      'reviewed app copy does not expand Assistant locale eligibility',
     ]) {
       expect(architecture, contains(required));
     }
