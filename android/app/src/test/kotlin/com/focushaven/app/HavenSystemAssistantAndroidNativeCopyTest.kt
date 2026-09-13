@@ -85,5 +85,7 @@ class HavenSystemAssistantAndroidNativeCopyTest {
         assertFalse(source.contains("Intent("))
         assertFalse(source.contains(".submit("))
         assertFalse(source.contains("FlutterMethodChannel"))
+        assertTrue(source.contains("Regex(\"\"\"\\{[^}]+\\}\"\"\")"))
+        assertFalse(source.contains("Regex(\"\"\"\\{[^}]+}\"\"\")"))
     }
 }

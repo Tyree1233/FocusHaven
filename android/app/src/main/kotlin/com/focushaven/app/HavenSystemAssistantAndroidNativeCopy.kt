@@ -117,6 +117,6 @@ internal class HavenSystemAssistantAndroidNativeCopy internal constructor(
                 !value.contains('%') &&
                 !PLACEHOLDER_PATTERN.containsMatchIn(value)
 
-        private val PLACEHOLDER_PATTERN = Regex("""\{[^}]+}""")
+        private val PLACEHOLDER_PATTERN = Regex("""\{[^}]+\}""")
     }
 }
