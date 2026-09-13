@@ -1,15 +1,16 @@
 # Android system-assistant native copy review gate
 
-Status: Phase 217I English Android-native copy and fifteen-language review
-foundation prepared; runtime resources, public App Actions registration,
-execution, and release authority remain closed.
+Status: Phase 217I English Android-native copy, fifteen-language review, and
+seventeen-locale resource integration complete; public App Actions
+registration, execution, and release authority remain closed.
 
 ## Purpose
 
-Phase 217I isolates the complete English copy that a future Android
-system-assistant surface may expose. It does not add the copy to Android
-resources, `shortcuts.xml`, the application manifest, Google Assistant, or a
-production consumer. The isolated source is
+Phase 217I isolates and reviews the complete copy that a future Android
+system-assistant surface may expose. The accepted values are now mapped into
+Android resources and a typed, fail-closed lookup accessor, but not into
+`shortcuts.xml`, the application manifest, Google Assistant, or a production
+registration. The immutable English source is
 `localization/proposals/app_en_android_system_assistant_native_review.arb`.
 
 The proposal contains exactly twenty-eight complete messages and twenty-eight
@@ -94,26 +95,30 @@ Portuguese delta and is not a sixteenth independent review.
 
 The locked Flutter runtime-catalog digests prove the exact active language set
 and prevent a stale review foundation. They are input locks only. Android-native
-copy must never be merged into the Flutter ARB runtime catalogs. Later approved
-deltas may be transformed into Android string resources only by a separate,
-verified integration phase with an exact key and placeholder-free mapping.
+copy must never be merged into the Flutter ARB runtime catalogs. The fifteen
+accepted deltas are transformed into separate Android resource files with an
+exact twenty-eight-key, placeholder-free mapping; English is the base resource,
+Brazilian Portuguese is independently reviewed, base Portuguese is its exact
+derivative, and Indonesian uses Android's `values-in` qualifier.
 
-The existing private CSV and two-sheet Excel review helpers may be reused after
-separately supplied draft bundles exist. The foundation itself creates no
-provider configuration, glossary, translation request, draft, CSV, workbook,
-review, approval, Android string resource, runtime catalog, or production
-native consumer. Provider-assisted drafts require separate explicit
-authorization.
+The original copy-lock foundation created no provider configuration, glossary,
+translation request, draft, CSV, workbook, review, approval, Android string
+resource, runtime catalog, or production native consumer. Provider-assisted
+drafts required separate explicit authorization. The later reviewed resource
+integration consumes only the accepted private approvals and creates no new
+provider request, review, approval, or Flutter runtime-catalog entry.
 
 ## Placement and release boundary
 
-The Phase 217I repository change may contain only this isolated proposal,
-contract tests, and documentation. It adds no `res/values` string, string
-array, `shortcuts.xml`, `android.app.shortcuts` manifest metadata, built-in or
-custom intent, query pattern, static shortcut, fulfillment intent, deep link,
-exported destination, dependency, permission, provider, or production copy
-accessor. All twenty-eight keys remain absent from every Flutter runtime
-catalog and Android resource file.
+The reviewed Phase 217I resource integration contains the isolated proposal,
+seventeen Android resource files, one typed lookup accessor, provenance,
+focused native and contract tests, and documentation. It adds no
+`shortcuts.xml`, `android.app.shortcuts` manifest metadata, built-in or custom
+intent, query pattern, static shortcut, fulfillment intent, deep link,
+exported destination, dependency, permission, provider, request submission, or
+production registration. All twenty-eight keys remain absent from every Flutter
+runtime catalog and are present only in the seventeen reviewed Android resource
+files.
 
 Before any public Android registration, a separately authorized phase must:
 

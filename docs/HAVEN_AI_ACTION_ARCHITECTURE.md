@@ -915,7 +915,7 @@ mapping, official Assistant preview and real-device validation, TalkBack and
 large-text review, signed release builds, Play disclosure review, candidate
 validation, and distribution remain separately authorized gates.
 
-## Phase 217I locked Android-native assistant copy
+## Phase 217I reviewed Android-native resource catalog
 
 Phase 217I isolates twenty-eight complete English messages for a future Android
 native discovery surface. The set contains one collection title, one discovery
@@ -933,15 +933,21 @@ successful execution.
 
 Android App Actions distinguish built-in intent models from custom-intent
 query patterns. Phase 217I selects neither and creates no query-pattern
-resource. Fifteen independent fluent reviews are required before a later
-Android-only integration may map approved values into string resources. Base
-Portuguese may be derived only from the completely approved Brazilian
-Portuguese delta. Flutter runtime-catalog digests are freshness locks, not
-destinations; the Android-native messages must never enter Flutter ARBs.
+resource. All fifteen independent fluent reviews are accepted. Their exact
+placeholder-free values now populate seventeen localized Android resource
+files, including English and a base-Portuguese fallback derived byte-for-byte
+from reviewed Brazilian Portuguese. Indonesian remains `id` in review
+provenance and maps only to Android's `values-in` qualifier. Flutter
+runtime-catalog digests remain freshness locks, not destinations; the
+Android-native messages never enter Flutter ARBs.
 
-Phase 217I adds no Android resource, copy accessor, `shortcuts.xml`, capability,
-query pattern, manifest metadata, fulfillment intent, deep link, dependency,
-permission, public registration, production consumer, or execution path.
+The typed Kotlin accessor resolves only the twenty-eight reviewed resource IDs,
+maps the same five-route enum to short, long, and review-example copy, and fails
+closed for a missing, blank, oversized, control-bearing, or parameterized
+value. Phase 217I still adds no `shortcuts.xml`, capability, query pattern,
+manifest metadata, fulfillment intent, deep link, dependency, permission,
+public registration, request submission, production consumer, or execution path.
+Public App Actions registration remains disabled.
 Official Assistant preview, real-device accessibility and language checks,
 signed builds, Play disclosure review, candidate validation, and distribution
 remain separately reviewed and authorized. Apple approval cannot authorize

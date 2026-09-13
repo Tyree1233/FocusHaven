@@ -171,7 +171,7 @@ void main() {
     );
   });
 
-  test('copy stays outside Flutter and Android runtime resources', () {
+  test('copy stays outside Flutter runtime catalogs', () {
     final arb = proposal();
     final sourceKeys = arb.keys
         .where((key) => key != '@@locale' && !key.startsWith('@'))
@@ -181,10 +181,6 @@ void main() {
         .whereType<File>()
         .where((file) => file.path.endsWith('.arb'))
         .toList(growable: false);
-    final resources = Directory(
-      'android/app/src/main/res',
-    ).listSync(recursive: true).whereType<File>().toList(growable: false);
-
     expect(sourceKeys, hasLength(28));
     expect(catalogs, hasLength(17));
     for (final catalog in catalogs) {
@@ -196,16 +192,5 @@ void main() {
         reason: catalog.path,
       );
     }
-    final androidResources = resources
-        .where((file) => file.path.endsWith('.xml'))
-        .map((file) => file.readAsStringSync())
-        .join('\n');
-    for (final key in sourceKeys) {
-      expect(androidResources, isNot(contains(key)), reason: key);
-    }
-    expect(
-      resources.where((file) => file.path.endsWith('/xml/shortcuts.xml')),
-      isEmpty,
-    );
   });
 }

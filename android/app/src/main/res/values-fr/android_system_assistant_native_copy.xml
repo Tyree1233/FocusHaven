@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Requête annulée. FocusHaven n\'a pas modifié votre minuteur ni votre file d\'attente.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">Demandes de FocusHaven</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Préparez une demande FocusHaven prise en charge pour examen dans l\'application.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Cette requête a expiré avant confirmation. FocusHaven n\'a pas modifié votre minuteur ni votre file d\'attente.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Il est impossible d\'ajouter des détails concernant l\'heure, la tâche ou la file d\'attente à cette requête.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Révision de l\'ouverture de la file d\'attente de concentration</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Révision de l\'ouverture de la file d\'attente de concentration</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Ouvrir la file d\'attente de concentration</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Révision de la pause de mon minuteur de concentration</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Révision de la pause du minuteur de concentration en cours</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Mettre en pause le minuteur de concentration</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Une autre requête FocusHaven est en attente d\'examen.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven a déjà une requête en attente. Ouvrez l\'application pour la consulter ou l\'ignorer avant de réessayer.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Seuls le type d\'action et un code de requête privé sont transmis à FocusHaven. Aucune transcription ni contenu privé n\'est inclus.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Révision de l\'état de mon minuteur de concentration</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Révision de l\'état actuel du minuteur de concentration</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Vérifier le minuteur de concentration</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven n\'a pas pu accepter cette requête. Rien n\'a changé.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Révision de la reprise de mon minuteur de concentration</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Révision de la reprise du minuteur de concentration mis en pause</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Reprendre le minuteur de concentration</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Ouvrez FocusHaven, examinez l\'effet exact, puis choisissez Confirmer l\'action ou Ignorer la requête.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">La requête FocusHaven est prête à être examinée. Aucune action n\'a été exécutée.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Ouvrez FocusHaven pour examiner cette demande. Aucune action n\'a encore été entreprise.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Révision du démarrage d\'un minuteur de concentration</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Révision du démarrage de la session de concentration prête</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Démarrer le minuteur de concentration</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Cette requête FocusHaven est indisponible. Rien n\'a changé.</string>
+</resources>

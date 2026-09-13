@@ -1,8 +1,8 @@
 # Android system-assistant ingress review gate
 
 Status: Phase 217H private Android-to-Flutter ingress active and Phase 217I
-Android-native copy review foundation prepared; public App Actions
-registration, runtime resources, release, and execution remain closed.
+reviewed Android-native resource catalog integrated; public App Actions
+registration, release, and execution remain closed.
 
 ## Purpose
 
@@ -86,14 +86,14 @@ and
 [shortcuts capability schema](https://developer.android.com/develop/devices/assistant/action-schema).
 Apple registration cannot authorize Android registration or release.
 
-## Phase 217I closed native-copy foundation
+## Phase 217I reviewed native-resource catalog
 
 Phase 217I isolates twenty-eight complete messages in one English proposal:
 collection and discovery copy, privacy and no-parameter summaries, one review
 instruction, five short labels, five long labels, five invocation examples,
 six truthful outcomes, and two TalkBack labels. The proposal contains no
-placeholder or parameter and remains outside every Flutter runtime catalog and
-Android resource.
+placeholder or parameter, and its keys remain outside every Flutter runtime
+catalog.
 
 Fifteen independent fluent reviews are required, with explicit Japanese and
 Korean font-coverage gates and later base-Portuguese derivation only from an
@@ -101,8 +101,15 @@ approved Brazilian-Portuguese delta. Runtime-catalog digests are freshness
 locks rather than copy destinations. Provider-assisted drafts remain a
 separately authorized private operation.
 
-The copy foundation adds no `res/values` string, string array, `shortcuts.xml`,
-capability, built-in or custom intent, query pattern, fulfillment, static
-shortcut, manifest metadata, deep link, permission, dependency, or production
-consumer. Copy approval cannot authorize public registration, Assistant
+Following all fifteen independent approvals, the exact twenty-eight values now
+exist in seventeen isolated Android resource files: English, fifteen reviewed
+locales, and one base-Portuguese fallback copied mechanically from reviewed
+Brazilian Portuguese. Indonesian review provenance remains `id` while the
+Android resource qualifier is `values-in`. A typed Kotlin accessor owns only
+fail-closed resource lookup and the exact five-route label mapping.
+
+The resource catalog adds no `shortcuts.xml`, capability, built-in or custom
+intent, query pattern, fulfillment, static shortcut, manifest metadata, deep
+link, permission, dependency, request submission, or production registration.
+Copy approval and resource integration cannot authorize public registration, Assistant
 preview, request execution, signed release, Play distribution, or phone access.

@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_phase217i_android_native_copy_resource_integration_v1",
+  "deltaId": "android-system-assistant-native-copy-v1",
+  "sourceProposal": "localization/proposals/app_en_android_system_assistant_native_review.arb",
+  "sourceProposalSha256": "0b3dd6be77b06164a2bfff3c3a295b90f8867beac6b8c66d744bfc6b7b5bb3d3",
+  "acceptanceLockSha256": "fb6bdbab93be4298b806c2c6058129c35b83c753c205df379ba5f3956745cfc1",
+  "approvedDeltaSha256": {
+    "es": "a11cfc375e0533cf50048934d8c4e9e22bc7054fa65d3bc76bf652c1f75dc06e",
+    "fr": "42cab5642c31eefe62ac2ec7e7b3178e335f399d6d733c13daef8a650a6ae4ca",
+    "de": "5835c7b258833a754d71ffe11b2ddb14fcf8a3d7f0476a229e1ef54a2b6854a1",
+    "pt-BR": "c390250cf42887edf95ab4d121950fc483f3908953a5447ed14fc4e2d4832d60",
+    "ja": "9650e517f917df530d0eda87918b7cd4d8edc2e724928538b96272053ae01cf3",
+    "ko": "bb2442982c64d36276ce54ab264380ccf41808f404d742307da1b39cb0b85bff",
+    "it": "eb07331dcd10e03a2a35500c149ede8efeb548c4594fea2c8909b4a77b40a032",
+    "pl": "d34021e95a467d824714f1772815bc69c10cd655447fa342e29f98e826f8e56d",
+    "nl": "841fc8fc42788d130c8cad2a470def34fbc9c6dbbd2a43f81775eace829b7aef",
+    "id": "fe63b6e705888e87ecd738aefd2d0ce227e42c1335effaed5db2839c64a946c7",
+    "tr": "64bce1d7f7fcac850c241b4760252fcf183a475de1c0531f55449d4b8a7a6854",
+    "sv": "8af3448595d8e79d54d507b84433ac065187211ae154371f661e7fb88dc58bd5",
+    "nb": "03da131f2b7c894e9b598ed47e350e1ba5b152f4e2580c822ebdf6b5d2e9dd1c",
+    "da": "9b1cd08a2b055433be20e0b2ad5a181666abcc0ff96c0d53acd8f7ef52b240bc",
+    "fi": "8a6dc34795b56245de466eeb2383aae7f96fcc6328eebe8ee20d11e4bd5d60a2"
+  },
+  "independentlyReviewedLocales": [
+    "es",
+    "fr",
+    "de",
+    "pt-BR",
+    "ja",
+    "ko",
+    "it",
+    "pl",
+    "nl",
+    "id",
+    "tr",
+    "sv",
+    "nb",
+    "da",
+    "fi"
+  ],
+  "derivedFallbacks": [
+    {
+      "reviewedLocale": "pt-BR",
+      "fallbackLocale": "pt"
+    }
+  ],
+  "androidResourceFiles": {
+    "en": {
+      "qualifier": "values",
+      "path": "android/app/src/main/res/values/android_system_assistant_native_copy.xml",
+      "sha256": "d8c38f18b46af527877b4db704b07369cbd80af7f823b381559eb18e4ecfbb32"
+    },
+    "es": {
+      "qualifier": "values-es",
+      "path": "android/app/src/main/res/values-es/android_system_assistant_native_copy.xml",
+      "sha256": "3139481c8029ec71733f4fde0384f91cbbce5d0cb254301b434c40a0275dab90"
+    },
+    "fr": {
+      "qualifier": "values-fr",
+      "path": "android/app/src/main/res/values-fr/android_system_assistant_native_copy.xml",
+      "sha256": "8d632d7a8465c8df6f69bbce45d7ac47f8b7c4c1c43e8373b0e39ec1acfef36a"
+    },
+    "de": {
+      "qualifier": "values-de",
+      "path": "android/app/src/main/res/values-de/android_system_assistant_native_copy.xml",
+      "sha256": "276679ab99bcf8d398e1ecd4a5a5dc7c4d18e559df4dc63637baaaa10efaed68"
+    },
+    "pt-BR": {
+      "qualifier": "values-pt-rBR",
+      "path": "android/app/src/main/res/values-pt-rBR/android_system_assistant_native_copy.xml",
+      "sha256": "730d228cb31e25f445ab2aec1c946100484770c60f4f9f91c2ee57a2e08628d8"
+    },
+    "pt": {
+      "qualifier": "values-pt",
+      "path": "android/app/src/main/res/values-pt/android_system_assistant_native_copy.xml",
+      "sha256": "730d228cb31e25f445ab2aec1c946100484770c60f4f9f91c2ee57a2e08628d8"
+    },
+    "ja": {
+      "qualifier": "values-ja",
+      "path": "android/app/src/main/res/values-ja/android_system_assistant_native_copy.xml",
+      "sha256": "5b6373bf0a7323c36e601585dd4d487fbc315b9b666b6adacaf7dd4a38d17baa"
+    },
+    "ko": {
+      "qualifier": "values-ko",
+      "path": "android/app/src/main/res/values-ko/android_system_assistant_native_copy.xml",
+      "sha256": "165a3d44307fad58fb48f65cc3e60a003f9c974e5c4da4c7b2a62481a2394a34"
+    },
+    "it": {
+      "qualifier": "values-it",
+      "path": "android/app/src/main/res/values-it/android_system_assistant_native_copy.xml",
+      "sha256": "d61403e7c8e392ce7b04e879f1ec36c2f1d872949c46be2e3c1bd16621c7a71f"
+    },
+    "pl": {
+      "qualifier": "values-pl",
+      "path": "android/app/src/main/res/values-pl/android_system_assistant_native_copy.xml",
+      "sha256": "a44fab77d4671721110cedee0099b88cc8afde50d0a830a4db6d4555a4f19bc1"
+    },
+    "nl": {
+      "qualifier": "values-nl",
+      "path": "android/app/src/main/res/values-nl/android_system_assistant_native_copy.xml",
+      "sha256": "5c708e1d96a646124aa2a86010deb1410fee5ed44b974ce2ef188edb7ee0aceb"
+    },
+    "id": {
+      "qualifier": "values-in",
+      "path": "android/app/src/main/res/values-in/android_system_assistant_native_copy.xml",
+      "sha256": "a7534ea646f81b51b9c09f1eca0317b26dcf1d008f7afdb8d789bb3850d69f6a"
+    },
+    "tr": {
+      "qualifier": "values-tr",
+      "path": "android/app/src/main/res/values-tr/android_system_assistant_native_copy.xml",
+      "sha256": "c2afc97c9ffaf8d81cd518dbf1f38deb9da26a10bd6946332effa8fc271cc56b"
+    },
+    "sv": {
+      "qualifier": "values-sv",
+      "path": "android/app/src/main/res/values-sv/android_system_assistant_native_copy.xml",
+      "sha256": "d88a098e71307f1fe69baa53e5d583aae2fee4927e014f471db3e97139102422"
+    },
+    "nb": {
+      "qualifier": "values-nb",
+      "path": "android/app/src/main/res/values-nb/android_system_assistant_native_copy.xml",
+      "sha256": "ab6333e472860d5124204660578a6f9c31dccaa7c34cd9fb305ebda9ebb9581f"
+    },
+    "da": {
+      "qualifier": "values-da",
+      "path": "android/app/src/main/res/values-da/android_system_assistant_native_copy.xml",
+      "sha256": "4087779dd6c52d14314510477373b3f2673ddd16b265fad7bfdbaf137ca62220"
+    },
+    "fi": {
+      "qualifier": "values-fi",
+      "path": "android/app/src/main/res/values-fi/android_system_assistant_native_copy.xml",
+      "sha256": "f9486e8a0dc791e31768f69d159e96b1c804a6970d950bc0465deb0d101dc3b2"
+    }
+  },
+  "resourceLocalizations": [
+    "en",
+    "es",
+    "fr",
+    "de",
+    "pt-BR",
+    "pt",
+    "ja",
+    "ko",
+    "it",
+    "pl",
+    "nl",
+    "id",
+    "tr",
+    "sv",
+    "nb",
+    "da",
+    "fi"
+  ],
+  "messageCount": 28,
+  "placeholderMessageCount": 0,
+  "reviewDecisionCounts": {
+    "accepted": 208,
+    "revised": 212,
+    "blocked": 0
+  },
+  "flutterRuntimeCatalogChanged": false,
+  "shortcutsXmlCreated": false,
+  "capabilityMetadataCreated": false,
+  "queryPatternsCreated": false,
+  "manifestRegistrationEnabled": false,
+  "appActionRegistrationEnabled": false,
+  "havenActionExecutionEnabled": false
+}

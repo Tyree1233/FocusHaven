@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">요청이 취소되었습니다. FocusHaven은 타이머나 대기열을 변경하지 않았습니다.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHaven 요청</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">앱에서 검토할 수 있도록 지원되는 FocusHaven 요청을 준비하세요.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">이 요청은 확인 전에 만료되었습니다. FocusHaven은 타이머나 대기열을 변경하지 않았습니다.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">이 요청에는 시간, 작업 또는 대기열 세부 정보를 추가할 수 없습니다.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">포커스 큐 열기 검토</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">포커스 큐 열기 검토</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">포커스 큐 열기</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">포커스 타이머 일시 중지 검토</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">현재 포커스 타이머 일시 중지 검토</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">포커스 타이머 일시 중지</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">또 다른 FocusHaven 요청이 검토를 기다리고 있습니다.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven에는 이미 대기 중인 요청이 있습니다. 앱을 열어 요청을 확인하거나 해제한 후 다시 시도하세요.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">FocusHaven에는 작업 유형과 비공개 요청 코드만 입력됩니다. 녹취록이나 비공개 콘텐츠는 포함되지 않습니다.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">포커스 타이머 상태 검토</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">현재 포커스 타이머 상태 검토</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">포커스 타이머를 확인하세요</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven이 이 요청을 수락할 수 없습니다. 아무것도 변경되지 않았습니다.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">포커스 타이머 재개 검토</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">일시 중지된 포커스 타이머 재개 검토</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">포커스 타이머 재개</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">FocusHaven을 열고 정확한 효과를 확인한 다음, 작업 확인 또는 요청 해제를 선택하세요.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">FocusHaven 요청이 검토 준비를 완료했습니다. 아직 실행된 작업이 없습니다.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">FocusHaven을 열어 이 요청을 검토하세요. 아직 아무런 변화가 없습니다.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">포커스 타이머 시작 검토</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">준비된 포커스 세션 시작 검토</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">포커스 타이머 시작</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">이 FocusHaven 요청은 사용할 수 없습니다. 변경된 사항이 없습니다.</string>
+</resources>

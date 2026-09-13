@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Pyyntö peruttu. FocusHaven ei muuttanut ajastinta tai jonoa.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHaven-pyynnöt</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Valmistele tuettu FocusHavenin pyyntö tarkistettavaksi sovelluksessa.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Tämä pyyntö vanheni ennen vahvistusta. FocusHaven ei muuttanut ajastinta tai jonoa.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Tähän pyyntöön ei voi lisätä aikaa, tehtävää tai jonoa koskevia tietoja.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Keskittymisjonon avaamisen tarkistus</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Keskittymisjonon avaamisen tarkistus</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Avaa keskittymisjono</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Keskittymisajastimeni keskeytys</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Tarkista nykyisen keskittymisajastimen keskeytys</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Keskeytä keskittymisajastin</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Toinen FocusHavenin pyyntö odottaa tarkistusta.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven on jo odottava pyyntö. Avaa sovellus tarkistaaksesi tai ohittaaksesi sen ennen kuin yrität uudelleen.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Vain toimintotyyppi ja yksityinen pyyntökoodi syötetään FocusHaveniin. Transkriptiä tai yksityistä sisältöä ei sisällytetä.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Tarkista keskittymisajastimeni tila</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Tarkista keskittymisajastimen nykyinen tila</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Tarkista keskittymisajastin</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven ei voinut hyväksyä tätä pyyntöä. Mikään ei muuttunut.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Keskittymisajastimen jatkamisen tarkistaminen</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Tarkista keskeytetyn keskittymisajastimen jatkaminen</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Jatka keskittymisajastinta</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Avaa FocusHaven, tarkista tarkka vaikutus ja valitse sitten Vahvista toiminto tai Ohita pyyntö.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">FocusHavenin pyyntö on valmis tarkistettavaksi. Mitään toimia ei ole suoritettu.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Avaa FocusHaven tarkastellaksesi tätä pyyntöä. Mitään ei ole vielä tapahtunut.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Keskittymisajastimen käynnistämisen tarkastelu</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Tarkastele valmiin keskittymisistunnon aloittamista</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Käynnistä keskittymisajastin</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Tämä FocusHavenin pyyntö ei ole käytettävissä. Mikään ei ole muuttunut.</string>
+</resources>

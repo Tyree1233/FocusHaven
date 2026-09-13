@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">İstek iptal edildi. FocusHaven zamanlayıcınızda veya sıranızda herhangi bir değişiklik yapmadı.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHaven istekleri</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Uygulamada incelenmek üzere desteklenen bir FocusHaven talebi hazırlayın.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Bu istek onaylanmadan önce süresi doldu. FocusHaven zamanlayıcınızı veya sıranızı değiştirmedi.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Bu isteğe zaman, görev veya sıra bilgisi eklenemez.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Odaklanma Kuyruğunun açılışını inceleyin</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Odaklanma Kuyruğunun açılışını inceleyin.</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Odaklanma Kuyruğunu Aç</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Odaklanma zamanlayıcımı duraklatmayı inceleyin</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Mevcut Odaklanma zamanlayıcısını duraklatmayı inceleyin.</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Odaklanma zamanlayıcısını duraklat</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Başka bir FocusHaven talebi inceleme aşamasında bekliyor.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven\'da halihazırda bekleyen bir istek var. Tekrar denemeden önce incelemek veya yoksaymak için uygulamayı açın.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">FocusHaven\'a yalnızca işlem türü ve özel istek kodu girilir. Transkript veya özel içerik dahil edilmez.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Odaklanma zamanlayıcımın durumunu inceleyin</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Mevcut Odaklanma zamanlayıcısının durumunu inceleyin.</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Odaklanma zamanlayıcısını kontrol edin</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven bu isteği kabul edemedi. Hiçbir şey değişmedi.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Odaklanma zamanlayıcımı devam ettirme incelemesi</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Duraklatılmış Odaklanma zamanlayıcısının devam ettirilmesini inceleyin.</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Odaklanma zamanlayıcısını sürdür</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">FocusHaven\'ı açın, tam etkiyi inceleyin, ardından İşlemi onaylayın veya İsteği yoksay seçeneklerinden birini seçin.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">FocusHaven isteği incelemeye hazır. Henüz hiçbir işlem gerçekleştirilmedi.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Bu isteği incelemek için FocusHaven\'ı açın. Henüz hiçbir şey olmadı.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Odaklanma zamanlayıcısını başlatmayı inceleyin</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Hazır Odaklanma oturumunu başlatmayı inceleyin.</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Odaklanma zamanlayıcısını başlat</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Bu FocusHaven isteği kullanılamıyor. Hiçbir şey değişmedi.</string>
+</resources>

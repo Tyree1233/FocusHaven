@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Prośba anulowana. FocusHaven nie zmienił Twojego timera ani kolejki.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">Prośby FocusHaven</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Przygotuj obsługiwaną prośbę FocusHaven do przejrzenia w aplikacji.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Ta prośba wygasła przed potwierdzeniem. FocusHaven nie zmienił Twojego timera ani kolejki.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Do tej prośby nie można dodać szczegółów dotyczących czasu, zadania ani kolejki.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Przejrzyj otwieranie kolejki skupienia</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Przejrzyj otwieranie kolejki skupienia</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Otwórz kolejkę skupienia</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Przejrzyj wstrzymanie timera skupienia</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Przejrzyj wstrzymanie bieżącego timera skupienia</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Wstrzymaj timer skupienia</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Kolejna prośba FocusHaven czeka na rozpatrzenie.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven ma już oczekującą prośbę. Otwórz aplikację, aby ją przejrzeć lub zignorować, a następnie spróbuj ponownie.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Do FocusHaven wprowadzany jest tylko typ akcji i prywatny kod prośby. Transkrypcja ani prywatna treść nie jest uwzględniana.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Przejrzyj status mojego timera skupienia</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Sprawdź aktualny stan timera skupienia</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Sprawdź timer skupienia</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven nie mógł zaakceptować tej prośby. Nic się nie zmieniło.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Przejrzyj wznowienie mojego timera skupienia</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Przejrzyj wznowienie wstrzymanego timera skupienia</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Wznów timer skupienia</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Otwórz FocusHaven, sprawdź dokładny efekt, a następnie wybierz opcję Potwierdź akcję lub Zignoruj prośbę.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">Prośba FocusHaven jest gotowa do rozpatrzenia. Nie wykonano żadnej akcji.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Otwórz FocusHaven, aby rozpatrzyć tę prośbę. Nic się jeszcze nie wydarzyło.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Przejrzyj uruchamianie timera skupienia</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Przejrzyj rozpoczęcie gotowej sesji skupienia</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Uruchom timer skupienia</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Ta prośba FocusHaven jest niedostępna. Nic się nie zmieniło.</string>
+</resources>

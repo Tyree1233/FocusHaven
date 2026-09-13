@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Anfrage abgebrochen. FocusHaven hat weder Ihren Timer noch Ihre Warteschlange geändert.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHaven-Anfragen</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Bereiten Sie eine unterstützte FocusHaven-Anfrage zur Überprüfung in der App vor.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Diese Anfrage ist vor der Bestätigung abgelaufen. FocusHaven hat weder Ihren Timer noch Ihre Warteschlange geändert.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Dieser Anfrage können keine Zeit-, Aufgaben- oder Warteschlangendetails hinzugefügt werden.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Überprüfung des Öffnens der Fokus-Warteschlange</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Überprüfung des Öffnens der Fokus-Warteschlange</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Fokus-Warteschlange öffnen</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Überprüfung der Pause meines Fokus-Timers</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Überprüfen Sie das Anhalten des aktuellen Fokus-Timers</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Fokus-Timer pausieren</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Eine weitere FocusHaven-Anfrage wartet auf die Überprüfung.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven hat bereits eine Anfrage. Öffnen Sie die App, um sie zu überprüfen oder zu verwerfen, bevor Sie es erneut versuchen.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Lediglich der Aktionstyp und ein privater Anforderungscode gelangen in FocusHaven. Es werden weder Transkripte noch private Inhalte übermittelt.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Überprüfung meines Fokus-Timer-Status</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Überprüfen Sie den aktuellen Status des Fokus-Timers</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Fokus-Timer prüfen</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven konnte diese Anfrage nicht annehmen. Es hat sich nichts geändert.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Überprüfung der Fortsetzung meines Fokus-Timers</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Überprüfen Sie die Fortsetzung des pausierten Fokus-Timers</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Fokus-Timer fortsetzen</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Öffnen Sie FocusHaven, überprüfen Sie die genauen Auswirkungen und wählen Sie dann „Aktion bestätigen“ oder „Anfrage verwerfen“.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">FocusHaven-Anfrage zur Überprüfung bereit. Es wurden keine Aktionen ausgeführt.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Öffnen Sie FocusHaven, um diese Anfrage zu überprüfen. Bisher ist noch nichts passiert.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Überprüfen Sie den Start eines Fokus-Timers</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Überprüfen Sie den Start der bereiten Fokus-Sitzung</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Fokus-Timer starten</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Diese FocusHaven-Anfrage ist nicht verfügbar. Es hat sich nichts geändert.</string>
+</resources>

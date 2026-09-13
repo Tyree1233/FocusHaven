@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Forespørselen ble avbrutt. FocusHaven endret ikke timeren eller køen din.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHaven-forespørsler</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Forbered en støttet FocusHaven-forespørsel for gjennomgang i appen.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Denne forespørselen utløp før bekreftelse. FocusHaven endret ikke timeren eller køen din.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Ingen detaljer om tid, oppgave eller kø kan legges til denne forespørselen.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Åpning av fokuskø for gjennomgang</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Åpning av fokuskø for gjennomgang</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Åpne fokuskøen</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Gjennomgang av pausing av fokustimeren</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Se gjennom hvordan du setter den gjeldende fokustimeren på pause</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Pause fokustimeren</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">En annen FocusHaven-forespørsel venter på vurdering.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven har allerede en forespørsel som venter. Åpne appen for å se gjennom den eller ignorere den før du prøver på nytt.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Bare handlingstypen og en privat forespørselskode går inn i FocusHaven. Ingen transkripsjon eller privat innhold er inkludert.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Se statusen min for fokustimeren</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Se gjeldende status for fokustimeren</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Sjekk fokustimeren</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven kunne ikke godta denne forespørselen. Ingenting endret seg.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Gjennomgang av gjenopptak av fokustimeren min</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Se gjennom gjenopptak av den midlertidig stoppede fokustimeren</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Gjenoppta fokustimeren</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Åpne FocusHaven, se gjennom den nøyaktige effekten, og velg deretter Bekreft handling eller Ignorer forespørsel.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">FocusHaven-forespørselen er klar til gjennomgang. Ingen handling er utført.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Åpne FocusHaven for å gjennomgå denne forespørselen. Ingenting har skjedd ennå.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Gjennomgang av oppstart av en fokustimer</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Gjennomgang av oppstart av den klare fokusøkten</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Start fokustimeren</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Denne FocusHaven-forespørselen er ikke tilgjengelig. Ingenting er endret.</string>
+</resources>

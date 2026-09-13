@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Anmodning annulleret. FocusHaven ændrede ikke din timer eller kø.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHaven-anmodninger</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Forbered en understøttet FocusHaven-anmodning til gennemgang i appen.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Denne anmodning udløb før bekræftelse. FocusHaven ændrede ikke din timer eller kø.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Der kan ikke tilføjes oplysninger om tid, opgave eller kø til denne anmodning.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Gennemgå åbning af fokuskø</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Gennemgå åbning af fokuskø</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Åbn fokuskø</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Gennemgang af pausering af min fokustimer</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Gennemgå pausering af den aktuelle fokustimer</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Pausér fokustimeren</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Endnu en FocusHaven-anmodning venter på gennemgang.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven har allerede en ventende anmodning. Åbn appen for at gennemgå den, eller ignorere den, før du prøver igen.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Kun handlingstypen og en privat anmodningskode indtastes i FocusHaven. Ingen transskription eller privat indhold er inkluderet.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Gennemgå min fokustimerstatus</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Gennemgå den aktuelle status for fokustimeren</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Tjek fokustimeren</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven kunne ikke acceptere denne anmodning. Intet ændrede sig.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Gennemgang af genoptagelse af min fokustimer</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Gennemgå genoptagelse af den pausede fokustimer</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Genoptag fokustimeren</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Åbn FocusHaven, gennemgå den nøjagtige effekt, og vælg derefter Bekræft handling eller Ignorer anmodning.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">FocusHaven-anmodning er klar til gennemgang. Der er ikke udført nogen handling.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Åbn FocusHaven for at gennemgå denne anmodning. Der er ikke sket noget endnu.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Gennemgang af start af en fokustimer</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Gennemgang af start af den klargjorte fokussession</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Start fokustimeren</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Denne FocusHaven-anmodning er ikke tilgængelig. Intet er ændret.</string>
+</resources>

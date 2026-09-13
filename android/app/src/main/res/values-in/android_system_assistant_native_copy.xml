@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Permintaan dibatalkan. FocusHaven tidak mengubah pengatur waktu atau antrean Anda.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">Permintaan FocusHaven</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Siapkan permintaan FocusHaven yang didukung untuk ditinjau di dalam aplikasi.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Permintaan ini kedaluwarsa sebelum dikonfirmasi. FocusHaven tidak mengubah pengatur waktu atau antrean Anda.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Tidak ada detail waktu, tugas, atau antrian yang dapat ditambahkan ke permintaan ini.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Tinjauan pembukaan Antrian Fokus</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Tinjauan pembukaan Antrian Fokus</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Buka Antrian Fokus</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Tinjau jeda pengatur waktu Fokus saya</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Tinjau penghentian sementara pengatur waktu Fokus saat ini</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Jeda Pengatur waktu Fokus</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Permintaan FocusHaven lainnya sedang menunggu peninjauan.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven sudah memiliki permintaan yang menunggu. Buka aplikasi untuk meninjau atau mengabaikannya sebelum mencoba lagi.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Hanya jenis tindakan dan kode permintaan pribadi yang masuk ke FocusHaven. Tidak ada transkrip atau konten pribadi yang disertakan.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Tinjau status pengatur waktu Fokus saya</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Tinjau status pengatur waktu Fokus saat ini</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Periksa pengatur waktu Fokus</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven tidak dapat menerima permintaan ini. Tidak ada yang berubah.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Tinjau pelanjutan pengatur waktu Fokus saya</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Tinjau kelanjutan pengatur waktu Fokus yang dijeda</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Lanjutkan pengatur waktu Fokus</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Buka FocusHaven, tinjau efek pastinya, lalu pilih Konfirmasi tindakan atau Abaikan permintaan.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">Permintaan FocusHaven siap untuk ditinjau. Belum ada tindakan yang dijalankan.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Buka FocusHaven untuk meninjau permintaan ini. Belum ada yang terjadi.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Tinjau permulaan pengatur waktu Fokus</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Tinjau permulaan sesi Fokus yang sudah siap</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Mulai pengatur waktu Fokus</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Permintaan FocusHaven ini tidak tersedia. Tidak ada perubahan.</string>
+</resources>

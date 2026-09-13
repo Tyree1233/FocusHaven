@@ -141,7 +141,7 @@ void main() {
     }
   });
 
-  test('documentation forbids runtime and public Android integration', () {
+  test('documentation separates Flutter runtime and public registration', () {
     String normalize(String value) =>
         value.replaceAll(RegExp(r'\s+'), ' ').trim();
 
@@ -158,11 +158,17 @@ void main() {
 
     expect(review, contains('twenty-eight complete messages'));
     expect(review, contains('Fifteen-language incremental review'));
-    expect(review, contains('must never be merged into the Flutter ARB'));
-    expect(review, contains('Android string resources only by a separate'));
-    expect(review, contains('Provider-assisted drafts require separate'));
+    expect(
+      review,
+      contains('must never be merged into the Flutter ARB runtime catalogs'),
+    );
+    expect(review, contains('seventeen Android resource files'));
+    expect(review, contains('adds no `shortcuts.xml`'));
+    expect(review, contains('production registration'));
+    expect(review, contains('creates no new provider request'));
     expect(workflow, contains('Android-native system-assistant copy'));
     expect(workflow, contains('not Flutter runtime content'));
-    expect(workflow, contains('public App Actions registration stays closed'));
+    expect(workflow, contains('integration creates no'));
+    expect(workflow, contains('public App Action registration'));
   });
 }

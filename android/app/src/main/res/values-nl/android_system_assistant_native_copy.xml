@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Verzoek geannuleerd. FocusHaven heeft uw timer of wachtrij niet gewijzigd.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHaven-verzoeken</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Bereid een ondersteund FocusHaven-verzoek voor ter beoordeling in de app.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Dit verzoek is verlopen voordat het bevestigd kon worden. FocusHaven heeft uw timer of wachtrij niet gewijzigd.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Aan dit verzoek kunnen geen tijds-, taak- of wachtrijdetails worden toegevoegd.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Controleer het openen van de Focus-wachtrij</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Controleer het openen van de Focus-wachtrij</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Open Focus-wachtrij</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Bekijk het pauzeren van mijn Focus-timer</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Bekijk het pauzeren van de huidige Focus-timer.</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Pauzeer de Focus-timer</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Een ander FocusHaven-verzoek wacht op beoordeling.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven heeft al een verzoek in behandeling. Open de app om het verzoek te bekijken of te negeren voordat u het opnieuw probeert.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">FocusHaven ontvangt alleen het actietype en een privéverzoekcode. Er wordt geen transcript of privé-inhoud meegestuurd.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Bekijk mijn Focus-timerstatus</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Bekijk de huidige status van de Focus-timer.</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Controleer de Focus-timer.</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven kon dit verzoek niet accepteren. Er is niets veranderd.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Controleer het hervatten van mijn Focus-timer</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Bekijk het hervatten van de gepauzeerde Focus-timer.</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Hervat de Focus-timer</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Open FocusHaven, bekijk het exacte effect en kies vervolgens \'Actie bevestigen\' of \'Verzoek negeren\'.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">Het FocusHaven-verzoek is klaar voor beoordeling. Er is nog geen actie ondernomen.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Open FocusHaven om dit verzoek te bekijken. Er is nog niets gebeurd.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Bekijk het starten van een Focus-timer.</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Bekijk de start van de gereedstaande Focus-sessie.</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Start Focus-timer</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Dit FocusHaven-verzoek is niet beschikbaar. Er is niets veranderd.</string>
+</resources>

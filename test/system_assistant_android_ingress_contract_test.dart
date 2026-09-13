@@ -121,7 +121,8 @@ void main() {
       expect(review, contains('remain closed'));
       expect(review, contains('twenty-eight complete messages'));
       expect(review, contains('outside every Flutter runtime catalog'));
-      expect(review, contains('no `res/values` string'));
+      expect(review, contains('seventeen isolated Android resource files'));
+      expect(review, contains('adds no `shortcuts.xml`'));
     },
   );
 

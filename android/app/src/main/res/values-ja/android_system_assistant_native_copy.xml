@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">リクエストはキャンセルされました。FocusHavenはタイマーやキューを変更していません。</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">FocusHavenのリクエスト</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">アプリ内で審査を受けるための、サポート対象のFocusHavenリクエストを準備してください。</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">このリクエストは確認前に期限切れとなりました。FocusHavenはタイマーやキューを変更していません。</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">このリクエストには、時間、タスク、キューの詳細を追加することはできません。</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">フォーカスキューを開くことを確認する</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">フォーカスキューを開くことを確認する</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">フォーカスキューを開く</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">フォーカスタイマーの一時停止を確認する</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">現在のフォーカスタイマーの一時停止を確認する</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">フォーカスタイマーを一時停止</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">FocusHavenの別のリクエストが審査待ちです。</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHavenには既にリクエストが届いています。アプリを開いて内容を確認するか無視してから、再度お試しください。</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">FocusHavenには、アクションの種類とプライベートリクエストコードのみが送信されます。文字起こしやプライベートコンテンツは含まれません。</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">フォーカスタイマーの状態を確認する</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">現在のフォーカスタイマーの状態を確認する</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">フォーカスタイマーを確認</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHavenはこのリクエストを受け付けられませんでした。何も変更されませんでした。</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">フォーカスタイマーの再開を確認する</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">一時停止したフォーカスタイマーの再開を確認する</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">フォーカスタイマーを再開</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">FocusHavenを開き、正確な効果を確認してから、「アクションを確認する」または「リクエストを無視する」を選択してください。</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">FocusHavenのリクエストは審査準備完了です。アクションはまだ実行されていません。</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">FocusHavenを開いてこのリクエストを確認してください。まだ何も処理されていません。</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">フォーカスタイマーの開始を確認する</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">準備完了のフォーカスセッションの開始を確認する</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">フォーカスタイマーを開始</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">このFocusHavenリクエストは利用できません。変更はありません。</string>
+</resources>

@@ -261,17 +261,16 @@ fifteen independent review targets and Japanese/Korean font-coverage gates are
 unchanged, and base `pt` may be derived only from fully reviewed `pt-BR`.
 
 This source is **not Flutter runtime content**. Runtime ARB digests in the
-manifest are freshness locks for the exact active language set; prepared or
-approved Android-native keys must never be merged into those catalogs. A later
-Android-only integration must transform all approved values into native string
-resources under an exact, placeholder-free key map. Until that separately
-verified integration, public App Actions registration stays closed.
+manifest are freshness locks for the exact active language set; approved
+Android-native keys remain absent from those catalogs. All fifteen reviews are
+accepted, and the exact values are transformed into seventeen isolated Android
+resource files under a placeholder-free key map. Reviewed `pt-BR` is copied
+byte-for-byte to base `pt`; reviewed `id` uses Android's `values-in` qualifier.
 
-The foundation does not contact a provider or create a configuration, draft,
-CSV, real workbook, completed review, approval, Android string resource,
-native copy accessor, production consumer, `shortcuts.xml`, capability, query
-pattern, manifest metadata, or release artifact. Provider-assisted drafting
-and every resulting review remain separately authorized private operations.
+The typed Kotlin accessor resolves only the reviewed resources and fails closed
+without request-submission or execution authority. The integration creates no
+`shortcuts.xml`, capability, query pattern, manifest metadata, fulfillment,
+public App Action registration, production consumer, or release artifact.
 
 ### Google-assisted incremental drafts
 

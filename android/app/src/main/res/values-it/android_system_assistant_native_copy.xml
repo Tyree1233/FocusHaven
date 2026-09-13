@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Richiesta annullata. FocusHaven non ha modificato il timer o la coda.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">Richieste FocusHaven</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Prepara una richiesta FocusHaven supportata per la revisione nell\'app.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">La richiesta è scaduta prima della conferma. FocusHaven non ha modificato il timer o la coda.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Non è possibile aggiungere dettagli relativi a orari, attività o code a questa richiesta.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Revisione apertura Coda Focus</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Revisione apertura Coda Focus</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Apri Coda Focus</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Revisione della messa in pausa del timer Focus</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Rivedi la pausa del timer Focus corrente.</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Metti in pausa il timer Focus</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Un\'altra richiesta FocusHaven è in attesa di revisione.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">FocusHaven ha già una richiesta in sospeso. Apri l\'app per esaminarla o ignorarla prima di riprovare.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">A FocusHaven vengono inviati solo il tipo di azione e un codice di richiesta privato. Non vengono incluse trascrizioni o contenuti privati.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Controlla lo stato del mio timer Focus</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Esamina lo stato attuale del timer Focus</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Controlla il timer Focus</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">FocusHaven non ha potuto accettare questa richiesta. Non è cambiato nulla.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Rivedi la ripresa del timer Focus</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Rivedi la ripresa del timer Focus in pausa</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Riprendi il timer Focus</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Apri FocusHaven, verifica l\'effetto esatto, quindi scegli Conferma azione o Ignora richiesta.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">Richiesta FocusHaven pronta per la revisione. Nessuna azione è stata eseguita.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Apri FocusHaven per esaminare questa richiesta. Non è ancora successo nulla.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Revisione dell\'avvio di un timer Focus</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Revisione dell\'avvio della sessione Focus pronta</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Avvia il timer Focus</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Questa richiesta FocusHaven non è disponibile. Nessuna modifica.</string>
+</resources>

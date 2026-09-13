@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Reviewed Phase 217I copy only. Public App Actions registration remains disabled. -->
+    <string name="android_system_assistant_native_cancelled_result" formatted="false">Solicitação cancelada. O FocusHaven não alterou seu temporizador nem sua fila.</string>
+    <string name="android_system_assistant_native_collection_title" formatted="false">Solicitações da FocusHaven</string>
+    <string name="android_system_assistant_native_discovery_description" formatted="false">Prepare uma solicitação FocusHaven compatível para análise no aplicativo.</string>
+    <string name="android_system_assistant_native_expired_result" formatted="false">Esta solicitação expirou antes da confirmação. O FocusHaven não alterou seu temporizador ou fila.</string>
+    <string name="android_system_assistant_native_no_parameters_summary" formatted="false">Não é possível adicionar detalhes de tempo, tarefa ou fila a esta solicitação.</string>
+    <string name="android_system_assistant_native_open_focus_queue_invocation_example" formatted="false">Revisar abertura da fila de foco</string>
+    <string name="android_system_assistant_native_open_focus_queue_long_label" formatted="false">Revisar abertura da fila de foco</string>
+    <string name="android_system_assistant_native_open_focus_queue_short_label" formatted="false">Abrir fila de foco</string>
+    <string name="android_system_assistant_native_pause_timer_invocation_example" formatted="false">Revisar a pausa do meu temporizador de foco</string>
+    <string name="android_system_assistant_native_pause_timer_long_label" formatted="false">Revisar a pausa do temporizador de foco atual</string>
+    <string name="android_system_assistant_native_pause_timer_short_label" formatted="false">Pausar o temporizador de foco</string>
+    <string name="android_system_assistant_native_pending_request_accessibility_label" formatted="false">Outra solicitação da FocusHaven está aguardando análise.</string>
+    <string name="android_system_assistant_native_pending_request_result" formatted="false">O FocusHaven já tem uma solicitação em espera. Abra o aplicativo para analisá-la ou descartá-la antes de tentar novamente.</string>
+    <string name="android_system_assistant_native_privacy_summary" formatted="false">Somente o tipo de ação e um código de solicitação privado são inseridos no FocusHaven. Nenhuma transcrição ou conteúdo privado é incluído.</string>
+    <string name="android_system_assistant_native_read_timer_status_invocation_example" formatted="false">Verificar o status do meu temporizador de foco</string>
+    <string name="android_system_assistant_native_read_timer_status_long_label" formatted="false">Verifique o status atual do temporizador de foco.</string>
+    <string name="android_system_assistant_native_read_timer_status_short_label" formatted="false">Verifique o temporizador de foco</string>
+    <string name="android_system_assistant_native_rejected_result" formatted="false">O FocusHaven não pôde aceitar esta solicitação. Nada mudou.</string>
+    <string name="android_system_assistant_native_resume_timer_invocation_example" formatted="false">Revisar a retomada do meu temporizador de foco</string>
+    <string name="android_system_assistant_native_resume_timer_long_label" formatted="false">Revisar a retomada do temporizador de foco pausado</string>
+    <string name="android_system_assistant_native_resume_timer_short_label" formatted="false">Retomar o temporizador de foco</string>
+    <string name="android_system_assistant_native_review_instruction" formatted="false">Abra o FocusHaven, revise o efeito exato e, em seguida, escolha Confirmar ação ou Descartar solicitação.</string>
+    <string name="android_system_assistant_native_review_required_accessibility_label" formatted="false">A solicitação da FocusHaven está pronta para análise. Nenhuma ação foi executada.</string>
+    <string name="android_system_assistant_native_review_required_result" formatted="false">Acesse o FocusHaven para analisar esta solicitação. Nada aconteceu ainda.</string>
+    <string name="android_system_assistant_native_start_focus_timer_invocation_example" formatted="false">Revisar o início de um temporizador de foco</string>
+    <string name="android_system_assistant_native_start_focus_timer_long_label" formatted="false">Revisar o início da sessão de foco pronta</string>
+    <string name="android_system_assistant_native_start_focus_timer_short_label" formatted="false">Iniciar temporizador de foco</string>
+    <string name="android_system_assistant_native_unavailable_result" formatted="false">Esta solicitação do FocusHaven não está disponível. Nada foi alterado.</string>
+</resources>
