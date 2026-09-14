@@ -89,7 +89,8 @@ final class _HavenSystemIntentReviewCardState
 
     return Material(
       key: const ValueKey<String>('system-intent-review-card'),
-      color: colors.primaryContainer.withValues(alpha: 0.24),
+      color: colors.surface.withValues(alpha: 1),
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
         side: BorderSide(color: colors.primary.withValues(alpha: 0.32)),
@@ -99,122 +100,182 @@ final class _HavenSystemIntentReviewCardState
         explicitChildNodes: true,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Semantics(
-                key: const ValueKey<String>('system-intent-review-summary'),
-                container: true,
-                liveRegion: true,
-                label: copy.summarySemantics,
-                child: ExcludeSemantics(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        copy.eyebrow,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.6,
-                        ),
+          child: _ReviewLayout(
+            summary: Semantics(
+              key: const ValueKey<String>('system-intent-review-summary'),
+              container: true,
+              liveRegion: true,
+              label: copy.summarySemantics,
+              child: ExcludeSemantics(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      copy.eyebrow,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        copy.title,
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      copy.title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(height: 14),
-                      _ReviewLine(
-                        key: const ValueKey<String>(
-                          'system-intent-interpretation',
-                        ),
-                        icon: Icons.fact_check_outlined,
-                        text: review.interpretation,
+                    ),
+                    const SizedBox(height: 14),
+                    _ReviewLine(
+                      key: const ValueKey<String>(
+                        'system-intent-interpretation',
                       ),
-                      const SizedBox(height: 9),
-                      _ReviewLine(
-                        key: const ValueKey<String>('system-intent-effect'),
-                        icon: Icons.arrow_forward_rounded,
-                        text: review.effect,
+                      icon: Icons.fact_check_outlined,
+                      text: review.interpretation,
+                    ),
+                    const SizedBox(height: 9),
+                    _ReviewLine(
+                      key: const ValueKey<String>('system-intent-effect'),
+                      icon: Icons.arrow_forward_rounded,
+                      text: review.effect,
+                    ),
+                    const SizedBox(height: 12),
+                    _ReviewLine(
+                      icon: Icons.assistant_outlined,
+                      text: copy.sourceBoundary,
+                      subdued: true,
+                    ),
+                    const SizedBox(height: 7),
+                    _ReviewLine(
+                      icon: Icons.lock_outline_rounded,
+                      text: copy.privacyBoundary,
+                      subdued: true,
+                    ),
+                    const SizedBox(height: 7),
+                    _ReviewLine(
+                      icon: Icons.schedule_outlined,
+                      text: copy.freshnessBoundary,
+                      subdued: true,
+                    ),
+                    const SizedBox(height: 7),
+                    _ReviewLine(
+                      icon: Icons.touch_app_outlined,
+                      text: copy.confirmationBoundary,
+                      subdued: true,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      copy.riskLabel,
+                      style: TextStyle(
+                        color: colors.primary,
+                        fontWeight: FontWeight.w700,
                       ),
-                      const SizedBox(height: 12),
-                      _ReviewLine(
-                        icon: Icons.assistant_outlined,
-                        text: copy.sourceBoundary,
-                        subdued: true,
-                      ),
-                      const SizedBox(height: 7),
-                      _ReviewLine(
-                        icon: Icons.lock_outline_rounded,
-                        text: copy.privacyBoundary,
-                        subdued: true,
-                      ),
-                      const SizedBox(height: 7),
-                      _ReviewLine(
-                        icon: Icons.schedule_outlined,
-                        text: copy.freshnessBoundary,
-                        subdued: true,
-                      ),
-                      const SizedBox(height: 7),
-                      _ReviewLine(
-                        icon: Icons.touch_app_outlined,
-                        text: copy.confirmationBoundary,
-                        subdued: true,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        copy.riskLabel,
-                        style: TextStyle(
-                          color: colors.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Semantics(
-                button: true,
-                enabled: actionsEnabled,
-                label: copy.dismissAction,
-                child: ExcludeSemantics(
-                  child: OutlinedButton(
-                    key: const ValueKey<String>('system-intent-dismiss-review'),
-                    onPressed: actionsEnabled
-                        ? () => _settle(widget.onDismiss)
-                        : null,
-                    child: Text(
-                      copy.dismissAction,
-                      textAlign: TextAlign.center,
+            ),
+            actions: Column(
+              key: const ValueKey<String>('system-intent-review-actions'),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Semantics(
+                  button: true,
+                  enabled: actionsEnabled,
+                  label: copy.dismissAction,
+                  onTap: actionsEnabled
+                      ? () => _settle(widget.onDismiss)
+                      : null,
+                  child: ExcludeSemantics(
+                    child: OutlinedButton(
+                      key: const ValueKey<String>(
+                        'system-intent-dismiss-review',
+                      ),
+                      onPressed: actionsEnabled
+                          ? () => _settle(widget.onDismiss)
+                          : null,
+                      child: Text(
+                        copy.dismissAction,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              Semantics(
-                button: true,
-                enabled: actionsEnabled,
-                label: copy.confirmAction,
-                child: ExcludeSemantics(
-                  child: FilledButton(
-                    key: const ValueKey<String>('system-intent-confirm-review'),
-                    onPressed: actionsEnabled
-                        ? () => _settle(widget.onConfirm)
-                        : null,
-                    child: Text(
-                      copy.confirmAction,
-                      textAlign: TextAlign.center,
+                const SizedBox(height: 10),
+                Semantics(
+                  button: true,
+                  enabled: actionsEnabled,
+                  label: copy.confirmAction,
+                  onTap: actionsEnabled
+                      ? () => _settle(widget.onConfirm)
+                      : null,
+                  child: ExcludeSemantics(
+                    child: FilledButton(
+                      key: const ValueKey<String>(
+                        'system-intent-confirm-review',
+                      ),
+                      onPressed: actionsEnabled
+                          ? () => _settle(widget.onConfirm)
+                          : null,
+                      child: Text(
+                        copy.confirmAction,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Pin the choices on phone-sized surfaces while allowing all review text to
+/// scroll. Compact heights or very large type instead scroll the complete card;
+/// neither mode clips, shrinks, or omits reviewed copy or either choice.
+final class _ReviewLayout extends StatelessWidget {
+  const _ReviewLayout({required this.summary, required this.actions});
+
+  final Widget summary;
+  final Widget actions;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget completeContent() => Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [summary, const SizedBox(height: 16), actions],
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (!constraints.hasBoundedHeight) return completeContent();
+        final largeType = MediaQuery.textScalerOf(context).scale(14) > 28;
+        if (constraints.maxHeight < 360 || largeType) {
+          return SingleChildScrollView(
+            key: const ValueKey<String>('system-intent-review-full-scroll'),
+            child: completeContent(),
+          );
+        }
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Flexible(
+              child: SingleChildScrollView(
+                key: const ValueKey<String>('system-intent-review-body-scroll'),
+                child: summary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            actions,
+          ],
+        );
+      },
     );
   }
 }

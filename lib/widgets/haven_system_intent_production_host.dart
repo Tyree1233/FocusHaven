@@ -259,7 +259,25 @@ final class _HavenSystemIntentProductionHostState
     return Stack(
       fit: StackFit.expand,
       children: [
-        widget.child,
+        ExcludeSemantics(
+          excluding: review != null,
+          child: ExcludeFocus(
+            excluding: review != null,
+            child: AbsorbPointer(
+              absorbing: review != null,
+              child: widget.child,
+            ),
+          ),
+        ),
+        if (review != null)
+          const Positioned.fill(
+            child: ModalBarrier(
+              key: ValueKey<String>('system-intent-review-barrier'),
+              dismissible: false,
+              barrierSemanticsDismissible: false,
+              color: Colors.black54,
+            ),
+          ),
         if (review != null)
           Positioned(
             left: 12,
@@ -267,18 +285,15 @@ final class _HavenSystemIntentProductionHostState
             top: 12,
             bottom: 12,
             child: SafeArea(
-              bottom: false,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 560),
-                  child: SingleChildScrollView(
-                    child: HavenSystemIntentReviewCard(
-                      review: review,
-                      copy: _copyFor(review),
-                      onDismiss: _dismiss,
-                      onConfirm: _confirm,
-                    ),
+                  child: HavenSystemIntentReviewCard(
+                    review: review,
+                    copy: _copyFor(review),
+                    onDismiss: _dismiss,
+                    onConfirm: _confirm,
                   ),
                 ),
               ),
