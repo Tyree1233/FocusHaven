@@ -115,12 +115,45 @@ void main() {
     expect(activity, contains('override fun onNewIntent'));
     expect(
       activity,
-      contains('resolveSystemAssistantAndroidAppAction(intent)'),
+      contains('resolveSystemAssistantAndroidAppAction(assistantInput)'),
     );
     expect(
       activity,
       contains('Intent(Intent.ACTION_MAIN).setPackage(packageName)'),
     );
+  });
+
+  test('capture precedes plugins and replay intent is cleared', () {
+    final activity = File(
+      'android/app/src/main/kotlin/com/focushaven/app/MainActivity.kt',
+    ).readAsStringSync();
+    for (final signature in [
+      'override fun onCreate(savedInstanceState: Bundle?)',
+      'override fun onNewIntent(intent: Intent)',
+    ]) {
+      final start = activity.indexOf(signature);
+      expect(start, greaterThanOrEqualTo(0));
+      final end = activity.indexOf('\n    }', start);
+      final body = activity.substring(start, end);
+      final capture = body.indexOf(
+        'val assistantInput = captureSystemAssistantAndroidAppAction(intent)',
+      );
+      final initialize = body.indexOf('super.');
+      final resolve = body.indexOf(
+        'resolveSystemAssistantAndroidAppAction(assistantInput)',
+      );
+      expect(capture, greaterThanOrEqualTo(0));
+      expect(initialize, greaterThan(capture));
+      expect(resolve, greaterThan(initialize));
+    }
+    expect(activity, contains('input.submitTo('));
+    expect(
+      activity,
+      contains('setIntent(Intent(Intent.ACTION_MAIN).setPackage(packageName))'),
+    );
+    expect(activity, isNot(contains('private val assistantInput')));
+    expect(activity, isNot(contains('private var assistantInput')));
+    expect(activity, isNot(contains('PROXY_PACKAGE')));
   });
 
   test(

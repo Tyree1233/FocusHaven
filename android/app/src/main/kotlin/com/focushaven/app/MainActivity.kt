@@ -18,8 +18,9 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val assistantInput = captureSystemAssistantAndroidAppAction(intent)
         super.onCreate(savedInstanceState)
-        resolveSystemAssistantAndroidAppAction(intent)
+        resolveSystemAssistantAndroidAppAction(assistantInput)
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -61,10 +62,11 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
+        val assistantInput = captureSystemAssistantAndroidAppAction(intent)
         super.onNewIntent(intent)
         setIntent(intent)
         deliverWarmPendingCommand()
-        resolveSystemAssistantAndroidAppAction(intent)
+        resolveSystemAssistantAndroidAppAction(assistantInput)
     }
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
@@ -115,22 +117,30 @@ class MainActivity : FlutterActivity() {
         )
     }
 
-    private fun resolveSystemAssistantAndroidAppAction(intent: Intent) {
+    private fun captureSystemAssistantAndroidAppAction(
+        intent: Intent,
+    ): HavenSystemAssistantAndroidAppActionInput? {
         val action = intent.action
-        if (!systemAssistantAndroidAppActionResolver.handles(action)) return
+        if (!HavenSystemAssistantAndroidAppActionResolver.handlesAction(action)) return null
         val extras =
             intent.extras
                 ?.keySet()
                 ?.associateWith { key -> intent.getStringExtra(key) }
                 .orEmpty()
-        val outcome =
-            systemAssistantAndroidAppActionResolver.submit(
-                action = action,
-                extras = extras,
-                hasData = intent.data != null,
-                hasClipData = intent.clipData != null,
-                hasSelector = intent.selector != null,
-            )
+        return HavenSystemAssistantAndroidAppActionInput.capture(
+            action = action,
+            extras = extras,
+            hasData = intent.data != null,
+            hasClipData = intent.clipData != null,
+            hasSelector = intent.selector != null,
+        )
+    }
+
+    private fun resolveSystemAssistantAndroidAppAction(
+        input: HavenSystemAssistantAndroidAppActionInput?,
+    ) {
+        if (input == null) return
+        val outcome = input.submitTo(systemAssistantAndroidAppActionResolver)
 
         // Never retain a public fulfillment intent where recreation could replay it.
         setIntent(Intent(Intent.ACTION_MAIN).setPackage(packageName))

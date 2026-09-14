@@ -10,6 +10,101 @@ class HavenSystemAssistantAndroidAppActionResolverTest {
     private val completeCopy = HavenSystemAssistantAndroidNativeCopy { "Reviewed copy $it" }
 
     @Test
+    fun originalColdInputSurvivesLaterPluginMutationButLiveMapIsRejected() {
+        val extras = mutableMapOf<String, String?>()
+        val action = HavenSystemAssistantAndroidAppActionResolver.REVIEW_TIMER_STATUS_ACTION
+        val captured = requireNotNull(
+            HavenSystemAssistantAndroidAppActionInput.capture(action, extras, false, false, false),
+        )
+        // Reproduce the installed in-app-purchase plugin's local Intent mutation.
+        extras["PROXY_PACKAGE"] = "io.flutter.plugins.inapppurchase"
+        val store = HavenSystemAssistantAndroidPendingRequestStore()
+        val resolver = HavenSystemAssistantAndroidAppActionResolver(store, completeCopy)
+        assertEquals(
+            HavenSystemAssistantAndroidAppActionOutcome.UNAVAILABLE,
+            resolver.submit(action, extras, false, false, false),
+        )
+        assertNull(store.peek())
+        assertEquals(HavenSystemAssistantAndroidAppActionOutcome.READY_FOR_REVIEW, captured.submitTo(resolver))
+        assertEquals(HavenSystemAssistantAndroidRoute.READ_TIMER_STATUS, store.peek()?.kind)
+        assertEquals(setOf("schemaVersion", "invocationId", "kind"), store.peek()?.payload?.keys)
+    }
+
+    @Test
+    fun callerSuppliedExtrasAreNeverIgnoredEvenIfLaterRemoved() {
+        for (key in listOf("PROXY_PACKAGE", "duration", "transcript")) {
+            val extras = mutableMapOf<String, String?>(key to "io.flutter.plugins.inapppurchase")
+            val captured = requireNotNull(
+                HavenSystemAssistantAndroidAppActionInput.capture(
+                    HavenSystemAssistantAndroidAppActionResolver.REVIEW_TIMER_STATUS_ACTION,
+                    extras, false, false, false,
+                ),
+            )
+            extras.clear()
+            val store = HavenSystemAssistantAndroidPendingRequestStore()
+            val resolver = HavenSystemAssistantAndroidAppActionResolver(store, completeCopy)
+            assertEquals(HavenSystemAssistantAndroidAppActionOutcome.UNAVAILABLE, captured.submitTo(resolver))
+            assertNull(store.peek())
+        }
+    }
+
+    @Test
+    fun queueFeatureSnapshotPreservesOriginalValueAndDropsNoCallerKeys() {
+        for (originalFeature in listOf("focus_queue_review", "wrong", null)) {
+            val extras = mutableMapOf("feature" to originalFeature)
+            val captured = requireNotNull(
+                HavenSystemAssistantAndroidAppActionInput.capture(
+                    HavenSystemAssistantAndroidAppActionResolver.REVIEW_OPEN_QUEUE_ACTION,
+                    extras, false, false, false,
+                ),
+            )
+            extras["feature"] = "focus_queue_review"
+            extras["PROXY_PACKAGE"] = "io.flutter.plugins.inapppurchase"
+            val store = HavenSystemAssistantAndroidPendingRequestStore()
+            val outcome = captured.submitTo(HavenSystemAssistantAndroidAppActionResolver(store, completeCopy))
+            assertEquals(
+                if (originalFeature == "focus_queue_review") HavenSystemAssistantAndroidAppActionOutcome.READY_FOR_REVIEW
+                else HavenSystemAssistantAndroidAppActionOutcome.UNAVAILABLE,
+                outcome,
+            )
+            assertEquals(originalFeature == "focus_queue_review", store.hasPendingRequest())
+        }
+    }
+
+    @Test
+    fun snapshotsRetainRejectionFlagsAndIgnoreUnsupportedLaunches() {
+        assertNull(HavenSystemAssistantAndroidAppActionInput.capture("android.intent.action.MAIN", emptyMap(), false, false, false))
+        for (flags in listOf(Triple(true, false, false), Triple(false, true, false), Triple(false, false, true))) {
+            val captured = requireNotNull(
+                HavenSystemAssistantAndroidAppActionInput.capture(
+                    HavenSystemAssistantAndroidAppActionResolver.REVIEW_TIMER_STATUS_ACTION,
+                    emptyMap(), flags.first, flags.second, flags.third,
+                ),
+            )
+            val store = HavenSystemAssistantAndroidPendingRequestStore()
+            assertEquals(HavenSystemAssistantAndroidAppActionOutcome.UNAVAILABLE,
+                captured.submitTo(HavenSystemAssistantAndroidAppActionResolver(store, completeCopy)))
+            assertNull(store.peek())
+        }
+    }
+
+    @Test
+    fun warmSnapshotRetainsOccupiedSlotAndDoesNotReplaceExistingRequest() {
+        val store = HavenSystemAssistantAndroidPendingRequestStore()
+        assertTrue(store.submit(HavenSystemAssistantAndroidRoute.PAUSE_TIMER, "existing"))
+        val captured = requireNotNull(
+            HavenSystemAssistantAndroidAppActionInput.capture(
+                HavenSystemAssistantAndroidAppActionResolver.REVIEW_TIMER_STATUS_ACTION,
+                emptyMap(), false, false, false,
+            ),
+        )
+        assertEquals(HavenSystemAssistantAndroidAppActionOutcome.PENDING_REQUEST,
+            captured.submitTo(HavenSystemAssistantAndroidAppActionResolver(store, completeCopy)))
+        assertEquals("existing", store.peek()?.invocationId)
+        assertEquals(HavenSystemAssistantAndroidRoute.PAUSE_TIMER, store.peek()?.kind)
+    }
+
+    @Test
     fun exactFiveActionsSubmitOnlyTheExistingThreeFieldRequests() {
         val actions =
             listOf(

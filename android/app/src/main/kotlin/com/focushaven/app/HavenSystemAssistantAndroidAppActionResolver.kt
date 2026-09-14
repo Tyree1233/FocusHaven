@@ -10,6 +10,48 @@ internal enum class HavenSystemAssistantAndroidAppActionOutcome {
 }
 
 /**
+ * A method-local snapshot of caller input, captured before plugin attachment.
+ *
+ * Plugins may augment the Activity's Intent during Flutter startup. Copy the
+ * original nullable string values rather than retaining an Intent, Bundle, or
+ * caller-owned map. No extra is removed or allowlisted here: the unchanged
+ * resolver must still validate every original key and value.
+ */
+internal class HavenSystemAssistantAndroidAppActionInput private constructor(
+    private val action: String?,
+    private val extras: Map<String, String?>,
+    private val hasData: Boolean,
+    private val hasClipData: Boolean,
+    private val hasSelector: Boolean,
+) {
+    fun submitTo(
+        resolver: HavenSystemAssistantAndroidAppActionResolver,
+    ): HavenSystemAssistantAndroidAppActionOutcome =
+        resolver.submit(action, extras, hasData, hasClipData, hasSelector)
+
+    companion object {
+        fun capture(
+            action: String?,
+            extras: Map<String, String?>,
+            hasData: Boolean,
+            hasClipData: Boolean,
+            hasSelector: Boolean,
+        ): HavenSystemAssistantAndroidAppActionInput? =
+            if (HavenSystemAssistantAndroidAppActionResolver.handlesAction(action)) {
+                HavenSystemAssistantAndroidAppActionInput(
+                    action,
+                    extras.toMap(),
+                    hasData,
+                    hasClipData,
+                    hasSelector,
+                )
+            } else {
+                null
+            }
+    }
+}
+
+/**
  * Fail-closed fulfillment for the exact Phase 217J Android App Actions mapping.
  *
  * The resolver admits no Assistant-authored value into the FocusHaven request.
@@ -24,7 +66,7 @@ internal class HavenSystemAssistantAndroidAppActionResolver(
     private val copy: HavenSystemAssistantAndroidNativeCopy,
     private val invocationIdFactory: () -> String = { UUID.randomUUID().toString() },
 ) {
-    fun handles(action: String?): Boolean = action in routeByAction
+    fun handles(action: String?): Boolean = handlesAction(action)
 
     fun submit(
         action: String?,
@@ -74,6 +116,8 @@ internal class HavenSystemAssistantAndroidAppActionResolver(
     }
 
     companion object {
+        fun handlesAction(action: String?): Boolean = action in routeByAction
+
         const val REVIEW_TIMER_STATUS_ACTION =
             "com.focushaven.app.action.REVIEW_FOCUS_TIMER_STATUS"
         const val REVIEW_START_TIMER_ACTION =
