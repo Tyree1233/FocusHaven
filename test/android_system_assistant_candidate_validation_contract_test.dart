@@ -167,6 +167,11 @@ void main() {
       'A blank result is not a pass',
       'Every route must be checked from both a cold app launch and a warm '
           'activity',
+      'An unavailable action must instead produce a correlated policy '
+          'rejection',
+      'A process-cold launch starts a new application process',
+      'A missing review alone is not proof of rejection',
+      'Device and official-tool evidence remain separate requirements',
       'Recreating `MainActivity`',
       'matching `en-US` device and Assistant language settings',
       'TalkBack, large text, and increased display size',

@@ -32,10 +32,44 @@ Actions test tool against the exact signed candidate under review:
 - review opening Focus Queue.
 
 Every route must be checked from both a cold app launch and a warm activity.
-The observable destination is the existing in-app **Confirm action** review,
-not a completed timer or queue mutation. Recreating `MainActivity` after a
+For an action available in the restored owner state, the observable destination
+is the existing in-app **Confirm action** review, not a completed timer or queue
+mutation. An unavailable action must instead produce a correlated policy
+rejection without a review or timer or queue mutation. The contract's
+`expectedDestination` names the admitted review destination; it does not bypass
+state-dependent action policy. Recreating `MainActivity` after a
 recognized delivery must not replay the fulfillment. Repeating an already
 consumed request code must also fail closed.
+
+### Cold restoration and state-dependent outcomes
+
+A process-cold launch starts a new application process and restores persisted
+owner state before review preparation. Recreating an activity in an existing
+process, or launching the app before delivering the request, is not proof of
+process-cold delivery. Record which lifecycle path was actually exercised.
+
+The existing timer restoration policy does not automatically restart an
+interrupted countdown. An unexpired persisted deadline restores a stopped
+timer with a pending resume; an explicitly paused timer remains paused.
+The required Pause/Resume outcomes after restoration are:
+
+| Restored state | Pause request | Resume request |
+| --- | --- | --- |
+| Ready | Policy rejection | Policy rejection |
+| Pending resume | Policy rejection | Confirm action review |
+| Explicitly paused | Policy rejection | Confirm action review |
+
+Pause remains available only while the timer is running. Do not start or resume
+the timer merely to turn a cold Pause rejection into a positive review result.
+A missing review alone is not proof of rejection: correlate the delivered
+request with the policy result and verify unchanged timer and queue state.
+Separate restoration's own persistence updates from subsequent request effects.
+
+`test/haven_system_intent_cold_restoration_test.dart` covers all six composed
+restoration outcomes, unchanged owner and mock preference state after review
+preparation, and replay rejection. These source tests do not prove Android
+intent delivery, device accessibility, Assistant recognition, or candidate
+qualification. Device and official-tool evidence remain separate requirements.
 
 ## Negative-input matrix
 
