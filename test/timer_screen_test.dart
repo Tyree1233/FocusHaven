@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -153,6 +157,21 @@ Future<TimerService> _createTimer(WidgetTester tester) async {
   return timer;
 }
 
+Future<void> _withLayoutDiagnostics(Future<void> Function() action) async {
+  final originalHandler = FlutterError.onError;
+  FlutterError.onError = (details) {
+    // Preserve the owning RenderFlex and source location before takeException
+    // reduces an overflow to its short message. Still forward every failure.
+    FlutterError.dumpErrorToConsole(details, forceReport: true);
+    originalHandler?.call(details);
+  };
+  try {
+    await action();
+  } finally {
+    FlutterError.onError = originalHandler;
+  }
+}
+
 void _useNarrowPhone(
   WidgetTester tester, {
   Size size = const Size(320, 720),
@@ -201,7 +220,7 @@ Future<void> _expectCloudRestoreClearsCoach(
       of: find.text(restoreLabel),
       matching: find.byType(TextButton),
     );
-    final coachButton = find.widgetWithText(FloatingActionButton, coachLabel);
+    final coachButton = find.widgetWithText(FilledButton, coachLabel);
 
     expect(restoreButton, findsOneWidget);
     expect(restoreButton.hitTestable(), findsOneWidget);
@@ -209,13 +228,8 @@ Future<void> _expectCloudRestoreClearsCoach(
     expect(coachButton.hitTestable(), findsOneWidget);
 
     final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
-    if (platform == TargetPlatform.iOS) {
-      expect(scaffold.floatingActionButton, isNull);
-      expect(scaffold.bottomNavigationBar, isNotNull);
-    } else {
-      expect(scaffold.floatingActionButton, isNotNull);
-      expect(scaffold.bottomNavigationBar, isNull);
-    }
+    expect(scaffold.floatingActionButton, isNull);
+    expect(scaffold.bottomNavigationBar, isNotNull);
 
     final restoreRect = tester.getRect(restoreButton);
     final coachRect = tester.getRect(coachButton);
@@ -315,9 +329,298 @@ class _RecordingHavenWindowReminders implements HavenWindowReminderClient {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  // Optional local previews use a disclosed font substitute, never a device
+  // or typography qualification. Ordinary regression runs retain test fonts.
+  final previewDirectory =
+      Platform.environment['FOCUSHAVEN_DASHBOARD_PREVIEWS'];
+  setUpAll(() async {
+    if (previewDirectory == null) return;
+    for (final entry in {
+      'Roboto': Platform.environment['FOCUSHAVEN_PREVIEW_FONT']!,
+      'MaterialIcons': Platform.environment['FOCUSHAVEN_PREVIEW_ICONS']!,
+    }.entries) {
+      final loader = FontLoader(entry.key);
+      loader.addFont(
+        Future.value(ByteData.sublistView(File(entry.value).readAsBytesSync())),
+      );
+      await loader.load();
+    }
+  });
+
   setUp(() {
     SharedPreferences.setMockInitialValues({});
   });
+
+  for (final width in [720 / 2.625, 320.0, 360.0, 600.0]) {
+    for (final scale in [1.0, 2.0]) {
+      for (final language in ['en', 'es']) {
+        testWidgets('saved actions and Coach fit $width $scale $language', (
+          tester,
+        ) async {
+          _useNarrowPhone(tester, size: Size(width, 800));
+          SharedPreferences.setMockInitialValues({
+            'focusSeconds': 1500,
+            'secondsRemaining': 1481,
+            'totalSessionSeconds': 1500,
+            'sessionType': 0,
+            'hasPendingTimerResume': true,
+          });
+          final timer = await _createTimer(tester);
+          final previewKey = GlobalKey();
+          await _withLayoutDiagnostics(() async {
+            await tester.pumpWidget(
+              RepaintBoundary(
+                key: previewKey,
+                child: _app(timer, locale: Locale(language), textScale: scale),
+              ),
+            );
+            await tester.pumpAndSettle();
+          });
+          expect(timer.hasPendingResume, isTrue);
+          expect(timer.isRunning, isFalse);
+          final seconds = timer.secondsRemaining;
+          final semantics = tester.ensureSemantics();
+          try {
+            final fresh = find.byKey(
+              const ValueKey('saved-session-start-fresh'),
+            );
+            final resume = find.byKey(const ValueKey('saved-session-resume'));
+            final coach = find.byKey(const ValueKey('timer-focus-coach'));
+            final dashboard = find.byKey(
+              const ValueKey('timer-dashboard-scroll'),
+            );
+            final scaffold = tester.widget<Scaffold>(
+              find.byType(Scaffold).first,
+            );
+            expect(scaffold.floatingActionButton, isNull);
+            expect(scaffold.bottomNavigationBar, isNotNull);
+            for (final control in [fresh, resume]) {
+              await tester.ensureVisible(control);
+              await tester.pumpAndSettle();
+              expect(control.hitTestable(), findsOneWidget);
+              expect(tester.getSize(control).height, greaterThanOrEqualTo(48));
+              final label = find.descendant(
+                of: control,
+                matching: find.byType(Text),
+              );
+              final text = tester.widget<Text>(label).data!;
+              expect(tester.getSemantics(control).label, contains(text));
+              final textRect = tester.getRect(label);
+              final controlRect = tester.getRect(control);
+              expect(controlRect.contains(textRect.topLeft), isTrue);
+              expect(
+                controlRect.contains(
+                  textRect.bottomRight - const Offset(.01, .01),
+                ),
+                isTrue,
+              );
+              if (control == resume &&
+                  (scale == 1 || previewDirectory != null)) {
+                final paragraph = tester.renderObject<RenderParagraph>(label);
+                final boxes = paragraph.getBoxesForSelection(
+                  TextSelection(baseOffset: 0, extentOffset: text.length),
+                );
+                expect(boxes.map((box) => box.top).toSet().length, 1);
+              }
+            }
+            expect(
+              tester.getRect(fresh).overlaps(tester.getRect(resume)),
+              isFalse,
+            );
+            if (width == 600 && scale == 1 && language == 'en') {
+              expect(tester.getRect(fresh).top, tester.getRect(resume).top);
+            }
+            // Longer localized labels may stack even at the same viewport.
+            final freshRect = tester.getRect(fresh);
+            final resumeRect = tester.getRect(resume);
+            if (freshRect.top != resumeRect.top) {
+              expect(
+                resumeRect.top - freshRect.bottom,
+                greaterThanOrEqualTo(10),
+              );
+              expect(freshRect.left, resumeRect.left);
+              expect(freshRect.width, resumeRect.width);
+            }
+            Future<void> savePreview(String section) async {
+              if (previewDirectory == null) return;
+              final boundary =
+                  previewKey.currentContext!.findRenderObject()!
+                      as RenderRepaintBoundary;
+              await tester.runAsync(() async {
+                final image = await boundary.toImage(pixelRatio: 2);
+                try {
+                  final bytes = await image.toByteData(
+                    format: ui.ImageByteFormat.png,
+                  );
+                  await File(
+                    '$previewDirectory/$section-${width.round()}-$scale-$language.png',
+                  ).writeAsBytes(bytes!.buffer.asUint8List());
+                } finally {
+                  image.dispose();
+                }
+              });
+            }
+
+            final savedCard = find.byKey(const ValueKey('saved-session-card'));
+            await tester.ensureVisible(savedCard);
+            await tester.pumpAndSettle();
+            if (previewDirectory != null) {
+              final cardRect = tester.getRect(savedCard);
+              final viewport = tester.getRect(dashboard);
+              expect(cardRect.top, greaterThanOrEqualTo(viewport.top - .01));
+              expect(cardRect.bottom, lessThanOrEqualTo(viewport.bottom + .01));
+              expect(fresh.hitTestable(), findsOneWidget);
+              expect(resume.hitTestable(), findsOneWidget);
+            }
+            await savePreview('saved-session');
+
+            final statistics = find.byKey(
+              const ValueKey('dashboard-statistics'),
+            );
+            expect(
+              tester.getSize(statistics).width,
+              closeTo(width - (width < 320 ? 32 : 48), .01),
+            );
+            final statCards = [
+              find.byKey(const ValueKey('dashboard-stat-today')),
+              find.byKey(const ValueKey('dashboard-stat-streak')),
+              find.byKey(const ValueKey('dashboard-stat-completed')),
+            ];
+            for (final stat in statCards) {
+              await tester.ensureVisible(stat);
+              await tester.pumpAndSettle();
+              final labels = find.descendant(
+                of: stat,
+                matching: find.byType(Text),
+              );
+              for (var index = 0; index < labels.evaluate().length; index++) {
+                final label = labels.at(index);
+                final text = tester.widget<Text>(label).data!;
+                final paragraph = tester.renderObject<RenderParagraph>(label);
+                // This catches mid-word breaks even when no RenderFlex
+                // overflow occurs. Values must also remain on one line.
+                final selections = index == 0
+                    ? [TextSelection(baseOffset: 0, extentOffset: text.length)]
+                    : [
+                        for (final word in RegExp(r'\S+').allMatches(text))
+                          TextSelection(
+                            baseOffset: word.start,
+                            extentOffset: word.end,
+                          ),
+                      ];
+                for (final selection in selections) {
+                  final boxes = paragraph.getBoxesForSelection(selection);
+                  expect(
+                    boxes.map((box) => box.top).toSet().length,
+                    1,
+                    reason:
+                        'Statistics text must not split within a word: $text',
+                  );
+                }
+              }
+            }
+            if (width == 600 && scale == 1) {
+              expect(
+                tester.getRect(statCards.first).top,
+                tester.getRect(statCards.last).top,
+              );
+            }
+            await tester.ensureVisible(statistics);
+            await tester.pumpAndSettle();
+            if (previewDirectory != null) {
+              final statsRect = tester.getRect(statistics);
+              final viewport = tester.getRect(dashboard);
+              expect(statsRect.top, greaterThanOrEqualTo(viewport.top - .01));
+              expect(
+                statsRect.bottom,
+                lessThanOrEqualTo(viewport.bottom + .01),
+              );
+            }
+            await savePreview('statistics');
+            final goalHeader = find.byKey(const ValueKey('daily-goal-header'));
+            final goalChange = find.byKey(const ValueKey('daily-goal-change'));
+            await tester.ensureVisible(goalHeader);
+            await tester.pumpAndSettle();
+            expect(goalChange.hitTestable(), findsOneWidget);
+            final headerRect = tester.getRect(goalHeader);
+            final changeRect = tester.getRect(goalChange);
+            expect(changeRect.left, greaterThanOrEqualTo(headerRect.left));
+            expect(changeRect.right, lessThanOrEqualTo(headerRect.right + .01));
+            expect(
+              headerRect.bottom,
+              lessThanOrEqualTo(tester.getRect(coach).top),
+            );
+            final changeLabel = tester
+                .widget<Text>(
+                  find.descendant(of: goalChange, matching: find.byType(Text)),
+                )
+                .data!;
+            expect(
+              tester.getSemantics(goalChange).label,
+              contains(changeLabel),
+            );
+            await savePreview('daily-goal');
+            final scroll = tester.state<ScrollableState>(
+              find
+                  .descendant(of: dashboard, matching: find.byType(Scrollable))
+                  .first,
+            );
+            for (final fraction in [0.0, .35, .65, 1.0]) {
+              scroll.position.jumpTo(
+                scroll.position.maxScrollExtent * fraction,
+              );
+              await tester.pumpAndSettle();
+              expect(
+                tester.getRect(dashboard).bottom,
+                lessThanOrEqualTo(tester.getRect(coach).top),
+              );
+              expect(coach.hitTestable(), findsOneWidget);
+            }
+            expect(timer.secondsRemaining, seconds);
+            expect(timer.isRunning, isFalse);
+            expect(timer.hasPendingResume, isTrue);
+            expect(tester.takeException(), isNull);
+            await tester.pumpWidget(const SizedBox.shrink());
+          } finally {
+            semantics.dispose();
+          }
+        });
+      }
+    }
+  }
+
+  for (final discard in [true, false]) {
+    testWidgets(
+      'saved action retains ${discard ? 'discard' : 'resume'} behavior',
+      (tester) async {
+        _useNarrowPhone(tester);
+        SharedPreferences.setMockInitialValues({
+          'focusSeconds': 1500,
+          'secondsRemaining': 1481,
+          'totalSessionSeconds': 1500,
+          'sessionType': 0,
+          'hasPendingTimerResume': true,
+        });
+        final timer = await _createTimer(tester);
+        await tester.pumpWidget(_app(timer));
+        await tester.pumpAndSettle();
+        expect(timer.hasPendingResume, isTrue);
+        final control = find.byKey(
+          ValueKey(
+            discard ? 'saved-session-start-fresh' : 'saved-session-resume',
+          ),
+        );
+        await tester.ensureVisible(control);
+        await tester.pumpAndSettle();
+        await tester.tap(control);
+        await tester.pump();
+        expect(timer.hasPendingResume, isFalse);
+        expect(timer.isRunning, !discard);
+        expect(timer.secondsRemaining, discard ? 1500 : 1481);
+        await tester.pumpWidget(const SizedBox.shrink());
+      },
+    );
+  }
 
   testWidgets('renders the complete initial focus dashboard', (tester) async {
     final timer = await _createTimer(tester);
@@ -792,6 +1095,8 @@ void main() {
     );
     await tester.pump();
 
+    await tester.ensureVisible(find.byKey(const ValueKey('open-haven-plan')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('open-haven-plan')));
     await tester.pumpAndSettle();
 
@@ -867,6 +1172,8 @@ void main() {
 
     await tester.pumpWidget(_app(timer));
     await tester.pump();
+    await tester.ensureVisible(find.byKey(const ValueKey('open-haven-plan')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('open-haven-plan')));
     await tester.pumpAndSettle();
 
@@ -1085,8 +1392,8 @@ void main() {
     await tester.pump();
 
     final initialPushCount = observer.pushCount;
-    final coachButton = tester.widget<FloatingActionButton>(
-      find.widgetWithText(FloatingActionButton, 'Focus Coach'),
+    final coachButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, 'Focus Coach'),
     );
     coachButton.onPressed!.call();
     coachButton.onPressed!.call();

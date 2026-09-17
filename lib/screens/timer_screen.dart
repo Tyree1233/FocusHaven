@@ -54,6 +54,161 @@ import '../widgets/stat_card.dart';
 import '../widgets/text_entry_dialog.dart';
 import '../widgets/timer_countdown.dart';
 
+class _SavedSessionActions extends StatelessWidget {
+  const _SavedSessionActions({
+    required this.startFreshLabel,
+    required this.resumeLabel,
+    required this.onStartFresh,
+    required this.onResume,
+    required this.sessionColor,
+    required this.foregroundColor,
+  });
+
+  final String startFreshLabel;
+  final String resumeLabel;
+  final VoidCallback onStartFresh;
+  final VoidCallback onResume;
+  final Color sessionColor;
+  final Color foregroundColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final labelStyle = Theme.of(context).textTheme.labelLarge!;
+    const horizontalPadding = 24.0;
+    const gap = 10.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double labelWidth(String text) {
+          final painter = TextPainter(
+            text: TextSpan(text: text, style: labelStyle),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+            locale: Localizations.localeOf(context),
+          )..layout();
+          final width = painter.width;
+          painter.dispose();
+          return width;
+        }
+
+        final freshWidth = labelWidth(startFreshLabel);
+        final resumeWidth = labelWidth(resumeLabel);
+        final widestLabel = freshWidth > resumeWidth ? freshWidth : resumeWidth;
+        final stacked =
+            constraints.maxWidth <
+            (widestLabel + horizontalPadding * 2) * 2 + gap;
+        final buttonPadding = EdgeInsets.symmetric(
+          horizontal: stacked ? 12 : horizontalPadding,
+          vertical: 12,
+        );
+        final startFresh = OutlinedButton(
+          key: const ValueKey('saved-session-start-fresh'),
+          onPressed: onStartFresh,
+          style: OutlinedButton.styleFrom(
+            textStyle: labelStyle,
+            minimumSize: const Size(0, 48),
+            padding: buttonPadding,
+          ),
+          child: Text(startFreshLabel, textAlign: TextAlign.center),
+        );
+        final resume = FilledButton(
+          key: const ValueKey('saved-session-resume'),
+          onPressed: onResume,
+          style: FilledButton.styleFrom(
+            textStyle: labelStyle,
+            minimumSize: const Size(0, 48),
+            padding: buttonPadding,
+            backgroundColor: sessionColor,
+            foregroundColor: foregroundColor,
+          ),
+          child: Text(resumeLabel, textAlign: TextAlign.center),
+        );
+        if (stacked) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              startFresh,
+              const SizedBox(height: gap),
+              resume,
+            ],
+          );
+        }
+        return Row(
+          children: [
+            Expanded(child: startFresh),
+            const SizedBox(width: gap),
+            Expanded(child: resume),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _DashboardStatistics extends StatelessWidget {
+  const _DashboardStatistics({required this.cards, super.key});
+
+  final List<StatCard> cards;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final inheritedStyle = DefaultTextStyle.of(context).style;
+        double textWidth(String text, TextStyle style) {
+          final painter = TextPainter(
+            text: TextSpan(text: text, style: style),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+            locale: Localizations.localeOf(context),
+          )..layout();
+          final width = painter.width;
+          painter.dispose();
+          return width;
+        }
+
+        // Match StatCard's typography and 6-unit horizontal padding. A label
+        // may wrap at spaces, but never force a word into a narrow column.
+        var minimumCardWidth = 30.0;
+        for (final card in cards) {
+          final valueWidth = textWidth(
+            card.value,
+            inheritedStyle.copyWith(fontSize: 17, fontWeight: FontWeight.bold),
+          );
+          if (valueWidth + 14 > minimumCardWidth) {
+            minimumCardWidth = valueWidth + 14;
+          }
+          for (final word in card.label.split(RegExp(r'\s+'))) {
+            final width = textWidth(
+              word,
+              inheritedStyle.copyWith(fontSize: 11),
+            );
+            if (width + 14 > minimumCardWidth) minimumCardWidth = width + 14;
+          }
+        }
+        if (constraints.maxWidth < minimumCardWidth * cards.length + 24) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var index = 0; index < cards.length; index++) ...[
+                if (index > 0) const SizedBox(height: 12),
+                cards[index],
+              ],
+            ],
+          );
+        }
+        return Row(
+          children: [
+            for (var index = 0; index < cards.length; index++) ...[
+              if (index > 0) const SizedBox(width: 12),
+              Expanded(child: cards[index]),
+            ],
+          ],
+        );
+      },
+    );
+  }
+}
+
 class TimerScreen extends riverpod.ConsumerWidget {
   const TimerScreen({this.openExternalUrl, this.writeClipboard, super.key});
 
@@ -1126,34 +1281,34 @@ class TimerScreen extends riverpod.ConsumerWidget {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final secondaryColor = Theme.of(context).colorScheme.secondary;
     final tertiaryColor = Theme.of(context).colorScheme.tertiary;
-    final reservesCoachLayoutSpace =
-        Theme.of(context).platform == TargetPlatform.iOS;
-    final coachButton = FloatingActionButton.extended(
-      tooltip: l10n.coachTitle,
+    final coachButton = FilledButton.icon(
+      key: const ValueKey('timer-focus-coach'),
       onPressed: () => _showCoachingSheet(context, ref),
       icon: const Icon(Icons.auto_awesome_outlined),
-      label: Text(l10n.coachTitle),
+      label: Text(l10n.coachTitle, textAlign: TextAlign.center),
+      style: FilledButton.styleFrom(
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onSecondaryContainer,
+        minimumSize: const Size(0, 56),
+        padding: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
     );
-    final dashboardBottomPadding = reservesCoachLayoutSpace ? 24.0 : 112.0;
+    const dashboardBottomPadding = 24.0;
     final dashboardVerticalPadding = 12.0 + dashboardBottomPadding;
 
     return Scaffold(
-      floatingActionButton: reservesCoachLayoutSpace ? null : coachButton,
-      // iOS accessibility can give the extended Coach control a larger
-      // effective footprint than a floating overlay can reserve reliably.
-      // Put it in the Scaffold layout on iOS so dashboard actions always end
-      // above it, while preserving the accepted Android presentation.
-      bottomNavigationBar: reservesCoachLayoutSpace
-          ? SafeArea(
-              top: false,
-              minimum: const EdgeInsets.fromLTRB(24, 8, 24, 16),
-              child: Align(
-                alignment: Alignment.centerRight,
-                heightFactor: 1,
-                child: coachButton,
-              ),
-            )
-          : null,
+      // Reserve space on every platform, including at intermediate scroll
+      // positions. Unlike a fixed-height FAB, this control can grow with text.
+      bottomNavigationBar: SafeArea(
+        top: false,
+        minimum: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+        child: Align(
+          alignment: Alignment.centerRight,
+          heightFactor: 1,
+          child: coachButton,
+        ),
+      ),
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
@@ -1191,7 +1346,14 @@ class TimerScreen extends riverpod.ConsumerWidget {
         child: LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
             key: const ValueKey('timer-dashboard-scroll'),
-            padding: EdgeInsets.fromLTRB(24, 12, 24, dashboardBottomPadding),
+            // Preserve usable text width on compact displays rather than
+            // spending the same horizontal space on margins at every size.
+            padding: EdgeInsets.fromLTRB(
+              constraints.maxWidth < 320 ? 16 : 24,
+              12,
+              constraints.maxWidth < 320 ? 16 : 24,
+              dashboardBottomPadding,
+            ),
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 minHeight: constraints.maxHeight > dashboardVerticalPadding
@@ -1342,6 +1504,7 @@ class TimerScreen extends riverpod.ConsumerWidget {
                       const SizedBox(height: 28),
                       if (session.hasPendingResume)
                         DecoratedBox(
+                          key: const ValueKey('saved-session-card'),
                           decoration: BoxDecoration(
                             color: sessionColor.withValues(alpha: 0.14),
                             borderRadius: BorderRadius.circular(16),
@@ -1363,28 +1526,13 @@ class TimerScreen extends riverpod.ConsumerWidget {
                                   style: const TextStyle(color: Colors.white70),
                                 ),
                                 const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: timer.discardPendingSession,
-                                        child: Text(
-                                          l10n.resumeSessionStartFresh,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: FilledButton(
-                                        onPressed: timer.resumePendingSession,
-                                        style: FilledButton.styleFrom(
-                                          backgroundColor: sessionColor,
-                                          foregroundColor: _ink,
-                                        ),
-                                        child: Text(l10n.actionResume),
-                                      ),
-                                    ),
-                                  ],
+                                _SavedSessionActions(
+                                  startFreshLabel: l10n.resumeSessionStartFresh,
+                                  resumeLabel: l10n.actionResume,
+                                  onStartFresh: timer.discardPendingSession,
+                                  onResume: timer.resumePendingSession,
+                                  sessionColor: sessionColor,
+                                  foregroundColor: _ink,
                                 ),
                               ],
                             ),
@@ -1535,32 +1683,28 @@ class TimerScreen extends riverpod.ConsumerWidget {
                     padding: const EdgeInsets.only(top: 30),
                     child: Column(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: StatCard(
-                                icon: Icons.today_outlined,
-                                value: l10n.statMinutesCompact(
-                                  summary.todayFocusMinutes,
-                                ),
-                                label: l10n.statToday,
+                        _DashboardStatistics(
+                          key: const ValueKey('dashboard-statistics'),
+                          cards: [
+                            StatCard(
+                              key: const ValueKey('dashboard-stat-today'),
+                              icon: Icons.today_outlined,
+                              value: l10n.statMinutesCompact(
+                                summary.todayFocusMinutes,
                               ),
+                              label: l10n.statToday,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: StatCard(
-                                icon: Icons.local_fire_department_outlined,
-                                value: '${summary.currentStreak}',
-                                label: l10n.statDayStreak,
-                              ),
+                            StatCard(
+                              key: const ValueKey('dashboard-stat-streak'),
+                              icon: Icons.local_fire_department_outlined,
+                              value: '${summary.currentStreak}',
+                              label: l10n.statDayStreak,
                             ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: StatCard(
-                                icon: Icons.check_circle_outline,
-                                value: '${summary.completedFocusSessions}',
-                                label: l10n.statCompleted,
-                              ),
+                            StatCard(
+                              key: const ValueKey('dashboard-stat-completed'),
+                              icon: Icons.check_circle_outline,
+                              value: '${summary.completedFocusSessions}',
+                              label: l10n.statCompleted,
                             ),
                           ],
                         ),
@@ -1633,22 +1777,32 @@ class TimerScreen extends riverpod.ConsumerWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Row(
+                                OverflowBar(
+                                  key: const ValueKey('daily-goal-header'),
+                                  alignment: MainAxisAlignment.spaceBetween,
+                                  overflowAlignment: OverflowBarAlignment.end,
+                                  spacing: 8,
                                   children: [
-                                    Icon(
-                                      Icons.flag_outlined,
-                                      color: primaryColor,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text(
-                                        l10n.dailyGoalTitle,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.flag_outlined,
+                                          color: primaryColor,
                                         ),
-                                      ),
+                                        const SizedBox(width: 8),
+                                        Flexible(
+                                          child: Text(
+                                            l10n.dailyGoalTitle,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                     TextButton(
+                                      key: const ValueKey('daily-goal-change'),
                                       onPressed: () =>
                                           _chooseDailyGoal(context, timer),
                                       child: Text(l10n.actionChange),
