@@ -11,6 +11,19 @@ a foundation, and what is deliberately still future work. It does not grant a
 runtime permission, enable enhanced coaching, deploy a service, alter a store
 candidate, or promise a release date.
 
+## First-release scope update — September 18, 2026
+
+External Google Assistant/Gemini invocation is **Deferred:** the product owner
+approved removing it from first-release dependencies after App Actions Support
+reported that new/in-development App Actions production approval is unavailable.
+Existing source registration is a retained foundation, not a supported release
+claim. Legacy registration and claims still need a narrowly scoped release
+review; no code was disabled by this decision. Do not pursue an AppFunctions or
+Google Home migration now. Preserve in-app voice, confirmation and validation,
+and continue Phase 218. Historical Phase 217L/217M provider-validation plans below
+are conditional future work, not active first-release requirements or passes.
+See [the approved scope decision](ANDROID_EXTERNAL_ASSISTANT_RELEASE_SCOPE.md).
+
 ## Status vocabulary
 
 - **Shipped:** implemented and covered by the current repository's tests.

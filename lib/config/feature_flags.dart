@@ -1,4 +1,10 @@
 abstract final class FeatureFlags {
+  // Opt-in preview; localized source and release/device acceptance pending.
+  static const soundscapesPreview = bool.fromEnvironment(
+    'ENABLE_SOUNDSCAPES_PREVIEW',
+    defaultValue: false,
+  );
+
   static const remoteCoachingEnabled = bool.fromEnvironment(
     'ENABLE_REMOTE_COACHING',
     defaultValue: false,

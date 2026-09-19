@@ -6,7 +6,7 @@ const adaptiveFocusDeltaMessageCount = 17;
 /// Reconstructs the exact catalog bytes that preceded the appended Adaptive
 /// Focus delta while refusing any unexpected delta shape or placement.
 List<int> catalogBytesBeforeAdaptiveFocus(String path) {
-  final complete = File(path).readAsStringSync();
+  final complete = utf8.decode(catalogBytesBeforeSoundscapes(path));
   final raw = complete.contains('\n  "systemAssistantReview')
       ? utf8.decode(catalogBytesBeforeSystemAssistant(path))
       : complete;
@@ -49,7 +49,7 @@ const systemAssistantDeltaMessageCount = 11;
 /// Reconstructs the exact catalog bytes that preceded the appended System
 /// Assistant delta while preserving the earlier Adaptive Focus integration.
 List<int> catalogBytesBeforeSystemAssistant(String path) {
-  final raw = File(path).readAsStringSync();
+  final raw = utf8.decode(catalogBytesBeforeSoundscapes(path));
   const markerText = '\n  "systemAssistantReview';
   final marker = raw.indexOf(markerText);
   if (marker < 1 || raw[marker - 1] != ',') {
@@ -83,3 +83,29 @@ List<int> catalogBytesBeforeSystemAssistant(String path) {
 Map<String, dynamic> catalogBeforeSystemAssistant(String path) =>
     jsonDecode(utf8.decode(catalogBytesBeforeSystemAssistant(path)))
         as Map<String, dynamic>;
+
+/// Strip only the appended, exact sixteen-message soundscape delta so earlier
+/// catalog hash checks continue checking their original bytes, not new copy.
+List<int> catalogBytesBeforeSoundscapes(String path) {
+  final raw = File(path).readAsStringSync();
+  final marker = raw.indexOf('\n  "soundscape');
+  if (marker == -1) return utf8.encode(raw);
+  if (marker < 1 || raw[marker - 1] != ',') {
+    throw StateError('Soundscape delta is not appended exactly: $path');
+  }
+  final delta = jsonDecode('{${raw.substring(marker)}') as Map<String, dynamic>;
+  final source =
+      jsonDecode(
+            File(
+              'localization/proposals/app_en_soundscapes_review.arb',
+            ).readAsStringSync(),
+          )
+          as Map<String, dynamic>;
+  source.remove('@@locale');
+  if (delta.length != 32 ||
+      source.length != 32 ||
+      !delta.keys.toSet().containsAll(source.keys)) {
+    throw StateError('Soundscape delta count or keys changed: $path');
+  }
+  return utf8.encode('${raw.substring(0, marker - 1)}\n}\n');
+}

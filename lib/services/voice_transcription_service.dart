@@ -128,10 +128,13 @@ class SpeechToTextVoiceRecognitionAdapter implements VoiceRecognitionAdapter {
 /// editable in-memory draft that an active sheet may display after a user
 /// explicitly taps the microphone control.
 class VoiceTranscriptionService extends ChangeNotifier {
-  VoiceTranscriptionService({VoiceRecognitionAdapter? adapter})
-    : _adapter = adapter ?? SpeechToTextVoiceRecognitionAdapter();
+  VoiceTranscriptionService({
+    VoiceRecognitionAdapter? adapter,
+    this.beforeCapture,
+  }) : _adapter = adapter ?? SpeechToTextVoiceRecognitionAdapter();
 
   final VoiceRecognitionAdapter _adapter;
+  final Future<void> Function()? beforeCapture;
 
   static const supportedLocaleIds = <String>{'en', 'es'};
 
@@ -210,6 +213,8 @@ class VoiceTranscriptionService extends ChangeNotifier {
     _setStatus(VoiceTranscriptionStatus.preparing);
 
     try {
+      if (beforeCapture != null) await beforeCapture!();
+      if (!_isCurrentOperation(operationRevision)) return false;
       if (!_isInitialized) {
         final initialized = await _adapter.initialize(
           onStatus: _handlePlatformStatus,

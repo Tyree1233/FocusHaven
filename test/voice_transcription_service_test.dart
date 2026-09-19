@@ -5,6 +5,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:focushaven/services/voice_transcription_service.dart';
 
 void main() {
+  test(
+    'audio interlock finishes before any microphone initialization',
+    () async {
+      final cleared = Completer<void>();
+      final adapter = _FakeVoiceRecognitionAdapter();
+      final service = VoiceTranscriptionService(
+        adapter: adapter,
+        beforeCapture: () => cleared.future,
+      )..acknowledgeDisclosure();
+      addTearDown(service.dispose);
+      final starting = service.start(localeId: 'en');
+      expect(adapter.initializeCalls, 0);
+      expect(adapter.listenCalls, 0);
+      cleared.complete();
+      expect(await starting, isTrue);
+      expect(adapter.initializeCalls, 1);
+      await service.cancel();
+    },
+  );
+
+  test('failed audio interlock leaves microphone unopened', () async {
+    final adapter = _FakeVoiceRecognitionAdapter();
+    final service = VoiceTranscriptionService(
+      adapter: adapter,
+      beforeCapture: () async => throw StateError('fixture'),
+    )..acknowledgeDisclosure();
+    addTearDown(service.dispose);
+    expect(await service.start(localeId: 'en'), isFalse);
+    expect(adapter.initializeCalls, 0);
+    expect(adapter.listenCalls, 0);
+  });
+
   test('construction does not initialize or listen', () {
     final adapter = _FakeVoiceRecognitionAdapter();
 

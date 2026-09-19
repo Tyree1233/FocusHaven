@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/focus_milestone.dart';
+import '../config/feature_flags.dart';
+import '../widgets/soundscape_card.dart';
 import '../models/focus_session.dart';
 import '../models/haven_plan.dart';
 import '../models/haven_action.dart';
@@ -1683,6 +1685,12 @@ class TimerScreen extends riverpod.ConsumerWidget {
                     padding: const EdgeInsets.only(top: 30),
                     child: Column(
                       children: [
+                        if (FeatureFlags.soundscapesPreview) ...[
+                          SoundscapeCard(
+                            controller: ref.watch(soundscapeControllerProvider),
+                          ),
+                          const SizedBox(height: 14),
+                        ],
                         _DashboardStatistics(
                           key: const ValueKey('dashboard-statistics'),
                           cards: [

@@ -23,12 +23,15 @@ import 'services/remote_coaching_responder.dart';
 import 'services/reminder_service.dart';
 import 'services/theme_service.dart';
 import 'services/timer_service.dart';
+import 'services/soundscape_audio.dart';
+import 'services/soundscape_controller.dart';
 import 'widgets/focus_shield_platform_host.dart';
 import 'widgets/haven_window_platform_host.dart';
 import 'widgets/haven_system_assistant_android_platform_host.dart';
 import 'widgets/haven_system_assistant_apple_platform_host.dart';
 import 'widgets/haven_system_intent_production_host.dart';
 import 'widgets/system_focus_platform_host.dart';
+import 'widgets/soundscape_localization_host.dart';
 
 Future<void> main() =>
     runFocusHaven(supportedLocales: FocusHavenLocales.productionLocales);
@@ -88,8 +91,20 @@ Future<void> runFocusHaven({
     reminderService.initialized,
   ]);
 
+  final selectedSoundscapeLocale = locale ?? localeService.selectedLocale;
+  final soundscapeLocale = basicLocaleListResolution([
+    ?selectedSoundscapeLocale,
+    ...WidgetsBinding.instance.platformDispatcher.locales,
+  ], supportedLocales);
+  final soundscapeController = FeatureFlags.soundscapesPreview
+      ? await initializeSoundscapeAudio(
+          localizations: lookupAppLocalizations(soundscapeLocale),
+        )
+      : null;
+
   runApp(
     FocusHavenApp(
+      soundscapeController: soundscapeController,
       authService: authService,
       coachingService: coachingService,
       notificationService: notificationService,
@@ -111,6 +126,7 @@ class FocusHavenApp extends StatelessWidget {
   const FocusHavenApp({
     super.key,
     this.authService,
+    this.soundscapeController,
     this.coachingService,
     this.notificationService,
     this.timerService,
@@ -126,6 +142,7 @@ class FocusHavenApp extends StatelessWidget {
   });
 
   final AuthService? authService;
+  final SoundscapeController? soundscapeController;
   final CoachingService? coachingService;
   final NotificationService? notificationService;
   final TimerService? timerService;
@@ -155,6 +172,10 @@ class FocusHavenApp extends StatelessWidget {
 
     return ProviderScope(
       overrides: [
+        if (soundscapeController != null)
+          soundscapeControllerProvider.overrideWith(
+            (ref) => soundscapeController!,
+          ),
         if (activeAuthService != null)
           authServiceProvider.overrideWith((ref) => activeAuthService),
         if (activeCoachingService != null)
@@ -252,10 +273,18 @@ class _FocusHavenMaterialAppState
         ),
         useMaterial3: true,
       ),
-      builder: (context, child) => HavenSystemIntentProductionHost(
-        navigatorKey: _navigatorKey,
-        child: child ?? const SizedBox.shrink(),
-      ),
+      builder: (context, child) {
+        final hosted = HavenSystemIntentProductionHost(
+          navigatorKey: _navigatorKey,
+          child: child ?? const SizedBox.shrink(),
+        );
+        return FeatureFlags.soundscapesPreview
+            ? SoundscapeLocalizationHost(
+                controller: ref.watch(soundscapeControllerProvider),
+                child: hosted,
+              )
+            : hosted;
+      },
       initialRoute: widget.showOnboarding ? '/' : '/timer',
       routes: {
         '/': (_) => const OnboardingScreen(),

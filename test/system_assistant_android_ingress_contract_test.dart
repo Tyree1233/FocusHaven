@@ -125,22 +125,34 @@ void main() {
     },
   );
 
-  test('Apple registration and all localization catalogs stay unchanged', () {
-    const unchangedSubtrees = <String, String>{
-      'ios': 'f7e23f4aa168c7ed57b3ba7198fe963abd37c064',
-      'lib/l10n': 'aa4f2428f72e9a226290de58fd9df89f651a0ba5',
-      'localization': 'fb3506c3d119263d2edee3a414704bbca586594a',
-    };
+  test(
+    'Apple system-assistant registration and native copy stay unchanged',
+    () {
+      // These blob identities match the reviewed Phase 217K files. Inspect the
+      // actual working files, not HEAD: whole-directory pins rejected unrelated
+      // Phase 218 background audio and could not detect uncommitted changes.
+      // Catalog preservation is checked separately by localization activation
+      // tests and soundscape_localization_test's exact pre-delta/delta hashes.
+      const unchangedFiles = <String, String>{
+        'ios/Runner/AppleSystemAssistantNativeCopy.xcstrings':
+            '13d580e2491217181816bc0414cc446cb15c08fb',
+        'ios/Runner/HavenSystemAssistantAppleAppIntents.swift':
+            '42c84b17e7e975956933e0b40ff797346ef2b72c',
+        'ios/Runner/HavenSystemAssistantAppleIngress.swift':
+            'addaf700a7967d9a39c218f73a8117abe63e7f82',
+        'ios/Runner/HavenSystemAssistantAppleNativeCopy.swift':
+            '2ceabdfe2ce84ef180e61b7a99af4e15293b12f4',
+        'ios/Runner/HavenSystemAssistantApplePlatformAdapter.swift':
+            '483427842f6008523fe66d3d15021072da96f39f',
+      };
 
-    for (final subtree in unchangedSubtrees.entries) {
-      final status = Process.runSync('git', [
-        'rev-parse',
-        'HEAD:${subtree.key}',
-      ]);
-      expect(status.exitCode, 0, reason: (status.stderr as String).trim());
-      expect((status.stdout as String).trim(), subtree.value);
-    }
-  });
+      for (final file in unchangedFiles.entries) {
+        final status = Process.runSync('git', ['hash-object', '--', file.key]);
+        expect(status.exitCode, 0, reason: (status.stderr as String).trim());
+        expect((status.stdout as String).trim(), file.value, reason: file.key);
+      }
+    },
+  );
 }
 
 String _read(String path) => File(path).readAsStringSync();

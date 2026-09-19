@@ -314,8 +314,38 @@ pass for that exact locale:
 Machine translation can help draft non-sensitive copy only after a separate
 review approves the provider and data boundary. It cannot receive tasks,
 journal entries, reflections, transcripts, coaching conversations, account
-data, or other private user content. Machine output never bypasses human review
-for production copy.
+data, or other private user content. Human review is the default for production
+copy, except for the explicitly scoped product-owner exception below.
+
+### Phase 218 soundscape delta: product-owner human-review waiver
+
+The product owner explicitly stated that human reviewers will not be available
+and authorized waiving that requirement for the current soundscape translation
+work. This exception applies to `offline-soundscapes-review-v1`: sixteen public
+messages in fifteen target languages (240 entries), with English proposal
+SHA-256 `1195e495edf942112065eb7609c354425d657887331ded0e470521952a6c616b`.
+The owner accepts the limitation that these translations have no independent
+fluent-human validation. Human review is not a prerequisite for this delta.
+
+The review basis must be recorded as `ai_editorial_with_owner_waiver`, with
+`humanReviewed: false` and `humanReviewWaivedByOwner: true`. Completed CSV
+decisions and automated validation must not be described as human review,
+native-speaker sign-off, or evidence of a reviewer who did not participate.
+Preserve the original provider drafts, AI-reviewed returns, and later corrected
+copies separately. Historical review records for other catalogs are unchanged.
+
+The waiver removes only the human-review prerequisite. It does not accept known
+meaning errors: complete the AI meaning/terminology pass and resolve the open
+background-notice and Korean status issues before accepting a final delta.
+Exact source/keys, ICU placeholders, brand integrity, structural/content-safety
+checks, fallback derivation, Japanese/Korean font checks, layout, accessibility,
+tests, analysis and applicable platform checks remain in force. A successful
+acceptance-tool result establishes only what that tool checks, not human review.
+
+This decision does not activate runtime translations, enable the default-off
+soundscape preview, approve an artifact, authorize a commit/push or release, or
+waive review requirements for unrelated safety, privacy, purchase, permission,
+deletion or destructive-action copy. No new locale or store region is enabled.
 
 ## Locale selection and fallback
 

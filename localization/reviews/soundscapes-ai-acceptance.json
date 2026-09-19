@@ -1,0 +1,117 @@
+{
+  "deltaId": "offline-soundscapes-review-v1",
+  "sourceProposalSha256": "1195e495edf942112065eb7609c354425d657887331ded0e470521952a6c616b",
+  "reviewBasis": "ai_editorial_with_owner_waiver",
+  "humanReviewed": false,
+  "humanReviewWaivedByOwner": true,
+  "localeCount": 15,
+  "messageCount": 240,
+  "accepted": 180,
+  "revised": 60,
+  "blocked": 0,
+  "releaseApproved": false,
+  "catalogs": [
+    {
+      "path": "lib/l10n/app_en.arb",
+      "baseSha256": "c35352331362b3b9c6ce037f2e5b83ef58a7f12264814dc9e354d7373204f438",
+      "deltaSha256": "1195e495edf942112065eb7609c354425d657887331ded0e470521952a6c616b",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_es.arb",
+      "baseSha256": "16424428fca89a5cf351ede4a90b48d93a8678c9278dc2d26db275e94fd1868c",
+      "deltaSha256": "a99ce48faa08959f784a9216d28c205ac7b5e89ea35cc9f2b6ecae203231424c",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_fr.arb",
+      "baseSha256": "0210dab1b5cfd847d6ec2017cd6d93694d7f3f3bed4573ee80bbdd170fd038ac",
+      "deltaSha256": "27517016841e969dc7481a4b14689869fe10491ff400d3e63f1f2e6a7d9a64c6",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_de.arb",
+      "baseSha256": "8ee21e3fbb14e8aa6b4874b207bce0dbf77e77afa068ba65ce6636cd9854b45e",
+      "deltaSha256": "94fb707788d211395face305abcc0d97ecd5a886375d68c5ef6e6d527c730fd6",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_pt_BR.arb",
+      "baseSha256": "677ab765fef24f04f5de3fd5d9e335be6a6f5527167545e78d69ba9f10b37d3c",
+      "deltaSha256": "557b4b0aa178844c3d2912f1f8d7e05f26584d0bcb1cf3cf2e35a203f33cf1af",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_ja.arb",
+      "baseSha256": "f57423f7340b9e73c847dc4b91700d91842658d429ca17318fcc7d9eae705849",
+      "deltaSha256": "1e1340249133973601314a09a7f0ef50606718344dce4254725d6aca1879ff80",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_ko.arb",
+      "baseSha256": "ec37afcfaaeedf6f13f25c934fc1dbe7738ef71c2171f938645c2c9caf405dc4",
+      "deltaSha256": "a541946342340fca3a6a9325f4e3ae177f467564d027b6b6a15b1ff189b1df0b",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_it.arb",
+      "baseSha256": "0e0e298d51eddcf34a393e36a75540588f2afe0e2714cd26ef4ed8dfcab071f5",
+      "deltaSha256": "15b32aaa62ce36a9b4e77df3d0254936495faf095155c64e272fe08fcbda462a",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_pl.arb",
+      "baseSha256": "d8a6f479bbbfb502baffe17dbcda47bafc724bf5773f59164d7ccc41980cbc86",
+      "deltaSha256": "1f827b7fe3071c2d1568bb93cfa4ea1f3b2c2f83d07c5d7d2a77bed3c18151a9",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_nl.arb",
+      "baseSha256": "6272d122329bb97c9f479bb464e97ec5666e301338c2f734fb827c7f8aa04281",
+      "deltaSha256": "3407ff11daff5a4ba168fa2eb05bd2ef2d4c5adb924c42e7958004cb7423e443",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_id.arb",
+      "baseSha256": "cab7c11b04646329b38a1d03cfe8e12b1726e1f058fc8cebc64fd23d15dd2698",
+      "deltaSha256": "7fc012ffd6dd6ac50d14e93fc3626a592f070c9ee94701b3f252026dc932d27b",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_tr.arb",
+      "baseSha256": "a8e908ed8d3ce1d20542654e12279a55c9057dd8c17d2b63d06c620ef3bfb1b2",
+      "deltaSha256": "fb8a8bd6f3c42702ed4ebffc268ba65841096cbef3de6278ebe09b29ce48954f",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_sv.arb",
+      "baseSha256": "6dfd4a2bf056f6c0d590dc637417dd66b04ddce2f354c600c41e005b01a693fd",
+      "deltaSha256": "c200758c07fa2f99932188d5e5649ff8612ee3b42b59f63e3ea2a5fada500199",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_nb.arb",
+      "baseSha256": "79a824be80337692588c425849c4476be97ed326133c24ffd28c7764ff29da1d",
+      "deltaSha256": "91129c7b1bef8c753f75cc350c3236c70d6cb0d2db9250ff4e57a5cf0455a2d8",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_da.arb",
+      "baseSha256": "d3c3e7738aca84ecf884629859b3b66f5105bf6256bd8dbd4ab9c2ed70f6c39e",
+      "deltaSha256": "daa69e3782a0a22ecb5d17f7ead545ba930cf101bb55fcefac192faa6b7464cb",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_fi.arb",
+      "baseSha256": "ba9891236ba8f04c8f7e8652ffcd96fd6dd2eeba5bd12f5c107b22826cfc7124",
+      "deltaSha256": "81ef0c45233808d9edd08865fca7848680cfda0d3bf259dd66bdf6e160b8017b",
+      "derivedFrom": null
+    },
+    {
+      "path": "lib/l10n/app_pt.arb",
+      "baseSha256": "600aa5b10c405d433a40954be0e80e12b98e098c1275433a1a3b43cf1ffd533a",
+      "deltaSha256": "557b4b0aa178844c3d2912f1f8d7e05f26584d0bcb1cf3cf2e35a203f33cf1af",
+      "derivedFrom": "pt-BR"
+    }
+  ]
+}

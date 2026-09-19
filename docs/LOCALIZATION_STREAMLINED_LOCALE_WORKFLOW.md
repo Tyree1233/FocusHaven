@@ -217,6 +217,18 @@ derivation occur only after all required fluent reviews are complete and must
 be followed by the normal localization, layout, accessibility, test, analysis,
 platform-build, commit, push, and CI gates.
 
+For the exact Phase 218 delta `offline-soundscapes-review-v1`, the product owner
+has waived the independent human-review prerequisite. See the scoped exception
+in `LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md`. This delta may proceed through
+AI editorial correction and unchanged automated validation without waiting for
+human reviewers. Its review provenance must remain
+`ai_editorial_with_owner_waiver`, `humanReviewed: false`, and
+`humanReviewWaivedByOwner: true`; populated CSV decisions or an `accept` result
+must not be relabeled as fluent-human review. Keep the original drafts/returns,
+and bind any later accepted result to the exact final corrected inputs and this
+waiver. Existing meaning, structural, UI/platform and release gates still apply.
+This exception does not change the tool's checks or prior locale histories.
+
 The system-assistant incremental-review foundation reuses this same tool and
 the existing private Excel helpers. Its manifest locks the isolated eleven-
 message English proposal, fifteen exact runtime-catalog digests, Japanese and

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('Android notification is optional and adds no privileged service', () {
+  test('timer notification remains optional and is not a foreground service', () {
     final manifest = _read('android/app/src/main/AndroidManifest.xml');
 
     expect(manifest, contains('android.permission.POST_NOTIFICATIONS'));
@@ -18,7 +18,6 @@ void main() {
       ),
     );
     for (final forbidden in <String>[
-      'android.permission.FOREGROUND_SERVICE',
       'android.permission.SCHEDULE_EXACT_ALARM',
       'android.permission.USE_EXACT_ALARM',
       'android.permission.POST_PROMOTED_NOTIFICATIONS',
@@ -26,6 +25,27 @@ void main() {
     ]) {
       expect(manifest, isNot(contains(forbidden)));
     }
+    // Phase 218 adds background *sound*, not a timer foreground service.
+    // Scope the exception to the playback permission and exact media service.
+    final foregroundPermissions = RegExp(
+      r'android:name="(android.permission.FOREGROUND_SERVICE[^"]*)"',
+    ).allMatches(manifest).map((match) => match.group(1)).toList();
+    expect(foregroundPermissions, [
+      'android.permission.FOREGROUND_SERVICE',
+      'android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK',
+    ]);
+    final foregroundServices = RegExp(
+      r'<service\b[^>]*android:foregroundServiceType="[^"]+"[^>]*>',
+    ).allMatches(manifest).map((match) => match.group(0)!).toList();
+    expect(foregroundServices, hasLength(1));
+    expect(
+      foregroundServices.single,
+      contains('com.ryanheise.audioservice.AudioService'),
+    );
+    expect(
+      foregroundServices.single,
+      contains('android:foregroundServiceType="mediaPlayback"'),
+    );
   });
 
   test('notification mirrors only the validated private timer contract', () {
