@@ -54,14 +54,59 @@ source/artifact/environment scope. Existing unresolved internal checks and the
 historical evidence gap remain explicit; they are not erased by provider deferral.
 The existing confirmation boundary and no-unreviewed-execution policy remain.
 
-## Release follow-up — not implemented by this note
+## Bounded registration cleanup — September 19, 2026
 
-Before first release, review the legacy Android App Actions registration,
-metadata and user-facing/store claims. Prepare a narrowly scoped change so the
-release does not expose or advertise unavailable integration, while preserving
-in-app voice and review behavior. This decision does not itself disable or remove
-the current registration. That code/configuration change needs its own scoped
-implementation and regression verification.
+The separately authorized cleanup removes the launcher's `android.app.shortcuts`
+metadata reference from the shipping Android manifest. `shortcuts.xml`, its query
+resources and the original mapping/registration/candidate contracts remain
+unchanged historical foundations, not active provider registration or proof of
+approval. No dynamic shortcut publisher is introduced. Regression checks reject
+registration or fulfillment intent filters in every app source-set manifest and
+reject dynamic shortcut publication calls in retained application code.
+
+This removes discovery registration, not the exported launcher or its explicit
+review-only intent handling. MainActivity, the fail-closed resolver, replay
+neutralization, review inbox, confirmation, timer/queue owners, in-app voice,
+Apple integrations, dependencies and permissions remain unchanged. It does not
+prevent another app from explicitly addressing the existing activity; such input
+continues through the existing validation and review boundary.
+
+README and roadmap current-state claims now describe external invocation as
+deferred and the registration as detached. Historical phase contracts are not
+rewritten into passes. No external store listing or provider account was inspected
+or edited; final distribution disclosures and signed-artifact checks remain
+release work. No AppFunctions or Google Home implementation is introduced.
+
+The change is isolated on `phase-218-assistant-release-cleanup`, based on the
+verified Phase 218 merge `f5899fc`. Source-level checks can verify this exact
+manifest deletion and preservation boundary; Flutter regressions/analysis and
+the native merged-manifest/resource check must pass before integration. No
+release qualification is inferred from the cleanup itself.
+
+Initial local checks passed: parsed manifest comparison found exactly one
+registration removal and no permission/component/intent-filter changes; all app
+source-set manifests omit the metadata; runtime code, resources, dependency files
+and historical contracts match the baseline. Four synthetic merged-manifest
+fixtures passed (accept detached registration; reject restored registration,
+missing launcher and missing output). Shell syntax and whitespace checks passed.
+Subsequent normal-Terminal verification completed both local gates using the
+existing `tool/verify_soundscapes.sh` workflow:
+
+- `phase218-verification-fjxKLa`: 80 focused tests and all 1,343 application
+  tests passed; Flutter analysis reported no issues. Formatting and whitespace
+  checks passed. The formatter adjusted only the two edited test files.
+- `phase218-verification-OGGBch`: Android compilation/resources completed in
+  1 minute 30 seconds (301 tasks executed, five up-to-date). All 54 native tests
+  passed across ten reports, with zero failures, errors or skipped tests. All
+  three merged debug manifests retained the launcher and omitted the legacy
+  registration; the saved manifests were independently inspected afterward.
+
+No APK, signing or device action was requested. Existing Kotlin/Gradle warnings
+did not fail the build and were not addressed by widening this cleanup. These
+results establish local cleanup verification, not GitHub CI success or signed
+release qualification. The production merged manifest remains a release-artifact
+check; the inspected native build was debug. No extra build/sign/install pipeline
+was introduced.
 
 No candidate lock, historical result or approval flag is rewritten. No support
 reply or EAP form is sent, no monitor is scheduled, and no commit, push, signing,

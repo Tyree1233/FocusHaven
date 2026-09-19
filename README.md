@@ -3,6 +3,19 @@
 FocusHaven is a calm, local-first focus timer and wellbeing companion for
 Android, iOS, macOS, and the web.
 
+External Google Assistant/Gemini invocation is deferred from the first release.
+The shipping manifest does not register Android App Actions. Legacy capability
+resources and review-only ingress are retained for future reassessment, not
+advertised as supported provider integration. In-app voice, explicit confirmation,
+timer/queue validation, and Apple integration are unchanged. See
+[the first-release scope](docs/ANDROID_EXTERNAL_ASSISTANT_RELEASE_SCOPE.md).
+
+Bundled offline soundscapes are implemented as a default-off preview, with
+localized controls and media metadata. Source, platform-build and scoped
+Spanish/English phone checks passed; production enablement and signed-release
+validation remain separate. See
+[the implementation and validation record](docs/OFFLINE_SOUNDSCAPES_IMPLEMENTATION.md).
+
 Apple system-focus surfaces now complete the same large-text and screen-reader
 boundary as their Android counterparts. The iPhone widget exposes its timer
 state separately from every interactive link, announces human-readable
@@ -962,11 +975,14 @@ Phase 217I checkpoint, public App Actions registration remained a separately
 reviewed and explicitly authorized later gate.
 
 Phase 217J then locks the exact Android capability mapping, and Phase 217K
-implements that reviewed mapping in source. The launcher activity now
-references one `shortcuts.xml` containing four parameter-free, en-US-only
+implemented that reviewed mapping in source. At that checkpoint, the launcher
+activity referenced one `shortcuts.xml` containing four parameter-free, en-US-only
 custom timer-review capabilities and one `OPEN_APP_FEATURE` queue-review
 capability. The queue inventory accepts only `focus_queue_review`, validates
 it, and discards it before the existing three-field request is created.
+The later first-release cleanup removes that manifest reference; the resource
+and original Phase 217K contract remain historical/reusable, not current discovery
+registration. Explicit review-only intent handling is retained, not disabled.
 
 One fail-closed Kotlin resolver rejects unknown actions, extra values, URI
 data, `ClipData`, selectors, missing reviewed copy, and invalid generated IDs.

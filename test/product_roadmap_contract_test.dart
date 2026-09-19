@@ -36,8 +36,8 @@ void main() {
       '| Voice-to-Coach | Shipped |',
       '| Safe voice commands | Shipped |',
       '| Siri, Shortcuts, and Android App Actions | '
-          'Availability-gated Apple registration and source-gated Android '
-          'registration active; Android candidate-validation contract ready |',
+          'Availability-gated Apple registration; external Android invocation deferred |',
+      '| Soundscapes and focus environments | Implemented, default-off preview |',
     ]) {
       expect(
         roadmap,
@@ -47,7 +47,6 @@ void main() {
     }
 
     for (final futureExperience in <String>[
-      '| Soundscapes and focus environments | Planned |',
       '| Haven Rooms and body doubling | Deferred |',
       '| Focus Score | Replaced |',
       '**Haven Momentum**',
@@ -67,6 +66,11 @@ void main() {
     expect(readme, contains('docs/PRODUCT_ROADMAP.md'));
     expect(readme, contains('docs/HAVEN_AI_ACTION_ARCHITECTURE.md'));
     expect(readme, contains('docs/VOICE_PRIVACY_AND_COMMAND_POLICY.md'));
+    expect(
+      readme,
+      contains('External Google Assistant/Gemini invocation is deferred'),
+    );
+    expect(readme, contains('does not register Android App Actions'));
     expect(readme, contains('explicit tap-to-talk Voice-to-Coach'));
     expect(readme, contains('typed Haven Action Engine'));
     expect(readme, contains('stores no raw command history'));
