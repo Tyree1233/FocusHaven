@@ -145,15 +145,19 @@ selected=(
   lib/screens/timer_screen.dart lib/services/voice_transcription_service.dart
   lib/services/soundscape_controller.dart lib/services/soundscape_audio.dart
   lib/services/soundscape_media.dart test/soundscape_media_test.dart
+  lib/services/soundscape_notification.dart
+  lib/widgets/soundscape_localization_host.dart
+  test/soundscape_localization_test.dart test/support/localization_catalog_prefix.dart
   lib/widgets/soundscape_card.dart test/soundscape_controller_test.dart
   test/soundscape_card_test.dart test/support/fake_soundscape_output.dart
   test/voice_transcription_service_test.dart
   test/android_ongoing_notification_contract_test.dart
+  test/system_assistant_android_ingress_contract_test.dart
 )
 run format-selected dart format "${selected[@]}"
 run format-check dart format --output=none --set-exit-if-changed "${selected[@]}"
-run sound-and-voice-tests flutter test --no-pub test/soundscape_controller_test.dart test/soundscape_card_test.dart test/soundscape_media_test.dart test/voice_transcription_service_test.dart test/android_ongoing_notification_contract_test.dart
+run sound-and-voice-tests flutter test --no-pub test/soundscape_controller_test.dart test/soundscape_card_test.dart test/soundscape_media_test.dart test/soundscape_localization_test.dart test/voice_transcription_service_test.dart test/android_ongoing_notification_contract_test.dart test/system_assistant_android_ingress_contract_test.dart
 run application-analysis flutter analyze --no-pub
 run complete-suite flutter test --no-pub
 run whitespace git diff --check
-printf 'Source verification passed. Native builds, playback/listening, lock-screen, interruptions, accessibility and localization review remain pending.\nLogs: %s\n' "$evidence"
+printf 'Source verification passed. Current localized native media/channel behavior and release artifacts remain unverified. AI-only localization acceptance uses the recorded owner waiver; no human review is claimed.\nLogs: %s\n' "$evidence"

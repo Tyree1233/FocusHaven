@@ -1,5 +1,5 @@
 abstract final class FeatureFlags {
-  // Isolated English preview; production localization/device acceptance pending.
+  // Opt-in preview; localized source and release/device acceptance pending.
   static const soundscapesPreview = bool.fromEnvironment(
     'ENABLE_SOUNDSCAPES_PREVIEW',
     defaultValue: false,

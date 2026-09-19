@@ -31,6 +31,7 @@ import 'widgets/haven_system_assistant_android_platform_host.dart';
 import 'widgets/haven_system_assistant_apple_platform_host.dart';
 import 'widgets/haven_system_intent_production_host.dart';
 import 'widgets/system_focus_platform_host.dart';
+import 'widgets/soundscape_localization_host.dart';
 
 Future<void> main() =>
     runFocusHaven(supportedLocales: FocusHavenLocales.productionLocales);
@@ -45,10 +46,6 @@ Future<void> runFocusHaven({
   required List<Locale> supportedLocales,
 }) async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  final soundscapeController = FeatureFlags.soundscapesPreview
-      ? await initializeSoundscapeAudio()
-      : null;
 
   final notificationService = NotificationService();
   await notificationService.initialize();
@@ -93,6 +90,17 @@ Future<void> runFocusHaven({
     journalService.initialized,
     reminderService.initialized,
   ]);
+
+  final selectedSoundscapeLocale = locale ?? localeService.selectedLocale;
+  final soundscapeLocale = basicLocaleListResolution([
+    ?selectedSoundscapeLocale,
+    ...WidgetsBinding.instance.platformDispatcher.locales,
+  ], supportedLocales);
+  final soundscapeController = FeatureFlags.soundscapesPreview
+      ? await initializeSoundscapeAudio(
+          localizations: lookupAppLocalizations(soundscapeLocale),
+        )
+      : null;
 
   runApp(
     FocusHavenApp(
@@ -265,10 +273,18 @@ class _FocusHavenMaterialAppState
         ),
         useMaterial3: true,
       ),
-      builder: (context, child) => HavenSystemIntentProductionHost(
-        navigatorKey: _navigatorKey,
-        child: child ?? const SizedBox.shrink(),
-      ),
+      builder: (context, child) {
+        final hosted = HavenSystemIntentProductionHost(
+          navigatorKey: _navigatorKey,
+          child: child ?? const SizedBox.shrink(),
+        );
+        return FeatureFlags.soundscapesPreview
+            ? SoundscapeLocalizationHost(
+                controller: ref.watch(soundscapeControllerProvider),
+                child: hosted,
+              )
+            : hosted;
+      },
       initialRoute: widget.showOnboarding ? '/' : '/timer',
       routes: {
         '/': (_) => const OnboardingScreen(),

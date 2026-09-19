@@ -493,29 +493,267 @@ call-interruption checks with Bluetooth headphones and without headphones.
 These observations and earlier native unit tests retain their original artifact
 scope; no full-suite or native lifecycle pass is inferred for a different build.
 
+### Subsequent Android call observation
+
+After the preview checkpoint commit, the user reported successful call
+interruption on the Moto using the separate TextFree app over Wi-Fi. The user
+also reported that a call from the active-service iPhone worked correctly.
+Within the requested checklist, the user reported that sound paused for the
+call, remained paused afterward and resumed with explicit Play. This is a
+user-reported TextFree/internet-call observation on the installed branding
+preview, not captured audio or instrumented verification. A cellular-service
+origin on the iPhone does not turn the receiving Moto's TextFree connection into
+Android carrier telephony. The Moto still has no active cellular service.
+No broader calling-app, carrier-call or release-artifact coverage is inferred.
+
+### Android carrier-call checklist disposition — closed by owner waiver
+
+The product owner explicitly chose not to perform the service-enabled Android
+carrier-call test and requested that this item be marked complete. Its checklist
+status is **complete — waived by the product owner, accepted without testing**.
+It is no longer an outstanding Phase 218 acceptance task or blocker. The
+underlying test outcome remains **not tested**; confidence and the TextFree/iPhone
+observations are not substituted for Android carrier-telephony evidence. This
+waiver applies only to that test item, not the other release gates or release
+approval. Historical build, installation and test results remain unchanged.
+
+### Moto manual activity-recreation check — passed by user report
+
+Using the installed branding preview, the user completed the guided check with
+Android's "Don't keep activities" temporarily enabled and reported that every
+step worked. Playback continued during Home/reopen without an observed duplicate
+sound; the screen and playback controls returned normally; the stopped timer
+remained unchanged. A paused Home/reopen stayed silent until explicit Play.
+In-app voice input paused sound, cancellation without submission did not resume
+it, and explicit Play worked afterward. The user explicitly confirmed the phone
+settings were restored to normal after the test.
+
+The bounded manual preview activity-recreation/voice checklist is complete.
+These are user observations under the developer setting, not instrumented
+activity/engine identity measurements, process-death coverage, or proof of every
+native channel and assistant route. Earlier ordinary background/reopen checks
+and automated regressions retain their own scope. No new build, diagnostic
+harness, external assistant operation or release approval was performed.
+
+### Soundscape localization delta — prepared, review pending
+
+The existing incremental localization workflow is reused; no new translation
+service, approval pipeline or runtime catalog is introduced. The source proposal
+is `localization/proposals/app_en_soundscapes_review.arb`, and the manifest is
+`localization/plans/soundscapes-incremental-review.json`.
+
+The proposal contains sixteen complete messages with context metadata: sound
+title, preview label, six status/error notices, Play/Pause, the volume label and
+two numeric volume phrases, background/timer-separation notice, and Android
+notification channel name. The media title shares the sound title; FocusHaven
+artist/album branding remains invariant. Stable media/channel identifiers,
+asset paths and internal errors are not translation input. Volume placeholders
+are typed integers already scaled 0–100, not fractions to multiply again.
+
+The manifest pins the proposal and the current catalogs for all fifteen reviewed
+non-English languages. Base `pt` must derive from reviewed `pt-BR`, not receive a
+separate review. Existing Japanese/Korean font gates are retained. Independent
+local structural checks passed for sixteen message/metadata pairs, placeholders,
+all sixteen target/fallback catalog hashes and absence of runtime key collisions.
+Application source, live ARBs, locale allowlist and dependencies are unchanged.
+
+Run the established Dart preflight from this checkout in the normal Terminal:
+
+```bash
+dart run tool/localization_incremental_review.dart preflight localization/plans/soundscapes-incremental-review.json
+```
+
+The user ran that Dart preflight in the normal Terminal and supplied its output:
+`passed: true`, fifteen locales, one derived fallback, sixteen messages and
+metadata entries per locale, sixteen target/fallback catalogs, and no errors.
+The result explicitly records `providerRequestMade: false`,
+`reviewWorkbookCreated: false` and `runtimeActivated: false`. This is the
+user-supplied preflight result, not a saved provider or review result.
+No translation draft, completed human review, approval or runtime merge is claimed.
+The existing policy requires independent fluent review of the sixteen messages
+in each of fifteen languages (240 decisions) before runtime integration.
+Provider-assisted drafting requires separately scoped authorization and may
+contain only this public application copy, never private user content.
+
+The user subsequently authorized the bounded Google-assisted draft batch.
+The local, repository-external `../phase218-generate-soundscape-drafts.py`
+wrapper reuses the existing incremental adapter and brand glossaries, with
+fresh private outputs and no inherited source-equal approval exceptions. It
+checks the exact proposal/manifest/catalogs, existing account/project,
+billing/API and glossary metadata/source before one request per language.
+No provider resource is created or updated and automatic retries are refused.
+Its read-only local check and mocked success, wrong-account, provider-failure,
+repeat-attempt and changed-input checks passed. No live provider call has yet
+been made by this preparation. Execution remains in the user's normal Terminal
+because the restricted environment cannot perform Dart's required CPU query.
+
+The first authorized draft execution stopped before translation at the glossary
+metadata guard. Its private result records `provider_attempted: false`; the
+passed provider preflight, configuration and empty output directory are retained.
+The user's read-only inspection found the same sole mismatch in all fifteen
+glossaries: Google returned project number `1098887656894` in place of project ID
+`focushaven-localization-f56131`. All other inspected metadata matched.
+The local wrapper now accepts either exact resource name only after freshly
+verifying that project-number mapping; language, location, glossary identity,
+entry count and brand-only source checks remain required.
+`--continue-after-project-name` pins and reuses the original passed preflight,
+preserves the original failure, and creates separate continuation evidence.
+An exclusive continuation marker and provider-attempt marker refuse repeated
+execution. Seven offline tests passed, including wrong metadata/content,
+changed evidence, existing outputs, success and provider-failure preservation.
+At that checkpoint the continuation was prepared but not yet executed.
+
+Subsequently, the user ran the continuation successfully: all fifteen draft
+bundles were generated, and offline worksheet preparation passed for all 240
+entries. An AI editorial pass recorded 40 meaning/control issues, 33 wording
+suggestions, four questions and 163 entries without a specific flagged issue.
+The returned CSVs contain 193 `ACCEPT` and 47 `REVISE` decisions, with protected
+fields and placeholders preserved by read-only intake checks. The user confirmed
+that these decisions are AI-only, not independent human review. Twelve
+background notices and the Korean `Off` status required meaning correction;
+optional wording suggestions are not mandatory simply because AI proposed them.
+
+The product owner then explicitly waived human review for this soundscape batch.
+The exact exception is recorded in `LOCALIZATION_AND_GLOBAL_RELEASE_POLICY.md`:
+review basis `ai_editorial_with_owner_waiver`, `humanReviewed: false`,
+`humanReviewWaivedByOwner: true`. Do not wait for human reviewers or fabricate
+fluent-review evidence. This records an owner decision about the review process,
+not acceptance of the current 13 unresolved entries or the final wording.
+Those thirteen entries were subsequently corrected in separate private
+`ai-corrected-review` CSVs, retaining all other decisions and all seven protected
+columns. The resulting 240 entries contain 180 `ACCEPT` and 60 `REVISE`
+decisions. CSV round-trip, placeholder, brand, exact change scope and original
+input-preservation checks passed. `review-provenance.json` binds the originals,
+source proposal, manifest, existing tool and corrected output hashes to the
+AI-only owner-waiver review basis.
+
+The first attempt to run the unchanged Dart acceptance tool aborted inside the
+Dart runtime before validation (`cpuinfo_macos.cc:42`, exit 134). The user then
+ran it successfully in normal Terminal: all fifteen locales passed, with zero
+errors and zero detected content-safety issues. The fifteen accepted ARB deltas
+and validation reports were inspected on disk. Preserve the initial failed
+attempt and earlier pending records as historical evidence, not current status.
+No candidate approval, preview enablement, commit, push or release occurred.
+
+The accepted delta is now appended in the isolated feature checkout: English,
+fifteen reviewed languages, and the planned `pt` fallback derived from `pt-BR`.
+`localization/reviews/soundscapes-ai-acceptance.json` records non-personal source,
+delta and pre-integration catalog hashes with the AI-only review basis. Earlier
+catalog bytes and metadata are preserved; historical prefix tests now strip only
+the exact sixteen-key soundscape addition before checking older evidence.
+
+The card, status live region, controls and volume semantics use AppLocalizations.
+A navigation-level localization host forwards the resolved locale to the sound
+controller via a presentation-only callback. Initial media configuration resolves
+the saved or system language; later locale changes refresh an existing media
+title without publishing an unused session or invoking playback operations.
+Artwork, stable media/channel IDs and the FocusHaven creator stay unchanged.
+Android channel naming uses the existing notification plugin and retains existing
+channel settings. No new package or platform permission was added.
+
+Added coverage checks all supported locale cards at 320px and 2x text, locale
+switches during playback and voice pause, stable media identity, notification
+settings, exact accepted-delta hashes and unchanged historical catalog bytes.
+The source-only verification script includes these tests. Initial local attempts
+were blocked by Flutter cache permissions and a Dart runtime startup failure.
+Subsequent normal-Terminal runs exposed and corrected semantics-handle cleanup,
+two style lints, and an outdated whole-directory Git pin in the Android ingress
+contract. That contract now checks the five actual Apple assistant working files
+against their unchanged Phase 217K identities; catalog preservation remains
+covered by exact prefix/delta and earlier localization activation tests.
+
+The normal-Terminal run `phase218-verification-ssgWgy` passed: four asset/boundary
+checks, localization generation, formatting (20 files, zero further changes),
+67 focused tests, application analysis with no issues, all 1,341 full-suite tests,
+and whitespace. Saved logs were inspected. Earlier failed runs remain preserved.
+This completes localized source verification, not localized native media/channel
+or physical accessibility validation. The preview remains default-off; the run
+did not build, sign, install, commit, push or release anything.
+
+Android verification `phase218-verification-WWj1FE` passed its task-plan guard
+and compilation/native-test task, with existing native test outputs reused.
+Unsigned iOS verification `phase218-verification-wStfcN` built Runner.app in
+296 seconds and confirmed unchanged original source/dependency locks and no
+tracked build-copy migrations. Neither run validates localized phone behavior.
+
+The existing local preview helpers now have explicit localization-update modes,
+separate from the preserved branding modes. The read-only localization checkpoint
+pins the successful source/Android/iOS evidence and checks the exact application
+manifest from the iOS export. Documentation/tools are excluded from that product
+manifest; additional or changed application files stop the update. Moto updates
+require the previously installed AcDDPp branding APK hash and size before using
+install-in-place, with no uninstall. iPhone updates retain the same development
+identity, profiles and exact phone checks, without provisioning updates or launch.
+Offline helper tests and syntax checks are preparation only: building/signing and
+phone installation still require the separately authorized preview cycle.
+No old signed iPhone build can be resumed through the new localization mode.
+
+### Localized previews — installed and focused owner checks passed
+
+Current status (2026-09-19): the focused Spanish-to-English preview round is
+complete on both physical phones. This section supersedes the earlier pending
+localization-preview status, not the production-release gates below.
+
+The Android debug preview in `phase218-preview-MaEOaP` passed source preservation,
+signature, package/version and artwork checks. Its APK SHA-256 is
+`c9e5b4e893a54a518eaa4bc0e53eff2663703ef67cbefa9ba3a7937d191d2c38`.
+The first update stopped with no Android connection and no installation attempt
+(`phase218-moto-install-2h_fbmo1`). Installation-only reuse then succeeded in
+`phase218-moto-install-wm8u6s2q`: the installed APK hash/size matched, no uninstall
+occurred, and accessibility/display settings were unchanged.
+
+The iPhone development-signed profile preview succeeded in
+`phase218-iphone-preview-5cqq_zy9`, bound to source verification
+`phase218-verification-wStfcN`. App signature, all four expected target
+certificates/profiles, and source preservation passed before installation.
+No provisioning updates, uninstall, automatic launch or upload occurred.
+
+After manual launch, the owner reported these focused observations:
+
+| Check | Moto g (2025), Android 16 | iPhone 12 Pro Max, iOS 26.6.2 |
+| --- | --- | --- |
+| Spanish/English soundscape labels and readable layout | Passed, owner-reported | Passed, owner-reported |
+| Media title changes, FocusHaven branding and artwork | Passed, owner-reported | Passed, owner-reported |
+| Playback continuity and unchanged timer during language switching | Passed, owner-reported | Passed, owner-reported |
+| Separately reachable, spoken controls; focus navigation does not activate playback | TalkBack passed, owner-reported | VoiceOver passed in both languages, explicitly confirmed by owner |
+| Sound notification-category name follows language selection | Passed, owner-reported | Not applicable to this iOS check |
+
+These are user observations, not automated screen/audio captures or independent
+fluent-language review. Installer results remain unchanged with their original
+`device_validated: false`: installation alone did not establish these later
+manual observations. This scoped record does not claim physical testing of every
+translated language, every accessibility scenario, or production release builds.
+The fifteen-language translation provenance remains AI editorial review with
+the explicit owner human-review waiver; phone testing does not relabel it as
+fluent-human translation approval. Do not repeat this same focused round unless
+relevant code, artifact or behavior changes.
+
 Remaining before production enablement:
 
-- Move English-only soundscape text/media labels into the approved localization
-  workflow; retain the default-off preview flag until release acceptance.
-- Verify a regular incoming-call interruption on Android. The recorded Moto
-  competing-audio test used browser YouTube, not a phone call.
-- Exercise retained in-app voice/platform-channel behavior across Android
-  activity recreation/cold and warm startup with the new AudioServiceActivity
-  base class. Earlier Phase 217M lifecycle evidence is not a substitute. This is
-  local lifecycle coverage, not a restart of external App Actions qualification.
+- Retain the default-off preview flag until release acceptance. The focused
+  Spanish/English localized preview checks above are complete, not release approval.
 - Validate the intended signed release artifacts with a focused playback,
-  interruption and accessibility pass; current Android debug and iOS profile
-  previews are not release artifacts. Review release disclosures/claims.
+  interruption, lifecycle/retained-platform behavior and accessibility pass;
+  current Android debug and iOS profile previews are not release artifacts.
+  Review release disclosures/claims. Do not infer unobserved channel behavior
+  from the scoped manual lifecycle result above.
 
 Separately, the already-approved first-release assistant scope decision requires
 a bounded legacy registration/claims cleanup before release. Do not start an
 AppFunctions migration or re-open the deferred provider pipeline for this phase.
 
-Proposed commit scope: product source/configuration, bundled asset, regression
-tests, reusable verification/generator tools, and the scope/implementation docs.
-Keep the four machine-bound preview helpers local: build_soundscape_preview.sh,
+Current localization commit scope: the 17 catalog deltas, localized soundscape
+source and startup wiring, the proposal/review plan and AI acceptance provenance,
+regression tests and catalog-prefix compatibility, reusable verification-script
+updates, the preview-flag comment, and the three localization/implementation docs.
+The bundled audio/artwork and dependency locks have no changes in this delta.
+Final read-only review found no new blocking issue in this scope; previously
+passed source/platform evidence remains applicable because product files are
+unchanged. No staging, commit, push or production enablement occurred.
+Keep the machine-bound preview helpers local: build_soundscape_preview.sh,
 install_soundscape_preview.py, install_ios_soundscape_preview.py and
-soundscape_branding_checkpoint.py. They pin personal device identities, local
+soundscape_branding_checkpoint.py, plus soundscape_localization_checkpoint.py
+and its test_soundscape_localized_preview.py checks. They pin personal device identities, local
 artifact/evidence directories or depend on those pins; they are not reusable
 product code. Preserve them and all evidence without staging them indiscriminately.
 Use explicit paths when staging; do not use a blanket add. No commit is authorized

@@ -3,14 +3,20 @@ import 'dart:async';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:just_audio/just_audio.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
 import 'soundscape_controller.dart';
 import 'soundscape_media.dart';
+import 'soundscape_notification.dart';
 
 /// One application-lifetime media session with fixed local brand artwork.
 /// No remote URLs, user text, timer/queue controls or persisted playback intent.
-Future<SoundscapeController> initializeSoundscapeAudio() async {
+Future<SoundscapeController> initializeSoundscapeAudio({
+  AppLocalizations? localizations,
+}) async {
   if (kIsWeb ||
       (defaultTargetPlatform != TargetPlatform.android &&
           defaultTargetPlatform != TargetPlatform.iOS)) {
@@ -19,15 +25,19 @@ Future<SoundscapeController> initializeSoundscapeAudio() async {
       available: false,
     );
   }
-  final output = _LocalSoundOutput();
-  final controller = SoundscapeController(output);
+  final l10n = localizations ?? defaultServiceLocalizations();
+  final output = _LocalSoundOutput(l10n);
+  final controller = SoundscapeController(
+    output,
+    onLocalizationsChanged: output.updateLocalizations,
+  );
   try {
     final handler = _SoundHandler(controller);
     await AudioService.init(
       builder: () => handler,
-      config: const AudioServiceConfig(
-        androidNotificationChannelId: 'com.focushaven.app.soundscapes',
-        androidNotificationChannelName: 'FocusHaven sounds',
+      config: AudioServiceConfig(
+        androidNotificationChannelId: soundscapeNotificationChannelId,
+        androidNotificationChannelName: l10n.soundscapeNotificationChannelName,
         androidNotificationOngoing: true,
         androidStopForegroundOnPause: true,
       ),
@@ -44,6 +54,10 @@ Future<SoundscapeController> initializeSoundscapeAudio() async {
 }
 
 class _LocalSoundOutput implements SoundscapeOutput {
+  _LocalSoundOutput(this._localizations);
+
+  AppLocalizations _localizations;
+  Future<void> _metadataOperations = Future.value();
   AudioPlayer? _player;
   AudioSession? _session;
   _SoundHandler? handler;
@@ -57,6 +71,42 @@ class _LocalSoundOutput implements SoundscapeOutput {
   Future<void> _operations = Future.value();
   bool _ownsSession = false;
   Uri? _artwork;
+
+  void updateLocalizations(AppLocalizations localizations) {
+    if (_disposed) return;
+    _localizations = localizations;
+    final current = handler?.mediaItem.value;
+    // No media session is published until explicit playback. Existing artwork,
+    // ID, creator and playback state are not changed by a language switch.
+    if (current != null) {
+      handler?.mediaItem.add(
+        current.copyWith(title: localizations.soundscapeSoftNoiseTitle),
+      );
+    }
+    if (defaultTargetPlatform != TargetPlatform.android) return;
+    _metadataOperations = _metadataOperations
+        .then((_) async {
+          if (_disposed) return;
+          final android = FlutterLocalNotificationsPlugin()
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
+          if (android == null) return;
+          final channels = await android.getNotificationChannels();
+          if (_disposed) return;
+          final existing = channels
+              ?.where(
+                (channel) => channel.id == soundscapeNotificationChannelId,
+              )
+              .firstOrNull;
+          await android.createNotificationChannel(
+            soundscapeNotificationChannel(_localizations, existing: existing),
+          );
+        })
+        .catchError((Object _) {
+          // A channel-label failure must not disable playback or touch its state.
+        });
+  }
 
   Future<void> _serial(Future<void> Function() action) {
     final operation = _operations.then((_) => action());
@@ -128,7 +178,9 @@ class _LocalSoundOutput implements SoundscapeOutput {
         await _deactivate();
         return;
       }
-      handler?.mediaItem.add(softNoiseMediaItem(artwork: _artwork));
+      handler?.mediaItem.add(
+        softNoiseMediaItem(artwork: _artwork, localizations: _localizations),
+      );
       // play's future completes at pause/end, not when playback starts.
       unawaited(
         player.play().catchError((Object error) {

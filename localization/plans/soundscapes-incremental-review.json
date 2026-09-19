@@ -1,0 +1,242 @@
+{
+  "schemaVersion": 1,
+  "workflow": "focus_haven_incremental_locale_review_v1",
+  "deltaId": "offline-soundscapes-review-v1",
+  "sourceProposal": "localization/proposals/app_en_soundscapes_review.arb",
+  "sourceProposalSha256": "1195e495edf942112065eb7609c354425d657887331ded0e470521952a6c616b",
+  "locales": [
+    {
+      "locale": "es",
+      "englishName": "Spanish",
+      "nativeName": "Español",
+      "reviewScope": "general_spanish",
+      "runtimeCatalog": "lib/l10n/app_es.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "16424428fca89a5cf351ede4a90b48d93a8678c9278dc2d26db275e94fd1868c"
+    },
+    {
+      "locale": "fr",
+      "englishName": "French",
+      "nativeName": "Français",
+      "reviewScope": "general_french",
+      "runtimeCatalog": "lib/l10n/app_fr.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "0210dab1b5cfd847d6ec2017cd6d93694d7f3f3bed4573ee80bbdd170fd038ac"
+    },
+    {
+      "locale": "de",
+      "englishName": "German",
+      "nativeName": "Deutsch",
+      "reviewScope": "general_german",
+      "runtimeCatalog": "lib/l10n/app_de.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "8ee21e3fbb14e8aa6b4874b207bce0dbf77e77afa068ba65ce6636cd9854b45e"
+    },
+    {
+      "locale": "pt-BR",
+      "englishName": "Brazilian Portuguese",
+      "nativeName": "Português (Brasil)",
+      "reviewScope": "brazilian_portuguese",
+      "runtimeCatalog": "lib/l10n/app_pt_BR.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "677ab765fef24f04f5de3fd5d9e335be6a6f5527167545e78d69ba9f10b37d3c"
+    },
+    {
+      "locale": "ja",
+      "englishName": "Japanese",
+      "nativeName": "日本語",
+      "reviewScope": "japanese_cjk",
+      "runtimeCatalog": "lib/l10n/app_ja.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": true,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "f57423f7340b9e73c847dc4b91700d91842658d429ca17318fcc7d9eae705849"
+    },
+    {
+      "locale": "ko",
+      "englishName": "Korean",
+      "nativeName": "한국어",
+      "reviewScope": "korean_cjk",
+      "runtimeCatalog": "lib/l10n/app_ko.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": true,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "ec37afcfaaeedf6f13f25c934fc1dbe7738ef71c2171f938645c2c9caf405dc4"
+    },
+    {
+      "locale": "it",
+      "englishName": "Italian",
+      "nativeName": "Italiano",
+      "reviewScope": "general_italian",
+      "runtimeCatalog": "lib/l10n/app_it.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "0e0e298d51eddcf34a393e36a75540588f2afe0e2714cd26ef4ed8dfcab071f5"
+    },
+    {
+      "locale": "pl",
+      "englishName": "Polish",
+      "nativeName": "Polski",
+      "reviewScope": "general_polish",
+      "runtimeCatalog": "lib/l10n/app_pl.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "d8a6f479bbbfb502baffe17dbcda47bafc724bf5773f59164d7ccc41980cbc86"
+    },
+    {
+      "locale": "nl",
+      "englishName": "Dutch",
+      "nativeName": "Nederlands",
+      "reviewScope": "general_dutch",
+      "runtimeCatalog": "lib/l10n/app_nl.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "6272d122329bb97c9f479bb464e97ec5666e301338c2f734fb827c7f8aa04281"
+    },
+    {
+      "locale": "id",
+      "englishName": "Indonesian",
+      "nativeName": "Bahasa Indonesia",
+      "reviewScope": "general_indonesian",
+      "runtimeCatalog": "lib/l10n/app_id.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "cab7c11b04646329b38a1d03cfe8e12b1726e1f058fc8cebc64fd23d15dd2698"
+    },
+    {
+      "locale": "tr",
+      "englishName": "Turkish",
+      "nativeName": "Türkçe",
+      "reviewScope": "general_turkish",
+      "runtimeCatalog": "lib/l10n/app_tr.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "a8e908ed8d3ce1d20542654e12279a55c9057dd8c17d2b63d06c620ef3bfb1b2"
+    },
+    {
+      "locale": "sv",
+      "englishName": "Swedish",
+      "nativeName": "Svenska",
+      "reviewScope": "general_swedish",
+      "runtimeCatalog": "lib/l10n/app_sv.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "6dfd4a2bf056f6c0d590dc637417dd66b04ddce2f354c600c41e005b01a693fd"
+    },
+    {
+      "locale": "nb",
+      "englishName": "Norwegian Bokmål",
+      "nativeName": "Norsk bokmål",
+      "reviewScope": "norwegian_bokmal",
+      "runtimeCatalog": "lib/l10n/app_nb.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "79a824be80337692588c425849c4476be97ed326133c24ffd28c7764ff29da1d"
+    },
+    {
+      "locale": "da",
+      "englishName": "Danish",
+      "nativeName": "Dansk",
+      "reviewScope": "general_danish",
+      "runtimeCatalog": "lib/l10n/app_da.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "d3c3e7738aca84ecf884629859b3b66f5105bf6256bd8dbd4ab9c2ed70f6c39e"
+    },
+    {
+      "locale": "fi",
+      "englishName": "Finnish",
+      "nativeName": "Suomi",
+      "reviewScope": "general_finnish",
+      "runtimeCatalog": "lib/l10n/app_fi.arb",
+      "exceptionalGates": {
+        "rightToLeft": false,
+        "fontCoverage": false,
+        "physicalScreenReader": false,
+        "physicalSpeechRecognition": false,
+        "storePromotion": false
+      },
+      "runtimeCatalogSha256": "ba9891236ba8f04c8f7e8652ffcd96fd6dd2eeba5bd12f5c107b22826cfc7124"
+    }
+  ],
+  "derivedFallbacks": [
+    {
+      "reviewedLocale": "pt-BR",
+      "fallbackLocale": "pt",
+      "runtimeCatalog": "lib/l10n/app_pt.arb",
+      "runtimeCatalogSha256": "600aa5b10c405d433a40954be0e80e12b98e098c1275433a1a3b43cf1ffd533a"
+    }
+  ]
+}

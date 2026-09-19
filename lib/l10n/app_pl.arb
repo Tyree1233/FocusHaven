@@ -5285,5 +5285,83 @@
   "systemAssistantReviewConfirm": "Potwierdź akcję",
   "@systemAssistantReviewConfirm": {
     "description": "Button that explicitly confirms the exact reviewed system-assistant action in FocusHaven."
+  },
+  "soundscapeBackgroundNotice": "Odtwarzanie trwa po zablokowaniu telefonu lub przełączeniu aplikacji. Odtwarzanie dźwięku nigdy nie uruchamia ani nie zmienia timera.",
+  "@soundscapeBackgroundNotice": {
+    "description": "Explains background sound playback and separation from timer control. Do not imply automatic playback at app startup or add health/performance claims."
+  },
+  "soundscapeLoading": "Ładowanie dźwięku…",
+  "@soundscapeLoading": {
+    "description": "Live-region status while preparing a bundled sound after explicit Play. No download is involved."
+  },
+  "soundscapeNotificationChannelName": "Dźwięki FocusHaven",
+  "@soundscapeNotificationChannelName": {
+    "description": "Android notification channel's human-readable name for sound media controls. Keep the FocusHaven brand unchanged. This is not the stable channel identifier."
+  },
+  "soundscapeOff": "Wyłączony",
+  "@soundscapeOff": {
+    "description": "Sound playback status before use or after stopping; describes sound only, not the focus timer."
+  },
+  "soundscapePause": "Wstrzymaj dźwięk",
+  "@soundscapePause": {
+    "description": "Visible and screen-reader button label for pausing sound only; never pauses the timer."
+  },
+  "soundscapePaused": "Wstrzymano",
+  "@soundscapePaused": {
+    "description": "Live-region status indicating that sound is paused; does not describe or change the timer."
+  },
+  "soundscapePausedForVoice": "Dźwięk został wstrzymany, aby umożliwić wprowadzenie głosu. Po zakończeniu dotknij przycisku Odtwórz.",
+  "@soundscapePausedForVoice": {
+    "description": "Notice during the microphone interlock. Sound does not restart automatically when voice input ends; explicit sound playback is required. Match the localized Play sound control terminology."
+  },
+  "soundscapePlay": "Odtwórz dźwięk",
+  "@soundscapePlay": {
+    "description": "Visible and screen-reader button label for explicitly starting or resuming sound only; never starts a timer."
+  },
+  "soundscapePlaybackFailed": "Nie można odtworzyć dźwięku. Otwórz aplikację ponownie, aby spróbować jeszcze raz. Timer pozostaje niezmieniony.",
+  "@soundscapePlaybackFailed": {
+    "description": "Contained sound failure message. Preserve the manual reopen instruction and the unchanged timer boundary; do not promise recovery or an automatic restart."
+  },
+  "soundscapePlaying": "Odtwarzanie",
+  "@soundscapePlaying": {
+    "description": "Live-region status indicating that the sound is playing, independently of the focus timer."
+  },
+  "soundscapePreviewLabel": "Dźwięk offline · Podgląd",
+  "@soundscapePreviewLabel": {
+    "description": "Label identifying the optional bundled offline sound as a development preview; do not imply streaming or a production release."
+  },
+  "soundscapeSoftNoiseTitle": "Cichy szum",
+  "@soundscapeSoftNoiseTitle": {
+    "description": "Name of the bundled filtered-noise sound. Used on the sound card and system media controls. Not music, a timer name, or a therapeutic claim."
+  },
+  "soundscapeUnavailable": "Dźwięk jest niedostępny na tej platformie. Timer nadal działa.",
+  "@soundscapeUnavailable": {
+    "description": "Fallback notice for unavailable audio support. Preserve that the timer remains usable; do not promise sound will work after retrying."
+  },
+  "soundscapeVolumeLabel": "Głośność dźwięku",
+  "@soundscapeVolumeLabel": {
+    "description": "Screen-reader label for the adjustable sound-player volume slider, not timer progress or overall system volume."
+  },
+  "soundscapeVolumePercent": "{percent} procent",
+  "@soundscapeVolumePercent": {
+    "description": "Spoken value for the sound-volume slider. The integer is already scaled from 0 to 100; localize the complete phrase and number without changing its scale.",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "format": "decimalPattern",
+        "example": "25"
+      }
+    }
+  },
+  "soundscapeVolumeValue": "Głośność dźwięku: {percent} %",
+  "@soundscapeVolumeValue": {
+    "description": "Visible sound-player volume. The integer is already scaled from 0 to 100; do not multiply it again or describe the phone's overall volume.",
+    "placeholders": {
+      "percent": {
+        "type": "int",
+        "format": "decimalPattern",
+        "example": "25"
+      }
+    }
   }
 }

@@ -4,10 +4,13 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../l10n/app_localizations.dart';
+import '../l10n/service_localizations.dart';
+
 const soundscapeArtworkAsset = 'assets/focushaven-lantern-icon.png';
 
 /// Fixed, offline metadata only; never accepts user text or remote artwork.
-MediaItem softNoiseMediaItem({Uri? artwork}) {
+MediaItem softNoiseMediaItem({Uri? artwork, AppLocalizations? localizations}) {
   if (artwork != null &&
       (artwork.scheme != 'file' ||
           artwork.host.isNotEmpty ||
@@ -16,7 +19,8 @@ MediaItem softNoiseMediaItem({Uri? artwork}) {
   }
   return MediaItem(
     id: 'focushaven.soft-noise.v1',
-    title: 'Soft noise',
+    title: (localizations ?? defaultServiceLocalizations())
+        .soundscapeSoftNoiseTitle,
     album: 'FocusHaven',
     artist: 'FocusHaven',
     artUri: artwork,

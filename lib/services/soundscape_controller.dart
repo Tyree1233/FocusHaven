@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../l10n/app_localizations.dart';
+
 /// Sound only. This boundary has no timer, queue, account or action-engine owner.
 abstract interface class SoundscapeOutput {
   Stream<bool> get playing;
@@ -18,7 +20,11 @@ abstract interface class SoundscapeOutput {
 enum SoundscapeStatus { off, loading, playing, paused, failed }
 
 class SoundscapeController extends ChangeNotifier {
-  SoundscapeController(this._output, {this.available = true}) {
+  SoundscapeController(
+    this._output, {
+    this.available = true,
+    this._onLocalizationsChanged,
+  }) {
     _subscriptions.add(
       _output.playing.listen((playing) {
         if (_disposed) return;
@@ -48,6 +54,8 @@ class SoundscapeController extends ChangeNotifier {
   }
 
   final SoundscapeOutput _output;
+  final void Function(AppLocalizations)? _onLocalizationsChanged;
+  String? _localeName;
   final bool available;
   final List<StreamSubscription<dynamic>> _subscriptions = [];
   Future<void>? _preparation;
@@ -69,6 +77,13 @@ class SoundscapeController extends ChangeNotifier {
       !_disposed &&
       _status != SoundscapeStatus.failed;
   bool get mediaPlayAllowed => _armed && canPlay;
+
+  /// Presentation-only update: no preparation, playback or timer authority.
+  void updateLocalizations(AppLocalizations localizations) {
+    if (_disposed || _localeName == localizations.localeName) return;
+    _localeName = localizations.localeName;
+    _onLocalizationsChanged?.call(localizations);
+  }
 
   Future<void> play() async {
     if (!canPlay || _wantsPlayback) return;
