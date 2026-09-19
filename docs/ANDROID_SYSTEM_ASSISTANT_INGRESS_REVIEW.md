@@ -2,8 +2,12 @@
 
 Status: Phase 217H private Android-to-Flutter ingress active, Phase 217I
 reviewed Android-native resource catalog integrated, and Phase 217J exact App
-Actions mapping reviewed; Phase 217K source registration is active while
-Assistant preview, release, and execution remain closed.
+Actions mapping reviewed. Phase 217K registration resources are retained, but
+the first-release cleanup detaches their launcher manifest reference. External
+Google Assistant/Gemini invocation is deferred; retained direct intent handling
+still ends at in-app review. Historical checkpoint descriptions below are not
+claims of current provider availability or release approval. See
+[the first-release scope](ANDROID_EXTERNAL_ASSISTANT_RELEASE_SCOPE.md).
 
 ## Purpose
 

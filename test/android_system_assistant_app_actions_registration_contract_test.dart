@@ -10,7 +10,7 @@ void main() {
   Map<String, dynamic> readContract() =>
       jsonDecode(File(contractPath).readAsStringSync()) as Map<String, dynamic>;
 
-  test('registration implements exactly the five reviewed mappings', () {
+  test('retained registration maps exactly the five historical routes', () {
     final contract = readContract();
     final mapping =
         jsonDecode(
@@ -97,7 +97,7 @@ void main() {
     },
   );
 
-  test('manifest, dependency, and explicit fulfillment are exact', () {
+  test('discovery is detached; dependency and review fulfillment remain', () {
     final contract = readContract();
     final manifest = File(
       'android/app/src/main/AndroidManifest.xml',
@@ -107,9 +107,10 @@ void main() {
       'android/app/src/main/kotlin/com/focushaven/app/MainActivity.kt',
     ).readAsStringSync();
 
+    // This is the unchanged historical Phase 217K record, not current enablement.
     expect(contract['registrationSourceEnabled'], isTrue);
-    expect(manifest, contains('android:name="android.app.shortcuts"'));
-    expect(manifest, contains('android:resource="@xml/shortcuts"'));
+    expect(manifest, isNot(contains('android.app.shortcuts')));
+    expect(manifest, isNot(contains('@xml/shortcuts')));
     expect(gradle, contains('androidx.core:core:1.17.0'));
     expect(activity, contains('override fun onCreate'));
     expect(activity, contains('override fun onNewIntent'));
@@ -121,6 +122,49 @@ void main() {
       activity,
       contains('Intent(Intent.ACTION_MAIN).setPackage(packageName)'),
     );
+  });
+
+  test(
+    'no app variant advertises deferred external Assistant capabilities',
+    () {
+      final manifests = Directory('android/app/src')
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((file) => file.path.endsWith('/AndroidManifest.xml'));
+      expect(manifests, isNotEmpty);
+      for (final file in manifests) {
+        final source = file.readAsStringSync();
+        for (final forbidden in [
+          'android.app.shortcuts',
+          '@xml/shortcuts',
+          'actions.intent.',
+          'com.focushaven.app.action.REVIEW_',
+        ]) {
+          expect(source, isNot(contains(forbidden)), reason: file.path);
+        }
+      }
+    },
+  );
+
+  test('retained code does not publish dynamic Assistant shortcuts', () {
+    final sources =
+        [
+          ...Directory('android/app/src/main').listSync(recursive: true),
+          ...Directory('lib').listSync(recursive: true),
+        ].whereType<File>().where(
+          (file) => ['.kt', '.java', '.dart'].any(file.path.endsWith),
+        );
+    for (final file in sources) {
+      final source = file.readAsStringSync();
+      for (final forbidden in [
+        'setDynamicShortcuts(',
+        'addDynamicShortcuts(',
+        'pushDynamicShortcut(',
+        'requestPinShortcut(',
+      ]) {
+        expect(source, isNot(contains(forbidden)), reason: file.path);
+      }
+    }
   });
 
   test('capture precedes plugins and replay intent is cleared', () {

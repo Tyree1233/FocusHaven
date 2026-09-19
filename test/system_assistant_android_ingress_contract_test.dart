@@ -94,7 +94,7 @@ void main() {
   });
 
   test(
-    'Android registration terminates at the existing review-only ingress',
+    'Android discovery stays detached from retained review-only ingress',
     () {
       final manifest = _read('android/app/src/main/AndroidManifest.xml');
       final gradle = _read('android/app/build.gradle.kts');
@@ -107,7 +107,8 @@ void main() {
         _read('docs/ANDROID_SYSTEM_ASSISTANT_INGRESS_REVIEW.md'),
       );
 
-      expect(manifest, contains('android.app.shortcuts'));
+      expect(manifest, isNot(contains('android.app.shortcuts')));
+      expect(manifest, isNot(contains('@xml/shortcuts')));
       expect(manifest, isNot(contains('com.google.android.gms.actions')));
       expect(
         resources.where((path) => path.endsWith('/xml/shortcuts.xml')),

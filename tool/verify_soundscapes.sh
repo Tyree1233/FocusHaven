@@ -132,6 +132,24 @@ if [ "$mode" = --android-only ] || [ "$mode" = --android-online ]; then
     cd android
     run android-compilation-and-unit-tests "${gradle[@]}"
   )
+  run android-merged-registration-check python3 - <<'PY'
+from pathlib import Path
+import xml.etree.ElementTree as ET
+
+name = '{http://schemas.android.com/apk/res/android}name'
+manifests = [p for p in Path('build/app/intermediates').rglob('AndroidManifest.xml')
+             if 'debug' in p.parts and any(part in ('merged_manifest', 'merged_manifests')
+                                          for part in p.parts)]
+if not manifests:
+    raise SystemExit('STOP: no merged debug manifest found; registration not verified')
+for path in manifests:
+    root = ET.parse(path).getroot()
+    if any(e.get(name) == 'android.app.shortcuts' for e in root.iter('meta-data')):
+        raise SystemExit(f'STOP: deferred shortcut registration present: {path}')
+    if not any(e.get(name) == 'android.intent.action.MAIN' for e in root.iter('action')):
+        raise SystemExit(f'STOP: launcher action missing: {path}')
+print(f'PASS: {len(manifests)} merged debug manifest(s), launcher retained, legacy registration absent.')
+PY
   run whitespace git diff --check
   printf 'Android debug compilation/resources/unit tests passed. No APK was requested; release builds and device playback remain unverified.\nLogs: %s\n' "$evidence"
   exit 0
@@ -153,10 +171,12 @@ selected=(
   test/voice_transcription_service_test.dart
   test/android_ongoing_notification_contract_test.dart
   test/system_assistant_android_ingress_contract_test.dart
+  test/android_system_assistant_app_actions_registration_contract_test.dart
+  test/product_roadmap_contract_test.dart
 )
 run format-selected dart format "${selected[@]}"
 run format-check dart format --output=none --set-exit-if-changed "${selected[@]}"
-run sound-and-voice-tests flutter test --no-pub test/soundscape_controller_test.dart test/soundscape_card_test.dart test/soundscape_media_test.dart test/soundscape_localization_test.dart test/voice_transcription_service_test.dart test/android_ongoing_notification_contract_test.dart test/system_assistant_android_ingress_contract_test.dart
+run sound-and-voice-tests flutter test --no-pub test/soundscape_controller_test.dart test/soundscape_card_test.dart test/soundscape_media_test.dart test/soundscape_localization_test.dart test/voice_transcription_service_test.dart test/android_ongoing_notification_contract_test.dart test/system_assistant_android_ingress_contract_test.dart test/android_system_assistant_app_actions_registration_contract_test.dart test/product_roadmap_contract_test.dart
 run application-analysis flutter analyze --no-pub
 run complete-suite flutter test --no-pub
 run whitespace git diff --check
