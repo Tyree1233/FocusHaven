@@ -1,5 +1,12 @@
 # Android system-assistant candidate validation
 
+Current first-release scope (September 18, 2026): external Google
+Assistant/Gemini invocation is deferred by the product owner following Google's
+support response. The original validation plan below remains preserved, not
+completed or waived into a pass. It is not an active first-release dependency;
+internal safeguards for retained features still apply. See
+[the approved scope decision](ANDROID_EXTERNAL_ASSISTANT_RELEASE_SCOPE.md).
+
 Status: Phase 217L defines the exact candidate-validation and release-review
 contract for the five Phase 217K Android App Actions routes. No Assistant
 preview, Google-account operation, signed candidate, phone access, Play upload,

@@ -61,6 +61,7 @@ import '../services/system_focus_surface_service.dart';
 import '../services/theme_service.dart';
 import '../services/timer_service.dart';
 import '../services/voice_transcription_service.dart';
+import '../services/soundscape_controller.dart';
 
 /// High-frequency state rendered by the countdown itself.
 ///
@@ -495,9 +496,24 @@ final coachingServiceProvider = ChangeNotifierProvider<CoachingService>(
 /// provider is lazy, and the underlying recognizer is initialized only after
 /// the user accepts the disclosure and taps a microphone control.
 final voiceTranscriptionServiceProvider =
-    ChangeNotifierProvider<VoiceTranscriptionService>(
-      (ref) => VoiceTranscriptionService(),
-      name: 'voiceTranscriptionServiceProvider',
+    ChangeNotifierProvider<VoiceTranscriptionService>((ref) {
+      if (!FeatureFlags.soundscapesPreview) return VoiceTranscriptionService();
+      final sound = ref.read(soundscapeControllerProvider);
+      final voice = VoiceTranscriptionService(
+        beforeCapture: sound.pauseForVoice,
+      );
+      voice.addListener(() {
+        if (!voice.isListening && !voice.isBusy) sound.releaseVoice();
+      });
+      ref.onDispose(sound.releaseVoice);
+      return voice;
+    }, name: 'voiceTranscriptionServiceProvider');
+
+final soundscapeControllerProvider =
+    ChangeNotifierProvider<SoundscapeController>(
+      (ref) =>
+          SoundscapeController(UnavailableSoundscapeOutput(), available: false),
+      name: 'soundscapeControllerProvider',
     );
 
 final themeServiceProvider = ChangeNotifierProvider<ThemeService>(

@@ -23,6 +23,8 @@ import 'services/remote_coaching_responder.dart';
 import 'services/reminder_service.dart';
 import 'services/theme_service.dart';
 import 'services/timer_service.dart';
+import 'services/soundscape_audio.dart';
+import 'services/soundscape_controller.dart';
 import 'widgets/focus_shield_platform_host.dart';
 import 'widgets/haven_window_platform_host.dart';
 import 'widgets/haven_system_assistant_android_platform_host.dart';
@@ -43,6 +45,10 @@ Future<void> runFocusHaven({
   required List<Locale> supportedLocales,
 }) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final soundscapeController = FeatureFlags.soundscapesPreview
+      ? await initializeSoundscapeAudio()
+      : null;
 
   final notificationService = NotificationService();
   await notificationService.initialize();
@@ -90,6 +96,7 @@ Future<void> runFocusHaven({
 
   runApp(
     FocusHavenApp(
+      soundscapeController: soundscapeController,
       authService: authService,
       coachingService: coachingService,
       notificationService: notificationService,
@@ -111,6 +118,7 @@ class FocusHavenApp extends StatelessWidget {
   const FocusHavenApp({
     super.key,
     this.authService,
+    this.soundscapeController,
     this.coachingService,
     this.notificationService,
     this.timerService,
@@ -126,6 +134,7 @@ class FocusHavenApp extends StatelessWidget {
   });
 
   final AuthService? authService;
+  final SoundscapeController? soundscapeController;
   final CoachingService? coachingService;
   final NotificationService? notificationService;
   final TimerService? timerService;
@@ -155,6 +164,10 @@ class FocusHavenApp extends StatelessWidget {
 
     return ProviderScope(
       overrides: [
+        if (soundscapeController != null)
+          soundscapeControllerProvider.overrideWith(
+            (ref) => soundscapeController!,
+          ),
         if (activeAuthService != null)
           authServiceProvider.overrideWith((ref) => activeAuthService),
         if (activeCoachingService != null)
