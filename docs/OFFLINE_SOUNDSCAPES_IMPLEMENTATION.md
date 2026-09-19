@@ -738,9 +738,21 @@ Remaining before production enablement:
   Review release disclosures/claims. Do not infer unobserved channel behavior
   from the scoped manual lifecycle result above.
 
-Separately, the already-approved first-release assistant scope decision requires
-a bounded legacy registration/claims cleanup before release. Do not start an
-AppFunctions migration or re-open the deferred provider pipeline for this phase.
+The bounded legacy Android registration/claims cleanup is now integrated via
+[PR #2](https://github.com/Tyree1233/FocusHaven/pull/2), merge commit
+`78000eff35e6ceec4c36533a7fbb91137d19f7e6`. It detaches discovery registration,
+not the exported launcher or existing review-only explicit intent handling.
+External Google Assistant/Gemini invocation remains deferred; no AppFunctions
+migration or provider-pipeline work is required for this phase. See the
+[assistant release scope](ANDROID_EXTERNAL_ASSISTANT_RELEASE_SCOPE.md).
+
+The September 19 source-only update to the
+[privacy and permission matrix](STORE_PRIVACY_DISCLOSURE_MATRIX.md) records
+bundled offline playback, local artwork/media metadata, Android foreground media
+permissions and iOS background audio. It does not complete the exact-release
+manifest/archive audit, external store forms or release-device acceptance.
+Existing owner observations, AI-only translation provenance and scoped waivers
+remain unchanged; the preview flag is still default-off.
 
 Current localization commit scope: the 17 catalog deltas, localized soundscape
 source and startup wiring, the proposal/review plan and AI acceptance provenance,

@@ -56,6 +56,16 @@ The existing confirmation boundary and no-unreviewed-execution policy remain.
 
 ## Bounded registration cleanup — September 19, 2026
 
+Current integration status: cleanup commit
+`6900c7a3c554b7f4ee0d041e53218fe613d2aa58` was merged through
+[PR #2](https://github.com/Tyree1233/FocusHaven/pull/2) as
+`78000eff35e6ceec4c36533a7fbb91137d19f7e6`. The merge tree matches the verified
+cleanup tree. Exact-merge Flutter CI run `35463982511` and Pages workflow run
+`35463982096` completed successfully; local main was fast-forwarded to that
+merge and checked clean. The preparation/local-verification notes below record
+the earlier checkpoints, not a still-pending merge. This integration does not
+qualify a signed release artifact or activate external provider invocation.
+
 The separately authorized cleanup removes the launcher's `android.app.shortcuts`
 metadata reference from the shipping Android manifest. `shortcuts.xml`, its query
 resources and the original mapping/registration/candidate contracts remain

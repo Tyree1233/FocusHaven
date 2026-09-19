@@ -2,6 +2,8 @@
 
 **Audit date: August 30, 2026**
 
+**Scoped source update: September 19, 2026 — Phase 218 offline soundscapes**
+
 This document is the source-backed working record for FocusHaven's Apple App
 Store privacy answers, Google Play Data safety answers, permission explanations,
 and review notes. It is not a substitute for the forms in App Store Connect or
@@ -15,6 +17,13 @@ by any earlier signed or store-validated artifact. Final answers require a new
 merged Android manifest, Apple archive audit, provider behavior review,
 real-device acceptance, and validated store candidates.
 
+The September 19 update adds the soundscape source boundary at integrated commit
+`78000eff35e6ceec4c36533a7fbb91137d19f7e6`. It is not a new store-policy audit,
+external-account status check, signed-archive audit, or submission approval.
+Soundscapes remain behind `ENABLE_SOUNDSCAPES_PREVIEW`, default `false`.
+Native media declarations and dependencies remain in the source even when the
+flag is off; they must be audited in the intended release artifacts.
+
 No store answer should claim that FocusHaven collects no data. Every app launch
 creates or restores an anonymous Firebase Authentication identity, and the
 Firebase SDKs process authentication and service metadata. Additional data is
@@ -25,6 +34,12 @@ coaching.
 
 FocusHaven is **not yet ready for public store submission**. The following
 items are release blockers rather than documentation suggestions:
+
+The four account/platform items below are retained from the August 30 audit.
+Their present external completion status was not rechecked by the September 19
+soundscape update. Reconcile them against current evidence before submission;
+do not interpret their retention as a new finding that every item is unfinished,
+or remove them solely because source or preview tests pass.
 
 1. **Apple login activation:** the source now offers Firebase's native Apple
    provider as an equivalent option on supported Apple devices and declares the
@@ -56,7 +71,10 @@ complete user document and every bounded account-specific quota record before
 deleting the Firebase Authentication user. It preserves content-free aggregate
 service limits. The app claims success only after the callable confirms it.
 
-## Shipped permission and entitlement inventory
+## Source permission and entitlement inventory
+
+These declarations describe the integrated source, not a newly qualified store
+binary. Soundscape-specific additions below require release-artifact review.
 
 ### Android phone app
 
@@ -66,7 +84,9 @@ service limits. The app claims success only after the callable confirms it.
 | `READ_CALENDAR` | Optional Haven Window suggestions | Requested only after the user chooses to review calendar access | Reads busy start/end boundaries only; titles, calendar names, notes, attendees, locations, URLs, and identifiers do not enter the model or leave the device |
 | `RECORD_AUDIO` and Android speech recognition | Optional Voice-to-Coach and Haven-action transcription | Requested only after an informed tap-to-talk action on the chosen surface; no startup or background request | FocusHaven retains no raw audio. The selected system recognition service may process audio on-device or over a network and returns an editable transcript. Coach text is not sent until Send; action text is not proposed until Review action or run until a second visual control. |
 | `RECEIVE_BOOT_COMPLETED` | Restore locally scheduled reminders and reconcile an already-authorized ongoing timer after reboot | No runtime prompt | Does not collect reboot history |
-| `VIBRATE` and `WAKE_LOCK` | Local notification delivery | Indirect plugin permissions | No user data is collected for these capabilities |
+| `VIBRATE` | Local notification delivery | Plugin-managed capability | No user data is collected for this capability |
+| `WAKE_LOCK` | Local notification support and background sound playback | Explicitly declared in the phone manifest; sound playback follows an explicit Play action in a soundscape-enabled build | No microphone capture, user-content upload, or timer/queue command is added by this declaration |
+| `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK` | Sound-only background media playback through `AudioService` with type `mediaPlayback` | Default-off soundscape feature; explicit playback, with foreground playback stopped on pause | Bundled sound, fixed brand artwork, localized track title and playback state are supplied to system media surfaces; no task, queue, journal or coaching text |
 | `INTERNET` and `ACCESS_NETWORK_STATE` | Firebase authentication, optional backup, enhanced coaching, Google sign-in, and purchases | Network access follows the feature boundaries below | All application network endpoints use encrypted transport; cleartext traffic is disabled |
 | `BILLING` | Optional Google Play purchase and restore flow | Only after a purchase or restore action | Google Play processes payment details; FocusHaven receives product and transaction status, not payment-card numbers |
 | Google/Firebase service permissions and signature-scoped receiver permission | Authentication, App Check, and integrated Google services | SDK-managed | Must be re-audited from the merged release manifest for every submission |
@@ -76,12 +96,23 @@ photos/media, SMS, call logs, accessibility service, VPN, or health permissions.
 The merged release manifest is authoritative because dependencies may add
 permissions.
 
+Soundscapes use a separate media notification channel,
+`com.focushaven.app.soundscapes`, rather than the text-free timer notification.
+The audio handler does not request notification permission. It supplies localized
+sound metadata and Play/Pause/Stop controls, with no timer or Haven-action
+commands. The declared `MediaButtonReceiver` forwards sound media controls;
+headset/media Play cannot start sound on a fresh app launch before an explicit
+in-app Play. Actual notification visibility and permission behavior still need
+verification on the intended release artifact; no additional permission behavior
+is inferred from this source inventory.
+
 ### Apple phone, widget, and Watch app
 
 | Permission or entitlement | Why it exists | Request or activation boundary | Data handling |
 | --- | --- | --- | --- |
 | Calendar event access | Optional Haven Window suggestions | Requested only after the user chooses to review calendar access | EventKit's full-event authorization API is required on modern iOS, but FocusHaven reads only busy start/end boundaries and never calls calendar write APIs |
 | Notification authorization | Local reminders and timer-completion notices | Requested only from a reminder flow | Notifications are scheduled locally |
+| `UIBackgroundModes` — `audio` | Continue explicitly started soundscape playback in the background and expose sound-only system media controls | Default-off soundscape feature; playback is separate from microphone and speech-recognition authorization | Bundled audio and local media metadata/artwork; this declaration does not add background recording or transmit user-authored content |
 | Microphone access | Optional Voice-to-Coach and Haven-action audio capture | Requested only after an informed tap-to-talk action on the selected surface | FocusHaven keeps no raw audio and ends capture on stop, cancel, timeout, interruption, recognition failure, surface dismissal, or app backgrounding |
 | Speech-recognition authorization | Convert deliberate speech into an editable Coach or Haven-action draft | Requested together with the chosen voice flow, never at startup | Apple's speech service may send captured voice audio to Apple servers depending on the API, language, and device capabilities. Coach text stays unsent until Send; action text stays unreviewed until Review action and unexecuted until a separate visual run or exact-confirmation control. |
 | `com.apple.developer.family-controls` | Optional Focus Shield | Authorization and selection are explicit user actions | Opaque application, category, and web-domain tokens stay in app-private storage and are never exposed to Flutter or sent off device |
@@ -97,6 +128,8 @@ or App Tracking Transparency framework.
 | Flow | Data | Required or optional | Destination and retention | User control |
 | --- | --- | --- | --- | --- |
 | Local focus experience | Timer settings and state, session history, goals, focus task, queue items, parked thoughts, journal reflections and moods, focus profile, appearance/onboarding settings, coaching conversation, reminder settings, and recognized Pro state | Required for the feature that stores it | App-private device storage | Delete local data, feature-specific clear controls, OS app-data clearing, or uninstall |
+| Offline soundscape playback | Bundled `assets/audio/soft_noise.wav`; in-memory playback intent and volume | Optional; default-off build flag and explicit Play | Local asset player and platform audio session; no streaming URL, recording, account request, or playback-history upload in the soundscape path; playback intent and volume are not persisted by the controller | Sound Play/Pause and volume controls; system Pause/Stop; interruption and headphone-disconnect handlers pause without automatic restart; no timer or queue mutation |
+| Soundscape media presentation | Fixed media ID, localized Soft noise title, FocusHaven artist/album, bundled lantern artwork, and playback state | Optional sound playback surface | OS media session/notification/Now Playing surfaces; artwork is copied to app-support `soundscape-media/focushaven-lantern.png` and recreated on preparation, using a local file URI rather than a remote artwork URL | Stop sound; language changes update title/channel label without starting playback; app-data removal removes the app-owned artwork copy |
 | Calendar assistance | Busy event start/end boundaries and derived open windows | Optional | On-device only; not included in cloud backup or coaching | Deny/revoke calendar access or leave Haven Window off |
 | Voice transcription | Bounded live voice audio and the recognized transcript | Optional, explicit tap-to-talk only | FocusHaven does not persist or upload raw audio. The OS speech service may process it on-device or over a network. A Coach transcript enters coaching history or optional enhanced coaching only after Send. A Haven-action transcript remains a session draft until Review action and is processed locally through the same typed policy; it is never sent to remote AI. | Deny permission and type, stop listening, edit or discard the draft, clear sent coaching history, or decline either action review or the second visual run/confirmation control |
 | Focus Shield | Opaque Family Controls selections and coarse authorization/protection state | Optional | Apple system stores and app-private device storage | Disable Focus Shield, change selection, or revoke authorization |
@@ -116,6 +149,35 @@ reporter, contact upload, location collection, photo/media upload,
 always-listening or background voice capture, raw-audio storage, or sale of
 personal data.
 
+### Phase 218 soundscape disclosure boundary
+
+Source anchors: `lib/config/feature_flags.dart`, `lib/main.dart`,
+`lib/services/soundscape_controller.dart`, `lib/services/soundscape_audio.dart`,
+`lib/services/soundscape_media.dart`, `lib/services/soundscape_notification.dart`,
+`android/app/src/main/AndroidManifest.xml`, and `ios/Runner/Info.plist`.
+The audio packages are `just_audio`, `audio_service`, and `audio_session`;
+the locked dependency set must be included in the next archive/manifest audit.
+
+Offline sound playback is not voice transcription: it does not activate the
+microphone or speech service. Before a separate voice flow starts listening,
+the sound controller pauses playback and blocks sound Play while voice is active;
+releasing the voice interlock does not resume playback automatically. System
+sound metadata contains no user-authored focus content. These are source-level
+boundaries, not an app-wide no-data-collection claim or a new conclusion about
+third-party SDK declarations. Existing authentication and optional network
+flows above retain their own disclosure requirements.
+
+The [soundscape implementation record](OFFLINE_SOUNDSCAPES_IMPLEMENTATION.md)
+preserves owner-reported Android debug/iOS profile preview checks, scoped
+Spanish/English accessibility observations, the untested Moto carrier-call
+waiver, and AI-only translation review with the explicit human-review waiver.
+None becomes signed-release qualification through this documentation update.
+For production, inspect the exact merged Android release manifest and Apple
+archive (including embedded SDK privacy manifests), validate focused sound
+behavior on those artifacts, and reconcile store-facing descriptions and forms.
+No store form, public privacy policy, feature flag or candidate approval is
+changed here.
+
 ## Archive-checked Apple App Privacy answers
 
 The conservative answer to **Data Collection** is **Yes**. The following is the
@@ -126,6 +188,8 @@ That candidate predates Phases 212 and 213 and contains neither Voice-to-Coach,
 Safe Voice Commands, nor their updated purpose strings and dependency. It
 cannot be used as Apple privacy or release evidence for the voice-enabled
 source.
+It also predates Phase 218 and provides no archive evidence for the soundscape
+dependencies or background-audio declarations.
 The archive contains 39 third-party privacy manifests. Every manifest that
 declares tracking sets its tracking value to false, every collected-data entry
 sets its tracking value to false, and no tracking domain is declared.
@@ -234,6 +298,16 @@ Review notes should make these boundaries easy to verify:
    remains available under the repository's purchase-transition rules.
 9. Provide App Review a fully functional guest path plus any account or
    entitlement instructions needed to exercise optional features.
+10. For a soundscape-enabled candidate, explain that bundled offline sound starts
+    only after Play, uses background media playback, and exposes only sound
+    controls and fixed/localized media metadata. It does not record audio or
+    control the focus timer. A default-off candidate must not be described as
+    offering enabled soundscapes; review the exact build configuration.
+11. External Google Assistant/Gemini invocation is deferred from the first
+    release. The legacy discovery registration was detached in the integrated
+    source; in-app voice and explicit review-only ingress remain. Do not promise
+    provider invocation or treat this as removing all incoming intents. See the
+    [assistant release scope](ANDROID_EXTERNAL_ASSISTANT_RELEASE_SCOPE.md).
 
 ## Official references used for this audit
 
