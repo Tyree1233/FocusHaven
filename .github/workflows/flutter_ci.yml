@@ -23,6 +23,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
+      - name: Check Android media resource guards
+        run: python3 -B -m unittest discover -s tool -p test_soundscape_apk_resources.py -v
+
       - name: Set up Node
         uses: actions/setup-node@v6
         with:

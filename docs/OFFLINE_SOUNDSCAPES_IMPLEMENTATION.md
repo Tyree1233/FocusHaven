@@ -80,6 +80,49 @@ even with the preview flag off; the flag does not make it release-qualified.
 
 ## Verification
 
+### Android release media-control resource gate
+
+The September 20 release candidate failed owner testing: sound played, but no
+media card appeared in the notification shade or on the lock screen. The APK
+lacked `audio_service_play_arrow`, `audio_service_pause` and `audio_service_stop`.
+The shrinker marked them unreachable, and the Moto's FocusHaven process logged
+`You must specify an icon resource id to build a CustomAction`. On API 33+,
+audio_service creates the Stop custom action before publishing playback state.
+This release result supersedes earlier broad media-control pass reports for
+that artifact; prior debug-preview results do not qualify the release build.
+
+The app-scoped resource keep file preserves exactly these three dynamically
+resolved drawables. Resource shrinking stays enabled; playback, interruption,
+timer and queue behavior are unchanged. Source verification includes keep-rule
+and APK-checker regressions. Before accepting or installing a newly packaged
+soundscape APK, run this additional gate with absolute paths:
+
+```bash
+command /bin/bash tool/verify_soundscapes.sh --android-apk /absolute/path/app-release.apk /absolute/path/android-sdk/build-tools/36.0.0/aapt2
+```
+
+It checks resource IDs/configurations and actual packaged PNG payloads, and
+returns nonzero if any required icon is absent. It does not build, sign or use
+a device. An old APK remains unchanged and must fail this gate if its icons
+were stripped. Every new optimized release candidate must also pass the relevant
+physical-device notification-shade, lock-screen and background-control checks;
+the source correction alone is not device or release approval.
+
+The corrected ARM64 release APK built on September 20 passed this resource
+gate and signature/identity checks. Its SHA-256 is
+`bc64ccb63ecde052d22d4069581058cd57be0ab0ebaf82ac1b106925a8c761e4`.
+After a same-certificate in-place Moto update, the owner reported successful
+notification-shade and lock-screen controls, consistent playback state with the
+timer unchanged, pause on headphone disconnect with no automatic reconnect
+resume, and correct TalkBack announcements without focus-only activation.
+These are scoped owner-observed results, not automated device assertions.
+Earlier language and TextFree-call checks were on the preceding release APK;
+they were not repeated for this resource-only correction. Moto carrier-call
+coverage remains waived, not tested. iOS release qualification and overall
+distribution approval remain separate.
+
+### Source and native checks
+
 Run from the isolated checkout:
 
 ```bash

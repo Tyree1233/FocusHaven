@@ -3,8 +3,9 @@
 set -euo pipefail
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
 mode=${1:-source}
-if [ "$#" -gt 1 ] || { [ "$mode" != source ] && [ "$mode" != --android-only ] && [ "$mode" != --android-online ] && [ "$mode" != --ios-only ]; }; then
-  printf 'Usage: bash tool/verify_soundscapes.sh [--android-only | --android-online | --ios-only]\n' >&2
+if { [ "$mode" = --android-apk ] && [ "$#" -ne 3 ]; } ||
+   { [ "$mode" != --android-apk ] && { [ "$#" -gt 1 ] || { [ "$mode" != source ] && [ "$mode" != --android-only ] && [ "$mode" != --android-online ] && [ "$mode" != --ios-only ]; }; }; }; then
+  printf 'Usage: bash tool/verify_soundscapes.sh [--android-only | --android-online | --ios-only | --android-apk APK AAPT2]\n' >&2
   exit 2
 fi
 evidence=$(mktemp -d "../phase218-verification-XXXXXX")
@@ -16,6 +17,12 @@ run() {
   printf 'Running %s\n' "$label"
   "$@" 2>&1 | tee "$evidence/$label.log"
 }
+if [ "$mode" = --android-apk ]; then
+  printf 'Read-only packaged Android media-resource check. No build, signing or device.\nLogs: %s\n' "$evidence"
+  run packaged-media-resource-check python3 -B tool/check_soundscape_apk_resources.py "$2" --aapt2 "$3"
+  printf 'Packaged media-control resources passed; device behavior remains separate.\n'
+  exit 0
+fi
 if [ "$mode" = --ios-only ]; then
   printf 'Unsigned iOS device-target compilation in a temporary copy. No connected device, simulator launch, installation, account sign-in or upload.\nLogs: %s\n' "$evidence"
   original_source=$PWD
@@ -156,6 +163,7 @@ PY
 fi
 printf 'Source-only soundscape verification. Logs: %s\n' "$evidence"
 run asset-and-boundaries python3 tool/check_soundscape_asset.py
+run media-resource-guards python3 -B -m unittest discover -s tool -p test_soundscape_apk_resources.py -v
 run offline-dependencies flutter pub get --offline
 run generated-localizations flutter gen-l10n
 selected=(
